@@ -8,6 +8,7 @@ import gym
 from gym.spaces import Discrete, Box
 from discrete_extended import DiscreteExtended
 
+
 class CustomEnv(gym.Env):
     """Example of a custom env"""
 
@@ -35,6 +36,7 @@ class CustomEnv(gym.Env):
         Do not want to write a new class with different parameters every time, so pass the desired functions in config! Could make a randomly generated function MDP class vs a fixed function one
         #TODO Test cases to check all assumptions
         #TODO Mersenne Twister pseudo-random number generator used in Gym: not cryptographically secure!
+        #Check TODO, fix and bottleneck
         """
 
         if config is None:
@@ -53,7 +55,7 @@ class CustomEnv(gym.Env):
 
             config["generate_random_mdp"] = True
             config["delay"] = 1
-            config["sequence_length"] = 3
+            config["sequence_length"] = 2
             config["reward_density"] = 0.25 # Number between 0 and 1
             assert config["sequence_length"] > 0 # also should be int
             #next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
@@ -106,21 +108,26 @@ class CustomEnv(gym.Env):
         num_possible_sequences = self.action_space.n ** self.config["sequence_length"] #TODO if sequence cannot have replacement, use permutations
         num_specific_sequences = int(self.config["reward_density"] * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
         self.specific_sequences = []
-        sel_sequence_nums = np.random.choice(num_specific_sequences, size=num_possible_sequences, replace=False) # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
+        sel_sequence_nums = np.random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
         for i in range(num_specific_sequences):
             curr_sequence_num = sel_sequence_nums[i]
             specific_sequence = []
-            while curr_sequence_num != 0:
+            while len(specific_sequence) != self.config["sequence_length"]:
                 specific_sequence.append(curr_sequence_num % self.state_space.n)
                 curr_sequence_num = curr_sequence_num // self.state_space.n
             #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
             # specific_sequence = self.state_space.sample(size=self.config["sequence_length"], replace=True) # Be careful that sequence_length is less than state space size
-
-            print("specific_sequence", specific_sequence) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+            self.specific_sequences.append(specific_sequence)
+            print("specific_sequence", specific_sequence, len(self.specific_sequences)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
 
 
     def init_transition_function(self):
         print(self.config["transition_function"], "init_transition_function")
+
+
+    def reward(self, state, action): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
+        # if :
+        pass
 
     def reset(self):
         #TODO reset is also returning info dict to be able to return state in addition to observation;
