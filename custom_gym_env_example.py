@@ -51,11 +51,11 @@ class CustomEnv(gym.Env):
             config["transition_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])]) #TODO For all these prob. dist., there's currently a difference in what is returned for discrete vs continuous!
             config["reward_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])])
             config["init_state_dist"] = np.array([i/10 for i in range(config["state_space_size"])])
-            config["is_terminal_state"] = np.array([config["state_space_size"] - 1]) # Can be discrete array or function to test terminal or not (e.g. for discrete and continuous spaces we may prefer 1 of the 2)
+            config["is_terminal_state"] = np.array([config["state_space_size"] - 1]) # Can be discrete array or function to test terminal or not (e.g. for discrete and continuous spaces we may prefer 1 of the 2) #TODO currently always the same terminal state for a given environment state space size
 
             config["generate_random_mdp"] = True
-            config["delay"] = 1
-            config["sequence_length"] = 2
+            config["delay"] = 0
+            config["sequence_length"] = 1
             config["reward_density"] = 0.25 # Number between 0 and 1
             assert config["sequence_length"] > 0 # also should be int
             #next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
@@ -134,8 +134,9 @@ class CustomEnv(gym.Env):
         self.P = lambda s, a: self.transition_function(s, a)
 
     def reward_function(self, state, action): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
-        print("TEST", self.augmented_state[0:-self.config["delay"]], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
-        if self.augmented_state[0:-self.config["delay"]] in self.specific_sequences:
+        delay = self.config["delay"]
+        print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
+        if self.augmented_state[0 : self.augmented_state_length - delay] in self.specific_sequences:
             print(self.augmented_state, "with delay", self.config["delay"], "rewarded with:", 1)
             return 1
         else:
@@ -160,7 +161,10 @@ class CustomEnv(gym.Env):
         #TODO reset is also returning info dict to be able to return state in addition to observation;
         #TODO Do not start in a terminal state?
         self.curr_state = np.random.choice(self.config["state_space_size"], p=self.init_state_dist)
-        return self.curr_state, {"curr_state": self.curr_state}
+        self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
+        self.augmented_state.append(self.curr_state)
+
+        return self.curr_state, {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
 
     def step(self, action):
         # assert self.action_space.contains(action) , str(action) + " not in" # TODO Need to implement check in for this environment
