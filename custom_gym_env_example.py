@@ -87,24 +87,23 @@ class CustomEnv(gym.Env):
             self.init_transition_function()
 
 
-        # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
-        print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
-        print("self.R:", np.array([[self.R(i, j) for j in range(5)] for i in range(5)]), self.config["reward_function"])
-
         self.init_state_dist = config["init_state_dist"] # if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath?
         # print("self.init_state_dist:", self.init_state_dist)
         #TODO sample at any time from "current"/converged distribution of states according to current policy
         self.curr_state = np.random.choice(self.config["state_space_size"], p=self.init_state_dist) #TODO make this seedable (Gym env has its own seed?); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?; Can't call reset() here because it has not been created yet!
         self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
         self.augmented_state.append(self.curr_state)
-        self.augmented_state = np.array(self.augmented_state)
+        # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
         print("self.augmented_state", self.augmented_state)
         self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
         print("self.config['is_terminal_state']:", self.config["is_terminal_state"])
 
+        # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
+        print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
+        print("self.R:", np.array([[self.R(i, j) for j in range(5)] for i in range(5)]), self.config["reward_function"])
 
     def init_reward_function(self):
-        print(self.config["reward_function"], "init_reward_function")
+        #print(self.config["reward_function"], "init_reward_function")
         num_possible_sequences = self.action_space.n ** self.config["sequence_length"] #TODO if sequence cannot have replacement, use permutations
         num_specific_sequences = int(self.config["reward_density"] * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
         self.specific_sequences = []
@@ -118,16 +117,39 @@ class CustomEnv(gym.Env):
             #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
             # specific_sequence = self.state_space.sample(size=self.config["sequence_length"], replace=True) # Be careful that sequence_length is less than state space size
             self.specific_sequences.append(specific_sequence)
-            print("specific_sequence", specific_sequence, len(self.specific_sequences)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+            print("specific_sequence that will be rewarded", specific_sequence) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+        print("Total no. of sequences reward:", len(self.specific_sequences), "Out of", num_possible_sequences)
+        self.R = lambda s, a: self.reward_function(s, a)
 
 
     def init_transition_function(self):
-        print(self.config["transition_function"], "init_transition_function")
 
+        # Future sequences don't depend on past sequences, only the next state depends on the past sequence of length, say n. n would depend on what order the dynamics are - 1st order would mean only 2 previous states needed to determine next state
+        self.config["transition_function"] = np.zeros(shape=(self.config["state_space_size"], self.config["action_space_size"]), dtype=object)
+        self.config["transition_function"][:] = -1 # To avoid having a valid value from the state space before we actually assign a usable value below!
+        for s in range(self.config["state_space_size"]):
+            for a in range(self.config["action_space_size"]):
+                self.config["transition_function"][s, a] = self.state_space.sample()
+        print(self.config["transition_function"], "init_transition_function", type(self.config["transition_function"][0, 0]))
+        self.P = lambda s, a: self.transition_function(s, a)
 
-    def reward(self, state, action): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
-        # if :
-        pass
+    def reward_function(self, state, action): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
+        print("TEST", self.augmented_state, state, self.specific_sequences, type(state), type(self.specific_sequences))
+        if self.augmented_state in self.specific_sequences:
+            print(state, "rewarded with:", 1)
+            return 1
+        else:
+            print(state, "NOT rewarded with:", 1)
+            return 0
+
+    def transition_function(self, state, action):
+        print("Before transition", self.augmented_state)
+        del self.augmented_state[0]
+        self.augmented_state.append(state)
+        print("After transition", self.augmented_state)
+        #TODO Check ergodicity of MDP/policy? Can calculate probability of a rewardable specific sequence occurring (for a random policy)
+        return self.config["transition_function"][state, action]
+
 
     def reset(self):
         #TODO reset is also returning info dict to be able to return state in addition to observation;
@@ -137,7 +159,7 @@ class CustomEnv(gym.Env):
     def step(self, action):
         # assert self.action_space.contains(action) , str(action) + " not in" # TODO Need to implement check in for this environment
         #TODO check self.done and throw error if it's True? (Gym doesn't do it!) Otherwise, define self transitions in terminal states
-        self.reward = self.R(self.curr_state, action)
+        self.reward = self.R(self.curr_state, action) #TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me)
         self.curr_state = self.P(self.curr_state, action)
 
 
@@ -148,10 +170,11 @@ class CustomEnv(gym.Env):
 if __name__ == "__main__":
 
     env = CustomEnv(None)
-    state = env.reset()
+    state = env.reset()[0]
+    # print("TEST", type(state))
     for _ in range(10):
         # env.render() # For GUI
-        action = env.action_space.sample() # take a random action
+        action = env.action_space.sample() # take a random action #TODO currently DiscreteExtended returns a sampled array
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done)
         state = next_state
