@@ -99,8 +99,8 @@ class CustomEnv(gym.Env):
         print("self.config['is_terminal_state']:", self.config["is_terminal_state"])
 
         # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
-        print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
-        print("self.R:", np.array([[self.R(i, j) for j in range(5)] for i in range(5)]), self.config["reward_function"])
+        # print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
+        # print("self.R:", np.array([[self.R(i, j) for j in range(5)] for i in range(5)]), self.config["reward_function"])
 
     def init_reward_function(self):
         #print(self.config["reward_function"], "init_reward_function")
@@ -134,25 +134,31 @@ class CustomEnv(gym.Env):
         self.P = lambda s, a: self.transition_function(s, a)
 
     def reward_function(self, state, action): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
-        print("TEST", self.augmented_state, state, self.specific_sequences, type(state), type(self.specific_sequences))
-        if self.augmented_state in self.specific_sequences:
-            print(state, "rewarded with:", 1)
+        print("TEST", self.augmented_state[0:-self.config["delay"]], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
+        if self.augmented_state[0:-self.config["delay"]] in self.specific_sequences:
+            print(self.augmented_state, "with delay", self.config["delay"], "rewarded with:", 1)
             return 1
         else:
-            print(state, "NOT rewarded with:", 1)
+            print(self.augmented_state, "with delay", self.config["delay"], "NOT rewarded.")
             return 0
 
-    def transition_function(self, state, action):
+    def transition_function(self, state, action, only_query=True):
+        # only_query when true performs an imaginary transition i.e. augmented state etc. are not updated; Basically used implicitly when self.P() is called
         print("Before transition", self.augmented_state)
-        del self.augmented_state[0]
-        self.augmented_state.append(state)
-        print("After transition", self.augmented_state)
+        if only_query:
+            print("Only query") # Since transition_function currently depends only on current state and action, we don't need to do anything here!
+        else:
+            del self.augmented_state[0]
+            self.augmented_state.append(self.config["transition_function"][state, action])
+            print("After transition", self.augmented_state)
         #TODO Check ergodicity of MDP/policy? Can calculate probability of a rewardable specific sequence occurring (for a random policy)
+        # print("TEEEEEST:", self.config["transition_function"], [state, action])
         return self.config["transition_function"][state, action]
 
 
     def reset(self):
         #TODO reset is also returning info dict to be able to return state in addition to observation;
+        #TODO Do not start in a terminal state?
         self.curr_state = np.random.choice(self.config["state_space_size"], p=self.init_state_dist)
         return self.curr_state, {"curr_state": self.curr_state}
 
@@ -160,7 +166,7 @@ class CustomEnv(gym.Env):
         # assert self.action_space.contains(action) , str(action) + " not in" # TODO Need to implement check in for this environment
         #TODO check self.done and throw error if it's True? (Gym doesn't do it!) Otherwise, define self transitions in terminal states
         self.reward = self.R(self.curr_state, action) #TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me)
-        self.curr_state = self.P(self.curr_state, action)
+        self.curr_state = self.transition_function(self.curr_state, action, only_query=False)
 
 
         self.done = self.is_terminal_state(self.curr_state)
