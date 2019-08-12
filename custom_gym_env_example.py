@@ -94,10 +94,7 @@ class CustomEnv(gym.Env):
         self.init_state_dist = self.config["init_state_dist"] # if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath?
         print("self.init_state_dist:", self.init_state_dist)
         #TODO sample at any time from "current"/converged distribution of states according to current policy
-        self.curr_state = np.random.choice(self.config["state_space_size"], p=self.init_state_dist) #TODO make this seedable (Gym env has its own seed?); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?; Can't call reset() here because it has not been created yet!
-        self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
-        self.augmented_state.append(self.curr_state)
-        # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
+        self.curr_state = self.reset()[0] #np.random.choice(self.config["state_space_size"], p=self.init_state_dist) #TODO make this seedable (Gym env has its own seed?); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
         print("self.augmented_state", self.augmented_state)
         self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
         print("self.config['is_terminal_state']:", self.config["is_terminal_state"])
@@ -171,10 +168,11 @@ class CustomEnv(gym.Env):
 
     def reset(self):
         #TODO reset is also returning info dict to be able to return state in addition to observation;
-        #TODO Do not start in a terminal state?
+        # TODO Do not start in a terminal state.
         self.curr_state = np.random.choice(self.config["state_space_size"], p=self.init_state_dist)
         self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
         self.augmented_state.append(self.curr_state)
+        # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
 
         return self.curr_state, {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
 
