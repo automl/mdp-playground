@@ -13,7 +13,7 @@ class CustomEnv(gym.Env):
     """Example of a custom env"""
 
     def __init__(self, config = None):
-        """config can contain S, A, P, R, an initial distribution function over states (discrete or continuous), gamma?,
+        """config can contain S, A, P, R, an initial distribution function over states (discrete or continuous), set of terminal states, gamma?,
         info to simulate a fixed/non-fixed delay in rewards (becomes non-Markovian then, need to keep a "delay" amount of previous states in memory),
         a non-determinism in state transitions, a non-determinism in rewards,
 
@@ -33,18 +33,19 @@ class CustomEnv(gym.Env):
         config["reward_function"]
 
         reward_range: A tuple corresponding to the min and max possible rewards?
+
         Do not want to write a new class with different parameters every time, so pass the desired functions in config! Could make a randomly generated function MDP class vs a fixed function one
         #TODO Test cases to check all assumptions
         #TODO Mersenne Twister pseudo-random number generator used in Gym: not cryptographically secure!
-        #Check TODO, fix and bottleneck
+        #Check TODO, fix and bottleneck tags
         """
 
         if config is None:
             config = {}
             config["state_space_type"] = "discrete" #TODO if states are assumed categorical in discrete setting, need to have an embedding for their OHE when using NNs.
             config["action_space_type"] = "discrete"
-            config["state_space_size"] = 5
-            config["action_space_size"] = 5
+            config["state_space_size"] = 6
+            config["action_space_size"] = 6
 
             # config["state_space_dim"] = 2
             # config["action_space_dim"] = 1
@@ -53,10 +54,11 @@ class CustomEnv(gym.Env):
             config["init_state_dist"] = np.array([i/10 for i in range(config["state_space_size"])])
             config["is_terminal_state"] = np.array([config["state_space_size"] - 1]) # Can be discrete array or function to test terminal or not (e.g. for discrete and continuous spaces we may prefer 1 of the 2) #TODO currently always the same terminal state for a given environment state space size
 
-            config["generate_random_mdp"] = True
+            config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
             config["delay"] = 0
-            config["sequence_length"] = 1
+            config["sequence_length"] = 2
             config["reward_density"] = 0.25 # Number between 0 and 1
+            config["terminal_state_density"] = 0.1 # Number between 0 and 1
             assert config["sequence_length"] > 0 # also should be int
             #next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
 
@@ -83,12 +85,14 @@ class CustomEnv(gym.Env):
             # R(s, a) or (s, a , s') = r for deterministic rewards; or a probability dist. function over r for non-deterministic and then the return value of P() is a function, too! #TODO What happens when config is out of scope? Maybe use as self.config?
             self.R = config["reward_function"] if callable(config["reward_function"]) else lambda s, a: config["reward_function"][s, a]
         else:
+            #TODO Generate state and action space sizes also randomly
+            self.init_terminal_states()
+            self.config["init_state_dist"] = np.array([1 / (config["state_space_size"] - self.num_terminal_states) for i in range(config["state_space_size"] - self.num_terminal_states)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution; Use Dirichlet distribution to select prob. distribution to use!
             self.init_reward_function()
             self.init_transition_function()
 
-
-        self.init_state_dist = config["init_state_dist"] # if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath?
-        # print("self.init_state_dist:", self.init_state_dist)
+        self.init_state_dist = self.config["init_state_dist"] # if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath?
+        print("self.init_state_dist:", self.init_state_dist)
         #TODO sample at any time from "current"/converged distribution of states according to current policy
         self.curr_state = np.random.choice(self.config["state_space_size"], p=self.init_state_dist) #TODO make this seedable (Gym env has its own seed?); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?; Can't call reset() here because it has not been created yet!
         self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
@@ -104,7 +108,7 @@ class CustomEnv(gym.Env):
 
     def init_reward_function(self):
         #print(self.config["reward_function"], "init_reward_function")
-        num_possible_sequences = self.action_space.n ** self.config["sequence_length"] #TODO if sequence cannot have replacement, use permutations
+        num_possible_sequences = (self.state_space.n - self.num_terminal_states) ** self.config["sequence_length"] #TODO if sequence cannot have replacement, use permutations; use state + action sequences? Subtract the no. of terminal states from state_space size to get sequences, having a terminal state even at end of reward sequence doesn't matter because to get reward we need to transition to next state which isn't possible for a terminal state.
         num_specific_sequences = int(self.config["reward_density"] * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
         self.specific_sequences = []
         sel_sequence_nums = np.random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
@@ -112,8 +116,8 @@ class CustomEnv(gym.Env):
             curr_sequence_num = sel_sequence_nums[i]
             specific_sequence = []
             while len(specific_sequence) != self.config["sequence_length"]:
-                specific_sequence.append(curr_sequence_num % self.state_space.n)
-                curr_sequence_num = curr_sequence_num // self.state_space.n
+                specific_sequence.append(curr_sequence_num % (self.state_space.n - self.num_terminal_states))
+                curr_sequence_num = curr_sequence_num // (self.state_space.n - self.num_terminal_states)
             #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
             # specific_sequence = self.state_space.sample(size=self.config["sequence_length"], replace=True) # Be careful that sequence_length is less than state space size
             self.specific_sequences.append(specific_sequence)
@@ -132,6 +136,14 @@ class CustomEnv(gym.Env):
                 self.config["transition_function"][s, a] = self.state_space.sample()
         print(self.config["transition_function"], "init_transition_function", type(self.config["transition_function"][0, 0]))
         self.P = lambda s, a: self.transition_function(s, a)
+
+    def init_terminal_states(self):
+        self.num_terminal_states = int(self.config["terminal_state_density"] * self.config["state_space_size"])
+        if self.num_terminal_states == 0: # Have at least 1 terminal state
+            self.num_terminal_states = 1
+        self.config["is_terminal_state"] = np.array([self.config["state_space_size"] - 1 - i for i in range(self.num_terminal_states)]) # terminal states inited to be at the "end" of the sorted states
+        print("Inited terminal states to:", self.config["is_terminal_state"], "total", self.num_terminal_states)
+
 
     def reward_function(self, state, action): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
         delay = self.config["delay"]
