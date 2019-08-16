@@ -85,7 +85,7 @@ class RLToyEnv(gym.Env):
             self.P = config["transition_function"] if callable(config["transition_function"]) else lambda s, a: config["transition_function"][s, a] # callable may not be optimal always since it was deprecated in Python 3.0 and 3.1
             # R(s, a) or (s, a , s') = r for deterministic rewards; or a probability dist. function over r for non-deterministic and then the return value of P() is a function, too! #TODO What happens when config is out of scope? Maybe use as self.config?
             self.R = config["reward_function"] if callable(config["reward_function"]) else lambda s, a: config["reward_function"][s, a]
-            #####TODO self.P and R were untended to be used as the dynamics functions inside step() - that's why were being inited by user-defined function here; but currently P is being used as dynamics for imagined tranitions and transition_function is ude for actual tranitions in step() instead.
+            #####TODO self.P and R were untended to be used as the dynamics functions inside step() - that's why were being inited by user-defined function here; but currently P is being used as dynamics for imagined tranitions and transition_function is used for actual tranitions in step() instead. So, setting P to manually configured transition means it won't be used in step() as was intended!
         else:
             #TODO Generate state and action space sizes also randomly
             self.init_terminal_states()
@@ -129,7 +129,7 @@ class RLToyEnv(gym.Env):
 
         # Future sequences don't depend on past sequences, only the next state depends on the past sequence of length, say n. n would depend on what order the dynamics are - 1st order would mean only 2 previous states needed to determine next state
         self.config["transition_function"] = np.zeros(shape=(self.config["state_space_size"], self.config["action_space_size"]), dtype=object)
-        self.config["transition_function"][:] = -1 # To avoid having a valid value from the state space before we actually assign a usable value below!
+        self.config["transition_function"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
         for s in range(self.config["state_space_size"]):
             for a in range(self.config["action_space_size"]):
                 self.config["transition_function"][s, a] = self.observation_space.sample()
@@ -144,14 +144,17 @@ class RLToyEnv(gym.Env):
         print("Inited terminal states to:", self.config["is_terminal_state"], "total", self.num_terminal_states)
 
 
-    def reward_function(self, state, action): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
+    def reward_function(self, state, action, only_query=True): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
         delay = self.config["delay"]
         # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
-        if self.augmented_state[0 : self.augmented_state_length - delay] in self.specific_sequences:
-            # print(self.augmented_state, "with delay", self.config["delay"], "rewarded with:", 1)
+        state_considered = state if only_query else self.augmented_state
+        if not isinstance(state_considered, list):
+            state_considered = [state_considered] # to get around case when sequence is an int
+        if state_considered[0 : self.augmented_state_length - delay] in self.specific_sequences:
+            # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
             return 1
         else:
-            # print(self.augmented_state, "with delay", self.config["delay"], "NOT rewarded.")
+            # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
             return 0
 
     def transition_function(self, state, action, only_query=True):

@@ -47,18 +47,43 @@ class VIAgent(Trainer):
 
     _name = "VIAgent"
     _default_config = with_common_config({
-        "rollouts_per_iteration": 10,
+        "tolerance": 0.01,
+        "discount_factor": 0.5,
+        # "lr": 0.5
     })
 
     @override(Trainer)
     def _init(self, config, env_creator):
         self.env = env_creator(config["env_config"])
+        self.V = np.zeros(self.env.observation_space.n)
+        self.policy = np.zeros(self.env.observation_space.n, dtype=int)
+        self.policy[:] = -1 #IMP # To avoid initing it to a value within action_space range
 
     @override(Trainer)
     def _train(self):
+        max_diff = np.inf # Maybe keep a state variable so that we don't need to update every train iteration??
+        state_space_size = self.env.observation_space.n
+        gamma = self.config["discount_factor"]
+        total_iterations = 0
+        while max_diff > self.config["tolerance"]:
+            total_iterations += 1
+            for s in range(state_space_size):
+                # print("self.V[:]", s, max_diff, self.V, [self.env.R(s, a) for a in range(self.env.action_space.n)], self.policy[s])
+                self.V_old = self.V.copy() # Is this asynchronous? V_old should be held constant for all states in the for loop?
+                # print([self.env.R(s, a) for a in range(self.env.action_space.n)], [gamma * self.V[self.env.P(s, a)] for a in range(self.env.action_space.n)], [self.env.R(s, a) + gamma * self.V[self.env.P(s, a)] for a in range(self.env.action_space.n)])
+                self.policy[s] = np.argmax([self.env.R(s, a) + gamma * self.V[self.env.P(s, a)] for a in range(self.env.action_space.n)])
+                self.V[s] = np.max([self.env.R(s, a) + gamma * self.V[self.env.P(s, a)] for a in range(self.env.action_space.n)]) # We want R to be a callable function, so I guess we have to keep a for loop here??
+                # print("self.V, self.V_old, self.policy[s]", self.V, self.V_old, self.policy[s], self.env.P(s, self.policy[s]))
+
+                max_diff = np.max(np.absolute(self.V_old - self.V))
+        # import time
+        # time.sleep(2)
+        # for s in range(state_space_size):
+        #     print("FINAL self.V[:]", s, max_diff, self.V[:], [self.env.R(s, a) for a in range(self.env.action_space.n)])
+
         rewards = []
         steps = 0
-        for _ in range(self.config["rollouts_per_iteration"]):
+        for _ in range(10):
             obs = self.env.reset()
             done = False
             reward = 0.0
@@ -98,27 +123,50 @@ register_env("RLToy-v0", lambda config: RLToyEnv(config))
 
 # rllib_seed(0, 0, 0)
 ray.init()
+# tune.run(
+#     RandomAgent,
+#     stop={
+#         "timesteps_total": 20000,
+#           },
+#     config={
+#       "rollouts_per_iteration": 10,
+#       "env": "RLToy-v0",
+#       "env_config": {
+#         'state_space_type': 'discrete',
+#         'action_space_type': 'discrete',
+#         'state_space_size': 16,
+#         'action_space_size': 16,
+#         'generate_random_mdp': True,
+#         'delay': 6,
+#         'sequence_length': 1,
+#         'reward_density': 0.25,
+#         'terminal_state_density': 0.25
+#         },
+#     },
+# )
+
 tune.run(
-    RandomAgent,
+    VIAgent,
     stop={
         "timesteps_total": 20000,
           },
     config={
-      "rollouts_per_iteration": 10,
+      # "rollouts_per_iteration": 10,
       "env": "RLToy-v0",
       "env_config": {
         'state_space_type': 'discrete',
         'action_space_type': 'discrete',
-        'state_space_size': 16,
-        'action_space_size': 16,
+        'state_space_size': 10,
+        'action_space_size': 10,
         'generate_random_mdp': True,
-        'delay': 6,
+        'delay': 0,
         'sequence_length': 1,
         'reward_density': 0.25,
         'terminal_state_density': 0.25
         },
     },
 )
+
 
 # tune.run(
 #     "DQN",
