@@ -43,12 +43,16 @@ class RandomAgent(Trainer):
         }
 
 class VIAgent(Trainer):
-    """Value Iteration."""
+    """Value Iteration.
+    #TODO Make it Generalized PI.
+    """
 
     _name = "VIAgent"
     _default_config = with_common_config({
         "tolerance": 0.01,
         "discount_factor": 0.5,
+        "rollouts_per_iteration": 10,
+        "episode_length": 200,
         # "lr": 0.5
     })
 
@@ -78,17 +82,17 @@ class VIAgent(Trainer):
                 max_diff = np.max(np.absolute(self.V_old - self.V))
         # import time
         # time.sleep(2)
-        # for s in range(state_space_size):
-        #     print("FINAL self.V[:]", s, max_diff, self.V[:], [self.env.R(s, a) for a in range(self.env.action_space.n)])
+        for s in range(state_space_size):
+            print("FINAL self.V[:]", s, max_diff, self.V[:], [self.env.R(s, a) for a in range(self.env.action_space.n)])
 
         rewards = []
         steps = 0
-        for _ in range(10):
+        for _ in range(self.config["rollouts_per_iteration"]):
             obs = self.env.reset()
             done = False
             reward = 0.0
-            while not done:
-                action = self.env.action_space.sample()
+            for _ in range(self.config["episode_length"]):
+                action = self.policy[obs]
                 obs, r, done, info = self.env.step(action)
 
                 reward += r
@@ -145,72 +149,74 @@ ray.init()
 #     },
 # )
 
-tune.run(
-    VIAgent,
-    stop={
-        "timesteps_total": 20000,
-          },
-    config={
-      # "rollouts_per_iteration": 10,
-      "env": "RLToy-v0",
-      "env_config": {
-        'state_space_type': 'discrete',
-        'action_space_type': 'discrete',
-        'state_space_size': 10,
-        'action_space_size': 10,
-        'generate_random_mdp': True,
-        'delay': 0,
-        'sequence_length': 1,
-        'reward_density': 0.25,
-        'terminal_state_density': 0.25
-        },
-    },
-)
-
-
 # tune.run(
-#     "DQN",
+#     VIAgent,
 #     stop={
 #         "timesteps_total": 20000,
 #           },
 #     config={
-#       "adam_epsilon": 0.00015,
-#       "beta_annealing_fraction": 1.0,
-#       "buffer_size": 1000000,
-#       "double_q": False,
-#       "dueling": False,
+#         "tolerance": 0.01,
+#         "discount_factor": 0.99,
+#         "rollouts_per_iteration": 10,
 #       "env": "RLToy-v0",
 #       "env_config": {
 #         'state_space_type': 'discrete',
 #         'action_space_type': 'discrete',
-#         'state_space_size': 16,
-#         'action_space_size': 16,
+#         'state_space_size': 10,
+#         'action_space_size': 10,
 #         'generate_random_mdp': True,
-#         'delay': 6,
+#         'delay': 0,
 #         'sequence_length': 1,
 #         'reward_density': 0.25,
 #         'terminal_state_density': 0.25
 #         },
-#       "exploration_final_eps": 0.01,
-#       "exploration_fraction": 0.1,
-#       "final_prioritized_replay_beta": 1.0,
-#       "hiddens": [
-#         256
-#       ],
-#       "learning_starts": 2000,
-#       "lr": 6.25e-05,
-#       "n_step": 1,
-#       "noisy": False,
-#       "num_atoms": 1,
-#       "prioritized_replay": False,
-#       "prioritized_replay_alpha": 0.5,
-#       "sample_batch_size": 4,
-#       "schedule_max_timesteps": 20000,
-#       "target_network_update_freq": 80,
-#       "timesteps_per_iteration": 100,
-#       "train_batch_size": 32
 #     },
 # )
+
+
+tune.run(
+    "DQN",
+    stop={
+        "timesteps_total": 20000,
+          },
+    config={
+      "adam_epsilon": 0.00015,
+      "beta_annealing_fraction": 1.0,
+      "buffer_size": 1000000,
+      "double_q": False,
+      "dueling": False,
+      "env": "RLToy-v0",
+      "env_config": {
+        'state_space_type': 'discrete',
+        'action_space_type': 'discrete',
+        'state_space_size': 16,
+        'action_space_size': 16,
+        'generate_random_mdp': True,
+        'delay': 6,
+        'sequence_length': 1,
+        'reward_density': 0.25,
+        'terminal_state_density': 0.25
+        },
+      "exploration_final_eps": 0.01,
+      "exploration_fraction": 0.1,
+      "final_prioritized_replay_beta": 1.0,
+      "hiddens": [
+        256
+      ],
+      "learning_starts": 2000,
+      "lr": 6.25e-05, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+      "n_step": 1,
+      "noisy": False,
+      "num_atoms": 1,
+      "prioritized_replay": False,
+      "prioritized_replay_alpha": 0.5,
+      "sample_batch_size": 4,
+      "schedule_max_timesteps": 20000,
+      "target_network_update_freq": 80,
+      "timesteps_per_iteration": 100,
+      "train_batch_size": 32
+    },
+)
 
 
 
