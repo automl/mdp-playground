@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+rl_stats_temp.csv
+
 # C extensions
 *.so
 
