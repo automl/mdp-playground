@@ -6,6 +6,7 @@ from __future__ import print_function
 import numpy as np
 import gym
 from gym.spaces import Discrete, Box, DiscreteExtended
+#from gym.utils import seeding
 
 
 class RLToyEnv(gym.Env):
@@ -36,6 +37,7 @@ class RLToyEnv(gym.Env):
         Do not want to write a new class with different parameters every time, so pass the desired functions in config! Could make a randomly generated function MDP class vs a fixed function one
         #TODO Test cases to check all assumptions
         #TODO Mersenne Twister pseudo-random number generator used in Gym: not cryptographically secure!
+        #TODO Different random seeds for S, A, P, R, rho_o and T? Currently 1 for env and 1 for its space.
         #Check TODO, fix and bottleneck tags
         """
 
@@ -63,6 +65,11 @@ class RLToyEnv(gym.Env):
             #TODO asserts for the rest of the config settings
             # next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
 
+        if "seed" in config:
+            self.seed(config["seed"])
+        else:
+            self.seed()
+
         self.config = config
         self.augmented_state_length = config["sequence_length"] + config["delay"]
 
@@ -70,12 +77,12 @@ class RLToyEnv(gym.Env):
         self.min_real = 0.0
 
         if config["state_space_type"].lower() == "discrete":
-            self.observation_space = DiscreteExtended(config["state_space_size"]) #TODO Gym (and so Ray) apparently needs observation_space as a member. I'd prefer state_space
+            self.observation_space = DiscreteExtended(config["state_space_size"], seed=self.seed_) #TODO Gym (and so Ray) apparently needs observation_space as a member. I'd prefer state_space
         else:
             self.observation_space = Box(self.min_real, self.max_real, shape=(config["state_space_dim"], ), dtype=np.float64)
 
         if config["action_space_type"].lower() == "discrete":
-            self.action_space = DiscreteExtended(config["action_space_size"])
+            self.action_space = DiscreteExtended(config["action_space_size"], seed=self.seed_)
         else:
             self.action_space = Box(self.min_real, self.max_real, shape=(config["action_space_dim"], ), dtype=np.float64)
 
@@ -96,7 +103,7 @@ class RLToyEnv(gym.Env):
         self.init_state_dist = self.config["init_state_dist"] # if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath?
         print("self.init_state_dist:", self.init_state_dist)
         #TODO sample at any time from "current"/converged distribution of states according to current policy
-        self.curr_state = self.reset() #np.random.choice(self.config["state_space_size"], p=self.init_state_dist) #TODO make this seedable (Gym env has its own seed?); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
+        self.curr_state = self.reset() #self.np_random.choice(self.config["state_space_size"], p=self.init_state_dist) #TODO make this seedable (Gym env has its own seed?); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
         print("self.augmented_state", self.augmented_state)
         self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
         print("self.config['is_terminal_state']:", self.config["is_terminal_state"])
@@ -110,7 +117,7 @@ class RLToyEnv(gym.Env):
         num_possible_sequences = (self.observation_space.n - self.num_terminal_states) ** self.config["sequence_length"] #TODO if sequence cannot have replacement, use permutations; use state + action sequences? Subtract the no. of terminal states from state_space size to get sequences, having a terminal state even at end of reward sequence doesn't matter because to get reward we need to transition to next state which isn't possible for a terminal state.
         num_specific_sequences = int(self.config["reward_density"] * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
         self.specific_sequences = []
-        sel_sequence_nums = np.random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
+        sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
         for i in range(num_specific_sequences):
             curr_sequence_num = sel_sequence_nums[i]
             specific_sequence = []
@@ -180,7 +187,7 @@ class RLToyEnv(gym.Env):
     def reset(self):
         # TODO reset is also returning info dict to be able to return state in addition to observation;
         # TODO Do not start in a terminal state.
-        self.curr_state = np.random.choice(self.config["state_space_size"], p=self.init_state_dist)
+        self.curr_state = self.np_random.choice(self.config["state_space_size"], p=self.init_state_dist)
         self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
         self.augmented_state.append(self.curr_state)
         # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
@@ -190,17 +197,36 @@ class RLToyEnv(gym.Env):
     def step(self, action):
         # assert self.action_space.contains(action) , str(action) + " not in" # TODO Need to implement check in for this environment
         #TODO check self.done and throw error if it's True? (Gym doesn't do it!); Otherwise, define self transitions in terminal states
-        self.reward = self.R(self.curr_state, action) #TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me)
+        self.reward = self.reward_function(self.curr_state, action, only_query=False) #TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me)
         self.curr_state = self.transition_function(self.curr_state, action, only_query=False)
 
 
         self.done = self.is_terminal_state(self.curr_state)
         return self.curr_state, self.reward, self.done, {"curr_state": self.curr_state}
 
+    def seed(self, seed=None):
+        # If seed is None, you get a randomly generated seed rfrom gym.utils...
+        # if seed is not None:
+        self.np_random, self.seed_ = gym.utils.seeding.np_random(seed)
+        return self.seed_
 
 if __name__ == "__main__":
 
-    env = RLToyEnv(None)
+    config = {}
+    config["seed"] = 0
+    config["generate_random_mdp"] = True
+    config["state_space_type"] = "discrete"
+    config["action_space_type"] = "discrete"
+    config["state_space_size"] = 6
+    config["action_space_size"] = 6
+
+    config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
+    config["delay"] = 1
+    config["sequence_length"] = 3
+    config["reward_density"] = 0.25 # Number between 0 and 1
+    config["terminal_state_density"] = 0.25 # Number between 0 and 1
+    env = RLToyEnv(config)
+#    env.seed(0)
     state = env.reset()
     # print("TEST", type(state))
     for _ in range(10):
