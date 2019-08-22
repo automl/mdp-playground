@@ -114,8 +114,30 @@ register_env("RLToy-v0", lambda config: RLToyEnv(config))
 # rllib_seed(0, 0, 0)
 ray.init()
 
-state_space_sizes = [2**i for i in range(4,6)]
-action_space_sizes = [2**i for i in range(1,6)]
+
+# Old config space
+# algorithms = ["DQN"]
+# state_space_sizes = [2**i for i in range(4,6)]
+# action_space_sizes = [2**i for i in range(1,6)]
+# delays = [0] + [2**i for i in range(5)]
+# sequence_lengths = [i for i in range(1,6)]
+# reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
+# # make_reward_dense = [True, False]
+# terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
+
+
+#test basic case
+# algorithms = ["DQN"]
+# state_space_sizes = [10]
+# action_space_sizes = [10]
+# delays = [4]
+# sequence_lengths = [2]
+# reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
+# # make_reward_dense = [True, False]
+# terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
+
+state_space_sizes = [8, 10, 12, 14] # [2**i for i in range(1,6)]
+action_space_sizes = [2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0] + [2**i for i in range(5)]
 sequence_lengths = [i for i in range(1,6)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
@@ -123,10 +145,10 @@ reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 algorithms = ["DQN"]
 
-print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_lengths, reward_densities, terminal_state_densities)
-
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density,'
                'terminal_state_density ')
+print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_lengths, reward_densities, terminal_state_densities)
+
 
 
 # stats = {}
@@ -162,9 +184,9 @@ def on_train_result(info):
 
     fout = open('/home/rajanr/custom-gym-env/rl_stats_temp.csv', 'a') #hardcoded
     fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
-               'terminal_state_density, ' + str(algorithm) + ' ' + str(state_space_size) +
+               'terminal_state_density,\n' + str(algorithm) + ' ' + str(state_space_size) +
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
-               + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + '\n')
+               + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
                # Writes every iteration, would slow things down. #hack
     fout.write(str(timesteps_total) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
