@@ -77,12 +77,12 @@ class RLToyEnv(gym.Env):
         self.min_real = 0.0
 
         if config["state_space_type"].lower() == "discrete":
-            self.observation_space = DiscreteExtended(config["state_space_size"], seed=self.seed_) #TODO Gym (and so Ray) apparently needs observation_space as a member. I'd prefer state_space
+            self.observation_space = DiscreteExtended(config["state_space_size"], seed=self.seed_) #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
         else:
             self.observation_space = Box(self.min_real, self.max_real, shape=(config["state_space_dim"], ), dtype=np.float64)
 
         if config["action_space_type"].lower() == "discrete":
-            self.action_space = DiscreteExtended(config["action_space_size"], seed=self.seed_)
+            self.action_space = DiscreteExtended(config["action_space_size"], seed=self.seed_ + 1)
         else:
             self.action_space = Box(self.min_real, self.max_real, shape=(config["action_space_dim"], ), dtype=np.float64)
 
@@ -222,7 +222,7 @@ if __name__ == "__main__":
 
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
     config["delay"] = 1
-    config["sequence_length"] = 3
+    config["sequence_length"] = 4
     config["reward_density"] = 0.25 # Number between 0 and 1
     config["terminal_state_density"] = 0.25 # Number between 0 and 1
     env = RLToyEnv(config)
