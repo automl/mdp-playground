@@ -182,7 +182,7 @@ def on_train_result(info):
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
     episode_len_mean = info["result"]["episode_len_mean"]
 
-    fout = open('rl_stats_temp.csv', 'a') #hardcoded
+    fout = open('/home/rajanr/custom-gym-env/rl_stats_temp.csv', 'a') #hardcoded
     fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
                'terminal_state_density,\n' + str(algorithm) + ' ' + str(state_space_size) +
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
