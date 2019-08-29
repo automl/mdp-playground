@@ -58,7 +58,12 @@ class RLToyEnv(gym.Env):
             config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
             config["delay"] = 0
             config["sequence_length"] = 3
+            config["repeats_in_sequences"] = True
+            config["reward_unit"] = 1.0
             config["reward_density"] = 0.25 # Number between 0 and 1
+#            config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
+#            config["reward_noise"] = lambda: np.random.normal() # a probability function added to reward function
+            config["make_denser"] = False
             config["terminal_state_density"] = 0.1 # Number between 0 and 1
             assert config["sequence_length"] > 0 # also should be int
             # print(config)
@@ -71,6 +76,9 @@ class RLToyEnv(gym.Env):
             self.seed()
 
         self.config = config
+        self.sequence_length = config["sequence_length"]
+        self.delay = config["delay"]
+        self.reward_unit = self.config["reward_unit"]
         self.augmented_state_length = config["sequence_length"] + config["delay"]
 
         self.max_real = 100.0 # Take these settings from config
@@ -108,27 +116,70 @@ class RLToyEnv(gym.Env):
         self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
         print("self.config['is_terminal_state']:", self.config["is_terminal_state"])
 
+
+        delay = self.delay
+        sequence_length = self.sequence_length        
+        self.possible_remaining_sequences = [[] for i in range(sequence_length)]
+        for j in range(1):
+        #        if j == 0:
+            for k in range(sequence_length):
+                for l in range(len(self.specific_sequences[k])):
+#                    if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]: #TODO for variable sequence length just maintain a list of lists of lists rewarded_sequences
+                        self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1])
+                        
+        print("self.possible_remaining_sequences", self.possible_remaining_sequences)
+
+
         # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
         # print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
         # print("self.R:", np.array([[self.R(i, j) for j in range(5)] for i in range(5)]), self.config["reward_function"])
 
     def init_reward_function(self):
+        #TODO Maybe refactor this code and put useful reusable permutation generators, etc. in one library
         #print(self.config["reward_function"], "init_reward_function")
-        num_possible_sequences = (self.observation_space.n - self.num_terminal_states) ** self.config["sequence_length"] #TODO if sequence cannot have replacement, use permutations; use state + action sequences? Subtract the no. of terminal states from state_space size to get sequences, having a terminal state even at end of reward sequence doesn't matter because to get reward we need to transition to next state which isn't possible for a terminal state.
-        num_specific_sequences = int(self.config["reward_density"] * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
-        self.specific_sequences = []
-        sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
-        for i in range(num_specific_sequences):
-            curr_sequence_num = sel_sequence_nums[i]
-            specific_sequence = []
-            while len(specific_sequence) != self.config["sequence_length"]:
-                specific_sequence.append(curr_sequence_num % (self.observation_space.n - self.num_terminal_states))
-                curr_sequence_num = curr_sequence_num // (self.observation_space.n - self.num_terminal_states)
-            #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
-            # specific_sequence = self.observation_space.sample(size=self.config["sequence_length"], replace=True) # Be careful that sequence_length is less than state space size
-            self.specific_sequences.append(specific_sequence)
-            print("specific_sequence that will be rewarded", specific_sequence) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
-        print("Total no. of sequences reward:", len(self.specific_sequences), "Out of", num_possible_sequences)
+        if self.config["repeats_in_sequences"]:
+            num_possible_sequences = (self.observation_space.n - self.num_terminal_states) ** self.config["sequence_length"] #TODO if sequence cannot have replacement, use permutations; use state + action sequences? Subtract the no. of terminal states from state_space size to get sequences, having a terminal state even at end of reward sequence doesn't matter because to get reward we need to transition to next state which isn't possible for a terminal state.
+            num_specific_sequences = int(self.config["reward_density"] * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
+            self.specific_sequences = [[] for i in range(self.sequence_length)]
+            sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
+            for i in range(num_specific_sequences):
+                curr_sequence_num = sel_sequence_nums[i]
+                specific_sequence = []
+                while len(specific_sequence) != self.config["sequence_length"]:
+                    specific_sequence.append(curr_sequence_num % (self.observation_space.n - self.num_terminal_states))
+                    curr_sequence_num = curr_sequence_num // (self.observation_space.n - self.num_terminal_states)
+                #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
+                # specific_sequence = self.observation_space.sample(size=self.config["sequence_length"], replace=True) # Be careful that sequence_length is less than state space size
+                self.specific_sequences[self.sequence_length - 1].append(specific_sequence) #hack
+                print("specific_sequence that will be rewarded", specific_sequence) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+            print("Total no. of rewarded sequences:", len(self.specific_sequences[self.sequence_length - 1]), "Out of", num_possible_sequences)
+        else:
+            state_space_size = self.config["state_space_size"]
+            len_ = self.sequence_length
+            permutations = list(range(state_space_size + 1 - len_, state_space_size + 1))
+            print("Permutations order, 1 random number out of possible perms, no. of possilbe perms", permutations, np.random.randint(np.prod(permutations)), np.prod(permutations))
+            num_specific_sequences = int(self.config["reward_density"] * permutations)
+            self.specific_sequences = [[] for i in range(self.sequence_length)]
+#            total_false = 0
+            for i in range(num_specific_sequences):
+                curr_permutation = i
+                seq_ = []
+                curr_rem_digits = list(range(state_space_size))
+                for j in permutations[::-1]:
+                    rem_ = curr_permutation % j
+                    seq_.append(curr_rem_digits[rem_])
+                    del curr_rem_digits[rem_]
+            #         print("curr_rem_digits", curr_rem_digits)
+                    curr_permutation = curr_permutation // j
+            #         print(rem_, curr_permutation, j, seq_)
+            #     print("T/F:", seq_ in self.specific_sequences)
+                if seq_ not in self.specific_sequences[self.sequence_length - 1]: #hack
+                    total_false += 1 #TODO remove these extra checks
+                self.specific_sequences[self.sequence_length - 1].append(seq_)
+            #print(len(set(self.specific_sequences))) #error
+
+            print(np.unique(self.specific_sequences[self.sequence_length - 1]), total_false)
+
         self.R = lambda s, a: self.reward_function(s, a)
 
 
@@ -152,17 +203,39 @@ class RLToyEnv(gym.Env):
 
 
     def reward_function(self, state, action, only_query=True): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
-        delay = self.config["delay"]
+        delay = self.delay
+        sequence_length = self.sequence_length
+        reward = 0
         # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
         state_considered = state if only_query else self.augmented_state
         if not isinstance(state_considered, list):
             state_considered = [state_considered] # to get around case when sequence is an int
-        if state_considered[0 : self.augmented_state_length - delay] in self.specific_sequences:
-            # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
-            return 1
+        if not self.config["make_denser"]:
+            if state_considered[0 : self.augmented_state_length - delay] in self.specific_sequences:
+                # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
+                reward += self.reward_unit
+                reward += self.config["reward_noise"]() if "reward_noise" in self.config else 0
+                return reward
+            else:
+                # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
+                return 0
         else:
-            # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
-            return 0
+            for j in range(1, sequence_length + 1):
+        # Check if augmented_states - delay up to different lengths in the past are present in sequence lists of that particular length; if so add them to the list of length 
+                if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] in self.possible_remaining_sequences[j - 1]:
+                    reward += self.reward_unit * j / self.sequence_length
+
+            self.possible_remaining_sequences = [[] for i in range(sequence_length)]
+            for j in range(0, sequence_length):
+        #        if j == 0:
+                for k in range(sequence_length):
+                    for l in range(len(self.specific_sequences[k])):
+                        if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]: #TODO for variable sequence length just maintain a list of lists of lists rewarded_sequences
+                            self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1])
+
+            print("rew", reward)
+            print("self.possible_remaining_sequences", self.possible_remaining_sequences)
+            return reward
 
     def transition_function(self, state, action, only_query=True):
         # only_query when true performs an imaginary transition i.e. augmented state etc. are not updated; Basically used implicitly when self.P() is called
@@ -172,11 +245,17 @@ class RLToyEnv(gym.Env):
             # print("Only query") # Since transition_function currently depends only on current state and action, we don't need to do anything here!
         else:
             del self.augmented_state[0]
-            self.augmented_state.append(self.config["transition_function"][state, action])
+            next_state = self.config["transition_function"][state, action]
+            if "transition_noise" in self.config:
+                probs = np.ones(shape=(self.config["state_space_size"],)) * self.config["transition_noise"] / (self.config["state_space_size"] - 1)
+                probs[next_state] = 1 - self.config["transition_noise"]
+                assert np.sum(probs) == 1
+            self.augmented_state.append(next_state)
+
             # print("After transition", self.augmented_state)
         #TODO Check ergodicity of MDP/policy? Can calculate probability of a rewardable specific sequence occurring (for a random policy)
         # print("TEEEEEST:", self.config["transition_function"], [state, action])
-        return self.config["transition_function"][state, action]
+        return next_state
 
     def get_augmented_state():
         '''
@@ -223,7 +302,11 @@ if __name__ == "__main__":
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
     config["delay"] = 1
     config["sequence_length"] = 3
+    config["repeats_in_sequences"] = False
+    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
+    config["reward_noise"] = lambda: np.random.normal() # a probability function added to reward function
     config["reward_density"] = 0.25 # Number between 0 and 1
+    config["make_denser"] = False
     config["terminal_state_density"] = 0.25 # Number between 0 and 1
     env = RLToyEnv(config)
 #    env.seed(0)
