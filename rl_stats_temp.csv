@@ -50232,3 +50232,2055 @@ DQN 14 16 4 1 0.25 0.25 16204 46.81 147.82
 DQN 14 16 4 1 0.25 0.25 16676 47.72 149.96
 # Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
 DQN 14 16 4 1 0.25 0.25 17148 47.72 149.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 1 0.25 0.25 17612 47.72 149.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 1 0.25 0.25 18072 47.72 149.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 1 0.25 0.25 18540 57.8 172.82
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 1 0.25 0.25 19000 58.78 174.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 1 0.25 0.25 19468 63.82 180.18
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 1 0.25 0.25 19936 66.06 182.4
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 1 0.25 0.25 20408 66.06 182.4
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 960 0.45180722891566266 5.740963855421687
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 2004 2.51 11.19
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 2500 3.42 13.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 2996 6.95 18.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 3484 6.95 18.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 3968 6.95 18.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 4428 14.83 33.31
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 4912 16.55 38.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 5404 19.01 43.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 5904 19.01 43.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 6396 22.36 53.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 6888 23.09 58.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 7392 24.61 61.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 7884 24.61 61.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 8380 29.55 70.13
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 8880 29.55 70.13
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 9368 40.42 81.16
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 9852 44.01 84.72
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 10344 44.01 84.72
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 10844 44.01 84.72
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 11336 60.08 101.28
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 11836 64.08 105.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 12328 68.75 110.29
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 12816 68.75 110.29
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 13312 79.66 121.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 13812 79.66 121.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 14312 87.17 128.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 14808 87.17 128.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 15296 97.43 139.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 15784 97.43 139.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 16276 97.43 139.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 16776 113.45 155.4
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 17272 117.09 158.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 17760 120.34 162.28
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 18248 127.41 169.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 18748 127.41 169.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 19244 135.78 177.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 19740 142.01 184.21
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 2 0.25 0.25 20228 142.66 184.9
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 728 0.5648854961832062 5.557251908396947
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 1440 0.1949685534591195 4.452830188679245
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 2044 0.05806451612903226 3.9096774193548387
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 2516 0.03 4.26
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 3012 4.09 11.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 3500 4.09 11.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 3984 8.73 19.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 4476 8.73 19.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 4972 14.35 28.94
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 5468 18.8 36.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 5960 18.8 36.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 6456 26.09 46.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 6948 26.09 46.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 7432 28.97 52.09
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 7916 28.97 52.09
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 8404 28.97 52.09
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 8892 40.99 70.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 9380 40.99 70.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 9868 43.64 76.85
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 10356 46.55 83.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 10852 48.26 86.91
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 11336 49.63 90.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 11816 49.63 90.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 12304 49.63 90.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 12784 60.67 107.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 13276 60.67 107.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 13748 60.67 107.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 14192 71.71 120.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 14664 71.71 120.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 15144 71.71 120.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 15612 87.24 136.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 16084 88.38 138.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 16540 93.13 142.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 17024 93.13 142.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 17500 93.13 142.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 17976 93.13 142.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 18452 111.71 162.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 18924 111.71 162.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 19400 121.06 171.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 19880 121.06 171.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 3 0.25 0.25 20356 121.06 171.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 176 0.43333333333333335 5.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 360 0.4 5.523076923076923
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 556 0.3333333333333333 5.78125
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 736 0.31 5.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 960 0.52 6.72
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 1156 0.55 6.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 1352 0.67 6.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 1572 0.68 7.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 1828 0.97 8.26
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 2072 1.26 9.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 2408 1.26 9.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 2716 1.41 15.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 3064 1.41 15.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 3408 1.41 15.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 3748 1.41 15.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 4096 1.41 15.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 4424 6.46 31.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 4748 7.12 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 5068 9.02 38.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 5396 9.83 42.32
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 5708 10.23 43.55
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 6020 10.23 43.55
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 6356 10.23 43.55
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 6764 10.23 43.55
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 7168 17.83 58.27
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 7600 17.83 58.27
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 8008 17.83 58.27
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 8420 29.14 71.29
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 8852 29.14 71.29
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 9268 37.51 80.94
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 9680 37.51 80.94
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 10100 37.51 80.94
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 10496 47.3 93.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 10904 47.3 93.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 11336 52.76 99.92
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 11776 52.76 99.92
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 12212 52.76 99.92
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 12600 64.38 111.86
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 12976 67.39 115.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 13380 71.4 120.07
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 13788 75.77 124.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 14224 75.77 124.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 14636 75.77 124.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 15072 75.77 124.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 15496 75.77 124.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 15892 75.77 124.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 16296 99.42 150.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 16700 99.42 150.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 17100 102.7 154.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 17512 109.92 162.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 17920 109.92 162.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 18324 115.79 169.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 18752 115.79 169.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 19156 115.79 169.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 19572 115.79 169.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 4 0.25 0.25 20004 115.79 169.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 100 0.13636363636363635 4.363636363636363
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 200 0.20454545454545456 4.545454545454546
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 300 0.31666666666666665 4.866666666666666
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 400 0.2261904761904762 4.690476190476191
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 500 0.25 4.98
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 600 0.25 5.09
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 700 0.23 5.11
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 800 0.13 4.92
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 900 0.16 4.9
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1000 0.17 4.88
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1100 0.16 4.66
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1200 0.16 4.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1300 0.17 4.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1400 0.11 4.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1500 0.15 4.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1600 0.18 5.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1700 0.16 5.09
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1800 0.17 5.94
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 1900 0.17 6.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2000 0.2 7.27
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2100 0.2 7.27
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2200 0.2 9.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2300 0.2 9.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2400 0.2 9.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2500 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2600 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2700 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2800 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 2900 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3000 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3100 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3200 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3300 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3400 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3500 0.29 11.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3600 0.61 22.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3700 0.61 22.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3804 0.61 22.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 3904 0.61 22.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4016 0.61 22.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4120 0.61 22.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4228 0.61 22.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4336 2.38 30.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4436 2.38 30.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4536 2.86 31.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4656 2.86 31.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4780 2.86 31.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4888 5.65 35.51
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 4988 5.65 35.51
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5088 6.47 37.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5208 6.47 37.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5312 6.47 37.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5428 6.47 37.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5528 8.34 41.15
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5636 8.34 41.15
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5736 8.73 42.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5844 8.73 42.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 5964 8.73 42.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6064 10.5 46.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6164 10.88 47.26
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6264 11.58 49.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6364 11.58 49.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6464 11.58 49.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6580 11.58 49.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6680 12.72 52.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6792 12.72 52.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6892 12.72 52.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 6992 13.3 55.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7096 13.3 55.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7204 13.3 55.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7312 13.3 55.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7412 13.3 55.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7528 15.16 61.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7628 15.16 61.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7740 15.16 61.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7840 15.16 61.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 7956 15.16 61.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8056 15.16 61.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8160 15.16 61.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8264 15.16 61.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8364 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8476 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8588 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8704 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8808 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 8920 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9020 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9136 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9236 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9344 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9452 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9552 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9660 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9760 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9876 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 9976 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10092 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10196 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10316 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10416 16.91 69.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10516 22.93 90.64
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10616 22.93 90.64
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10732 23.92 93.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10832 23.92 93.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 10948 23.92 93.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11052 23.92 93.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11160 23.92 93.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11268 23.92 93.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11368 23.92 93.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11468 25.88 100.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11568 25.88 100.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11684 25.88 100.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11788 25.88 100.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 11900 25.88 100.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12008 25.88 100.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12108 27.93 106.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12220 27.93 106.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12320 28.8 108.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12436 28.8 108.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12536 28.8 108.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12648 28.8 108.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12752 28.8 108.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12852 30.14 113.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 12960 30.74 115.31
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13060 30.74 115.31
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13176 30.74 115.31
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13276 31.43 117.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13376 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13476 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13592 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13716 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13828 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 13940 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14040 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14152 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14288 31.92 119.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14388 34.95 129.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14488 34.95 129.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14588 34.95 129.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14688 34.95 129.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14808 34.95 129.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 14908 35.75 134.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15008 35.82 134.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15112 35.82 134.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15212 35.82 134.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15328 35.82 134.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15428 37.42 139.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15540 37.42 139.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15640 37.42 139.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15752 37.42 139.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15852 37.42 139.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 15952 37.42 139.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16056 37.42 139.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16160 37.42 139.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16260 38.86 146.85
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16372 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16472 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16580 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16700 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16816 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 16916 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17024 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17132 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17264 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17368 39.51 148.95
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17468 41.88 159.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17600 41.88 159.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17712 41.88 159.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17840 43.44 163.38
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 17940 43.44 163.38
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18064 43.44 163.38
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18164 44.48 166.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18264 44.75 166.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18388 44.75 166.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18496 45.66 169.82
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18596 45.66 169.82
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18708 45.66 169.82
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18812 45.66 169.82
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 18912 46.48 173.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19048 46.48 173.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19168 46.48 173.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19276 46.48 173.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19376 46.48 173.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19476 48.63 179.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19576 48.63 179.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19684 48.63 179.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19800 48.63 179.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 19924 48.63 179.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 4 5 0.25 0.25 20024 48.63 179.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 1004 0.1781609195402299 5.764367816091954
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 2004 0.06726457399103139 4.488789237668161
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 2472 0.08 4.19
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 2940 0.08 4.19
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 3400 3.14 15.27
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 3844 5.21 21.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 4320 5.21 21.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 4788 7.14 27.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 5260 7.97 34.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 5736 8.59 37.99
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 6188 8.59 37.99
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 6668 9.24 47.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 7132 9.24 47.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 7608 12.34 59.23
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 8076 12.57 59.98
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 8552 14.0 66.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 9016 15.35 72.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 9488 15.35 72.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 9952 15.35 72.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 10396 17.49 84.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 10880 17.49 84.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 11332 17.49 84.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 11784 20.16 97.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 12260 21.15 102.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 12736 21.15 102.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 13204 21.15 102.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 13660 21.15 102.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 14124 21.15 102.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 14596 27.74 124.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 15060 27.74 124.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 15468 27.74 124.78
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 15900 35.28 141.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 16352 36.42 144.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 16808 36.42 144.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 17280 36.42 144.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 17744 36.42 144.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 18212 44.41 161.44
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 18684 47.94 168.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 19148 47.94 168.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 19612 50.66 175.42
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 1 0.25 0.25 20088 53.08 180.42
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 1004 0.25766871165644173 6.153374233128834
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 2004 0.35185185185185186 6.1234567901234565
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 2468 1.43 8.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 2932 1.43 8.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 3400 1.43 8.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 3884 1.43 8.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 4368 12.04 26.17
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 4848 12.04 26.17
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 5336 14.73 36.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 5816 14.73 36.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 6296 16.82 46.33
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 6772 18.21 52.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 7252 18.21 52.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 7728 18.21 52.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 8204 18.21 52.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 8680 28.47 67.47
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 9160 37.46 76.73
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 9636 37.46 76.73
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 10120 43.01 82.4
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 10608 43.01 82.4
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 11092 54.97 94.67
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 11572 56.52 96.09
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 12060 64.68 104.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 12536 69.23 109.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 13008 69.23 109.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 13496 70.89 114.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 13984 70.89 114.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 14460 70.89 114.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 14936 70.89 114.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 15404 88.01 133.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 15880 88.01 133.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 16364 98.99 145.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 16828 100.46 147.71
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 17312 107.58 156.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 17784 108.18 157.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 18260 108.18 157.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 18732 108.18 157.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 19204 124.49 175.92
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 19680 126.19 177.66
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 2 0.25 0.25 20156 126.19 177.66
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 672 0.1484375 5.234375
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 1420 0.61 8.18
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 2084 0.81 11.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 2548 0.82 15.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 3016 0.82 15.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 3472 1.54 20.91
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 3932 1.54 20.91
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 4400 1.54 20.91
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 4852 6.23 37.07
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 5324 6.23 37.07
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 5784 7.74 44.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 6248 9.21 51.73
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 6708 10.13 56.21
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 7172 11.26 61.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 7640 12.05 65.31
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 8096 12.51 66.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 8548 12.51 66.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 9012 12.51 66.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 9472 16.05 80.72
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 9932 18.87 88.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 10396 20.1 91.16
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 10864 20.1 91.16
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 11332 20.1 91.16
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 11792 26.49 105.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 12252 26.49 105.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 12712 30.76 115.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 13168 30.76 115.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 13632 30.76 115.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 14092 36.56 128.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 14548 37.85 131.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 15008 40.36 137.89
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 15472 40.36 137.89
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 15936 42.93 145.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 16400 42.93 145.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 16848 42.93 145.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 17296 48.39 157.86
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 17748 48.39 157.86
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 18196 52.77 167.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 18652 55.25 173.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 19116 55.25 173.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 19584 55.25 173.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 3 0.25 0.25 20036 61.55 188.16
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 148 0.0625 4.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 300 0.078125 4.6875
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 448 0.0625 4.572916666666667
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 608 0.11 5.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 760 0.11 5.36
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 916 0.11 5.51
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 1068 0.09 5.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 1240 0.11 5.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 1400 0.15 5.47
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 1580 0.14 5.99
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 1748 0.18 6.16
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 1964 0.15 7.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 2300 0.15 7.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 2664 1.2 11.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 3036 3.17 17.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 3428 3.17 17.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 3776 4.48 21.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 4136 6.07 28.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 4516 6.07 28.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 4884 6.07 28.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 5260 6.07 28.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 5616 8.79 40.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 5960 9.69 43.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 6308 10.8 47.94
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 6676 10.8 47.94
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 7024 12.66 56.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 7364 12.66 56.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 7684 13.8 61.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 8056 13.8 61.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 8412 13.8 61.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 8780 13.8 61.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 9124 16.33 77.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 9476 16.33 77.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 9828 16.33 77.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 10184 16.33 77.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 10540 16.33 77.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 10860 21.24 94.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 11220 21.24 94.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 11548 23.64 100.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 11916 23.64 100.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 12260 25.92 105.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 12624 25.92 105.97
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 12952 29.89 115.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 13300 29.89 115.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 13656 29.89 115.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 14016 29.89 115.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 14372 29.89 115.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 14728 29.89 115.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 15048 36.04 134.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 15412 36.04 134.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 15772 36.04 134.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 16136 36.04 134.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 16496 36.04 134.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 16852 36.04 134.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 17192 42.77 155.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 17532 43.91 159.52
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 17892 43.91 159.52
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 18224 46.01 167.38
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 18584 46.01 167.38
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 18936 48.14 174.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 19288 48.14 174.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 19624 49.89 180.45
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 19976 49.89 180.45
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 4 0.25 0.25 20340 49.89 180.45
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 100 0.0 4.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 200 0.024390243902439025 4.878048780487805
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 300 0.018518518518518517 5.425925925925926
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 400 0.04225352112676056 5.492957746478873
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 500 0.08139534883720931 5.8023255813953485
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 600 0.09 5.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 700 0.12 6.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 800 0.11 6.02
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 900 0.09 5.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1000 0.08 4.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1100 0.07 5.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1200 0.07 5.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1300 0.16 5.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1400 0.17 5.99
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1500 0.24 6.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1600 0.33 7.45
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1700 0.35 7.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1800 0.49 8.26
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 1900 0.58 8.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2000 1.03 10.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2116 1.57 11.33
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2216 1.57 11.13
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2336 2.5 13.15
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2436 2.5 13.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2568 2.5 13.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2704 2.5 13.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2820 4.35 17.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 2920 4.35 17.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 3060 4.35 17.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 3168 5.95 21.09
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 3268 6.17 21.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 3404 6.17 21.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 3528 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 3628 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 3768 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 3912 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 4056 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 4192 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 4332 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 4472 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 4612 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 4756 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 4896 7.52 24.54
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 4996 14.37 38.34
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 5140 14.37 38.34
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 5240 15.61 40.92
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 5388 15.61 40.92
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 5488 16.71 43.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 5608 16.71 43.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 5732 16.71 43.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 5840 18.66 47.4
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 5940 18.8 47.74
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6040 19.09 48.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6156 19.09 48.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6276 19.09 48.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6404 19.09 48.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6528 19.09 48.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6640 19.09 48.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6740 22.68 55.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6860 22.68 55.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 6972 22.68 55.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 7088 22.68 55.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 7216 22.68 55.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 7324 22.68 55.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 7436 22.68 55.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 7536 26.37 63.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 7636 26.95 64.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 7776 26.95 64.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 7912 26.95 64.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8036 26.95 64.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8136 29.39 70.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8264 29.39 70.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8376 29.39 70.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8496 29.39 70.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8620 29.39 70.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8752 29.39 70.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8852 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 8984 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 9124 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 9272 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 9408 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 9528 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 9648 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 9780 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 9904 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 10048 32.46 76.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 10148 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 10248 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 10348 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 10468 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 10612 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 10744 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 10864 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11000 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11116 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11236 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11340 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11460 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11564 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11692 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11828 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 11948 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 12092 38.87 89.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 12192 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 12336 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 12472 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 12592 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 12704 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 12824 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 12948 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13072 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13188 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13308 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13424 46.95 109.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13524 53.44 122.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13648 53.44 122.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13776 53.44 122.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13896 53.44 122.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 13996 55.62 127.74
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 14112 55.62 127.74
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 14244 55.62 127.74
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 14344 57.3 131.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 14456 57.3 131.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 14556 58.18 133.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 14672 58.18 133.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 14808 58.18 133.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 14936 58.18 133.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15064 58.18 133.39
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15164 60.75 139.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15264 60.75 139.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15392 60.75 139.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15496 60.75 139.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15616 60.75 139.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15744 60.75 139.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15876 60.75 139.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 15976 64.22 147.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 16100 64.22 147.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 16224 64.22 147.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 16348 64.22 147.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 16476 64.22 147.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 16600 64.22 147.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 16700 67.4 154.33
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 16800 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 16936 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 17072 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 17204 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 17320 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 17452 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 17580 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 17708 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 17832 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 17960 67.89 155.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 18064 73.75 168.17
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 18164 73.75 168.17
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 18292 73.75 168.17
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 18392 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 18520 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 18644 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 18768 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 18896 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 19020 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 19156 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 19292 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 19424 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 19556 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 19684 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 19832 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 19948 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 8 5 0.25 0.25 20084 74.98 170.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 788 0.012422360248447204 4.869565217391305
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 1748 0.005235602094240838 5.026178010471204
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 2340 0.25 8.86
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 2812 1.42 13.65
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 3292 3.18 17.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 3664 3.18 17.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 4064 5.99 23.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 4520 7.62 27.51
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 5016 9.17 31.32
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 5512 11.28 36.91
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 6016 13.27 44.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 6524 14.17 48.13
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 7024 14.81 51.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 7528 14.81 51.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 8032 18.02 64.18
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 8528 18.48 66.93
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 9028 19.92 73.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 9536 21.28 78.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 10032 21.28 78.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 10520 21.28 78.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 11028 21.28 78.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 11508 26.72 98.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 12004 28.53 103.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 12492 28.53 103.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 12988 28.53 103.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 13444 28.53 103.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 13848 36.62 119.56
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 14328 39.55 127.02
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 14828 39.55 127.02
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 15324 42.77 135.72
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 15812 42.77 135.72
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 16296 42.77 135.72
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 16764 47.88 151.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 17256 47.88 151.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 17732 47.88 151.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 18196 47.88 151.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 18692 47.88 151.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 19180 47.88 151.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 19680 56.91 176.89
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 1 0.25 0.25 20180 56.91 176.89
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 980 0.034482758620689655 5.626436781609195
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 1920 0.022988505747126436 5.408045977011494
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 2328 0.02 6.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 2824 0.08 12.15
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 3320 0.1 16.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 3812 0.1 16.6
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 4308 1.63 26.71
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 4792 1.63 26.71
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 5292 1.63 26.71
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 5740 1.63 26.71
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 6152 1.63 26.71
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 6504 1.63 26.71
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 6864 12.91 52.29
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 7280 12.91 52.29
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 7732 12.91 52.29
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 8172 15.76 65.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 8664 15.76 65.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 9160 15.76 65.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 9652 15.76 65.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 10144 19.59 81.9
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 10600 20.99 87.9
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 11072 22.2 93.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 11556 22.2 93.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 12052 23.97 102.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 12548 23.97 102.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 13044 27.14 112.99
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 13540 27.14 112.99
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 14016 29.81 121.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 14508 29.81 121.62
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 14992 31.67 131.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 15480 32.41 136.66
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 15972 32.41 136.66
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 16476 32.41 136.66
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 16972 36.32 152.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 17472 36.32 152.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 17972 39.2 163.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 18456 39.22 164.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 18924 39.22 164.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 19416 41.4 174.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 19880 43.13 182.42
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 2 0.25 0.25 20264 43.13 182.42
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 600 0.008064516129032258 4.838709677419355
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 1224 0.005405405405405406 3.362162162162162
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 1752 0.0 2.712820512820513
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 2188 0.007936507936507936 3.3253968253968256
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 2584 0.01 3.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 3036 2.63 12.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 3500 2.63 12.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 3948 2.63 12.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 4332 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 4804 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 5276 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 5672 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 6088 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 6512 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 6980 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 7412 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 7804 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 8196 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 8616 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 9084 5.9 22.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 9508 45.11 76.67
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 9904 45.11 76.67
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 10356 51.12 83.67
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 10800 51.12 83.67
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 11220 51.12 83.67
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 11520 62.16 96.13
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 11804 62.16 96.13
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 12164 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 12624 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 13072 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 13532 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 13944 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 14388 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 14856 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 15328 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 15760 65.14 99.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 16132 99.9 139.48
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 16588 99.9 139.48
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 17048 99.9 139.48
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 17516 99.9 139.48
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 17976 115.15 160.21
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 18436 115.79 161.47
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 18868 120.23 166.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 19336 120.23 166.57
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 19800 130.88 179.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 3 0.25 0.25 20208 130.88 179.43
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 156 0.08 6.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 312 0.03389830508474576 5.237288135593221
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 464 0.020833333333333332 4.8125
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 620 0.0 3.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 768 0.01 3.7
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 920 0.01 4.21
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 1084 0.07 4.68
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 1240 0.06 4.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 1404 0.08 5.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 1560 0.02 4.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 1716 0.06 5.15
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 1884 0.19 6.02
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 2056 0.45 6.76
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 2244 0.45 6.63
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 2612 2.04 9.02
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 3012 2.04 9.02
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 3404 2.04 9.02
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 3756 11.05 21.35
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 4104 13.93 25.45
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 4444 15.85 28.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 4784 15.85 28.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 5136 19.4 33.18
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 5536 19.4 33.18
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 5836 25.25 41.32
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 6140 28.17 45.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 6424 29.2 47.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 6668 31.21 50.0
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 6988 33.04 52.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 7336 33.04 52.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 7672 33.04 52.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 8020 33.04 52.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 8376 33.04 52.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 8780 33.04 52.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 9160 33.04 52.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 9548 33.04 52.61
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 9848 50.0 82.82
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 10200 51.86 85.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 10600 51.86 85.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 11008 51.86 85.5
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 11332 58.14 94.98
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 11700 60.62 98.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 12096 60.62 98.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 12460 65.68 106.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 12752 68.26 111.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 12996 69.32 113.18
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 13344 71.47 116.87
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 13680 72.54 118.41
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 14032 75.16 123.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 14416 75.16 123.58
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 14744 78.46 130.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 15108 78.46 130.8
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 15428 80.47 134.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 15796 80.47 134.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 16140 83.34 144.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 16516 83.34 144.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 16880 83.34 144.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 17244 83.34 144.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 17612 83.34 144.01
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 17956 89.41 162.33
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 18332 89.41 162.33
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 18664 91.17 169.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 18976 92.1 172.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 19356 92.1 172.79
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 19692 94.17 179.27
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 4 0.25 0.25 20052 94.17 179.27
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 100 0.058823529411764705 5.823529411764706
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 200 0.02702702702702703 5.297297297297297
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 300 0.015873015873015872 4.746031746031746
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 400 0.011627906976744186 4.616279069767442
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 500 0.0 3.96
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 600 0.0 4.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 700 0.0 4.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 800 0.0 4.08
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 900 0.0 4.14
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1000 0.0 3.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1100 0.0 3.48
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1200 0.0 3.34
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1300 0.0 3.42
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1400 0.0 3.2
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1500 0.0 3.05
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1600 0.0 2.75
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1700 0.0 2.83
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1800 0.0 2.69
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 1900 0.0 2.59
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2000 0.0 2.34
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2100 0.09 2.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2220 0.09 2.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2360 0.09 2.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2500 0.09 2.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2600 2.17 7.15
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2744 2.17 7.15
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2884 2.17 7.15
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 2984 4.3 11.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 3084 4.3 11.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 3224 4.3 11.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 3368 4.3 11.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 3508 4.3 11.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 3648 4.3 11.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 3784 4.3 11.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 3924 4.3 11.77
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4024 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4156 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4268 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4372 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4476 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4584 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4688 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4788 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 4900 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5004 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5120 8.96 21.46
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5220 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5340 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5452 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5588 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5696 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5796 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 5908 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6036 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6160 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6280 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6408 13.8 33.22
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6528 19.11 47.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6628 19.11 47.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6744 19.11 47.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6868 19.11 47.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 6976 19.11 47.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 7100 19.11 47.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 7212 19.11 47.06
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 7312 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 7412 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 7516 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 7640 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 7760 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 7884 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8000 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8104 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8204 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8304 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8404 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8520 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8636 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8744 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8860 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 8972 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9088 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9204 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9304 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9412 21.62 54.25
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9548 29.13 77.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9648 29.13 77.24
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9748 29.69 79.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9848 29.69 79.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 9952 29.69 79.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10060 29.69 79.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10168 29.69 79.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10288 29.69 79.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10400 29.69 79.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10512 29.69 79.12
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10612 32.53 87.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10712 32.53 87.81
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10812 32.9 89.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 10920 32.9 89.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 11020 32.9 89.04
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 11124 33.64 92.89
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 11224 33.64 92.89
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 11360 33.64 92.89
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 11540 33.64 92.89
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 11640 35.84 97.26
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 11804 37.51 99.66
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 11904 37.51 99.66
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 12076 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 12176 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 12404 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 12664 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 12864 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 13108 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 13276 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 13472 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 13700 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 13932 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 14176 39.81 102.3
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 14384 60.71 125.4
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 14484 60.71 125.4
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 14604 62.2 127.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 14704 62.2 127.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 14940 62.2 127.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 15188 62.2 127.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 15432 62.2 127.53
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 15560 71.15 137.03
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 15660 71.3 137.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 15900 71.3 137.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 16140 71.3 137.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 16380 71.3 137.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 16564 71.3 137.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 16728 71.3 137.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 16932 71.3 137.37
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 17032 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 17248 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 17460 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 17712 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 17912 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 18140 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 18360 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 18600 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 18816 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 19036 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 19280 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 19532 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 19772 83.74 151.49
+# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density,
+DQN 14 16 16 5 0.25 0.25 20028 83.74 151.49
