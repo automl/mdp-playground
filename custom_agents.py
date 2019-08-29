@@ -271,7 +271,10 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                     'delay': delay,
                                     'sequence_length': sequence_length,
                                     'reward_density': reward_density,
-                                    'terminal_state_density': terminal_state_density
+                                    'terminal_state_density': terminal_state_density,
+                                    'repeats_in_sequences': True,
+                                    'reward_unit': 1.0,
+                                    'make_denser': False
                                     },
                                   "exploration_final_eps": 0.01,
                                   "exploration_fraction": 0.1,

@@ -38,8 +38,13 @@ class RLToyEnv(gym.Env):
         #TODO Test cases to check all assumptions
         #TODO Mersenne Twister pseudo-random number generator used in Gym: not cryptographically secure!
         #TODO Different random seeds for S, A, P, R, rho_o and T? Currently 1 for env and 1 for its space.
+        ###TODO Make sure terminal state is reachable by at least 1 path (no. of available actions affects avg. length of path from init. to term. state); no self transition loops?; Make sure each rewarded sequence is reachable; with equal S and A sizes we can make sure every state is reachable from every other state (just pick a random sequence to be the state tranition row for a state - solves previous problems sort of)
+        Can check total no. of unique sequences of length, say, 3 reachable from diff. init. states based on the randomly generated transition function - could generate transition function and generate specific_sequences based on it.
+        Maybe make some parts init states, some term. states and a majority be neither and let rewarded sequences begin from "neither" states (so we can see if algo. can learn to reach a reward-dense region and stay in it) - maybe keep only 1 init and 1 term. state?
+        Can also make discrete/continuous "Euclidean space" with transition function fixed - then problem is with generating sequences (need to maybe from each init. state have a few length n rewardable sequences) - if distance from init state to term. state is large compared to sequence_length, exploration becomes easier? - you do get a signal is term. state is closer (like cliff walking problem) - still, things depend on percentage reachability of rewarded sequences (which increases if close term. states chop off a big part of the search space)
         #Check TODO, fix and bottleneck tags
         Sources of #randomness: Seed for Env.observation_space (to generate P, for noise in P), Env.action_space (to generate initial random policy), Env. (to generate R, for noise in R, initial state); ; Check # seed, # random
+        ###IMP state_space_size should be large enough that after terminal state generation, we have enough num_specific_sequences rewardable!
         """
 
         if config is None:
@@ -130,6 +135,7 @@ class RLToyEnv(gym.Env):
 
         print("self.possible_remaining_sequences", self.possible_remaining_sequences)
 
+        print(" self.delay, self.sequence_length:", self.delay, self.sequence_length)
 
         # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
         # print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
