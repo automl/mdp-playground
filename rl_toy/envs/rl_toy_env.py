@@ -65,18 +65,21 @@ class RLToyEnv(gym.Env):
             config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
             config["delay"] = 0
             config["sequence_length"] = 3
-            config["repeats_in_sequences"] = True
+            config["repeats_in_sequences"] = False
             config["reward_unit"] = 1.0
             config["reward_density"] = 0.25 # Number between 0 and 1
 #            config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
 #            config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
             config["make_denser"] = False
             config["terminal_state_density"] = 0.1 # Number between 0 and 1
-            config["completely_connected"] = True # Make every state reachable from every state
-            assert config["sequence_length"] > 0 # also should be int
+            config["completely_connected"] = True # Make every state reachable from every state; If completely_connected, then no. of actions has to be at least equal to no. of states( - 1 if without self-loop); if repeating sequences allowed, then we have to have self-loops. Self-loops are ok even in non-repeating sequences - we just have a harder search problem then! Or make it maximally connected by having transitions to as many different states as possible - the row for P would have as many different transitions as possible!
             # print(config)
             #TODO asserts for the rest of the config settings
             # next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
+
+        assert config["sequence_length"] > 0, "config[\"sequence_length\"] <= 0. Set to: " + str(config["sequence_length"]) # also should be int
+        if config["completely_connected"]:
+            assert config["state_space_size"] == config["action_space_size"], "config[\"state_space_size\"] != config[\"action_space_size\"]. Please provide valid values! Vals: " + str(config["state_space_size"]) + " " + str(config["action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
 
         if "seed" in config:
             self.seed(config["seed"]) #seed
@@ -166,7 +169,7 @@ class RLToyEnv(gym.Env):
             state_space_size = self.config["state_space_size"] - self.num_terminal_states
             len_ = self.sequence_length
             permutations = list(range(state_space_size + 1 - len_, state_space_size + 1))
-            print("Permutations order, 1 random number out of possible perms, no. of possilbe perms", permutations, np.random.randint(np.prod(permutations)), np.prod(permutations))
+            print("Permutations order, 1 random number out of possible perms, no. of possible perms", permutations, np.random.randint(np.prod(permutations)), np.prod(permutations))
             num_possible_permutations = np.prod(permutations)
             num_specific_sequences = int(self.config["reward_density"] * num_possible_permutations)
             self.specific_sequences = [[] for i in range(self.sequence_length)]
@@ -190,7 +193,7 @@ class RLToyEnv(gym.Env):
                 print("specific_sequence that will be rewarded", seq_)
             #print(len(set(self.specific_sequences))) #error
 
-            print(np.unique(self.specific_sequences[self.sequence_length - 1]), total_false)
+            print("Number of generated sequences that did not clash with an existing one when it was generated:", total_false)
             print("Total no. of rewarded sequences:", len(self.specific_sequences[self.sequence_length - 1]), "Out of", num_possible_permutations)
 
         self.R = lambda s, a: self.reward_function(s, a)
@@ -201,9 +204,13 @@ class RLToyEnv(gym.Env):
         # Future sequences don't depend on past sequences, only the next state depends on the past sequence of length, say n. n would depend on what order the dynamics are - 1st order would mean only 2 previous states needed to determine next state
         self.config["transition_function"] = np.zeros(shape=(self.config["state_space_size"], self.config["action_space_size"]), dtype=object)
         self.config["transition_function"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
-        for s in range(self.config["state_space_size"]):
-            for a in range(self.config["action_space_size"]):
-                self.config["transition_function"][s, a] = self.observation_space.sample() #random #TODO Preferably use the seed of the Env for this!
+        if self.config["completely_connected"]:
+            for s in range(self.config["state_space_size"]):
+                self.config["transition_function"][s] = list(self.observation_space.sample(size=self.config["action_space_size"], replace=False)) #random #TODO Preferably use the seed of the Env for this?
+        else:
+            for s in range(self.config["state_space_size"]):
+                for a in range(self.config["action_space_size"]):
+                    self.config["transition_function"][s, a] = self.observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
         print(self.config["transition_function"], "init_transition_function", type(self.config["transition_function"][0, 0]))
         self.P = lambda s, a: self.transition_function(s, a)
 
@@ -304,9 +311,10 @@ class RLToyEnv(gym.Env):
         return self.curr_state, self.reward, self.done, {"curr_state": self.curr_state}
 
     def seed(self, seed=None):
-        # If seed is None, you get a randomly generated seed rfrom gym.utils...
+        # If seed is None, you get a randomly generated seed from gym.utils...
         # if seed is not None:
         self.np_random, self.seed_ = gym.utils.seeding.np_random(seed) #random
+        print("Env SEED set to:", seed, "Returned seed from Gym:", self.seed_)
         return self.seed_
 
 if __name__ == "__main__":
@@ -322,7 +330,7 @@ if __name__ == "__main__":
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
     config["delay"] = 1
     config["sequence_length"] = 3
-    config["repeats_in_sequences"] = True
+    config["repeats_in_sequences"] = False
     config["reward_unit"] = 1.0
     # config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
     # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
@@ -334,7 +342,7 @@ if __name__ == "__main__":
 #    env.seed(0)
     state = env.reset()
     # print("TEST", type(state))
-    for _ in range(10):
+    for _ in range(20):
         # env.render() # For GUI
         action = env.action_space.sample() # take a #random action # TODO currently DiscreteExtended returns a sampled array
         next_state, reward, done, info = env.step(action)

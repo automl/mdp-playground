@@ -137,7 +137,7 @@ ray.init()
 # terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
-action_space_sizes = [4]#2, 4, 8, 16] # [2**i for i in range(1,6)]
+action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0] + [2**i for i in range(4)]
 sequence_lengths = [1, 2]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
@@ -275,9 +275,10 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                     'sequence_length': sequence_length,
                                     'reward_density': reward_density,
                                     'terminal_state_density': terminal_state_density,
-                                    'repeats_in_sequences': True,
+                                    'repeats_in_sequences': False,
                                     'reward_unit': 1.0,
-                                    'make_denser': False
+                                    'make_denser': False,
+                                    'completely_connected': True
                                     },
                                   "exploration_final_eps": 0.01,
                                   "exploration_fraction": 0.1,
@@ -307,7 +308,8 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                             #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
                                         },
                                 },
-                            )
+                             #return_trials=True # add tirals = tune.run( above
+                             )
 
 end = time.time()
 print("No. of seconds to run:", end - start)
