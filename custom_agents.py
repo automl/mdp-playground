@@ -111,7 +111,7 @@ from rl_toy.envs import RLToyEnv
 from ray.tune.registry import register_env
 register_env("RLToy-v0", lambda config: RLToyEnv(config))
 
-# rllib_seed(0, 0, 0)
+#rllib_seed(0, 0, 0) ####IMP Doesn't work due to multi-process I think; so use config["seed"]
 ray.init()
 
 
@@ -136,14 +136,15 @@ ray.init()
 # # make_reward_dense = [True, False]
 # terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 
-state_space_sizes = [8, 10, 12, 14] # [2**i for i in range(1,6)]
-action_space_sizes = [2, 4, 8, 16] # [2**i for i in range(1,6)]
-delays = [0] + [2**i for i in range(5)]
-sequence_lengths = [i for i in range(1,6)]
+state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
+action_space_sizes = [4]#2, 4, 8, 16] # [2**i for i in range(1,6)]
+delays = [0] + [2**i for i in range(4)]
+sequence_lengths = [1, 2]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 algorithms = ["DQN"]
+#seeds = []
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density,'
                'terminal_state_density ')
@@ -256,6 +257,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                     "timesteps_total": 20000,
                                       },
                                 config={
+                                  # 'seed': 0, #seed
                                   "adam_epsilon": 0.00015,
                                   "beta_annealing_fraction": 1.0,
                                   "buffer_size": 1000000,
@@ -263,6 +265,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                   "dueling": False,
                                   "env": "RLToy-v0",
                                   "env_config": {
+                                    'seed': 0, #seed
                                     'state_space_type': 'discrete',
                                     'action_space_type': 'discrete',
                                     'state_space_size': state_space_size,

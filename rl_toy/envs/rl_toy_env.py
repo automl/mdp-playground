@@ -44,6 +44,7 @@ class RLToyEnv(gym.Env):
         Can also make discrete/continuous "Euclidean space" with transition function fixed - then problem is with generating sequences (need to maybe from each init. state have a few length n rewardable sequences) - if distance from init state to term. state is large compared to sequence_length, exploration becomes easier? - you do get a signal is term. state is closer (like cliff walking problem) - still, things depend on percentage reachability of rewarded sequences (which increases if close term. states chop off a big part of the search space)
         #Check TODO, fix and bottleneck tags
         Sources of #randomness: Seed for Env.observation_space (to generate P, for noise in P), Env.action_space (to generate initial random policy), Env. (to generate R, for noise in R, initial state); ; Check # seed, # random
+        ###TODO Separate out seeds for all the random processes!
         ###IMP state_space_size should be large enough that after terminal state generation, we have enough num_specific_sequences rewardable!
         """
 
@@ -71,6 +72,7 @@ class RLToyEnv(gym.Env):
 #            config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
             config["make_denser"] = False
             config["terminal_state_density"] = 0.1 # Number between 0 and 1
+            config["completely_connected"] = True # Make every state reachable from every state
             assert config["sequence_length"] > 0 # also should be int
             # print(config)
             #TODO asserts for the rest of the config settings
@@ -270,6 +272,8 @@ class RLToyEnv(gym.Env):
             # print("After transition", self.augmented_state)
         #TODO Check ergodicity of MDP/policy? Can calculate probability of a rewardable specific sequence occurring (for a random policy)
         # print("TEEEEEST:", self.config["transition_function"], [state, action])
+        # if next_state in self.config["is_terminal_state"]:
+        #     print("NEXT_STATE:", next_state, next_state in self.config["is_terminal_state"])
         return next_state
 
     def get_augmented_state():
@@ -282,6 +286,7 @@ class RLToyEnv(gym.Env):
         # TODO reset is also returning info dict to be able to return state in addition to observation;
         # TODO Do not start in a terminal state.
         self.curr_state = self.np_random.choice(self.config["state_space_size"], p=self.init_state_dist) #random
+        print("RESET called. State reset to:", self.curr_state)
         self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
         self.augmented_state.append(self.curr_state)
         # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
@@ -324,6 +329,7 @@ if __name__ == "__main__":
     config["reward_density"] = 0.25 # Number between 0 and 1
     config["make_denser"] = False
     config["terminal_state_density"] = 0.25 # Number between 0 and 1
+    config["completely_connected"] = True # Make every state reachable from every state
     env = RLToyEnv(config)
 #    env.seed(0)
     state = env.reset()
