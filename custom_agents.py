@@ -283,9 +283,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                   "exploration_final_eps": 0.01,
                                   "exploration_fraction": 0.1,
                                   "final_prioritized_replay_beta": 1.0,
-                                  "hiddens": [
-                                    256
-                                  ],
+                                  "hiddens": None,
                                   "learning_starts": 2000,
                                   "lr": 6.25e-05, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
                                   "n_step": 1,

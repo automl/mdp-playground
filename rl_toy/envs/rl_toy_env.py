@@ -317,6 +317,7 @@ class RLToyEnv(gym.Env):
         print("Env SEED set to:", seed, "Returned seed from Gym:", self.seed_)
         return self.seed_
 
+
 if __name__ == "__main__":
 
     config = {}
@@ -340,6 +341,9 @@ if __name__ == "__main__":
     config["completely_connected"] = True # Make every state reachable from every state
     env = RLToyEnv(config)
 #    env.seed(0)
+#    from rl_toy.envs import RLToyEnv
+#    env = gym.make("RLToy-v0")
+#    print("env.spec.max_episode_steps, env.unwrapped:", env.spec.max_episode_steps, env.unwrapped)
     state = env.reset()
     # print("TEST", type(state))
     for _ in range(20):
