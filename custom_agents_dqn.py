@@ -201,6 +201,8 @@ def on_train_result(info):
     fcnet_hiddens = info["result"]["config"]["model"]["fcnet_hiddens"]
     num_layers = len(fcnet_hiddens)
     layer_width = fcnet_hiddens[0] #hack
+    learning_starts = info["result"]["config"]["learning_starts"]
+    target_network_update_freq = info["result"]["config"]["target_network_update_freq"]
 
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
@@ -208,11 +210,11 @@ def on_train_result(info):
 
     fout = open('/home/rajanr/custom-gym-env/rl_stats_temp.csv', 'a') #hardcoded
     fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
-               'terminal_state_density, num_layers, layer_width,\n' + str(algorithm) + ' ' + str(state_space_size) +
+               'terminal_state_density, num_layers, layer_width, learning_starts, target_network_update_freq,\n' + str(algorithm) + ' ' + str(state_space_size) +
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
                + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
                # Writes every iteration, would slow things down. #hack
-    fout.write(str(num_layers) + ' ' + str(layer_width) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
+    fout.write(str(num_layers) + ' ' + str(layer_width) + ' ' + str(timesteps_total) + ' ' + str(learning_starts) + ' ' + str(target_network_update_freq) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
@@ -273,8 +275,8 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                 for sequence_length in sequence_lengths:
                     for reward_density in reward_densities:
                         for terminal_state_density in terminal_state_densities:
-                            for num_layers in num_layerss:
-                                for layer_width in layer_widths:
+                            for learning_starts in learning_startss:
+                                for target_network_update_freq in target_network_update_freqs:
                                     tune.run(
                                         algorithm,
                                         stop={
@@ -305,7 +307,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             'completely_connected': True
                                             },
                                         "model": {
-                                            "fcnet_hiddens": [layer_width for i in range(num_layers)],
+                                            "fcnet_hiddens": [256, 256],
                                             "custom_preprocessor": "ohe",
                                             "custom_options": {},  # extra options to pass to your preprocessor
                                             "fcnet_activation": "tanh",
@@ -318,7 +320,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                           "exploration_fraction": 0.1,
                                           "final_prioritized_replay_beta": 1.0,
                                           "hiddens": None,
-                                          "learning_starts": 2000,
+                                          "learning_starts": learning_starts,
                                           "lr": 6.25e-05, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
                                           "n_step": 1,
                                           "noisy": False,
@@ -327,7 +329,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                           "prioritized_replay_alpha": 0.5,
                                           "sample_batch_size": 4,
                                           "schedule_max_timesteps": 20000,
-                                          "target_network_update_freq": 80,
+                                          "target_network_update_freq": target_network_update_freq,
                                           "timesteps_per_iteration": 100,
                                           "train_batch_size": 32,
 

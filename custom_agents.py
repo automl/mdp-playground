@@ -277,7 +277,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                     "timesteps_total": 20000,
                                       },
                                 config={
-                                  # 'seed': 0, #seed
+#                                  'seed': 0, #seed
                                   "adam_epsilon": 0.00015,
                                   "beta_annealing_fraction": 1.0,
                                   "buffer_size": 1000000,
