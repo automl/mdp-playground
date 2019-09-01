@@ -161,8 +161,8 @@ algorithms = ["DQN"]
 num_layerss = [1, 2, 3, 4]
 layer_widths = [8, 32, 128]
 fcnet_activations = ["tanh", "relu", "sigmoid"]
-learning_startss = [500, 1000, 2000, 4000, 8000]
-target_network_update_freqs = [8, 80, 800]
+learning_startss = [1000, 2000, 4000]
+target_network_update_freqs = [80, 800, 8000]
 double_dqn = [False, True]
 # lstm with sequence lengths
 
@@ -214,7 +214,7 @@ def on_train_result(info):
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
                + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
                # Writes every iteration, would slow things down. #hack
-    fout.write(str(num_layers) + ' ' + str(layer_width) + ' ' + str(timesteps_total) + ' ' + str(learning_starts) + ' ' + str(target_network_update_freq) + ' ' + str(episode_reward_mean) +
+    fout.write(str(num_layers) + ' ' + str(layer_width) + ' ' + str(learning_starts) + ' ' + str(target_network_update_freq) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
