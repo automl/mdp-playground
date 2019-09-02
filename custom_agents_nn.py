@@ -318,7 +318,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                           "exploration_fraction": 0.1,
                                           "final_prioritized_replay_beta": 1.0,
                                           "hiddens": None,
-                                          "learning_starts": 2000,
+                                          "learning_starts": 1000,
                                           "lr": 6.25e-05, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
                                           "n_step": 1,
                                           "noisy": False,
@@ -327,7 +327,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                           "prioritized_replay_alpha": 0.5,
                                           "sample_batch_size": 4,
                                           "schedule_max_timesteps": 20000,
-                                          "target_network_update_freq": 80,
+                                          "target_network_update_freq": 800,
                                           "timesteps_per_iteration": 100,
                                           "train_batch_size": 32,
 
