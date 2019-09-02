@@ -6,6 +6,21 @@ import numpy as np
 
 from ray.rllib.agents.trainer import Trainer, with_common_config
 from ray.rllib.utils.annotations import override
+from ray.rllib.agents.dqn import DQNTrainer
+from ray.rllib.offline import OutputWriter
+
+class HackWriter(OutputWriter):
+    def write(self, sample_batch):
+        print(sample_batch.data)
+        fout = open('/home/rajanr/custom-gym-env/rl_stats_temp_hack_writer.csv', 'a') #hack
+        fout.write(str(sample_batch.data))
+        fout.close()
+
+def return_hack_writer(io_context):
+    hw = HackWriter()
+#    print("##############sample_batch", io_context)#.rows(), sample_batch.data)
+    return hw
+#    hw.write(sample_batch)
 
 # yapf: disable
 # __sphinx_doc_begin__
@@ -123,7 +138,12 @@ ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
 
 #rllib_seed(0, 0, 0) ####IMP Doesn't work due to multi-process I think; so use config["seed"]
-ray.init()
+# np.random.seed(0)
+# import random
+# random.seed(0)
+# import tensorflow as tf
+# tf.set_random_seed(0)
+ray.init(local_mode=True)#, object_id_seed=0)
 
 
 # Old config space
@@ -156,7 +176,7 @@ reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 algorithms = ["DQN"]
 #seeds = []
-# Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size
+# Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
 # More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
 num_layerss = [1, 2, 3, 4]
 layer_widths = [8, 32, 128]
@@ -164,6 +184,8 @@ fcnet_activations = ["tanh", "relu", "sigmoid"]
 learning_startss = [500, 1000, 2000, 4000, 8000]
 target_network_update_freqs = [8, 80, 800]
 double_dqn = [False, True]
+learning_rates = []
+
 # lstm with sequence lengths
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density,'
@@ -273,11 +295,13 @@ for algorithm in algorithms: #TODO each one has different config_spaces
 
                             tune.run(
                                 algorithm,
+                            #hack
+                            # ag = DQNTrainer(
                                 stop={
                                     "timesteps_total": 20000,
                                       },
                                 config={
-#                                  'seed': 0, #seed
+                                  #'seed': 0, #seed
                                   "adam_epsilon": 0.00015,
                                   "beta_annealing_fraction": 1.0,
                                   "buffer_size": 1000000,
@@ -314,7 +338,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                   "exploration_fraction": 0.1,
                                   "final_prioritized_replay_beta": 1.0,
                                   "hiddens": None,
-                                  "learning_starts": 2000,
+                                  "learning_starts": 1000,
                                   "lr": 6.25e-05, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
                                   "n_step": 1,
                                   "noisy": False,
@@ -335,9 +359,17 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             "on_train_result": tune.function(on_train_result),
                             #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
                                         },
+                                "evaluation_config": {
+                                #'seed': 0, #seed
+                                "exploration_fraction": 0,
+                                "exploration_final_eps": 0
                                 },
-                             #return_trials=True # add tirals = tune.run( above
+                                # "output": return_hack_writer,
+                                # "output_compress_columns": [],
+                                },
+                             #return_trials=True # add trials = tune.run( above
                              )
+                            # ag.train()
 
 end = time.time()
 print("No. of seconds to run:", end - start)

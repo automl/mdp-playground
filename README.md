@@ -7,3 +7,5 @@ pip install -e .
 git clone git@github.com:RaghuSpaceRajan/gym-extension.git
 cd gym-extension
 pip install -e .
+
+It is recommended to OHE the states/actions before using them in a function approximator.

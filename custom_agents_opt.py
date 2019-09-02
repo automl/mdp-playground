@@ -164,6 +164,8 @@ fcnet_activations = ["tanh", "relu", "sigmoid"]
 learning_startss = [500, 1000, 2000, 4000, 8000]
 target_network_update_freqs = [8, 80, 800]
 double_dqn = [False, True]
+learning_rates = [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
+adam_epsilons = [1e-1, 1e-4, 1e-7, 1e-10]
 # lstm with sequence lengths
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density,'
@@ -201,18 +203,20 @@ def on_train_result(info):
     fcnet_hiddens = info["result"]["config"]["model"]["fcnet_hiddens"]
     num_layers = len(fcnet_hiddens)
     layer_width = fcnet_hiddens[0] #hack
+    lr = info["result"]["config"]["lr"]
+    adam_epsilon = info["result"]["config"]["adam_epsilon"]
 
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
     episode_len_mean = info["result"]["episode_len_mean"]
 
-    fout = open('/home/rajanr/custom-gym-env/rl_stats_temp_nn.csv', 'a') #hardcoded
+    fout = open('/home/rajanr/custom-gym-env/rl_stats_temp_opt.csv', 'a') #hardcoded
     fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
-               'terminal_state_density, num_layers, layer_width,\n' + str(algorithm) + ' ' + str(state_space_size) +
+               'terminal_state_density, num_layers, layer_width, lr, adam_epsilon,\n' + str(algorithm) + ' ' + str(state_space_size) +
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
                + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
                # Writes every iteration, would slow things down. #hack
-    fout.write(str(num_layers) + ' ' + str(layer_width) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
+    fout.write(str(num_layers) + ' ' + str(layer_width) + ' ' + str(lr) + ' ' + str(adam_epsilon) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
@@ -273,8 +277,8 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                 for sequence_length in sequence_lengths:
                     for reward_density in reward_densities:
                         for terminal_state_density in terminal_state_densities:
-                            for num_layers in num_layerss:
-                                for layer_width in layer_widths:
+                            for lr in learning_rates:
+                                for adam_epsilon in adam_epsilons:
                                     tune.run(
                                         algorithm,
                                         stop={
@@ -282,7 +286,8 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                               },
                                         config={
 #                                          'seed': 0, #seed
-                                          "adam_epsilon": 0.00015,
+                                          "adam_epsilon": adam_epsilon,
+                                          "lr": lr, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
                                           "beta_annealing_fraction": 1.0,
                                           "buffer_size": 1000000,
                                           "double_q": False,
@@ -305,7 +310,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             'completely_connected': True
                                             },
                                         "model": {
-                                            "fcnet_hiddens": [layer_width for i in range(num_layers)],
+                                            "fcnet_hiddens": [256, 256],
                                             "custom_preprocessor": "ohe",
                                             "custom_options": {},  # extra options to pass to your preprocessor
                                             "fcnet_activation": "tanh",
@@ -319,7 +324,6 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                           "final_prioritized_replay_beta": 1.0,
                                           "hiddens": None,
                                           "learning_starts": 1000,
-                                          "lr": 6.25e-05, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
                                           "n_step": 1,
                                           "noisy": False,
                                           "num_atoms": 1,
