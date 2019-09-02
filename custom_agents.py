@@ -323,7 +323,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                   "prioritized_replay_alpha": 0.5,
                                   "sample_batch_size": 4,
                                   "schedule_max_timesteps": 20000,
-                                  "target_network_update_freq": 80,
+                                  "target_network_update_freq": 800,
                                   "timesteps_per_iteration": 100,
                                   "train_batch_size": 32,
 

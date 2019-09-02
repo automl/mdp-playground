@@ -161,7 +161,7 @@ algorithms = ["DQN"]
 num_layerss = [1, 2, 3, 4]
 layer_widths = [8, 32, 128]
 fcnet_activations = ["tanh", "relu", "sigmoid"]
-learning_startss = [1000, 2000, 4000]
+learning_startss = [500, 1000, 2000, 4000]
 target_network_update_freqs = [80, 800, 8000]
 double_dqn = [False, True]
 # lstm with sequence lengths
