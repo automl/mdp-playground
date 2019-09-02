@@ -197,7 +197,17 @@ config_space_dict["RL_algorithm_specific"]["DQN"] = {
 
 print("config_space_dict:", config_space_dict)
 
-joint_config_space_runs = [["delays", "sequence_lengths"], ["num_layerss", "layer_widths"], ["fcnet_activations"], ["learning_rates"]] #TODO Add seeds list to each one - but we need different seed space for each
+joint_config_space_runs = [["delays", "sequence_lengths"], ["num_layerss", "layer_widths"], ["fcnet_activations"], ["learning_rates", "adam_epsilons"]] #TODO Add seeds list to each one - but we need different seed space for each
+import itertools
+for i in range(len(joint_config_space_runs)):
+    exp_configs = []
+    for j in range(len(joint_config_space_runs[i])):
+        exp_configs.append(config_space_dict[joint_config_space_runs[i][j]])
+        print("Appended config_space for", joint_config_space_runs[i][j])
+    print("Cartesian product of config spaces:")
+    for element in itertools.product(*exp_configs):
+        print(element)
+
 
 import sys
 sys.exit(0)
