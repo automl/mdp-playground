@@ -8,6 +8,9 @@ from ray.rllib.agents.trainer import Trainer, with_common_config
 from ray.rllib.utils.annotations import override
 from ray.rllib.agents.dqn import DQNTrainer
 from ray.rllib.offline import OutputWriter
+import sys, os
+print("Arguments", sys.argv)
+SLURM_ARRAY_TASK_ID = sys.argv[1]
 
 class HackWriter(OutputWriter):
     def write(self, sample_batch):
@@ -222,7 +225,8 @@ def on_train_result(info):
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
     episode_len_mean = info["result"]["episode_len_mean"]
 
-    fout = open('/home/rajanr/custom-gym-env/rl_stats_temp.csv', 'a') #hardcoded
+    filename = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '.csv'
+    fout = open(filename, 'a') #hardcoded
     fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
                'terminal_state_density, dummy_seed,\n' + str(algorithm) + ' ' + str(state_space_size) +
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
@@ -336,7 +340,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                       "exploration_fraction": 0.1,
                                       "final_prioritized_replay_beta": 1.0,
                                       "hiddens": None,
-                                      "learning_starts": 1000,
+                                      "learning_starts": 2000,
                                       "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
                                       "n_step": 1,
                                       "noisy": False,
@@ -345,7 +349,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                       "prioritized_replay_alpha": 0.5,
                                       "sample_batch_size": 4,
                                       "schedule_max_timesteps": 20000,
-                                      "target_network_update_freq": 800,
+                                      "target_network_update_freq": 80,
                                       "timesteps_per_iteration": 100,
                                       "train_batch_size": 32,
 
