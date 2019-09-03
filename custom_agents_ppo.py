@@ -183,13 +183,26 @@ seeds = [i for i in range(num_seeds)]
 # Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
 # More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
 num_layerss = [1, 2, 3, 4]
-layer_widths = [8, 32, 128]
-fcnet_activations = ["tanh", "relu", "sigmoid"]
-learning_startss = [500, 1000, 2000, 4000, 8000]
-target_network_update_freqs = [8, 80, 800]
-double_dqn = [False, True]
-learning_rates = []
+layer_widths = [64, 128, 256]
 
+fcnet_activations = ["tanh", "relu", "sigmoid"]
+learning_rates = [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
+
+lambdas = []
+
+clip_params = []
+
+kl_coeffs = []
+kl_targets = []
+
+train_batch_sizes = []
+sgd_minibatch_sizes = []
+
+vf_share_layerss = []
+vf_loss_coeffs = []
+vf_clip_params = []
+
+entropy_coeffs = []
 # lstm with sequence lengths
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density,'
@@ -303,11 +316,56 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                           },
                                     config={
                                       #'seed': 0, #seed
-                                      "adam_epsilon": 1e-4,
-                                      "beta_annealing_fraction": 1.0,
-                                      "buffer_size": 1000000,
-                                      "double_q": False,
-                                      "dueling": False,
+                                          "use_gae": True, # Try [True, False] use_gae; I think they don't use target network in GAE.
+                                          # GAE(lambda) parameter #IMP lambda of TD(lambda), TD(1) is MC.
+                                          "lambda": 1.0, # [0, 0.5, 0.95, 1.0] lambda
+                                          # PPO clip parameter
+                                          "clip_param": 0.3, # [0.1, 0.2, 0.3] epsilon
+                                          # Initial coefficient for KL divergence
+                                          "kl_coeff": 0.2, # [0.0, 0.2, 1, 5] low prio.
+                                          # Target value for KL divergence
+                                          "kl_target": 0.01, # dependent on
+                                          # Size of batches collected from each worker
+                                          "sample_batch_size": 200, # [4, 20, 100, 500] low prio.
+                                          # Number of timesteps collected for each SGD round
+                                          "train_batch_size": 4000, # [500, 1500, 4500] was 32 for DQN
+                                          # Total SGD batch size across all devices for SGD
+                                          "sgd_minibatch_size": 128, # [0.1, 0.5, 1.0] Put as a ratio to train_batch_size
+                                          # Number of SGD iterations in each outer loop
+                                          "num_sgd_iter": 30, # [10, 30, 100] low prio. since train_batch_size also controls the amount of learning per step I think.
+                                          # Stepsize of SGD
+                                          "lr": 5e-5, # [1e-3, ]
+                                          # Learning rate schedule
+                                          "lr_schedule": None,
+                                          # Whether to shuffle sequences in the batch when training (recommended)
+                                          "shuffle_sequences": True,
+                                          # Share layers for value function. If you set this to True, it's important
+                                          # to tune vf_loss_coeff.
+                                          "vf_share_layers": False, # [False, True]; low prio.
+                                          # Coefficient of the value function loss. It's important to tune this if
+                                          # you set vf_share_layers: True
+                                          "vf_loss_coeff": 1.0, # [0.1, 1.0, 10.0] dependent on previous one;
+                                          # Coefficient of the entropy regularizer
+                                          "entropy_coeff": 0.0, # [0.0, 0.01, 0.1, 1] low prio.
+                                          # Decay schedule for the entropy regularizer
+                                          "entropy_coeff_schedule": None,
+                                          # Clip param for the value function. Note that this is sensitive to the
+                                          # scale of the rewards. If your expected V is large, increase this.
+                                          "vf_clip_param": 10.0, # [1, 10, 100]
+                                          # If specified, clip the global norm of gradients by this amount
+                                          "grad_clip": None,
+                                          # Whether to rollout "complete_episodes" or "truncate_episodes"
+                                          "batch_mode": "complete_episodes",
+                                          # Which observation filter to apply to the observation
+                                          "observation_filter": "NoFilter",
+                                          # Uses the sync samples optimizer instead of the multi-gpu one. This does
+                                          # not support minibatches.
+                                          "simple_optimizer": False,
+                                      "hiddens": None,
+#                                      "timesteps_per_iteration": 100,
+
+
+
                                       "env": "RLToy-v0",
                                       "env_config": {
                                         'dummy_seed': dummy_seed,
@@ -336,23 +394,6 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                         "lstm_cell_size": 256,
                                         "lstm_use_prev_action_reward": False,
                                         },
-                                      "exploration_final_eps": 0.01,
-                                      "exploration_fraction": 0.1,
-                                      "final_prioritized_replay_beta": 1.0,
-                                      "hiddens": None,
-                                      "learning_starts": 1000,
-                                      "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
-                                      "n_step": 1,
-                                      "noisy": False,
-                                      "num_atoms": 1,
-                                      "prioritized_replay": False,
-                                      "prioritized_replay_alpha": 0.5,
-                                      "sample_batch_size": 4,
-                                      "schedule_max_timesteps": 20000,
-                                      "target_network_update_freq": 800,
-                                      "timesteps_per_iteration": 100,
-                                      "train_batch_size": 32,
-
                                               "callbacks": {
                                 #                 "on_episode_start": tune.function(on_episode_start),
                                 #                 "on_episode_step": tune.function(on_episode_step),
