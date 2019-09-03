@@ -168,49 +168,30 @@ ray.init(local_mode=True)#, object_id_seed=0)
 # terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 
 num_seeds = 10
-config_space_dict = {
-"state_space_sizes": [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
-"action_space_sizes": [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-"delays": [0] + [2**i for i in range(4)],
-"sequence_lengths": [1, 2, 3, 4],#i for i in range(1,4)]
-"reward_densities": [0.25], # np.linspace(0.0, 1.0, num=5)
+state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
+action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
+delays = [0] + [2**i for i in range(4)]
+sequence_lengths = [1, 2]#i for i in range(1,4)]
+reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
-"terminal_state_densities": [0.25], # np.linspace(0.1, 1.0, num=5)
-"algorithms": ["DQN"],
-"seeds": [i for i in range(num_seeds)],
+terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
+algorithms = ["DQN"]
+seeds = [i for i in range(num_seeds)]
 # Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
 # More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
-"num_layerss": [1, 2, 3, 4],
-"layer_widths": [128, 256, 512],
-"fcnet_activations": ["tanh", "relu", "sigmoid"],
-"learning_rates": [1e-2, 1e-3, 1e-4, 1e-5, 1e-6],
-"adam_epsilons": [1e-3, 1e-4, 1e-5, 1e-6], # [1e-1, 1e-4, 1e-7, 1e-10] # optimization algorithm specific
-"RL_algorithm_specific": {},
-}
-# RL algorithm specific:
-config_space_dict["RL_algorithm_specific"]["DQN"] = {
-"learning_startss": [500, 1000, 2000, 4000, 8000],
-"target_network_update_freqs": [8, 80, 800],
-"double_dqn": [False, True],
-}
+num_layerss = [1, 2, 3, 4]
+layer_widths = [8, 32, 128]
+fcnet_activations = ["tanh", "relu", "sigmoid"]
+learning_startss = [500, 1000, 2000, 4000, 8000]
+target_network_update_freqs = [8, 80, 800]
+double_dqn = [False, True]
+learning_rates = []
+
 # lstm with sequence lengths
 
-print("config_space_dict:", config_space_dict)
-
-joint_config_space_runs = [["delays", "sequence_lengths"], ["num_layerss", "layer_widths"], ["fcnet_activations"], ["learning_rates", "adam_epsilons"]] #TODO Add seeds list to each one - but we need different seed space for each
-import itertools
-for i in range(len(joint_config_space_runs)):
-    exp_configs = []
-    for j in range(len(joint_config_space_runs[i])):
-        exp_configs.append(config_space_dict[joint_config_space_runs[i][j]])
-        print("Appended config_space for", joint_config_space_runs[i][j])
-    print("Cartesian product of config spaces:")
-    for element in itertools.product(*exp_configs):
-        print(element)
-
-
-import sys
-sys.exit(0)
+print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density,'
+               'terminal_state_density ')
+print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_lengths, reward_densities, terminal_state_densities)
 
 
 
