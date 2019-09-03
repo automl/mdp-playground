@@ -170,7 +170,7 @@ ray.init(local_mode=True)#, object_id_seed=0)
 # # make_reward_dense = [True, False]
 # terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 
-num_seeds = 10
+num_seeds = 1
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0]# + [2**i for i in range(4)]
@@ -178,7 +178,7 @@ sequence_lengths = [1]#, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
-algorithms = ["DQN"]
+algorithms = ["PPO"]
 seeds = [i for i in range(num_seeds)]
 # Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
 # More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
@@ -312,41 +312,41 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                 #hack
                                 # ag = DQNTrainer(
                                     stop={
-                                        "timesteps_total": 20000,
+                                        "timesteps_total": 200000,
                                           },
                                     config={
                                       #'seed': 0, #seed
                                           "use_gae": True, # Try [True, False] use_gae; I think they don't use target network in GAE.
                                           # GAE(lambda) parameter #IMP lambda of TD(lambda), TD(1) is MC.
-                                          "lambda": 1.0, # [0, 0.5, 0.95, 1.0] lambda
+                                          "lambda": 0.5, # [0, 0.5, 0.95, 1.0] lambda
                                           # PPO clip parameter
-                                          "clip_param": 0.3, # [0.1, 0.2, 0.3] epsilon
+                                          "clip_param": 0.1, # [0.1, 0.2, 0.3] epsilon
                                           # Initial coefficient for KL divergence
-                                          "kl_coeff": 0.2, # [0.0, 0.2, 1, 5] low prio.
+                                          "kl_coeff": 0.5, # [0.0, 0.2, 1, 5] low prio.
                                           # Target value for KL divergence
                                           "kl_target": 0.01, # dependent on
                                           # Size of batches collected from each worker
-                                          "sample_batch_size": 200, # [4, 20, 100, 500] low prio.
+                                          "sample_batch_size": 20, # [4, 20, 100, 500] low prio.
                                           # Number of timesteps collected for each SGD round
-                                          "train_batch_size": 4000, # [500, 1500, 4500] was 32 for DQN
+                                          "train_batch_size": 5000, # [500, 1500, 4500] was 32 for DQN
                                           # Total SGD batch size across all devices for SGD
-                                          "sgd_minibatch_size": 128, # [0.1, 0.5, 1.0] Put as a ratio to train_batch_size
+                                          "sgd_minibatch_size": 500, # [0.1, 0.5, 1.0] Put as a ratio to train_batch_size
                                           # Number of SGD iterations in each outer loop
-                                          "num_sgd_iter": 30, # [10, 30, 100] low prio. since train_batch_size also controls the amount of learning per step I think.
+                                          "num_sgd_iter": 10, # [10, 30, 100] low prio. since train_batch_size also controls the amount of learning per step I think.
                                           # Stepsize of SGD
-                                          "lr": 5e-5, # [1e-3, ]
+                                          "lr": 1e-1, # [1e-3, ]
                                           # Learning rate schedule
                                           "lr_schedule": None,
                                           # Whether to shuffle sequences in the batch when training (recommended)
                                           "shuffle_sequences": True,
                                           # Share layers for value function. If you set this to True, it's important
                                           # to tune vf_loss_coeff.
-                                          "vf_share_layers": False, # [False, True]; low prio.
+                                          "vf_share_layers": True, # [False, True]; low prio.
                                           # Coefficient of the value function loss. It's important to tune this if
                                           # you set vf_share_layers: True
                                           "vf_loss_coeff": 1.0, # [0.1, 1.0, 10.0] dependent on previous one;
                                           # Coefficient of the entropy regularizer
-                                          "entropy_coeff": 0.0, # [0.0, 0.01, 0.1, 1] low prio.
+                                          "entropy_coeff": 0.01, # [0.0, 0.01, 0.1, 1] low prio.
                                           # Decay schedule for the entropy regularizer
                                           "entropy_coeff_schedule": None,
                                           # Clip param for the value function. Note that this is sensitive to the
@@ -355,14 +355,15 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                           # If specified, clip the global norm of gradients by this amount
                                           "grad_clip": None,
                                           # Whether to rollout "complete_episodes" or "truncate_episodes"
-                                          "batch_mode": "complete_episodes",
+                                          "batch_mode": "truncate_episodes",
                                           # Which observation filter to apply to the observation
                                           "observation_filter": "NoFilter",
                                           # Uses the sync samples optimizer instead of the multi-gpu one. This does
                                           # not support minibatches.
                                           "simple_optimizer": False,
-                                      "hiddens": None,
 #                                      "timesteps_per_iteration": 100,
+                                            "num_workers": 11,
+                                            "num_envs_per_worker": 5,
 
 
 
@@ -402,11 +403,11 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 "on_train_result": tune.function(on_train_result),
                                 #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
                                             },
-                                    "evaluation_config": {
+#                                    "evaluation_config": {
                                     #'seed': 0, #seed
-                                    "exploration_fraction": 0,
-                                    "exploration_final_eps": 0
-                                    },
+#                                    "exploration_fraction": 0,
+#                                    "exploration_final_eps": 0
+#                                    },
                                     # "output": return_hack_writer,
                                     # "output_compress_columns": [],
                                     },
