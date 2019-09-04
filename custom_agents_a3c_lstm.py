@@ -369,7 +369,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                         "use_lstm": True,
                                         "max_seq_len": delay + sequence_length,
                                         "lstm_cell_size": 256,
-                                        "lstm_use_prev_action_reward": False,
+                                        "lstm_use_prev_action_reward": True,
                                         },
                                               "callbacks": {
                                 #                 "on_episode_start": tune.function(on_episode_start),
