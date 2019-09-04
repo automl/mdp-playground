@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-rl_stats_temp*.csv
+*.csv
 
 # C extensions
 *.so
