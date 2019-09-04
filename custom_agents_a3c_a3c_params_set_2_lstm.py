@@ -323,11 +323,11 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                     # Use PyTorch as backend - no LSTM support
                                                     "use_pytorch": False,
                                                     # GAE(gamma) parameter
-                                                    "lambda": , #
+                                                    "lambda": 1.0, #
                                                     # Max global norm for each gradient calculated by worker
-                                                    "grad_clip": , # low prio.
+                                                    "grad_clip": 10, # low prio.
                                                     # Learning rate
-                                                    "lr": , #
+                                                    "lr": 1e-4, #
                                                     # Learning rate schedule
                                                     "lr_schedule": None,
                                                     # Value Function Loss coefficient
@@ -367,10 +367,10 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 'completely_connected': True
                                                 },
                                             "model": {
-                                                "fcnet_hiddens": [,
+                                                "fcnet_hiddens": [256, 256, 256, 256],
                                                 "custom_preprocessor": "ohe",
                                                 "custom_options": {},  # extra options to pass to your preprocessor
-                                                "fcnet_activation": ,
+                                                "fcnet_activation": 'tanh',
                                                 "use_lstm": True,
                                                 "max_seq_len": delay + sequence_length,
                                                 "lstm_cell_size": 256,
