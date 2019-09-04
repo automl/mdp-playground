@@ -173,8 +173,8 @@ ray.init()#local_mode=True)#, object_id_seed=0)
 num_seeds = 3
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
-delays = [0] + [2**i for i in range(4)]
-sequence_lengths = [1, 2]#, 2, 3, 4]#i for i in range(1,4)]
+delays = [0]# + [2**i for i in range(4)]
+sequence_lengths = [1]#, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
@@ -185,8 +185,8 @@ seeds = [i for i in range(num_seeds)]
 num_layerss = [1, 2, 3, 4]
 layer_widths = [64, 128, 256]
 
-fcnet_activations = ["tanh", "relu", "sigmoid"]
 learning_rates = [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
+fcnet_activations = ["tanh", "relu", "sigmoid"]
 
 lambdas = [0, 0.5, 0.95, 1.0]
 grad_clips = [10, 30, 100]
@@ -209,7 +209,7 @@ print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_length
 hack_filename = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '.csv'
 fout = open(hack_filename, 'a') #hardcoded
 fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
-               'terminal_state_density, dummy_seed,\n')
+               'terminal_state_density, num_layers, layer_width, learning_rate, fcnet_activation, dummy_seed,\n')
 fout.close()
 
 import time
@@ -230,6 +230,12 @@ def on_train_result(info):
     reward_density = info["result"]["config"]["env_config"]["reward_density"]
     terminal_state_density = info["result"]["config"]["env_config"]["terminal_state_density"]
     dummy_seed = info["result"]["config"]["env_config"]["dummy_seed"]
+    fcnet_hiddens = info["result"]["config"]["model"]["fcnet_hiddens"]
+    num_layers = len(fcnet_hiddens)
+    layer_width = fcnet_hiddens[0] #hack
+    lr = info["result"]["config"]["lr"]
+    fcnet_activation = info["result"]["config"]["model"]["fcnet_activation"]
+    fcnet_activation = int(np.argwhere(np.array(fcnet_activations) == fcnet_activation))
 
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
@@ -241,7 +247,7 @@ def on_train_result(info):
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
                + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
                # Writes every iteration, would slow things down. #hack
-    fout.write(str(dummy_seed) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
+    fout.write(str(num_layers) + ' ' + str(layer_width) + ' ' + str(lr) + ' ' + str(fcnet_activation) + ' ' + str(dummy_seed) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
@@ -302,94 +308,96 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                 for sequence_length in sequence_lengths:
                     for reward_density in reward_densities:
                         for terminal_state_density in terminal_state_densities:
-                            for dummy_seed in seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
-                                tune.run(
-                                    algorithm,
-                                #hack
-                                # ag = DQNTrainer(
-                                    stop={
-                                        "timesteps_total": 150000,
-                                          },
-                                    config={
-                                      #'seed': 0, #seed
-                                            # Size of rollout batch
-                                            "sample_batch_size": 10, # maybe num_workers * sample_batch_size * num_envs_per_worker * grads_per_step
-                                            "train_batch_size": 100, # seems to have no effect
-                                            # Use PyTorch as backend - no LSTM support
-                                            "use_pytorch": False,
-                                            # GAE(gamma) parameter
-                                            "lambda": 1.0, #
-                                            # Max global norm for each gradient calculated by worker
-                                            "grad_clip": 40.0, # low prio.
-                                            # Learning rate
-                                            "lr": 0.0001, #
-                                            # Learning rate schedule
-                                            "lr_schedule": None,
-                                            # Value Function Loss coefficient
-                                            "vf_loss_coeff": 0.5, #
-                                            # Entropy coefficient
-                                            "entropy_coeff": 0.01, #
-                                            # Min time per iteration
-                                            "min_iter_time_s": 0,
-                                            # Workers sample async. Note that this increases the effective
-                                            # sample_batch_size by up to 5x due to async buffering of batches.
-                                            "sample_async": True,
-                                            "timesteps_per_iteration": 100,
-                                            "num_workers": 3,
-                                            "num_envs_per_worker": 5,
+                            for lr in learning_rates:
+                                for fcnet_activation in fcnet_activations:
+                                    for dummy_seed in seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
+                                        tune.run(
+                                            algorithm,
+                                        #hack
+                                        # ag = DQNTrainer(
+                                            stop={
+                                                "timesteps_total": 150000,
+                                                  },
+                                            config={
+                                              #'seed': 0, #seed
+                                                    # Size of rollout batch
+                                                    "sample_batch_size": 10, # maybe num_workers * sample_batch_size * num_envs_per_worker * grads_per_step
+                                                    "train_batch_size": 100, # seems to have no effect
+                                                    # Use PyTorch as backend - no LSTM support
+                                                    "use_pytorch": False,
+                                                    # GAE(gamma) parameter
+                                                    "lambda": 1.0, #
+                                                    # Max global norm for each gradient calculated by worker
+                                                    "grad_clip": 40.0, # low prio.
+                                                    # Learning rate
+                                                    "lr": lr, #
+                                                    # Learning rate schedule
+                                                    "lr_schedule": None,
+                                                    # Value Function Loss coefficient
+                                                    "vf_loss_coeff": 0.5, #
+                                                    # Entropy coefficient
+                                                    "entropy_coeff": 0.01, #
+                                                    # Min time per iteration
+                                                    "min_iter_time_s": 0,
+                                                    # Workers sample async. Note that this increases the effective
+                                                    # sample_batch_size by up to 5x due to async buffering of batches.
+                                                    "sample_async": True,
+                                                    "timesteps_per_iteration": 100,
+                                                    "num_workers": 3,
+                                                    "num_envs_per_worker": 5,
 
-                                            "optimizer": {
-                                                "grads_per_step": 10
+                                                    "optimizer": {
+                                                        "grads_per_step": 10
+                                                    },
+
+
+                                              "env": "RLToy-v0",
+                                              "env_config": {
+                                                'dummy_seed': dummy_seed,
+                                                'seed': 0, #seed
+                                                'state_space_type': 'discrete',
+                                                'action_space_type': 'discrete',
+                                                'state_space_size': state_space_size,
+                                                'action_space_size': action_space_size,
+                                                'generate_random_mdp': True,
+                                                'delay': delay,
+                                                'sequence_length': sequence_length,
+                                                'reward_density': reward_density,
+                                                'terminal_state_density': terminal_state_density,
+                                                'repeats_in_sequences': False,
+                                                'reward_unit': 1.0,
+                                                'make_denser': False,
+                                                'completely_connected': True
+                                                },
+                                            "model": {
+                                                "fcnet_hiddens": [256, 256],
+                                                "custom_preprocessor": "ohe",
+                                                "custom_options": {},  # extra options to pass to your preprocessor
+                                                "fcnet_activation": fcnet_activation,
+                                                "use_lstm": False,
+                                                "max_seq_len": 20,
+                                                "lstm_cell_size": 256,
+                                                "lstm_use_prev_action_reward": False,
+                                                },
+                                                      "callbacks": {
+                                        #                 "on_episode_start": tune.function(on_episode_start),
+                                        #                 "on_episode_step": tune.function(on_episode_step),
+                                        #                 "on_episode_end": tune.function(on_episode_end),
+                                        #                 "on_sample_end": tune.function(on_sample_end),
+                                                        "on_train_result": tune.function(on_train_result),
+                                        #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+                                                    },
+        #                                    "evaluation_config": {
+                                            #'seed': 0, #seed
+        #                                    "exploration_fraction": 0,
+        #                                    "exploration_final_eps": 0
+        #                                    },
+                                            # "output": return_hack_writer,
+                                            # "output_compress_columns": [],
                                             },
-
-
-                                      "env": "RLToy-v0",
-                                      "env_config": {
-                                        'dummy_seed': dummy_seed,
-                                        'seed': 0, #seed
-                                        'state_space_type': 'discrete',
-                                        'action_space_type': 'discrete',
-                                        'state_space_size': state_space_size,
-                                        'action_space_size': action_space_size,
-                                        'generate_random_mdp': True,
-                                        'delay': delay,
-                                        'sequence_length': sequence_length,
-                                        'reward_density': reward_density,
-                                        'terminal_state_density': terminal_state_density,
-                                        'repeats_in_sequences': False,
-                                        'reward_unit': 1.0,
-                                        'make_denser': False,
-                                        'completely_connected': True
-                                        },
-                                    "model": {
-                                        "fcnet_hiddens": [256, 256],
-                                        "custom_preprocessor": "ohe",
-                                        "custom_options": {},  # extra options to pass to your preprocessor
-                                        "fcnet_activation": "tanh",
-                                        "use_lstm": False,
-                                        "max_seq_len": 20,
-                                        "lstm_cell_size": 256,
-                                        "lstm_use_prev_action_reward": False,
-                                        },
-                                              "callbacks": {
-                                #                 "on_episode_start": tune.function(on_episode_start),
-                                #                 "on_episode_step": tune.function(on_episode_step),
-                                #                 "on_episode_end": tune.function(on_episode_end),
-                                #                 "on_sample_end": tune.function(on_sample_end),
-                                                "on_train_result": tune.function(on_train_result),
-                                #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
-                                            },
-#                                    "evaluation_config": {
-                                    #'seed': 0, #seed
-#                                    "exploration_fraction": 0,
-#                                    "exploration_final_eps": 0
-#                                    },
-                                    # "output": return_hack_writer,
-                                    # "output_compress_columns": [],
-                                    },
-                                 #return_trials=True # add trials = tune.run( above
-                                 )
-                                # ag.train()
+                                         #return_trials=True # add trials = tune.run( above
+                                         )
+                                        # ag.train()
 
 end = time.time()
 print("No. of seconds to run:", end - start)
