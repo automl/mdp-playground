@@ -370,7 +370,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 'completely_connected': True
                                                 },
                                             "model": {
-                                                "fcnet_hiddens": [256, 256],
+                                                "fcnet_hiddens": [128, 128, 128],
                                                 "custom_preprocessor": "ohe",
                                                 "custom_options": {},  # extra options to pass to your preprocessor
                                                 "fcnet_activation": fcnet_activation,
