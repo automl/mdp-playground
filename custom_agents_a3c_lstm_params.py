@@ -307,7 +307,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                 for sequence_length in sequence_lengths:
                     for reward_density in reward_densities:
                         for terminal_state_density in terminal_state_densities:
-                            for lstm_cell_sizes in lstm_cell_sizes:
+                            for lstm_cell_size in lstm_cell_sizes:
                                 for lstm_use_prev_action_reward in lstm_use_prev_action_rewards:
                                     for dummy_seed in seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
                                         tune.run(
