@@ -170,11 +170,11 @@ ray.init()#local_mode=True)#, object_id_seed=0)
 # # make_reward_dense = [True, False]
 # terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 
-num_seeds = 3
+num_seeds = 10
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0] + [2**i for i in range(4)]
-sequence_lengths = [1, 2]#, 2, 3, 4]#i for i in range(1,4)]
+sequence_lengths = [1, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
@@ -318,9 +318,9 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             # Use PyTorch as backend - no LSTM support
                                             "use_pytorch": False,
                                             # GAE(gamma) parameter
-                                            "lambda": 1.0, #
+                                            "lambda": 0.0, #
                                             # Max global norm for each gradient calculated by worker
-                                            "grad_clip": 40.0, # low prio.
+                                            "grad_clip": 10.0, # low prio.
                                             # Learning rate
                                             "lr": 0.0001, #
                                             # Learning rate schedule
@@ -328,7 +328,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             # Value Function Loss coefficient
                                             "vf_loss_coeff": 0.5, #
                                             # Entropy coefficient
-                                            "entropy_coeff": 0.01, #
+                                            "entropy_coeff": 0.1, #
                                             # Min time per iteration
                                             "min_iter_time_s": 0,
                                             # Workers sample async. Note that this increases the effective
@@ -362,7 +362,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                         'completely_connected': True
                                         },
                                     "model": {
-                                        "fcnet_hiddens": [256, 256],
+                                        "fcnet_hiddens": [128, 128, 128],
                                         "custom_preprocessor": "ohe",
                                         "custom_options": {},  # extra options to pass to your preprocessor
                                         "fcnet_activation": "tanh",
