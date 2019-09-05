@@ -6,6 +6,9 @@ import numpy as np
 
 from ray.rllib.agents.trainer import Trainer, with_common_config
 from ray.rllib.utils.annotations import override
+import sys, os
+print("Arguments", sys.argv)
+SLURM_ARRAY_TASK_ID = sys.argv[1]
 
 # yapf: disable
 # __sphinx_doc_begin__
@@ -123,7 +126,7 @@ ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
 
 #rllib_seed(0, 0, 0) ####IMP Doesn't work due to multi-process I think; so use config["seed"]
-ray.init()
+ray.init(local_mode=True)
 
 
 # Old config space
@@ -147,6 +150,7 @@ ray.init()
 # # make_reward_dense = [True, False]
 # terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 
+num_seeds = 3
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0] # + [2**i for i in range(4)]
@@ -155,12 +159,13 @@ reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 algorithms = ["DQN"]
-#seeds = []
+seeds = [i for i in range(num_seeds)]
 # Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size
 # More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
 num_layerss = [1, 2, 3, 4]
-layer_widths = [8, 32, 128]
+layer_widths = [128, 256, 512]
 fcnet_activations = ["tanh", "relu", "sigmoid"]
+learning_rates = [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
 learning_startss = [500, 1000, 2000, 4000]
 target_network_update_freqs = [80, 800, 8000]
 double_dqn = [False, True]
@@ -178,6 +183,12 @@ print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_length
 #TODO Write addnl. line at beginning of file for column names
 # fout = open('rl_stats_temp.csv', 'a') #hardcoded
 # fout.write('# basename, n_points, n_features, n_trees ')
+
+hack_filename = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '.csv'
+fout = open(hack_filename, 'a') #hardcoded
+fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
+           'terminal_state_density, learning_starts, target_network_update_freq, dummy_seed,\n')
+fout.close()
 
 import time
 start = time.time()
@@ -198,9 +209,7 @@ def on_train_result(info):
     sequence_length = info["result"]["config"]["env_config"]["sequence_length"]
     reward_density = info["result"]["config"]["env_config"]["reward_density"]
     terminal_state_density = info["result"]["config"]["env_config"]["terminal_state_density"]
-    fcnet_hiddens = info["result"]["config"]["model"]["fcnet_hiddens"]
-    num_layers = len(fcnet_hiddens)
-    layer_width = fcnet_hiddens[0] #hack
+    dummy_seed = info["result"]["config"]["env_config"]["dummy_seed"]
     learning_starts = info["result"]["config"]["learning_starts"]
     target_network_update_freq = info["result"]["config"]["target_network_update_freq"]
 
@@ -208,13 +217,12 @@ def on_train_result(info):
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
     episode_len_mean = info["result"]["episode_len_mean"]
 
-    fout = open('/home/rajanr/custom-gym-env/rl_stats_temp.csv', 'a') #hardcoded
-    fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
-               'terminal_state_density, num_layers, layer_width, learning_starts, target_network_update_freq,\n' + str(algorithm) + ' ' + str(state_space_size) +
+    fout = open(hack_filename, 'a') #hardcoded
+    fout.write(str(algorithm) + ' ' + str(state_space_size) +
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
                + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
                # Writes every iteration, would slow things down. #hack
-    fout.write(str(num_layers) + ' ' + str(layer_width) + ' ' + str(learning_starts) + ' ' + str(target_network_update_freq) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
+    fout.write(str(learning_starts) + ' ' + str(target_network_update_freq) + ' ' + str(dummy_seed) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
@@ -277,73 +285,79 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                         for terminal_state_density in terminal_state_densities:
                             for learning_starts in learning_startss:
                                 for target_network_update_freq in target_network_update_freqs:
-                                    tune.run(
-                                        algorithm,
-                                        stop={
-                                            "timesteps_total": 20000,
-                                              },
-                                        config={
-#                                          'seed': 0, #seed
-                                          "adam_epsilon": 0.00015,
-                                          "beta_annealing_fraction": 1.0,
-                                          "buffer_size": 1000000,
-                                          "double_q": False,
-                                          "dueling": False,
-                                          "env": "RLToy-v0",
-                                          "env_config": {
-                                            'seed': 0, #seed
-                                            'state_space_type': 'discrete',
-                                            'action_space_type': 'discrete',
-                                            'state_space_size': state_space_size,
-                                            'action_space_size': action_space_size,
-                                            'generate_random_mdp': True,
-                                            'delay': delay,
-                                            'sequence_length': sequence_length,
-                                            'reward_density': reward_density,
-                                            'terminal_state_density': terminal_state_density,
-                                            'repeats_in_sequences': False,
-                                            'reward_unit': 1.0,
-                                            'make_denser': False,
-                                            'completely_connected': True
-                                            },
-                                        "model": {
-                                            "fcnet_hiddens": [256, 256],
-                                            "custom_preprocessor": "ohe",
-                                            "custom_options": {},  # extra options to pass to your preprocessor
-                                            "fcnet_activation": "tanh",
-                                            "use_lstm": False,
-                                            "max_seq_len": 20,
-                                            "lstm_cell_size": 256,
-                                            "lstm_use_prev_action_reward": False,
-                                            },
-                                          "exploration_final_eps": 0.01,
-                                          "exploration_fraction": 0.1,
-                                          "final_prioritized_replay_beta": 1.0,
-                                          "hiddens": None,
-                                          "learning_starts": learning_starts,
-                                          "lr": 6.25e-05, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
-                                          "n_step": 1,
-                                          "noisy": False,
-                                          "num_atoms": 1,
-                                          "prioritized_replay": False,
-                                          "prioritized_replay_alpha": 0.5,
-                                          "sample_batch_size": 4,
-                                          "schedule_max_timesteps": 20000,
-                                          "target_network_update_freq": target_network_update_freq,
-                                          "timesteps_per_iteration": 100,
-                                          "train_batch_size": 32,
+                                    for dummy_seed in seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
+                                        tune.run(
+                                            algorithm,
+                                            stop={
+                                                "timesteps_total": 20000,
+                                                  },
+                                            config={
+    #                                          'seed': 0, #seed
+                                              "adam_epsilon": 1e-4,
+                                              "buffer_size": 1000000,
+                                              "double_q": True,
+                                              "dueling": True,
+                                              "lr": 1e-3,
+                                              "exploration_final_eps": 0.01,
+                                              "exploration_fraction": 0.1,
+                                              "schedule_max_timesteps": 20000,
+                                              # "hiddens": None,
+                                              "learning_starts": learning_starts,
+                                              "target_network_update_freq": target_network_update_freq,
+                                              "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
+                                              "noisy": True,
+                                              "num_atoms": 10, # [5, 10, 20]
+                                              "prioritized_replay": True,
+                                              "prioritized_replay_alpha": 0.75, #
+                                              "prioritized_replay_beta": 0.4,
+                                              "final_prioritized_replay_beta": 1.0, #
+                                              "beta_annealing_fraction": 1.0, #
 
-                                                  "callbacks": {
-                                    #                 "on_episode_start": tune.function(on_episode_start),
-                                    #                 "on_episode_step": tune.function(on_episode_step),
-                                    #                 "on_episode_end": tune.function(on_episode_end),
-                                    #                 "on_sample_end": tune.function(on_sample_end),
-                                                    "on_train_result": tune.function(on_train_result),
-                                    #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+                                              "sample_batch_size": 4,
+                                              "timesteps_per_iteration": 100,
+                                              "train_batch_size": 32,
+                                              "min_iter_time_s": 0,
+
+                                              "env": "RLToy-v0",
+                                              "env_config": {
+                                                'dummy_seed': dummy_seed,
+                                                'seed': 0, #seed
+                                                'state_space_type': 'discrete',
+                                                'action_space_type': 'discrete',
+                                                'state_space_size': state_space_size,
+                                                'action_space_size': action_space_size,
+                                                'generate_random_mdp': True,
+                                                'delay': delay,
+                                                'sequence_length': sequence_length,
+                                                'reward_density': reward_density,
+                                                'terminal_state_density': terminal_state_density,
+                                                'repeats_in_sequences': False,
+                                                'reward_unit': 1.0,
+                                                'make_denser': False,
+                                                'completely_connected': True
                                                 },
-                                        },
-                                     #return_trials=True # add tirals = tune.run( above
-                                     )
+                                            "model": {
+                                                "fcnet_hiddens": [256, 256],
+                                                "custom_preprocessor": "ohe",
+                                                "custom_options": {},  # extra options to pass to your preprocessor
+                                                "fcnet_activation": "tanh",
+                                                "use_lstm": False,
+                                                "max_seq_len": 20,
+                                                "lstm_cell_size": 256,
+                                                "lstm_use_prev_action_reward": False,
+                                                },
+
+                                                      "callbacks": {
+                                        #                 "on_episode_start": tune.function(on_episode_start),
+                                        #                 "on_episode_step": tune.function(on_episode_step),
+                                        #                 "on_episode_end": tune.function(on_episode_end),
+                                        #                 "on_sample_end": tune.function(on_sample_end),
+                                                        "on_train_result": tune.function(on_train_result),
+                                        #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+                                                    },
+                                            },
+                                         #return_trials=True # add tirals = tune.run( above
+                                         )
 
 end = time.time()
 print("No. of seconds to run:", end - start)
