@@ -170,11 +170,11 @@ ray.init(local_mode=True)#, object_id_seed=0)
 # # make_reward_dense = [True, False]
 # terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 
-num_seeds = 3
+num_seeds = 10
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
-delays = [0]# + [2**i for i in range(4)]
-sequence_lengths = [1]#, 2, 3, 4]#i for i in range(1,4)]
+delays = [0] + [2**i for i in range(4)]
+sequence_lengths = [1, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
@@ -311,13 +311,13 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                       "buffer_size": 1000000,
                                       "double_q": True,
                                       "dueling": True,
-                                      "lr": 1e-4,
+                                      "lr": 1e-3,
                                       "exploration_final_eps": 0.01,
                                       "exploration_fraction": 0.1,
                                       "schedule_max_timesteps": 20000,
                                       # "hiddens": None,
-                                      "learning_starts": 1000,
-                                      "target_network_update_freq": 800,
+                                      "learning_starts": 500,
+                                      "target_network_update_freq": 80,
                                       "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
                                       "noisy": True,
                                       "num_atoms": 10, # [5, 10, 20]
