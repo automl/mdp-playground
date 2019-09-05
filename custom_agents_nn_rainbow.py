@@ -308,17 +308,17 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                               "noisy": True,
                                               "num_atoms": 10, # [5, 10, 20]
                                               "prioritized_replay": True,
-                                              "prioritized_replay_alpha": 0.5, #
+                                              "prioritized_replay_alpha": 0.75, #
                                               "prioritized_replay_beta": 0.4,
                                               "final_prioritized_replay_beta": 1.0, #
                                               "beta_annealing_fraction": 1.0, #
 
                                               "sample_batch_size": 4,
                                               "timesteps_per_iteration": 100,
-                                              "train_batch_size": 64,
+                                              "train_batch_size": 32,
                                               "min_iter_time_s": 0,
- 
-                                             "env": "RLToy-v0",
+
+                                              "env": "RLToy-v0",
                                               "env_config": {
                                                 'dummy_seed': dummy_seed,
                                                 'seed': 0, #seed

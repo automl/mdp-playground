@@ -329,7 +329,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
 
                                       "sample_batch_size": 4,
                                       "timesteps_per_iteration": 100,
-                                      "train_batch_size": 64,
+                                      "train_batch_size": 32,
                                       "min_iter_time_s": 0,
 
                                       "env": "RLToy-v0",
