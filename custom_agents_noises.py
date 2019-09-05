@@ -170,14 +170,14 @@ ray.init(local_mode=True)#, object_id_seed=0)
 # # make_reward_dense = [True, False]
 # terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 
-num_seeds = 3
+num_seeds = 10
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0]# + [2**i for i in range(4)]
 sequence_lengths = [1]#, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
-transition_noises = [0.0]#, 0.1, 0.25, 0.5]
-reward_noises = [5, 10, 25, 100] # Std dev. of normal dist. #, lambda a: a.normal(0, 0.1), lambda a: a.normal(0, 0.25), lambda a: a.normal(0, 0.5),]
+transition_noises = [0, 0.01, 0.02, 0.10, 0.25, 0.5]
+reward_noises = [0, 1, 5, 10, 25, 100] # Std dev. of normal dist. #, lambda a: a.normal(0, 0.1), lambda a: a.normal(0, 0.25), lambda a: a.normal(0, 0.5),]
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 algorithms = ["DQN"]
