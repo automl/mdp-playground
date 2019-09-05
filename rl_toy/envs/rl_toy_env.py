@@ -92,6 +92,11 @@ class RLToyEnv(gym.Env):
         self.reward_unit = self.config["reward_unit"]
         self.augmented_state_length = config["sequence_length"] + config["delay"]
 
+        self.total_abs_noise_in_reward_episode = 0
+        self.total_reward_episode = 0
+        self.total_noisy_transitions_episode = 0
+        self.total_transitions_episode = 0
+
         self.max_real = 100.0 # Take these settings from config
         self.min_real = 0.0
 
@@ -254,7 +259,10 @@ class RLToyEnv(gym.Env):
             print("rew", reward)
             print("self.possible_remaining_sequences", self.possible_remaining_sequences)
 
-        reward += self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
+        noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
+        self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
+        self.total_reward_episode += reward
+        reward += noise_in_reward
         return reward
 
     def transition_function(self, state, action, only_query=True):
@@ -266,9 +274,10 @@ class RLToyEnv(gym.Env):
             probs[next_state] = 1 - self.config["transition_noise"]
             #TODO Samples according to new probs to get noisy discrete transition
             new_next_state = self.observation_space.sample(prob=probs) #random
-            print("noisy old next_state, new_next_state", next_state, new_next_state)
+            # print("noisy old next_state, new_next_state", next_state, new_next_state)
             if next_state != new_next_state:
-                print("NOISE inserted!")
+                print("NOISE inserted! old next_state, new_next_state", next_state, new_next_state)
+                self.total_noisy_transitions_episode += 1
             # print("new probs:", probs, self.observation_space.sample(prob=probs))
             next_state = new_next_state
             # assert np.sum(probs) == 1, str(np.sum(probs)) + " is not equal to " + str(1)
@@ -278,6 +287,8 @@ class RLToyEnv(gym.Env):
         else:
             del self.augmented_state[0]
             self.augmented_state.append(next_state)
+            self.total_transitions_episode += 1
+
 
             # print("After transition", self.augmented_state)
         #TODO Check ergodicity of MDP/policy? Can calculate probability of a rewardable specific sequence occurring (for a random policy)
@@ -300,6 +311,13 @@ class RLToyEnv(gym.Env):
         self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
         self.augmented_state.append(self.curr_state)
         # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
+
+        print("Noise stats for previous episode (total abs. noise in rewards, total reward, total noisy transitions, total transitions):",
+        self.total_abs_noise_in_reward_episode, self.total_reward_episode, self.total_noisy_transitions_episode, self.total_transitions_episode)
+        self.total_abs_noise_in_reward_episode = 0
+        self.total_reward_episode = 0
+        self.total_noisy_transitions_episode = 0
+        self.total_transitions_episode = 0
 
         return self.curr_state
 
@@ -355,6 +373,7 @@ if __name__ == "__main__":
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done)
         state = next_state
+    env.reset()
     env.close()
 
     # import sys

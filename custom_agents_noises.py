@@ -176,8 +176,8 @@ action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0]# + [2**i for i in range(4)]
 sequence_lengths = [1]#, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
-transition_noises = [0.05]#, 0.1, 0.25, 0.5]
-reward_noises = [lambda a: a.normal(0, 0.0)]#, lambda a: a.normal(0, 0.1), lambda a: a.normal(0, 0.25), lambda a: a.normal(0, 0.5),]
+transition_noises = [0.0]#, 0.1, 0.25, 0.5]
+reward_noises = [5, 10, 25, 100] # Std dev. of normal dist. #, lambda a: a.normal(0, 0.1), lambda a: a.normal(0, 0.25), lambda a: a.normal(0, 0.5),]
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 algorithms = ["DQN"]
@@ -229,7 +229,7 @@ def on_train_result(info):
     terminal_state_density = info["result"]["config"]["env_config"]["terminal_state_density"]
     dummy_seed = info["result"]["config"]["env_config"]["dummy_seed"]
     transition_noise = info["result"]["config"]["env_config"]["transition_noise"]
-    reward_noise = info["result"]["config"]["env_config"]["reward_noise"]
+    reward_noise = info["result"]["config"]["env_config"]["reward_noise_std"]
 
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
@@ -353,7 +353,8 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 'make_denser': False,
                                                 'completely_connected': True,
                                                 'transition_noise': transition_noise,
-                                                'reward_noise': tune.function(reward_noise)
+                                                'reward_noise': tune.function(lambda a: a.normal(0, reward_noise)),
+                                                'reward_noise_std': reward_noise,
                                                 },
                                             "model": {
                                                 "fcnet_hiddens": [256, 256],
@@ -377,7 +378,11 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             "evaluation_config": {
                                             #'seed': 0, #seed
                                             "exploration_fraction": 0,
-                                            "exploration_final_eps": 0
+                                            "exploration_final_eps": 0,
+                                              "env_config": {
+                                                'transition_noise': 0,
+                                                'reward_noise': tune.function(lambda a: a.normal(0, 0))
+                                                }
                                             },
                                             # "output": return_hack_writer,
                                             # "output_compress_columns": [],
