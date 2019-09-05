@@ -245,8 +245,11 @@ class RLToyEnv(gym.Env):
         else:
             for j in range(1, sequence_length + 1):
         # Check if augmented_states - delay up to different lengths in the past are present in sequence lists of that particular length; if so add them to the list of length
-                if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] in self.possible_remaining_sequences[j - 1]:
-                    reward += self.reward_unit * j / self.sequence_length
+                curr_seq_being_checked = state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay]
+                if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
+                    count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
+                    print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_unit * j / self.sequence_length)
+                    reward += count_ * self.reward_unit * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
 
             self.possible_remaining_sequences = [[] for i in range(sequence_length)]
             for j in range(0, sequence_length):
@@ -354,10 +357,10 @@ if __name__ == "__main__":
     config["sequence_length"] = 3
     config["repeats_in_sequences"] = False
     config["reward_unit"] = 1.0
-    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
-    config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
+#    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
+#    config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
     config["reward_density"] = 0.25 # Number between 0 and 1
-    config["make_denser"] = False
+    config["make_denser"] = True
     config["terminal_state_density"] = 0.25 # Number between 0 and 1
     config["completely_connected"] = True # Make every state reachable from every state
     env = RLToyEnv(config)
@@ -371,7 +374,7 @@ if __name__ == "__main__":
         # env.render() # For GUI
         action = env.action_space.sample() # take a #random action # TODO currently DiscreteExtended returns a sampled array
         next_state, reward, done, info = env.step(action)
-        print("sars', done =", state, action, reward, next_state, done)
+        print("sars', done =", state, action, reward, next_state, done, "\n")
         state = next_state
     env.reset()
     env.close()
