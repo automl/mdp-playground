@@ -232,7 +232,7 @@ class RLToyEnv(gym.Env):
             state_considered = [state_considered] # to get around case when sequence is an int
         if not self.config["make_denser"]:
             if state_considered[0 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
-                # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
+                print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
                 reward += self.reward_unit
             else:
                 # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
@@ -260,20 +260,23 @@ class RLToyEnv(gym.Env):
     def transition_function(self, state, action, only_query=True):
         # only_query when true performs an imaginary transition i.e. augmented state etc. are not updated; Basically used implicitly when self.P() is called
         # print("Before transition", self.augmented_state)
+        next_state = self.config["transition_function"][state, action]
+        if "transition_noise" in self.config:
+            probs = np.ones(shape=(self.config["state_space_size"],)) * self.config["transition_noise"] / (self.config["state_space_size"] - 1)
+            probs[next_state] = 1 - self.config["transition_noise"]
+            #TODO Samples according to new probs to get noisy discrete transition
+            new_next_state = self.observation_space.sample(prob=probs) #random
+            print("noisy old next_state, new_next_state", next_state, new_next_state)
+            if next_state != new_next_state:
+                print("NOISE inserted!")
+            # print("new probs:", probs, self.observation_space.sample(prob=probs))
+            next_state = new_next_state
+            # assert np.sum(probs) == 1, str(np.sum(probs)) + " is not equal to " + str(1)
         if only_query:
             pass
             # print("Only query") # Since transition_function currently depends only on current state and action, we don't need to do anything here!
         else:
             del self.augmented_state[0]
-            next_state = self.config["transition_function"][state, action]
-            if "transition_noise" in self.config:
-                probs = np.ones(shape=(self.config["state_space_size"],)) * self.config["transition_noise"] / (self.config["state_space_size"] - 1)
-                probs[next_state] = 1 - self.config["transition_noise"]
-                #TODO Samples according to new probs to get noisy discrete transition
-                new_next_state = self.observation_space.sample(prob=probs) #random
-                print("NOISY old next_state, new_next_state", next_state, new_next_state)
-                next_state = new_next_state
-                # assert np.sum(probs) == 1, str(np.sum(probs)) + " is not equal to " + str(1)
             self.augmented_state.append(next_state)
 
             # print("After transition", self.augmented_state)
@@ -333,8 +336,8 @@ if __name__ == "__main__":
     config["sequence_length"] = 3
     config["repeats_in_sequences"] = False
     config["reward_unit"] = 1.0
-    # config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
-    # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
+    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
+    config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
     config["reward_density"] = 0.25 # Number between 0 and 1
     config["make_denser"] = False
     config["terminal_state_density"] = 0.25 # Number between 0 and 1
@@ -346,7 +349,7 @@ if __name__ == "__main__":
 #    print("env.spec.max_episode_steps, env.unwrapped:", env.spec.max_episode_steps, env.unwrapped)
     state = env.reset()
     # print("TEST", type(state))
-    for _ in range(20):
+    for _ in range(40):
         # env.render() # For GUI
         action = env.action_space.sample() # take a #random action # TODO currently DiscreteExtended returns a sampled array
         next_state, reward, done, info = env.step(action)

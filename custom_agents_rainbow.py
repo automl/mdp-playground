@@ -305,7 +305,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                     stop={
                                         "timesteps_total": 20000,
                                           },
-                                    config={ # Addnl. for rainbow: n_step, prioritized_replay, num_atoms, dueling, double_q, noisy
+                                    config={ # Addnl. for rainbow: n_step (sample_batch_size will be at least this much!!), prioritized_replay, num_atoms, dueling, double_q, noisy
                                       #'seed': 0, #seed
                                       "adam_epsilon": 1e-4,
                                       "buffer_size": 1000000,
