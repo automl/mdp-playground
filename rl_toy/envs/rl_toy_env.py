@@ -147,6 +147,9 @@ class RLToyEnv(gym.Env):
 
         print(" self.delay, self.sequence_length:", self.delay, self.sequence_length)
 
+
+        print("toy env instantiated with config:", self.config) #hack
+
         # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
         # print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
         # print("self.R:", np.array([[self.R(i, j) for j in range(5)] for i in range(5)]), self.config["reward_function"])

@@ -367,6 +367,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 "on_train_result": tune.function(on_train_result),
                                 #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
                                             },
+                                    "evaluation_interval": 500,
                                     "evaluation_config": {
                                     #'seed': 0, #seed
                                     "exploration_fraction": 0,
