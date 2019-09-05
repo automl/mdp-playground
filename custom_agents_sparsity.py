@@ -174,7 +174,7 @@ num_seeds = 3
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0]# + [2**i for i in range(4)]
-sequence_lengths = [1]#, 2, 3, 4]#i for i in range(1,4)]
+sequence_lengths = [1, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
@@ -371,7 +371,9 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                     #'seed': 0, #seed
                                     "exploration_fraction": 0,
                                     "exploration_final_eps": 0,
-                                    "make_denser": False
+                                      "env_config": {
+                                          "make_denser": False
+                                        }
                                     },
                                     # "output": return_hack_writer,
                                     # "output_compress_columns": [],
