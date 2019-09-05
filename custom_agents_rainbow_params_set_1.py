@@ -170,6 +170,8 @@ target_network_update_freqs = [8, 80, 800]
 double_dqn = [False, True]
 
 # lstm with sequence lengths
+n_steps = [1, 2, 4, 8]
+num_atomss = [5, 10, 20]
 
 prioritized_replay_alphas = [0.25, 0.5, 0.75, 1.0] # controls exponent of unnormalised probability for each sample(=proportional to TD-error)
 prioritized_replay_betas = [0.4, 0.7, 1.0] # controls bias - exponent for controlling probability of sample selection; used for weighted importance sampling
@@ -191,14 +193,11 @@ print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_length
 hack_filename = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '.csv'
 fout = open(hack_filename, 'a') #hardcoded
 fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
-           'terminal_state_density, prioritized_replay_alpha, prioritized_replay_beta, dummy_seed,\n')
+           'terminal_state_density, n_step, num_atoms, dummy_seed,\n')
 fout.close()
 
 import time
 start = time.time()
-print(algorithms, state_space_sizes, action_space_sizes, delays,
-      sequence_lengths, reward_densities, terminal_state_densities)
-
 
 def on_train_result(info):
 #     print("#############trainer.train() result: {} -> {} episodes".format(
@@ -214,8 +213,8 @@ def on_train_result(info):
     reward_density = info["result"]["config"]["env_config"]["reward_density"]
     terminal_state_density = info["result"]["config"]["env_config"]["terminal_state_density"]
     dummy_seed = info["result"]["config"]["env_config"]["dummy_seed"]
-    prioritized_replay_alpha = info["result"]["config"]["prioritized_replay_alpha"]
-    prioritized_replay_beta = info["result"]["config"]["prioritized_replay_beta"]
+    n_step = info["result"]["config"]["n_step"]
+    num_atoms = info["result"]["config"]["num_atoms"]
 
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
@@ -226,7 +225,7 @@ def on_train_result(info):
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
                + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
                # Writes every iteration, would slow things down. #hack
-    fout.write(str(prioritized_replay_alpha) + ' ' + str(prioritized_replay_beta) + ' ' + str(dummy_seed) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
+    fout.write(str(n_step) + ' ' + str(num_atoms) + ' ' + str(dummy_seed) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
@@ -287,8 +286,8 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                 for sequence_length in sequence_lengths:
                     for reward_density in reward_densities:
                         for terminal_state_density in terminal_state_densities:
-                            for prioritized_replay_alpha in prioritized_replay_alphas:
-                                for prioritized_replay_beta in prioritized_replay_betas:
+                            for n_step in n_steps:
+                                for num_atoms in num_atomss:
                                     for dummy_seed in seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
                                         tune.run(
                                             algorithm,
@@ -308,12 +307,12 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                               # "hiddens": None,
                                               "learning_starts": 1000,
                                               "target_network_update_freq": 800,
-                                              "n_step": 8, # delay + sequence_length [1, 2, 4, 8]
+                                              "n_step": n_step, # delay + sequence_length [1, 2, 4, 8]
                                               "noisy": True,
-                                              "num_atoms": 10, # [5, 10, 20]
+                                              "num_atoms": num_atoms, # [5, 10, 20]
                                               "prioritized_replay": True,
-                                              "prioritized_replay_alpha": prioritized_replay_alpha, #
-                                              "prioritized_replay_beta": prioritized_replay_beta,
+                                              "prioritized_replay_alpha": 0.5, #
+                                              "prioritized_replay_beta": 0.4,
                                               "final_prioritized_replay_beta": 1.0, #
                                               "beta_annealing_fraction": 1.0, #
 
