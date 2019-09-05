@@ -232,7 +232,7 @@ class RLToyEnv(gym.Env):
             state_considered = [state_considered] # to get around case when sequence is an int
         if not self.config["make_denser"]:
             if state_considered[0 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
-                print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
+                # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
                 reward += self.reward_unit
             else:
                 # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
