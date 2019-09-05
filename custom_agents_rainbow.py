@@ -318,7 +318,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                       # "hiddens": None,
                                       "learning_starts": 1000,
                                       "target_network_update_freq": 800,
-                                      "n_step": 8, # delay + sequence_length [1, 2, 4, 8]
+                                      "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
                                       "noisy": True,
                                       "num_atoms": 10, # [5, 10, 20]
                                       "prioritized_replay": True,

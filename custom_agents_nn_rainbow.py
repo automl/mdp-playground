@@ -293,12 +293,32 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                   },
                                             config={
     #                                          'seed': 0, #seed
-                                              "adam_epsilon": 0.00015,
-                                              "beta_annealing_fraction": 1.0,
+                                              "adam_epsilon": 1e-4,
                                               "buffer_size": 1000000,
-                                              "double_q": False,
-                                              "dueling": False,
-                                              "env": "RLToy-v0",
+                                              "double_q": True,
+                                              "dueling": True,
+                                              "lr": 1e-4,
+                                              "exploration_final_eps": 0.01,
+                                              "exploration_fraction": 0.1,
+                                              "schedule_max_timesteps": 20000,
+                                              # "hiddens": None,
+                                              "learning_starts": 1000,
+                                              "target_network_update_freq": 800,
+                                              "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
+                                              "noisy": True,
+                                              "num_atoms": 10, # [5, 10, 20]
+                                              "prioritized_replay": True,
+                                              "prioritized_replay_alpha": 0.5, #
+                                              "prioritized_replay_beta": 0.4,
+                                              "final_prioritized_replay_beta": 1.0, #
+                                              "beta_annealing_fraction": 1.0, #
+
+                                              "sample_batch_size": 4,
+                                              "timesteps_per_iteration": 100,
+                                              "train_batch_size": 64,
+                                              "min_iter_time_s": 0,
+ 
+                                             "env": "RLToy-v0",
                                               "env_config": {
                                                 'dummy_seed': dummy_seed,
                                                 'seed': 0, #seed
@@ -326,22 +346,6 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 "lstm_cell_size": 256,
                                                 "lstm_use_prev_action_reward": False,
                                                 },
-                                              "exploration_final_eps": 0.01,
-                                              "exploration_fraction": 0.1,
-                                              "final_prioritized_replay_beta": 1.0,
-                                              "hiddens": None,
-                                              "learning_starts": 1000,
-                                              "lr": 6.25e-05, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
-                                              "n_step": 1,
-                                              "noisy": False,
-                                              "num_atoms": 1,
-                                              "prioritized_replay": False,
-                                              "prioritized_replay_alpha": 0.5,
-                                              "sample_batch_size": 4,
-                                              "schedule_max_timesteps": 20000,
-                                              "target_network_update_freq": 800,
-                                              "timesteps_per_iteration": 100,
-                                              "train_batch_size": 32,
 
                                                       "callbacks": {
                                         #                 "on_episode_start": tune.function(on_episode_start),
