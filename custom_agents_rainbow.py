@@ -322,7 +322,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                       "noisy": True,
                                       "num_atoms": 10, # [5, 10, 20]
                                       "prioritized_replay": True,
-                                      "prioritized_replay_alpha": 0.5, #
+                                      "prioritized_replay_alpha": 0.75, #
                                       "prioritized_replay_beta": 0.4,
                                       "final_prioritized_replay_beta": 1.0, #
                                       "beta_annealing_fraction": 1.0, #
