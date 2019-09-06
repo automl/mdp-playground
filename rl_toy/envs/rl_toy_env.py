@@ -101,12 +101,12 @@ class RLToyEnv(gym.Env):
         self.min_real = 0.0
 
         if config["state_space_type"].lower() == "discrete":
-            self.observation_space = DiscreteExtended(config["state_space_size"], seed=config["state_space_size"]) #seed #hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
+            self.observation_space = DiscreteExtended(config["state_space_size"], seed=config["state_space_size"] + config["seed"]) #seed #hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
         else:
             self.observation_space = Box(self.min_real, self.max_real, shape=(config["state_space_dim"], ), dtype=np.float64)
 
         if config["action_space_type"].lower() == "discrete":
-            self.action_space = DiscreteExtended(config["action_space_size"], seed=config["action_space_size"]) #seed #hack
+            self.action_space = DiscreteExtended(config["action_space_size"], seed=config["action_space_size"] + config["seed"]) #seed #hack
         else:
             self.action_space = Box(self.min_real, self.max_real, shape=(config["action_space_dim"], ), dtype=np.float64)
 

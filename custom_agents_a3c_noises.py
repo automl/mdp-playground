@@ -417,6 +417,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             "exploration_fraction": 0,
                                             "exploration_final_eps": 0,
                                             "batch_mode": "complete_episodes",
+                                            'horizon': 100,
                                               "env_config": {
                                                 "dummy_eval": True, #hack
                                                 'transition_noise': 0,
