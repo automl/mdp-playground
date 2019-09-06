@@ -395,6 +395,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                     #'seed': 0, #seed
                                     "exploration_fraction": 0,
                                     "exploration_final_eps": 0,
+                                    "batch_mode": "complete_episodes",
                                       "env_config": {
                                           "dummy_eval": True, #hack
                                           "make_denser": False

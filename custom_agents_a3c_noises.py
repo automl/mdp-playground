@@ -265,7 +265,7 @@ def on_episode_end(info):
 
     #info has env, policy, Episode objects
     if "dummy_eval" in info["env"].get_unwrapped()[0].config:
-        print("###on_episode_end info", info["env"].get_unwrapped()[0].config["make_denser"], info["episode"].total_reward, info["episode"].length) #, info["episode"]._agent_reward_history)
+        print("###on_episode_end info", info["env"].get_unwrapped()[0].config["make_denser"], info["episode"].total_reward, info["episode"].length) #, info["episode"].agent_rewards, info["episode"]._agent_reward_history)
         reward_this_episode = info["episode"].total_reward
         length_this_episode = info["episode"].length
         hack_filename_eval = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '_eval.csv'
@@ -416,6 +416,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             #'seed': 0, #seed
                                             "exploration_fraction": 0,
                                             "exploration_final_eps": 0,
+                                            "batch_mode": "complete_episodes",
                                               "env_config": {
                                                 "dummy_eval": True, #hack
                                                 'transition_noise': 0,
