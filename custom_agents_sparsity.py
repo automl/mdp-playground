@@ -260,6 +260,8 @@ def on_episode_end(info):
         fout.write(str(reward_this_episode) + ' ' + str(length_this_episode) + "\n")
         fout.close()
 
+
+
 # tune.run(
 #     RandomAgent,
 #     stop={
