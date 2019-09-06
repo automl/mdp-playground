@@ -250,6 +250,12 @@ def on_train_result(info):
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
+    # print("###HACK info object:", info)
+    hack_filename_eval = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '_eval.csv'
+    fout = open(hack_filename_eval, 'a') #hardcoded
+    fout.write('#HACK STRING EVAL' + "\n")
+    fout.close()
+
     info["result"]["callback_ok"] = True
 
 
@@ -396,7 +402,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 "lstm_cell_size": 256,
                                                 "lstm_use_prev_action_reward": False,
                                                 },
-                                                
+
                                                       "callbacks": {
                                         #                 "on_episode_start": tune.function(on_episode_start),
                                         #                 "on_episode_step": tune.function(on_episode_step),
