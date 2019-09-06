@@ -146,7 +146,7 @@ ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 # random.seed(0)
 # import tensorflow as tf
 # tf.set_random_seed(0)
-ray.init(local_mode=True)#, object_id_seed=0)
+ray.init()#local_mode=True)#, object_id_seed=0)
 
 
 # Old config space
@@ -180,18 +180,22 @@ transition_noises = [0, 0.01, 0.02, 0.10, 0.25]
 reward_noises = [0, 1, 5, 10, 25] # Std dev. of normal dist. #, lambda a: a.normal(0, 0.1), lambda a: a.normal(0, 0.25), lambda a: a.normal(0, 0.5),]
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
-algorithms = ["DQN"]
+algorithms = ["A3C"]
 seeds = [i for i in range(num_seeds)]
 # Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
 # More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
 num_layerss = [1, 2, 3, 4]
-layer_widths = [8, 32, 128]
-fcnet_activations = ["tanh", "relu", "sigmoid"]
-learning_startss = [500, 1000, 2000, 4000, 8000]
-target_network_update_freqs = [8, 80, 800]
-double_dqn = [False, True]
-learning_rates = []
+layer_widths = [64, 128, 256]
 
+fcnet_activations = ["tanh", "relu", "sigmoid"]
+learning_rates = [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
+
+lambdas = [0, 0.5, 0.95, 1.0]
+grad_clips = [10, 30, 100]
+
+#vf_share_layerss = []
+vf_loss_coeffs = [0.1, 0.5, 2.5]
+entropy_coeffs = [0.001, 0.01, 0.1, 1]
 # lstm with sequence lengths
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density,'
@@ -326,31 +330,40 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                         #hack
                                         # ag = DQNTrainer(
                                             stop={
-                                                "timesteps_total": 20000,
+                                                "timesteps_total": 150000,
                                                   },
                                             config={
                                               #'seed': 0, #seed
-                                              "adam_epsilon": 1e-4,
-                                              "beta_annealing_fraction": 1.0,
-                                              "buffer_size": 1000000,
-                                              "double_q": False,
-                                              "dueling": False,
-                                              "exploration_final_eps": 0.01,
-                                              "exploration_fraction": 0.1,
-                                              "final_prioritized_replay_beta": 1.0,
-                                              "hiddens": None,
-                                              "learning_starts": 1000,
-                                              "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
-                                              "n_step": 1,
-                                              "noisy": False,
-                                              "num_atoms": 1,
-                                              "prioritized_replay": False,
-                                              "prioritized_replay_alpha": 0.5,
-                                              "sample_batch_size": 4,
-                                              "schedule_max_timesteps": 20000,
-                                              "target_network_update_freq": 800,
-                                              "timesteps_per_iteration": 100,
-                                              "train_batch_size": 32,
+                                                    # Size of rollout batch
+                                                    "sample_batch_size": 10, # maybe num_workers * sample_batch_size * num_envs_per_worker * grads_per_step
+                                                    "train_batch_size": 100, # seems to have no effect
+                                                    # Use PyTorch as backend - no LSTM support
+                                                    "use_pytorch": False,
+                                                    # GAE(gamma) parameter
+                                                    "lambda": 0.0, #
+                                                    # Max global norm for each gradient calculated by worker
+                                                    "grad_clip": 10.0, # low prio.
+                                                    # Learning rate
+                                                    "lr": 0.0001, #
+                                                    # Learning rate schedule
+                                                    "lr_schedule": None,
+                                                    # Value Function Loss coefficient
+                                                    "vf_loss_coeff": 0.5, #
+                                                    # Entropy coefficient
+                                                    "entropy_coeff": 0.1, #
+                                                    # Min time per iteration
+                                                    "min_iter_time_s": 0,
+                                                    # Workers sample async. Note that this increases the effective
+                                                    # sample_batch_size by up to 5x due to async buffering of batches.
+                                                    "sample_async": True,
+                                                    "timesteps_per_iteration": 100,
+                                                    "num_workers": 3,
+                                                    "num_envs_per_worker": 5,
+
+                                                    "optimizer": {
+                                                        "grads_per_step": 10
+                                                    },
+
 
                                               "env": "RLToy-v0",
                                               "env_config": {
@@ -374,7 +387,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 'reward_noise_std': reward_noise,
                                                 },
                                             "model": {
-                                                "fcnet_hiddens": [256, 256],
+                                                "fcnet_hiddens": [128, 128, 128],
                                                 "custom_preprocessor": "ohe",
                                                 "custom_options": {},  # extra options to pass to your preprocessor
                                                 "fcnet_activation": "tanh",
@@ -383,7 +396,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                 "lstm_cell_size": 256,
                                                 "lstm_use_prev_action_reward": False,
                                                 },
-
+                                                
                                                       "callbacks": {
                                         #                 "on_episode_start": tune.function(on_episode_start),
                                         #                 "on_episode_step": tune.function(on_episode_step),

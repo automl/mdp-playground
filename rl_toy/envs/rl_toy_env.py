@@ -251,7 +251,7 @@ class RLToyEnv(gym.Env):
                 curr_seq_being_checked = state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay]
                 if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
                     count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
-                    print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_unit * j / self.sequence_length)
+                    # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_unit * j / self.sequence_length)
                     reward += count_ * self.reward_unit * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
 
             self.possible_remaining_sequences = [[] for i in range(sequence_length)]
