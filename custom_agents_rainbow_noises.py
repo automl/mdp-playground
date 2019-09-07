@@ -173,9 +173,11 @@ ray.init(local_mode=True)#, object_id_seed=0)
 num_seeds = 10
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
-delays = [0] + [2**i for i in range(4)]
-sequence_lengths = [1, 2, 3, 4]#i for i in range(1,4)]
+delays = [0]# + [2**i for i in range(4)]
+sequence_lengths = [1]#, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
+transition_noises = [0, 0.01, 0.02, 0.10, 0.25]
+reward_noises = [0, 1, 5, 10, 25] # Std dev. of normal dist. #, lambda a: a.normal(0, 0.1), lambda a: a.normal(0, 0.25), lambda a: a.normal(0, 0.5),]
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
 algorithms = ["DQN"]
@@ -205,7 +207,7 @@ print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_length
 hack_filename = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '.csv'
 fout = open(hack_filename, 'a') #hardcoded
 fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
-           'terminal_state_density, dummy_seed,\n')
+           'terminal_state_density, transition_noise, reward_noise, dummy_seed,\n')
 fout.close()
 
 import time
@@ -227,6 +229,8 @@ def on_train_result(info):
     reward_density = info["result"]["config"]["env_config"]["reward_density"]
     terminal_state_density = info["result"]["config"]["env_config"]["terminal_state_density"]
     dummy_seed = info["result"]["config"]["env_config"]["dummy_seed"]
+    transition_noise = info["result"]["config"]["env_config"]["transition_noise"]
+    reward_noise = info["result"]["config"]["env_config"]["reward_noise_std"]
 
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
@@ -238,7 +242,7 @@ def on_train_result(info):
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
                + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
                # Writes every iteration, would slow things down. #hack
-    fout.write(str(dummy_seed) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
+    fout.write(str(transition_noise) + ' ' + str(reward_noise) + ' ' + str(dummy_seed) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
@@ -320,92 +324,102 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                 for sequence_length in sequence_lengths:
                     for reward_density in reward_densities:
                         for terminal_state_density in terminal_state_densities:
-                            for dummy_seed in seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
-                                tune.run(
-                                    algorithm,
-                                #hack
-                                # ag = DQNTrainer(
-                                    stop={
-                                        "timesteps_total": 20000,
-                                          },
-                                    config={
-                                      #'seed': 0, #seed
-                                      "adam_epsilon": 1e-4,
-                                      "beta_annealing_fraction": 1.0,
-                                      "buffer_size": 1000000,
-                                      "double_q": False,
-                                      "dueling": False,
-                                      "exploration_final_eps": 0.01,
-                                      "exploration_fraction": 0.1,
-                                      "final_prioritized_replay_beta": 1.0,
-                                      "hiddens": None,
-                                      "learning_starts": 1000,
-                                      "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
-                                      "n_step": 1,
-                                      "noisy": False,
-                                      "num_atoms": 1,
-                                      "prioritized_replay": False,
-                                      "prioritized_replay_alpha": 0.5,
-                                      "sample_batch_size": 4,
-                                      "schedule_max_timesteps": 20000,
-                                      "target_network_update_freq": 800,
-                                      "timesteps_per_iteration": 100,
-                                      "train_batch_size": 32,
+                            for transition_noise in transition_noises:
+                                for reward_noise in  reward_noises:
+                                    for dummy_seed in seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
+                                        tune.run(
+                                            algorithm,
+                                        #hack
+                                        # ag = DQNTrainer(
+                                            stop={
+                                                "timesteps_total": 20000,
+                                                  },
+                                            config={ # Addnl. for rainbow: n_step (sample_batch_size will be at least this much!!), prioritized_replay, num_atoms, dueling, double_q, noisy
+                                              #'seed': 0, #seed
+                                              "adam_epsilon": 1e-4,
+                                              "buffer_size": 1000000,
+                                              "double_q": True,
+                                              "dueling": True,
+                                              "lr": 1e-3,
+                                              "exploration_final_eps": 0.01,
+                                              "exploration_fraction": 0.1,
+                                              "schedule_max_timesteps": 20000,
+                                              # "hiddens": None,
+                                              "learning_starts": 500,
+                                              "target_network_update_freq": 80,
+                                              "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
+                                              "noisy": True,
+                                              "num_atoms": 10, # [5, 10, 20]
+                                              "prioritized_replay": True,
+                                              "prioritized_replay_alpha": 0.75, #
+                                              "prioritized_replay_beta": 0.4,
+                                              "final_prioritized_replay_beta": 1.0, #
+                                              "beta_annealing_fraction": 1.0, #
 
-                                      "env": "RLToy-v0",
-                                      "env_config": {
-                                        'dummy_seed': dummy_seed,
-                                        'seed': 0, #seed
-                                        'state_space_type': 'discrete',
-                                        'action_space_type': 'discrete',
-                                        'state_space_size': state_space_size,
-                                        'action_space_size': action_space_size,
-                                        'generate_random_mdp': True,
-                                        'delay': delay,
-                                        'sequence_length': sequence_length,
-                                        'reward_density': reward_density,
-                                        'terminal_state_density': terminal_state_density,
-                                        'repeats_in_sequences': False,
-                                        'reward_unit': 1.0,
-                                        'make_denser': False,
-                                        'completely_connected': True
-                                        },
-                                    "model": {
-                                        "fcnet_hiddens": [256, 256],
-                                        "custom_preprocessor": "ohe",
-                                        "custom_options": {},  # extra options to pass to your preprocessor
-                                        "fcnet_activation": "tanh",
-                                        "use_lstm": False,
-                                        "max_seq_len": 20,
-                                        "lstm_cell_size": 256,
-                                        "lstm_use_prev_action_reward": False,
-                                        },
+                                              "sample_batch_size": 4,
+                                              "timesteps_per_iteration": 500,
+                                              "train_batch_size": 32,
+                                              "min_iter_time_s": 1,
 
-                                              "callbacks": {
-                                #                 "on_episode_start": tune.function(on_episode_start),
-                                #                 "on_episode_step": tune.function(on_episode_step),
-                                                "on_episode_end": tune.function(on_episode_end),
-                                #                 "on_sample_end": tune.function(on_sample_end),
-                                                "on_train_result": tune.function(on_train_result),
-                                #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+                                              "env": "RLToy-v0",
+                                              "env_config": {
+                                                'dummy_seed': dummy_seed,
+                                                'seed': 0, #seed
+                                                'state_space_type': 'discrete',
+                                                'action_space_type': 'discrete',
+                                                'state_space_size': state_space_size,
+                                                'action_space_size': action_space_size,
+                                                'generate_random_mdp': True,
+                                                'delay': delay,
+                                                'sequence_length': sequence_length,
+                                                'reward_density': reward_density,
+                                                'terminal_state_density': terminal_state_density,
+                                                'repeats_in_sequences': False,
+                                                'reward_unit': 1.0,
+                                                'make_denser': False,
+                                                'completely_connected': True,
+                                                'transition_noise': transition_noise,
+                                                'reward_noise': tune.function(lambda a: a.normal(0, reward_noise)),
+                                                'reward_noise_std': reward_noise,
+                                                },
+                                            "model": {
+                                                "fcnet_hiddens": [256, 256],
+                                                "custom_preprocessor": "ohe",
+                                                "custom_options": {},  # extra options to pass to your preprocessor
+                                                "fcnet_activation": "tanh",
+                                                "use_lstm": False,
+                                                "max_seq_len": 20,
+                                                "lstm_cell_size": 256,
+                                                "lstm_use_prev_action_reward": False,
+                                                },
+
+                                                      "callbacks": {
+                                        #                 "on_episode_start": tune.function(on_episode_start),
+                                        #                 "on_episode_step": tune.function(on_episode_step),
+                                                        "on_episode_end": tune.function(on_episode_end),
+                                        #                 "on_sample_end": tune.function(on_sample_end),
+                                                        "on_train_result": tune.function(on_train_result),
+                                        #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+                                                    },
+                                            "evaluation_interval": 1, # I think this every x training_iterations
+                                            "evaluation_config": {
+                                            #'seed': 0, #seed
+                                            "exploration_fraction": 0,
+                                            "exploration_final_eps": 0,
+                                            "batch_mode": "complete_episodes",
+                                            'horizon': 100,
+                                              "env_config": {
+                                                "dummy_eval": True, #hack
+                                                'transition_noise': 0,
+                                                'reward_noise': tune.function(lambda a: a.normal(0, 0))
+                                                }
                                             },
-                                        "evaluation_interval": 1, # I think this every x training_iterations
-                                        "evaluation_config": {
-                                        #'seed': 0, #seed
-                                        "exploration_fraction": 0,
-                                        "exploration_final_eps": 0,
-                                        "batch_mode": "complete_episodes",
-                                        'horizon': 100,
-                                          "env_config": {
-                                            "dummy_eval": True, #hack
-                                            }
-                                    },
-                                    # "output": return_hack_writer,
-                                    # "output_compress_columns": [],
-                                    },
-                                 #return_trials=True # add trials = tune.run( above
-                                 )
-                                # ag.train()
+                                            # "output": return_hack_writer,
+                                            # "output_compress_columns": [],
+                                            },
+                                         #return_trials=True # add trials = tune.run( above
+                                         )
+                                        # ag.train()
 
 end = time.time()
 print("No. of seconds to run:", end - start)
