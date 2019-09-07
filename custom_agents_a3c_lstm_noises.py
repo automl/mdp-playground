@@ -362,7 +362,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                     # Workers sample async. Note that this increases the effective
                                                     # sample_batch_size by up to 5x due to async buffering of batches.
                                                     "sample_async": True,
-                                                    "timesteps_per_iteration": 100,
+                                                    "timesteps_per_iteration": 5000,
                                                     "num_workers": 3,
                                                     "num_envs_per_worker": 5,
 

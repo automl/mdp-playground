@@ -355,7 +355,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                               "sample_batch_size": 4,
                                               "schedule_max_timesteps": 20000,
                                               "target_network_update_freq": 800,
-                                              "timesteps_per_iteration": 100,
+                                              "timesteps_per_iteration": 1000,
                                               "train_batch_size": 32,
 
                                               "env": "RLToy-v0",
