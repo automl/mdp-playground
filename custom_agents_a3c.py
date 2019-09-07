@@ -209,7 +209,7 @@ print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_length
 hack_filename = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '.csv'
 fout = open(hack_filename, 'a') #hardcoded
 fout.write('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, '
-               'terminal_state_density, dummy_seed,\n')
+           'terminal_state_density, dummy_seed,\n')
 fout.close()
 
 import time
@@ -222,6 +222,7 @@ def on_train_result(info):
     # you can mutate the result dict to add new fields to return
 #     stats['episode_len_mean'] = info['result']['episode_len_mean']
 #     print("++++++++", aaaa, stats)
+    training_iteration = info["result"]["training_iteration"]
     algorithm = info["trainer"]._name
     state_space_size = info["result"]["config"]["env_config"]["state_space_size"]
     action_space_size = info["result"]["config"]["env_config"]["action_space_size"]
@@ -237,6 +238,7 @@ def on_train_result(info):
 
 #    hack_filename = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '.csv'
     fout = open(hack_filename, 'a') #hardcoded
+    fout.write(str(training_iteration) + ' ')
     fout.write(str(algorithm) + ' ' + str(state_space_size) +
                ' ' + str(action_space_size) + ' ' + str(delay) + ' ' + str(sequence_length)
                + ' ' + str(reward_density) + ' ' + str(terminal_state_density) + ' ')
@@ -245,7 +247,28 @@ def on_train_result(info):
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
 
+    # print("###HACK info object:", info)
+    hack_filename_eval = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '_eval.csv'
+    fout = open(hack_filename_eval, 'a') #hardcoded
+    fout.write('#HACK STRING EVAL' + "\n")
+    fout.close()
+
     info["result"]["callback_ok"] = True
+
+
+def on_episode_end(info):
+    # if not info["env"].config["make_denser"]:
+#    print("###on_episode_end", info["episode"].agent_rewards)
+
+    #info has env, policy, Episode objects
+    if "dummy_eval" in info["env"].get_unwrapped()[0].config:
+        print("###on_episode_end info", info["env"].get_unwrapped()[0].config["make_denser"], info["episode"].total_reward, info["episode"].length) #, info["episode"]._agent_reward_history)
+        reward_this_episode = info["episode"].total_reward
+        length_this_episode = info["episode"].length
+        hack_filename_eval = '/home/rajanr/custom-gym-env/' + SLURM_ARRAY_TASK_ID + '_eval.csv'
+        fout = open(hack_filename_eval, 'a') #hardcoded
+        fout.write(str(reward_this_episode) + ' ' + str(length_this_episode) + "\n")
+        fout.close()
 
 
 
@@ -334,7 +357,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                             # Workers sample async. Note that this increases the effective
                                             # sample_batch_size by up to 5x due to async buffering of batches.
                                             "sample_async": True,
-                                            "timesteps_per_iteration": 100,
+                                            "timesteps_per_iteration": 5000,
                                             "num_workers": 3,
                                             "num_envs_per_worker": 5,
 
@@ -371,19 +394,26 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                         "lstm_cell_size": 256,
                                         "lstm_use_prev_action_reward": False,
                                         },
+
                                               "callbacks": {
                                 #                 "on_episode_start": tune.function(on_episode_start),
                                 #                 "on_episode_step": tune.function(on_episode_step),
-                                #                 "on_episode_end": tune.function(on_episode_end),
+                                                "on_episode_end": tune.function(on_episode_end),
                                 #                 "on_sample_end": tune.function(on_sample_end),
                                                 "on_train_result": tune.function(on_train_result),
                                 #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
                                             },
-#                                    "evaluation_config": {
-                                    #'seed': 0, #seed
-#                                    "exploration_fraction": 0,
-#                                    "exploration_final_eps": 0
-#                                    },
+                                        "evaluation_interval": 1, # I think this every x training_iterations
+                                        "evaluation_config": {
+                                        #'seed': 0, #seed
+                                        "exploration_fraction": 0,
+                                        "exploration_final_eps": 0,
+                                        "batch_mode": "complete_episodes",
+                                        'horizon': 100,
+                                          "env_config": {
+                                            "dummy_eval": True, #hack
+                                            }
+                                    },
                                     # "output": return_hack_writer,
                                     # "output_compress_columns": [],
                                     },
