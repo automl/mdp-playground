@@ -357,7 +357,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                               "beta_annealing_fraction": 1.0, #
 
                                               "sample_batch_size": 4,
-                                              "timesteps_per_iteration": 500,
+                                              "timesteps_per_iteration": 1000,
                                               "train_batch_size": 32,
                                               "min_iter_time_s": 1,
 
