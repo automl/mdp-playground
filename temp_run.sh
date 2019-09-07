@@ -14,3 +14,13 @@ python custom_agents_rainbow1.py 114 | tee -a 114.log
 python custom_agents_rainbow2.py 114 | tee -a 114.log
 python custom_agents_rainbow3.py 114 | tee -a 114.log
 python custom_agents_rainbow4.py 114 | tee -a 114.log
+
+
+
+# python custom_agents_a3c_noises.py 115 | tee -a 115.log
+# python custom_agents_a3c_lstm_noises.py 116 | tee -a 116.log
+
+# python custom_agents_sparsity.py 117 | tee -a 117.log
+# python custom_agents_a3c_sparsity.py 118 | tee -a 118.log
+# python custom_agents_a3c_lstm_sparsity.py 119 | tee -a 119.log
+# python custom_agents_rainbow_sparsity.py 120 | tee -a 120.log
