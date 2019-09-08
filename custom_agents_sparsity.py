@@ -350,7 +350,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                       "beta_annealing_fraction": 1.0,
 
                                       "sample_batch_size": 4,
-                                      "timesteps_per_iteration": 100,
+                                      "timesteps_per_iteration": 1000,
                                       "train_batch_size": 32,
 
                                       "env": "RLToy-v0",
