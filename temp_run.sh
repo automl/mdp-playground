@@ -9,11 +9,18 @@ pwd
 # date >>temp.txt
 
 
-python custom_agents_rainbow.py 121 | tee -a 121.log
-python custom_agents_rainbow1.py 121 | tee -a 121.log
-python custom_agents_rainbow2.py 121 | tee -a 121.log
-python custom_agents_rainbow3.py 121 | tee -a 121.log
-python custom_agents_rainbow4.py 121 | tee -a 121.log
+# python custom_agents_rainbow.py 121 | tee -a 121.log
+# python custom_agents_rainbow1.py 121 | tee -a 121.log
+# python custom_agents_rainbow2.py 121 | tee -a 121.log
+# python custom_agents_rainbow3.py 121 | tee -a 121.log
+# python custom_agents_rainbow4.py 121 | tee -a 121.log
+
+
+python custom_agents_rainbow_noises.py 122 | tee -a 122.log
+python custom_agents_rainbow_noises1.py 122 | tee -a 122.log
+python custom_agents_rainbow_noises2.py 122 | tee -a 122.log
+python custom_agents_rainbow_noises3.py 122 | tee -a 122.log
+python custom_agents_rainbow_noises4.py 122 | tee -a 122.log
 
 
 
