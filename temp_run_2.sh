@@ -9,11 +9,11 @@ pwd
 # date >>temp.txt
 
 
-python custom_agents_rainbow.py 123 | tee -a 123.log
-python custom_agents_rainbow1.py 123 | tee -a 123.log
-python custom_agents_rainbow2.py 123 | tee -a 123.log
-python custom_agents_rainbow3.py 123 | tee -a 123.log
-python custom_agents_rainbow4.py 123 | tee -a 123.log
+# python custom_agents_rainbow.py 123 | tee -a 123.log
+# python custom_agents_rainbow1.py 123 | tee -a 123.log
+# python custom_agents_rainbow2.py 123 | tee -a 123.log
+# python custom_agents_rainbow3.py 123 | tee -a 123.log
+# python custom_agents_rainbow4.py 123 | tee -a 123.log
 
 
 # python custom_agents_rainbow_noises.py 122 | tee -a 122.log
@@ -31,3 +31,8 @@ python custom_agents_rainbow4.py 123 | tee -a 123.log
 # python custom_agents_a3c_sparsity.py 118 | tee -a 118.log
 # python custom_agents_a3c_lstm_sparsity.py 119 | tee -a 119.log
 # python custom_agents_rainbow_sparsity.py 120 | tee -a 120.log
+
+python custom_agents_sparsity_2.py 124 | tee 124.log
+python custom_agents_a3c_sparsity_2.py 125 | tee 125.log
+# python custom_agents_a3c_lstm_sparsity_2.py 126 | tee 126.log
+# python custom_agents_rainbow_sparsity_2.py 127 | tee 127.log
