@@ -43,9 +43,11 @@ class RLToyEnv(gym.Env):
         Maybe make some parts init states, some term. states and a majority be neither and let rewarded sequences begin from "neither" states (so we can see if algo. can learn to reach a reward-dense region and stay in it) - maybe keep only 1 init and 1 term. state?
         Can also make discrete/continuous "Euclidean space" with transition function fixed - then problem is with generating sequences (need to maybe from each init. state have a few length n rewardable sequences) - if distance from init state to term. state is large compared to sequence_length, exploration becomes easier? - you do get a signal is term. state is closer (like cliff walking problem) - still, things depend on percentage reachability of rewarded sequences (which increases if close term. states chop off a big part of the search space)
         #Check TODO, fix and bottleneck tags
-        Sources of #randomness: Seed for Env.observation_space (to generate P, for noise in P), Env.action_space (to generate initial random policy), Env. (to generate R, for noise in R, initial state); ; Check # seed, # random
+        Sources of #randomness: Seed for Env.observation_space (to generate P, for noise in P), Env.action_space (to generate initial random policy (done by the algorithm)), Env. (to generate R, for noise in R, initial state); ; Check # seed, # random
         ###TODO Separate out seeds for all the random processes!
         ###IMP state_space_size should be large enough that after terminal state generation, we have enough num_specific_sequences rewardable!
+        #TODO Implement logger, command line argument parser, config from YAML file?
+        #Discount factor Can be used by the algorithm if it wants it, more an intrinsic property of the agent. With delay, seq_len, etc., it's not clear how discount factor will work.
         """
 
         if config is None:
@@ -60,7 +62,7 @@ class RLToyEnv(gym.Env):
             config["transition_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])]) #TODO For all these prob. dist., there's currently a difference in what is returned for discrete vs continuous!
             config["reward_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])])
             config["init_state_dist"] = np.array([i/10 for i in range(config["state_space_size"])])
-            config["is_terminal_state"] = np.array([config["state_space_size"] - 1]) # Can be discrete array or function to test terminal or not (e.g. for discrete and continuous spaces we may prefer 1 of the 2) #TODO currently always the same terminal state for a given environment state space size
+            config["is_terminal_state"] = np.array([config["state_space_size"] - 1]) # Can be discrete array or function to test terminal or not (e.g. for discrete and continuous spaces we may prefer 1 of the 2) #TODO currently always the same terminal state for a given environment state space size; have another variable named terminal_states to make semantic sense of variable name.
 
             config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
             config["delay"] = 0
@@ -116,11 +118,11 @@ class RLToyEnv(gym.Env):
             self.P = config["transition_function"] if callable(config["transition_function"]) else lambda s, a: config["transition_function"][s, a] # callable may not be optimal always since it was deprecated in Python 3.0 and 3.1
             # R(s, a) or (s, a , s') = r for deterministic rewards; or a probability dist. function over r for non-deterministic and then the return value of P() is a function, too! #TODO What happens when config is out of scope? Maybe use as self.config?
             self.R = config["reward_function"] if callable(config["reward_function"]) else lambda s, a: config["reward_function"][s, a]
-            #####TODO self.P and R were untended to be used as the dynamics functions inside step() - that's why were being inited by user-defined function here; but currently P is being used as dynamics for imagined tranitions and transition_function is used for actual tranitions in step() instead. So, setting P to manually configured transition means it won't be used in step() as was intended!
+            ##### TODO self.P and R were untended to be used as the dynamics functions inside step() - that's why were being inited by user-defined function here; but currently P is being used as dynamics for imagined tranitions and transition_function is used for actual tranitions in step() instead. So, setting P to manually configured transition means it won't be used in step() as was intended!
         else:
             #TODO Generate state and action space sizes also randomly
             self.init_terminal_states()
-            self.config["init_state_dist"] = np.array([1 / (config["state_space_size"] - self.num_terminal_states) for i in range(config["state_space_size"] - self.num_terminal_states)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution; Use Dirichlet distribution to select prob. distribution to use!
+            self.config["init_state_dist"] = np.array([1 / (config["state_space_size"] - self.num_terminal_states) for i in range(config["state_space_size"] - self.num_terminal_states)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use!
             self.init_reward_function()
             self.init_transition_function()
 
@@ -153,6 +155,9 @@ class RLToyEnv(gym.Env):
         # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
         # print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
         # print("self.R:", np.array([[self.R(i, j) for j in range(5)] for i in range(5)]), self.config["reward_function"])
+        # self.R = self.reward_function
+        # print("self.R:", self.R(0, 1))
+
 
     def init_reward_function(self):
         #TODO Maybe refactor this code and put useful reusable permutation generators, etc. in one library
@@ -204,7 +209,7 @@ class RLToyEnv(gym.Env):
             print("Number of generated sequences that did not clash with an existing one when it was generated:", total_false)
             print("Total no. of rewarded sequences:", len(self.specific_sequences[self.sequence_length - 1]), "Out of", num_possible_permutations)
 
-        self.R = lambda s, a: self.reward_function(s, a)
+        self.R = lambda s, a: self.reward_function(s, a, only_query=False)
 
 
     def init_transition_function(self):
@@ -220,7 +225,7 @@ class RLToyEnv(gym.Env):
                 for a in range(self.config["action_space_size"]):
                     self.config["transition_function"][s, a] = self.observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
         print(self.config["transition_function"], "init_transition_function", type(self.config["transition_function"][0, 0]))
-        self.P = lambda s, a: self.transition_function(s, a)
+        self.P = lambda s, a: self.transition_function(s, a, only_query = False)
 
     def init_terminal_states(self):
         self.num_terminal_states = int(self.config["terminal_state_density"] * self.config["state_space_size"])
@@ -235,7 +240,7 @@ class RLToyEnv(gym.Env):
         sequence_length = self.sequence_length
         reward = 0.0
         # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
-        state_considered = state if only_query else self.augmented_state
+        state_considered = state if only_query else self.augmented_state # When we imagine a rollout, the user has to provide full augmented state as the argument!!
         if not isinstance(state_considered, list):
             state_considered = [state_considered] # to get around case when sequence is an int
         if not self.config["make_denser"]:
@@ -272,7 +277,7 @@ class RLToyEnv(gym.Env):
         return reward
 
     def transition_function(self, state, action, only_query=True):
-        # only_query when true performs an imaginary transition i.e. augmented state etc. are not updated; Basically used implicitly when self.P() is called
+        # only_query when true performs an imaginary transition i.e. augmented state etc. are not updated;
         # print("Before transition", self.augmented_state)
         next_state = self.config["transition_function"][state, action]
         if "transition_noise" in self.config:
@@ -330,8 +335,8 @@ class RLToyEnv(gym.Env):
     def step(self, action):
         # assert self.action_space.contains(action) , str(action) + " not in" # TODO Need to implement check in for this environment
         #TODO check self.done and throw error if it's True? (Gym doesn't do it!); Otherwise, define self transitions in terminal states
-        self.reward = self.reward_function(self.curr_state, action, only_query=False) #TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me)
-        self.curr_state = self.transition_function(self.curr_state, action, only_query=False)
+        self.reward = self.R(self.curr_state, action) #TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me)
+        self.curr_state = self.P(self.curr_state, action)
 
 
         self.done = self.is_terminal_state(self.curr_state)
