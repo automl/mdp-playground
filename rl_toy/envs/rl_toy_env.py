@@ -4,6 +4,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+from scipy import stats
 import gym
 from gym.spaces import Discrete, BoxExtended, DiscreteExtended
 #from gym.utils import seeding
@@ -103,12 +104,14 @@ class RLToyEnv(gym.Env):
         self.config = config
         self.sequence_length = config["sequence_length"]
         self.delay = config["delay"]
-        self.reward_unit = self.config["reward_unit"]
         self.augmented_state_length = config["sequence_length"] + config["delay"]
-        if self.config["state_space_type"] == "continuous":
+        if self.config["state_space_type"] == "discrete":
+            self.reward_unit = self.config["reward_unit"]
+        else: # cont. spaces
             self.dynamics_order = self.config["transition_dynamics_order"]
             self.inertia = self.config["inertia"]
             self.time_unit = self.config["time_unit"]
+            self.reward_scale = self.config["reward_scale"]
 
         self.total_abs_noise_in_reward_episode = 0
         self.total_reward_episode = 0
@@ -162,7 +165,7 @@ class RLToyEnv(gym.Env):
             print("self.init_state_dist:", self.config["init_state_dist"])
         #TODO sample at any time from "current"/converged distribution of states according to current policy
         self.curr_state = self.reset() #TODO make this seedable (Gym env has its own seed?); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
-        print("self.augmented_state", self.augmented_state)
+        print("self.augmented_state, len", self.augmented_state, len(self.augmented_state))
 
         if self.config["state_space_type"] == "discrete":
             self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
@@ -326,6 +329,16 @@ class RLToyEnv(gym.Env):
 
         else: # if continuous space
             print("#TODO for cont. spaces: noise")
+            if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because even without transition there may be reward as R() is before P() in step()
+                pass #TODO
+            else:
+                print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
+                x = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 0]
+                y = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 1]
+                slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+                reward += (1 - std_err) * self.reward_scale
+                print("rew", reward)
+                # print(slope, intercept, r_value, p_value, std_err)
 
 
         noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
@@ -351,13 +364,6 @@ class RLToyEnv(gym.Env):
                 # print("new probs:", probs, self.observation_space.sample(prob=probs))
                 next_state = new_next_state
                 # assert np.sum(probs) == 1, str(np.sum(probs)) + " is not equal to " + str(1)
-            if only_query:
-                pass
-                # print("Only query") # Since transition_function currently depends only on current state and action, we don't need to do anything here!
-            else:
-                del self.augmented_state[0]
-                self.augmented_state.append(next_state)
-                self.total_transitions_episode += 1
 
         else: # if continuous space
             print("#TODO for cont. spaces: noise")
@@ -367,6 +373,14 @@ class RLToyEnv(gym.Env):
                     next_state = state + action * self.time_unit / self.inertia
             else:
                 print("Action out of range of action space")
+
+        if only_query:
+            pass
+            # print("Only query") # Since transition_function currently depends only on current state and action, we don't need to do anything here!
+        else:
+            del self.augmented_state[0]
+            self.augmented_state.append(next_state)
+            self.total_transitions_episode += 1
 
             # print("After transition", self.augmented_state)
         #TODO Check ergodicity of MDP/policy? Can calculate probability of a rewardable specific sequence occurring (for a random policy)
@@ -394,7 +408,8 @@ class RLToyEnv(gym.Env):
             print("#TODO for cont. spaces: reset")
             self.curr_state = self.observation_space.sample() #random
             print("RESET called. State reset to:", self.curr_state)
-            self.augmented_state = []
+            self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
+            self.augmented_state.append(self.curr_state)
 
         print("Noise stats for previous episode (total abs. noise in rewards, total reward, total noisy transitions, total transitions):",
         self.total_abs_noise_in_reward_episode, self.total_reward_episode, self.total_noisy_transitions_episode, self.total_transitions_episode)
@@ -438,6 +453,7 @@ if __name__ == "__main__":
     # config["repeats_in_sequences"] = False
     # config["delay"] = 1
     # config["sequence_length"] = 3
+    # config["reward_unit"] = 1.0
 
 
     config["state_space_type"] = "continuous"
@@ -447,14 +463,14 @@ if __name__ == "__main__":
     config["transition_dynamics_order"] = 1
     config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
     config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
-    config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
-    config["time_unit"] = 0.01 # Discretization of time domain
+    config["action_space_max"] = 5 # Will be a Box in the range [-max, max]
+    config["time_unit"] = 1 # Discretization of time domain
 
 
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
-    config["delay"] = 0
+    config["delay"] = 1
     config["sequence_length"] = 10
-    config["reward_unit"] = 1.0
+    config["reward_scale"] = 1.0
 #    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
 #    config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
     env = RLToyEnv(config)
@@ -467,6 +483,7 @@ if __name__ == "__main__":
     for _ in range(40):
         # env.render() # For GUI
         action = env.action_space.sample() # take a #random action # TODO currently DiscreteExtended returns a sampled array
+        # action = np.array([1, 1]) # just to test if acting "in a line" works
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
         state = next_state
