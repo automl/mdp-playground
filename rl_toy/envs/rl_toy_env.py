@@ -335,9 +335,14 @@ class RLToyEnv(gym.Env):
                 print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
                 x = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 0]
                 y = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 1]
-                slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
-                reward += (1 - std_err) * self.reward_scale
-                print("rew", reward)
+                A = np.vstack([x, np.ones(len(x))]).T
+                coeffs, sum_se, rank_A, singular_vals_A = np.linalg.lstsq(A, y, rcond=None)
+                reward += (-np.sqrt(sum_se / self.sequence_length)) * self.reward_scale
+
+                # slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
+                # reward += (1 - std_err) * self.reward_scale
+
+                print("rew", reward, reward / self.sequence_length)
                 # print(slope, intercept, r_value, p_value, std_err)
 
 
@@ -463,7 +468,7 @@ if __name__ == "__main__":
     config["transition_dynamics_order"] = 1
     config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
     config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
-    config["action_space_max"] = 5 # Will be a Box in the range [-max, max]
+    config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
     config["time_unit"] = 1 # Discretization of time domain
 
 
@@ -480,7 +485,7 @@ if __name__ == "__main__":
 #    print("env.spec.max_episode_steps, env.unwrapped:", env.spec.max_episode_steps, env.unwrapped)
     state = env.reset()
     # print("TEST", type(state))
-    for _ in range(40):
+    for _ in range(20):
         # env.render() # For GUI
         action = env.action_space.sample() # take a #random action # TODO currently DiscreteExtended returns a sampled array
         # action = np.array([1, 1]) # just to test if acting "in a line" works
