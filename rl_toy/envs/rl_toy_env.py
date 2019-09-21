@@ -136,14 +136,14 @@ class RLToyEnv(gym.Env):
             # config["state_space_max"] = num_to_list(config["state_space_max"]) * config["state_space_dim"]
             # print("config[\"state_space_max\"]", config["state_space_max"])
 
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=int(self.state_space_max) + config["seed"], dtype=np.float64) #seed #hack #TODO
+            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=10 + config["seed"], dtype=np.float64) #seed #hack #TODO
 
         if config["action_space_type"] == "discrete":
             self.action_space = DiscreteExtended(config["action_space_size"], seed=config["action_space_size"] + config["seed"]) #seed #hack #TODO
         else:
             self.action_space_max = config["action_space_max"]
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
-            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=int(self.action_space_max) + config["seed"], dtype=np.float64) #seed #hack #TODO
+            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=11 + config["seed"], dtype=np.float64) #seed #hack #TODO
 
         if not config["generate_random_mdp"]:
             #TODO When having a fixed delay/specific sequences, we need to have transition function from tuples of states of diff. lengths to next tuple of states. We can have this tupleness to have Markovianness on 1 or both of dynamics and reward functions.
@@ -328,21 +328,22 @@ class RLToyEnv(gym.Env):
                 print("self.possible_remaining_sequences", self.possible_remaining_sequences)
 
         else: # if continuous space
-            print("#TODO for cont. spaces: noise")
+            # print("#TODO for cont. spaces: noise")
             if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because even without transition there may be reward as R() is before P() in step()
                 pass #TODO
             else:
-                print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
+                # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
                 x = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 0]
                 y = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 1]
                 A = np.vstack([x, np.ones(len(x))]).T
                 coeffs, sum_se, rank_A, singular_vals_A = np.linalg.lstsq(A, y, rcond=None)
-                reward += (-np.sqrt(sum_se / self.sequence_length)) * self.reward_scale
+                sum_se = sum_se[0]
+                reward += (- np.sqrt(sum_se / self.sequence_length)) * self.reward_scale
 
                 # slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
                 # reward += (1 - std_err) * self.reward_scale
 
-                print("rew", reward, reward / self.sequence_length)
+                # print("rew, rew / seq_len", reward, reward / self.sequence_length)
                 # print(slope, intercept, r_value, p_value, std_err)
 
 
@@ -371,7 +372,7 @@ class RLToyEnv(gym.Env):
                 # assert np.sum(probs) == 1, str(np.sum(probs)) + " is not equal to " + str(1)
 
         else: # if continuous space
-            print("#TODO for cont. spaces: noise")
+            # print("#TODO for cont. spaces: noise")
             if self.action_space.contains(action):
                 ##TODO implement for multiple orders, currently only for 1st order systems.
                 if self.dynamics_order == 1:
