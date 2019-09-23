@@ -185,7 +185,7 @@ seeds = [i for i in range(num_seeds)]
 # Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
 # More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
 num_layerss = [1, 2, 3, 4]
-layer_widths = [64, 128, 256]
+layer_widths = [32, 64, 128, 256]
 
 fcnet_activations = ["tanh", "relu", "sigmoid"]
 learning_rates = [1e-2, 1e-3, 1e-4, 1e-5, 1e-6]
@@ -334,7 +334,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                 #hack
                                 # ag = DQNTrainer(
                                     stop={
-                                        "timesteps_total": 150000,
+                                        "timesteps_total": 20000,
                                           },
                                     config={
                                       #'seed': 0, #seed
