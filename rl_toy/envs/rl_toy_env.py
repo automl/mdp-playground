@@ -69,7 +69,7 @@ class RLToyEnv(gym.Env):
             # config["action_space_max"] = 5 # Will be a Box in the range [-max, max]
             # config["time_unit"] = 0.01 # Discretization of time domain
             config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
-            config["term_state_edge"] =  1.0 # Terminal states will be in a cube centred around the terminal states given above with the edge of the cube of this length.
+            config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
 
             config["transition_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])]) #TODO For all these prob. dist., there's currently a difference in what is returned for discrete vs continuous!
             config["reward_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])])
@@ -396,6 +396,10 @@ class RLToyEnv(gym.Env):
             noise_in_transition = self.config["transition_noise"](self.np_random) if "transition_noise" in self.config else 0 #random
             self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
             next_state += noise_in_transition
+            ### TODO Check if next_state is within state space bounds
+            if not self.observation_space.contains(next_state):
+                print("next_state out of bounds. next_state, clipping to", next_state, np.clip(next_state, -self.state_space_max, self.state_space_max))
+                next_state = np.clip(next_state, -self.state_space_max, self.state_space_max) # Could also "reflect" next_state when it goes out of bounds. Would seem more logical for a "wall", but need to take care of multiple reflections near a corner/edge.
 
         if only_query:
             pass
@@ -501,7 +505,7 @@ if __name__ == "__main__":
     config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
     config["time_unit"] = 1 # Discretization of time domain
     config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
-    config["term_state_edge"] =  1.0 # Terminal states will be in a cube centred around the terminal states given above with the edge of the cube of this length.
+    config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
 
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
     config["delay"] = 1
