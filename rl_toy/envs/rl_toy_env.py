@@ -114,6 +114,7 @@ class RLToyEnv(gym.Env):
             self.reward_scale = self.config["reward_scale"]
 
         self.total_abs_noise_in_reward_episode = 0
+        self.total_abs_noise_in_transition_episode = 0 # only present in continuous spaces
         self.total_reward_episode = 0
         self.total_noisy_transitions_episode = 0
         self.total_transitions_episode = 0
@@ -378,7 +379,12 @@ class RLToyEnv(gym.Env):
                 if self.dynamics_order == 1:
                     next_state = state + action * self.time_unit / self.inertia
             else:
-                print("Action out of range of action space")
+                next_state = state
+                print("WARNING: Action out of range of action space. Applying 0 action!!")
+            # if "transition_noise" in self.config:
+            noise_in_transition = self.config["transition_noise"](self.np_random) if "transition_noise" in self.config else 0 #random
+            self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
+            next_state += noise_in_transition
 
         if only_query:
             pass
@@ -417,9 +423,11 @@ class RLToyEnv(gym.Env):
             self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state)
 
-        print("Noise stats for previous episode (total abs. noise in rewards, total reward, total noisy transitions, total transitions):",
-        self.total_abs_noise_in_reward_episode, self.total_reward_episode, self.total_noisy_transitions_episode, self.total_transitions_episode)
+        print("Noise stats for previous episode (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions):",
+                self.total_abs_noise_in_reward_episode, self.total_abs_noise_in_transition_episode, self.total_reward_episode, self.total_noisy_transitions_episode,
+                self.total_transitions_episode)
         self.total_abs_noise_in_reward_episode = 0
+        self.total_abs_noise_in_transition_episode = 0 # only present in continuous spaces
         self.total_reward_episode = 0
         self.total_noisy_transitions_episode = 0
         self.total_transitions_episode = 0
@@ -478,7 +486,8 @@ if __name__ == "__main__":
     config["sequence_length"] = 10
     config["reward_scale"] = 1.0
 #    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
-#    config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
+    # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
+    # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
     env = RLToyEnv(config)
 #    env.seed(0)
 #    from rl_toy.envs import RLToyEnv
