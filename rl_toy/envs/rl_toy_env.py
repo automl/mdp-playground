@@ -68,6 +68,8 @@ class RLToyEnv(gym.Env):
             # config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
             # config["action_space_max"] = 5 # Will be a Box in the range [-max, max]
             # config["time_unit"] = 0.01 # Discretization of time domain
+            config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
+            config["term_state_edge"] =  1.0 # Terminal states will be in a cube centred around the terminal states given above with the edge of the cube of this length.
 
             config["transition_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])]) #TODO For all these prob. dist., there's currently a difference in what is returned for discrete vs continuous!
             config["reward_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])])
@@ -82,6 +84,7 @@ class RLToyEnv(gym.Env):
             config["reward_density"] = 0.25 # Number between 0 and 1
 #            config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
 #            config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
+            # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
             config["make_denser"] = False
             config["terminal_state_density"] = 0.1 # Number between 0 and 1
             config["completely_connected"] = True # Make every state reachable from every state; If completely_connected, then no. of actions has to be at least equal to no. of states( - 1 if without self-loop); if repeating sequences allowed, then we have to have self-loops. Self-loops are ok even in non-repeating sequences - we just have a harder search problem then! Or make it maximally connected by having transitions to as many different states as possible - the row for P would have as many different transitions as possible!
@@ -119,16 +122,16 @@ class RLToyEnv(gym.Env):
         self.total_noisy_transitions_episode = 0
         self.total_transitions_episode = 0
 
-        self.max_real = 100.0 # Take these settings from config
-        self.min_real = 0.0
+        # self.max_real = 100.0 # Take these settings from config
+        # self.min_real = 0.0
 
 
-        def num_to_list(num1): #TODO Move this to a Utils file.
-            if type(num1) == int or type(num1) == float:
-                list1 = [num1]
-            elif not isinstance(num1, list):
-                raise TypeError("Argument to function should have been an int, float or list. Arg was: " + str(num1))
-            return list1
+        # def num_to_list(num1): #TODO Move this to a Utils file.
+        #     if type(num1) == int or type(num1) == float:
+        #         list1 = [num1]
+        #     elif not isinstance(num1, list):
+        #         raise TypeError("Argument to function should have been an int, float or list. Arg was: " + str(num1))
+        #     return list1
 
         if config["state_space_type"] == "discrete":
             self.observation_space = DiscreteExtended(config["state_space_size"], seed=config["state_space_size"] + config["seed"]) #seed #hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
@@ -172,7 +175,7 @@ class RLToyEnv(gym.Env):
             self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
             print("self.config['is_terminal_state']:", self.config["is_terminal_state"])
         else:
-            self.is_terminal_state = lambda s: False ###TODO for cont.
+            self.is_terminal_state = lambda s: np.any([self.term_spaces[i].contains(s) for i in range(len(self.term_spaces))]) ### TODO for cont.
 
 
         if self.config["state_space_type"] == "discrete":
@@ -208,13 +211,21 @@ class RLToyEnv(gym.Env):
             self.config["is_terminal_state"] = np.array([self.config["state_space_size"] - 1 - i for i in range(self.num_terminal_states)]) # terminal states inited to be at the "end" of the sorted states
             print("Inited terminal states to:", self.config["is_terminal_state"], "total", self.num_terminal_states)
         else: # if continuous space
-            print("#TODO for cont. spaces: term states")
+            # print("#TODO for cont. spaces: term states")
+            self.term_spaces = []
+            for i in range(len(self.config["terminal_states"])):
+                lows = np.array([self.config["terminal_states"][i][j] - self.config["term_state_edge"]/2 for j in range(self.config["state_space_dim"])])
+                highs = np.array([self.config["terminal_states"][i][j] + self.config["term_state_edge"]/2 for j in range(self.config["state_space_dim"])])
+                # print("Term state lows, highs:", lows, highs)
+                self.term_spaces.append(BoxExtended(low=lows, high=highs, seed=12 + config["seed"], dtype=np.float64)) #seed #hack #TODO
+            print("self.term_spaces samples:", self.term_spaces[0].sample(), self.term_spaces[-1].sample())
 
     def init_init_state_dist(self):
         if self.config["state_space_type"] == "discrete":
             self.config["init_state_dist"] = np.array([1 / (self.config["state_space_size"] - self.num_terminal_states) for i in range(self.config["state_space_size"] - self.num_terminal_states)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use!
         else: # if continuous space
-            print("#TODO for cont. spaces: init_state_dist")
+            # print("#TODO for cont. spaces: init_state_dist")
+            pass # this is handled in reset where we resample if we sample a term. state
 
     def init_reward_function(self):
         #TODO Maybe refactor this code and put useful reusable permutation generators, etc. in one library
@@ -418,7 +429,17 @@ class RLToyEnv(gym.Env):
             # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
         else: # if continuous space
             print("#TODO for cont. spaces: reset")
-            self.curr_state = self.observation_space.sample() #random
+            while True: # Be careful about infinite loops
+                term_space_was_sampled = False
+                self.curr_state = self.observation_space.sample() #random
+                for i in range(len(self.term_spaces)):
+                    if self.term_spaces[i].contains(self.curr_state):
+                        print("A state was sampled in term state subspace. Therefore, resampling. State was, subspace was:", self.curr_state, i) ##TODO Move this logic into a new class in Gym spaces that can contain subspaces for term states! (with warning/error if term subspaces cover whole state space)
+                        term_space_was_sampled = True
+                        break
+                if not term_space_was_sampled:
+                    break
+
             print("RESET called. State reset to:", self.curr_state)
             self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state)
@@ -455,7 +476,7 @@ class RLToyEnv(gym.Env):
 if __name__ == "__main__":
 
     config = {}
-    config["seed"] = 0 #seed
+    config["seed"] = 0 #seed, 7 worked for initially sampling within term state subspace
     # config["state_space_type"] = "discrete"
     # config["action_space_type"] = "discrete"
     # config["state_space_size"] = 6
@@ -479,7 +500,8 @@ if __name__ == "__main__":
     config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
     config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
     config["time_unit"] = 1 # Discretization of time domain
-
+    config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
+    config["term_state_edge"] =  1.0 # Terminal states will be in a cube centred around the terminal states given above with the edge of the cube of this length.
 
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
     config["delay"] = 1
