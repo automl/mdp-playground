@@ -355,7 +355,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                       "env": "RLToy-v0",
                                       "env_config": {
                                         'dummy_seed': dummy_seed,
-                                        'seed': 1, #seed
+                                        'seed': 0, #seed
                                         'state_space_type': 'discrete',
                                         'action_space_type': 'discrete',
                                         'state_space_size': state_space_size,
