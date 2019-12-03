@@ -25,11 +25,11 @@ import configparser
 
 parser = argparse.ArgumentParser(description='Run experiments for MDP Playground')
 parser.add_argument('--config-file', dest='config_file', action='store', default='default_config',
-                   help='Configuration file containing configuration space to run. Will be a Python file so config can be programmatically given. '
-                   'Remove the .py extension when providing the filename')
-parser.add_argument('--output-file', dest='csv_stats_file', action='store', default='234',
+                   help='Configuration file containing configuration space to run. It must be a Python file so config can be given programmatically. '
+                   'Remove the .py extension when providing the filename. See default_config.py for an example.')
+parser.add_argument('--output-file', dest='csv_stats_file', action='store', default='temp234',
                    help='Prefix of output file. It will save stats to 2 CSV files, with the filenames as the one given as argument'
-                   'and another file with an extra "_eval" in the filename that contains evaluation stats during the training')
+                   'and another file with an extra "_eval" in the filename that contains evaluation stats during the training. Appends to existing files or creates new ones if they don\'t exist.')
 
 args = parser.parse_args()
 print("Parsed args:", args)
@@ -54,30 +54,30 @@ ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 ray.init(local_mode=True)#, object_id_seed=0)
 
 
-num_seeds = 10
-state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
-action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
-delays = [0] + [2**i for i in range(4)]
-sequence_lengths = [1, 2, 3, 4]#i for i in range(1,4)]
-reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
-# make_reward_dense = [True, False]
-terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
-algorithms = ["DQN"]
-seeds = [i for i in range(num_seeds)]
-# Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
-# More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
-num_layerss = [1, 2, 3, 4]
-layer_widths = [8, 32, 128]
-fcnet_activations = ["tanh", "relu", "sigmoid"]
-learning_startss = [500, 1000, 2000, 4000, 8000]
-target_network_update_freqs = [8, 80, 800]
-double_dqn = [False, True]
-learning_rates = []
+# num_seeds = 10
+# state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
+# action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
+# delays = [0] + [2**i for i in range(4)]
+# sequence_lengths = [1, 2, 3, 4]#i for i in range(1,4)]
+# reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
+# # make_reward_dense = [True, False]
+# terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
+# algorithms = ["DQN"]
+# seeds = [i for i in range(num_seeds)]
+# # Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
+# # More others: adam_epsilon, exploration_final_eps/exploration_fraction, buffer_size
+# num_layerss = [1, 2, 3, 4]
+# layer_widths = [8, 32, 128]
+# fcnet_activations = ["tanh", "relu", "sigmoid"]
+# learning_startss = [500, 1000, 2000, 4000, 8000]
+# target_network_update_freqs = [8, 80, 800]
+# double_dqn = [False, True]
+# learning_rates = []
 
 # lstm with sequence lengths
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density ')
-print(algorithms, state_space_sizes, action_space_sizes, delays, sequence_lengths, reward_densities, terminal_state_densities)
+print(config.algorithms, config.state_space_sizes, config.action_space_sizes, config.delays, config.sequence_lengths, config.reward_densities, config.terminal_state_densities)
 
 
 
@@ -150,14 +150,14 @@ def on_episode_end(info):
         fout.close()
 
 
-for algorithm in algorithms: #TODO each one has different config_spaces
-    for state_space_size in state_space_sizes:
-        for action_space_size in action_space_sizes:
-            for delay in delays:
-                for sequence_length in sequence_lengths:
-                    for reward_density in reward_densities:
-                        for terminal_state_density in terminal_state_densities:
-                            for dummy_seed in seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
+for algorithm in config.algorithms: #TODO each one has different config_spaces
+    for state_space_size in config.state_space_sizes:
+        for action_space_size in config.action_space_sizes:
+            for delay in config.delays:
+                for sequence_length in config.sequence_lengths:
+                    for reward_density in config.reward_densities:
+                        for terminal_state_density in config.terminal_state_densities:
+                            for dummy_seed in config.seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
                                 tune.run(
                                     algorithm,
                                     stop={
