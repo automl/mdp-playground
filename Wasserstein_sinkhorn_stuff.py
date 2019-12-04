@@ -19,9 +19,9 @@ B_j = B_j / np.sum(B_j)
 Y_j = np.random.rand(num_points, num_dims) - np.ones((num_points, num_dims))/2
 
 print(A_i.shape, X_i.shape, B_j.shape, Y_j.shape)
+print(A_i, X_i, B_j, Y_j)
 
 #plot variations across num_points, num_dims, p = 1 or 2, blur, diameter,
-
 
 
 
