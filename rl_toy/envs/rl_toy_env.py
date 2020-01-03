@@ -54,6 +54,8 @@ class RLToyEnv(gym.Env):
 
         if config is None:
             config = {}
+
+            # Discrete spaces configs:
             config["state_space_type"] = "discrete" # TODO if states are assumed categorical in discrete setting, need to have an embedding for their OHE when using NNs; do the encoding on the training end!
             config["action_space_type"] = "discrete"
             config["state_space_size"] = 6
@@ -72,9 +74,9 @@ class RLToyEnv(gym.Env):
             config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
             config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
 
-            # config for user specified P, R, rho_0, T
-            config["transition_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])]) #TODO ###IMP For all these prob. dist., there's currently a difference in what is returned for discrete vs continuous!
-            config["reward_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["state_space_size"])])
+            # config for user specified P, R, rho_0, T. Examples here are for discrete spaces
+            config["transition_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["action_space_size"])]) #TODO ###IMP For all these prob. dist., there's currently a difference in what is returned for discrete vs continuous!
+            config["reward_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["action_space_size"])])
             config["init_state_dist"] = np.array([i/10 for i in range(config["state_space_size"])])
             config["is_terminal_state"] = np.array([config["state_space_size"] - 1]) # Can be discrete array or function to test terminal or not (e.g. for discrete and continuous spaces we may prefer 1 of the 2) #TODO currently always the same terminal state for a given environment state space size; have another variable named terminal_states to make semantic sense of variable name.
 
