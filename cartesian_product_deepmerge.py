@@ -1,4 +1,8 @@
 import numpy as np
+
+# variable_configs hold the ConfigSpace values which vary over the runs.
+# Each key in variable_configs is actually a "key_chain" which is a '.' separated "chain" of keys which represent keys in a nested dict with the rightmost key being the deepest in the hierarchy.
+# Made it '.' separated because the logic seemed simpler than to have the entire nested dict for the code further below. Not sure if that's surely the case.
 variable_configs = {
 "a.b.c": [1, 2, 3],
 "d.e": [1, 3],
@@ -6,6 +10,8 @@ variable_configs = {
 "f.g": [i for i in range(4)],
 }
 
+# fixed_configs hold the ConfigSpace values which don't vary over the runs.
+#TODO Just do a for loop over the merge of each of the variable_configs in Cartesian product with the fixed_configs.
 
 
 def deepmerge(a, b, path=None):
@@ -14,7 +20,7 @@ def deepmerge(a, b, path=None):
     for key in b:
         if key in a:
             if isinstance(a[key], dict) and isinstance(b[key], dict):
-                merge(a[key], b[key], path + [str(key)])
+                deepmerge(a[key], b[key], path + [str(key)])
             elif a[key] == b[key]:
                 pass # same leaf value
             else:
@@ -28,7 +34,7 @@ num_configs_list = []
 for key_chain in sorted(variable_configs.keys()):
     num_configs_list.append(len(variable_configs[key_chain]))
 num_configs = np.product(num_configs_list)
-print(num_configs_list, num_configs)
+print("List of no. of configs for each config in variable_config:", num_configs_list, "Total no. of configs. in the Cartesian product of diff. configs in variable_configs:", num_configs)
 
 cartesian_product = [None] * num_configs
 for i in range(num_configs):
@@ -61,7 +67,7 @@ print(cartesian_product)
 
 
 
-#TODO recursively merge dicts: https://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge/7205107#7205107
+# TODO recursively merge dicts: https://stackoverflow.com/questions/7204805/dictionaries-of-dictionaries-merge/7205107#7205107
 # counter // 1 % 4 = j
 # for k in range(len(variable_configs[key_chain])):
 #     curr_list = [k * prod_smaller + np.arange(prod_smaller) + prod_smaller * len((variable_configs[key_chain])) * l for l in range(prod_bigger)]
