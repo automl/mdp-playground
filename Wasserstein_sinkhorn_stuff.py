@@ -1,3 +1,4 @@
+# A file form of the .ipynb to run it with PDB to debug the shape bug.
 # -*- coding: utf-8 -*-
 import numpy as np
 import torch
