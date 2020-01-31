@@ -1,4 +1,4 @@
-name: py36
+name: py36_toy_rl
 channels:
   - defaults
 dependencies:
@@ -304,4 +304,4 @@ dependencies:
     - termcolor==1.1.0
     - wcwidth==0.1.7
     - werkzeug==0.15.5
-prefix: /home/anon/anaconda3/envs/py36
+prefix: /home/anon/anaconda3/envs/py36_toy_rl

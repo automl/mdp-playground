@@ -482,6 +482,18 @@ class RLToyEnv(gym.Env):
         return self.seed_
 
 
+
+# class OT4RL():
+#     """Functions to perform calculations of metrics like Wasserstein distance. Useful for tracking learning progress by getting the distance between learnt and true models."""
+#
+#     def __init__(self, config = None):
+
+def mean_sinkhorn_dist(model_1_P, model_2_P, model_1_R=None, model_2_R=None, weighted=True):
+    """Calculates the mean approx. Wasserstein dist. between P(s, a) distributions over all the possible (s, a) values, each dist. weighted by the |R(s, a)| magnitudes. Can optionally be unweighted.
+       If model_1_R=None and model_2_R=None, then model_1_P and model_2_P can be general models for which averaged approx. Wasserstein dist. (i.e. sinkhorn divergence) is calculated, for e.g., they could even be models of R().
+    """
+
+
 if __name__ == "__main__":
 
     config = {}
