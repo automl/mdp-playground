@@ -336,7 +336,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                         #hack
                                         # ag = DQNTrainer(
                                             stop={
-                                                "timesteps_total": 150000,
+                                                "timesteps_total": 20000,
                                                   },
                                             config={
                                               #'seed': 0, #seed
@@ -362,7 +362,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                                     # Workers sample async. Note that this increases the effective
                                                     # sample_batch_size by up to 5x due to async buffering of batches.
                                                     "sample_async": True,
-                                                    "timesteps_per_iteration": 5000,
+                                                    "timesteps_per_iteration": 1000,
                                                     "num_workers": 3,
                                                     "num_envs_per_worker": 5,
 
