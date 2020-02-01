@@ -390,7 +390,7 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                         "custom_options": {},  # extra options to pass to your preprocessor
                                         "fcnet_activation": "tanh",
                                         "use_lstm": True,
-                                        "max_seq_len": 10 * delay + sequence_length,
+                                        "max_seq_len": delay + sequence_length,
                                         "lstm_cell_size": 64,
                                         "lstm_use_prev_action_reward": True,
                                         },
