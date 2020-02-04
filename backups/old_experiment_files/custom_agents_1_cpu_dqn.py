@@ -358,10 +358,10 @@ for algorithm in algorithms: #TODO each one has different config_spaces
                                       "tf_session_args": {
                                         "intra_op_parallelism_threads": 1,
                                         "inter_op_parallelism_threads": 1,
-                                        "gpu_options": {"allow_growth": true},
-                                        "log_device_placement": false,
+                                        "gpu_options": {"allow_growth": True},
+                                        "log_device_placement": False,
                                         "device_count": {"CPU": 1},
-                                        "allow_soft_placement": true
+                                        "allow_soft_placement": True
                                         },
                                       "local_tf_session_args": {
                                         "intra_op_parallelism_threads": 1,
