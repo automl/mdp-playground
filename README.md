@@ -11,6 +11,20 @@ cd gym-extension
 pip install -e .
 
 
+If that doesn't work (PyYAML gave us errors sometimes for the above procedure):
+conda create -n <env_name> python=3.6
+pip install ray[rllib,debug]==0.7.3
+pip install tensorflow==1.13.0rc1
+pip install pandas==0.25.0
+pip install requests==2.22.0
+git clone https://github.com/anonips/-MDP-Playground.git
+cd -MDP-Playground
+pip install -e .
+git clone https://github.com/anonips/Gym-Extension.git
+cd Gym-Extension
+pip install -e .
+
+
 The file run_experiments.py has the run for the DQN experiments in the paper. It can be run as "python3 run_experiments.py <Prefix for CSV filenames to save stats to>". It will save stats to 2 CSV files, with the filenames as the one given as argument to the experiments python script and another file with an extra "_eval" in the filename that contains evaluation stats during the training.
 These can be plotted using the plot_experiments.ipynb Jupyter Notebook.
 
