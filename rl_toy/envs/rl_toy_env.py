@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import warnings
 import numpy as np
 from scipy import stats
 import gym
@@ -141,18 +142,21 @@ class RLToyEnv(gym.Env):
         if config["state_space_type"] == "discrete":
             self.observation_space = DiscreteExtended(config["state_space_size"], seed=config["state_space_size"] + config["seed"]) #seed #hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
         else:
-            self.state_space_max = config["state_space_max"]
+            self.state_space_max = config["state_space_max"] if 'state_space_max' in config else np.inf # should we select a random max? #test?
             # config["state_space_max"] = num_to_list(config["state_space_max"]) * config["state_space_dim"]
             # print("config[\"state_space_max\"]", config["state_space_max"])
 
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=10 + config["seed"], dtype=np.float64) #seed #hack #TODO
+            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=10 + config["seed"], dtype=np.float64) #seed #hack #TODO # low and high are 1st 2 and required arguments
+
 
         if config["action_space_type"] == "discrete":
             self.action_space = DiscreteExtended(config["action_space_size"], seed=config["action_space_size"] + config["seed"]) #seed #hack #TODO
         else:
-            self.action_space_max = config["action_space_max"]
+            self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
             self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=11 + config["seed"], dtype=np.float64) #seed #hack #TODO
+
+
 
         if not config["generate_random_mdp"]:
             #TODO When having a fixed delay/specific sequences, we need to have transition function from tuples of states of diff. lengths to next tuple of states. We can have this tupleness to have Markovianness on 1 or both of dynamics and reward functions.
@@ -211,19 +215,25 @@ class RLToyEnv(gym.Env):
         if self.config["state_space_type"] == "discrete":
             self.num_terminal_states = int(self.config["terminal_state_density"] * self.config["state_space_size"])
             if self.num_terminal_states == 0: # Have at least 1 terminal state
-                print("WARNING: int(terminal_state_density * state_space_size) was 0. Setting num_terminal_states to be 1!")
+                warnings.warn("WARNING: int(terminal_state_density * state_space_size) was 0. Setting num_terminal_states to be 1!")
                 self.num_terminal_states = 1
             self.config["is_terminal_state"] = np.array([self.config["state_space_size"] - 1 - i for i in range(self.num_terminal_states)]) # terminal states inited to be at the "end" of the sorted states
             print("Inited terminal states to:", self.config["is_terminal_state"], "total", self.num_terminal_states)
         else: # if continuous space
             # print("#TODO for cont. spaces: term states")
             self.term_spaces = []
-            for i in range(len(self.config["terminal_states"])):
-                lows = np.array([self.config["terminal_states"][i][j] - self.config["term_state_edge"]/2 for j in range(self.config["state_space_dim"])])
-                highs = np.array([self.config["terminal_states"][i][j] + self.config["term_state_edge"]/2 for j in range(self.config["state_space_dim"])])
-                # print("Term state lows, highs:", lows, highs)
-                self.term_spaces.append(BoxExtended(low=lows, high=highs, seed=12 + config["seed"], dtype=np.float64)) #seed #hack #TODO
-            print("self.term_spaces samples:", self.term_spaces[0].sample(), self.term_spaces[-1].sample())
+            # if 'terminal_states' not in self.config:
+            #     self.config["terminal_states"] = []
+            # if ('term_state_edge' not in self.config):
+            #     self.config["term_state_edge"] = 0
+
+            if 'terminal_states' in self.config: #test?
+                for i in range(len(self.config["terminal_states"])):
+                    lows = np.array([self.config["terminal_states"][i][j] - self.config["term_state_edge"]/2 for j in range(self.config["state_space_dim"])])
+                    highs = np.array([self.config["terminal_states"][i][j] + self.config["term_state_edge"]/2 for j in range(self.config["state_space_dim"])])
+                    # print("Term state lows, highs:", lows, highs)
+                    self.term_spaces.append(BoxExtended(low=lows, high=highs, seed=12 + config["seed"], dtype=np.float64)) #seed #hack #TODO
+                print("self.term_spaces samples:", self.term_spaces[0].sample(), self.term_spaces[-1].sample())
 
     def init_init_state_dist(self):
         if self.config["state_space_type"] == "discrete":
@@ -350,12 +360,27 @@ class RLToyEnv(gym.Env):
                 pass #TODO
             else:
                 # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
-                x = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 0]
-                y = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 1]
-                A = np.vstack([x, np.ones(len(x))]).T
-                coeffs, sum_se, rank_A, singular_vals_A = np.linalg.lstsq(A, y, rcond=None)
-                sum_se = sum_se[0]
-                reward += (- np.sqrt(sum_se / self.sequence_length)) * self.reward_scale
+                #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_dist calc.?.
+                data_ = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, :]
+                data_mean = data_.mean(axis=0)
+                uu, dd, vv = np.linalg.svd(data_ - data_mean)
+                print('uu.shape, dd.shape, vv.shape =', uu.shape, dd.shape, vv.shape)
+                line_end_pts = vv[0] * np.linspace(-1, 1, 2)[:, np.newaxis] # vv[0] = 1st eigenvector, corres. to Principal Component #hardcoded -100 to 100 to get a "long" line which should make calculations more robust(?: didn't seem to be the case for 1st few trials, so changed it to -1, 1; even tried up to 10000- seems to get less precise for larger numbers) to numerical issues in dist_of_pt_from_line() below; newaxis added so that expected broadcasting takes place
+                line_end_pts += data_mean
+
+                total_dist = 0
+                for data_pt in data_: # find total distance of all data points from the fit line above
+                    total_dist += dist_of_pt_from_line(data_pt, line_end_pts[0], line_end_pts[-1])
+                print('total_dist of pts from fit line:', total_dist)
+
+                reward += ( - total_dist / self.sequence_length ) * self.reward_scale
+
+                # x = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 0]
+                # y = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 1]
+                # A = np.vstack([x, np.ones(len(x))]).T
+                # coeffs, sum_se, rank_A, singular_vals_A = np.linalg.lstsq(A, y, rcond=None)
+                # sum_se = sum_se[0]
+                # reward += (- np.sqrt(sum_se / self.sequence_length)) * self.reward_scale
 
                 # slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
                 # reward += (1 - std_err) * self.reward_scale
@@ -390,13 +415,15 @@ class RLToyEnv(gym.Env):
 
         else: # if continuous space
             # print("#TODO for cont. spaces: noise")
+            assert len(action.shape) == 1, 'Action should be specified as a 1-D tensor. However, shape of action was: ' + str(action.shape)
+            assert action.shape[0] == self.config['action_space_dim'], 'Action shape is: ' + str(action.shape[0]) + '. Expected: ' + str(self.config['action_space_dim'])
             if self.action_space.contains(action):
-                ##TODO implement for multiple orders, currently only for 1st order systems.
+                ###TODO implement for multiple orders, currently only for 1st order systems.
                 if self.dynamics_order == 1:
                     next_state = state + action * self.time_unit / self.inertia
             else:
                 next_state = state
-                print("WARNING: Action out of range of action space. Applying 0 action!!")
+                warnings.warn("WARNING: Action out of range of action space. Applying 0 action!!")
             # if "transition_noise" in self.config:
             noise_in_transition = self.config["transition_noise"](self.np_random) if "transition_noise" in self.config else 0 #random
             self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
@@ -421,7 +448,7 @@ class RLToyEnv(gym.Env):
         #     print("NEXT_STATE:", next_state, next_state in self.config["is_terminal_state"])
         return next_state
 
-    def get_augmented_state():
+    def get_augmented_state(self):
         '''
         Intended to return the full state which would be Markovian. For noisy processes, this would need the noise distribution and random seed too?
         '''
@@ -493,6 +520,22 @@ def mean_sinkhorn_dist(model_1_P, model_2_P, model_1_R=None, model_2_R=None, wei
        If model_1_R=None and model_2_R=None, then model_1_P and model_2_P can be general models for which averaged approx. Wasserstein dist. (i.e. sinkhorn divergence) is calculated, for e.g., they could even be models of R().
     """
 
+#distance of a point from a line: https://softwareengineering.stackexchange.com/questions/168572/distance-from-point-to-n-dimensional-line
+def dist_of_pt_from_line(pt, ptA, ptB):
+    lineAB = ptA - ptB
+    lineApt = ptA - pt
+    dot_product = np.dot(lineAB, lineApt)
+    proj = dot_product / np.linalg.norm(lineAB)
+    sq_dist = np.linalg.norm(lineApt)**2 - proj**2
+    tolerance = -1e-13
+    if sq_dist < 0:
+        if sq_dist < tolerance:
+            warnings.warn('The squared distance calculated in dist_of_pt_from_line() using Pythagoras\' theorem was less than the tolerance allowed. It was: ' + str(sq_dist) + '. Tolerance was: ' + str(tolerance))
+        sq_dist = 0
+    dist = np.sqrt(sq_dist)
+#     print('pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist:', pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist)
+    return dist
+
 
 if __name__ == "__main__":
 
@@ -514,15 +557,15 @@ if __name__ == "__main__":
 
     config["state_space_type"] = "continuous"
     config["action_space_type"] = "continuous"
-    config["state_space_dim"] = 2
-    config["action_space_dim"] = 2
+    config["state_space_dim"] = 4
+    config["action_space_dim"] = 4
     config["transition_dynamics_order"] = 1
     config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
-    config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
-    config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
+    # config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
+    # config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
     config["time_unit"] = 1 # Discretization of time domain
-    config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
-    config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
+    # config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
+    # config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
 
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
     config["delay"] = 1
@@ -536,12 +579,12 @@ if __name__ == "__main__":
 #    from rl_toy.envs import RLToyEnv
 #    env = gym.make("RLToy-v0")
 #    print("env.spec.max_episode_steps, env.unwrapped:", env.spec.max_episode_steps, env.unwrapped)
-    state = env.reset()
+    state = env.get_augmented_state()['curr_state']
     # print("TEST", type(state))
     for _ in range(20):
         # env.render() # For GUI
         action = env.action_space.sample() # take a #random action # TODO currently DiscreteExtended returns a sampled array
-        # action = np.array([1, 1]) # just to test if acting "in a line" works
+        # action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
         state = next_state
