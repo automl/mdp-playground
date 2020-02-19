@@ -102,11 +102,6 @@ class RLToyEnv(gym.Env):
         if "completely_connected" in config and config["completely_connected"]:
             assert config["state_space_size"] == config["action_space_size"], "config[\"state_space_size\"] != config[\"action_space_size\"]. Please provide valid values! Vals: " + str(config["state_space_size"]) + " " + str(config["action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
 
-        if "seed" in config:
-            self.seed(config["seed"]) #seed
-        else:
-            self.seed()
-
         config["state_space_type"] = config["state_space_type"].lower()
         config["action_space_type"] = config["action_space_type"].lower()
 
@@ -127,13 +122,17 @@ class RLToyEnv(gym.Env):
         # self.max_real = 100.0 # Take these settings from config
         # self.min_real = 0.0
 
-
         # def num_to_list(num1): #TODO Move this to a Utils file.
         #     if type(num1) == int or type(num1) == float:
         #         list1 = [num1]
         #     elif not isinstance(num1, list):
         #         raise TypeError("Argument to function should have been an int, float or list. Arg was: " + str(num1))
         #     return list1
+
+        if "seed" in config:
+            self.seed(config["seed"]) #seed
+        else:
+            self.seed()
 
         if config["state_space_type"] == "discrete":
             self.observation_space = DiscreteExtended(config["state_space_size"], seed=config["state_space_size"] + config["seed"]) #seed #hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
@@ -153,7 +152,6 @@ class RLToyEnv(gym.Env):
             self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=11 + config["seed"], dtype=np.float64) #seed #hack #TODO
 
 
-
         if not config["generate_random_mdp"]:
             #TODO When having a fixed delay/specific sequences, we need to have transition function from tuples of states of diff. lengths to next tuple of states. We can have this tupleness to have Markovianness on 1 or both of dynamics and reward functions.
             # P(s, a) = s' for deterministic transitions; or a probability dist. function over s' for non-deterministic #TODO keep it a probability function for deterministic too? pdf would be Dirac-Delta at specific points! Can be done in sympy but not scipy I think. Or overload function to return Prob dist.(s') function when called as P(s, a); or pdf or pmf(s, a, s') value when called as P(s, a, s')
@@ -162,25 +160,17 @@ class RLToyEnv(gym.Env):
             self.R = config["reward_function"] if callable(config["reward_function"]) else lambda s, a: config["reward_function"][s, a]
             ##### TODO self.P and R were untended to be used as the dynamics functions inside step() - that's why were being inited by user-defined function here; but currently P is being used as dynamics for imagined transitions and transition_function is used for actual transitions in step() instead. So, setting P to manually configured transition means it won't be used in step() as was intended!
         else:
-            #TODO Generate state and action space sizes also randomly
+            #TODO Generate state and action space sizes also randomly?
+            # Order of init is important!!
             self.init_terminal_states()
             self.init_init_state_dist()
             self.init_reward_function()
             self.init_transition_function()
 
-        #TODO make init_state_dist the default sample() for state space?
-        if self.config["state_space_type"] == "discrete":
-            self.init_state_dist = self.config["init_state_dist"] if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath? self.init_state_dist is not used anywhere right now, self.config["init_state_dist"] is used!
-            print("self.init_state_dist:", self.config["init_state_dist"])
         #TODO sample at any time from "current"/converged distribution of states according to current policy
+
         self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes it does as also does space); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
         print("self.augmented_state, len", self.augmented_state, len(self.augmented_state))
-
-        if self.config["state_space_type"] == "discrete":
-            self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
-            print("self.config['is_terminal_state']:", self.config["is_terminal_state"])
-        else:
-            self.is_terminal_state = lambda s: np.any([self.term_spaces[i].contains(s) for i in range(len(self.term_spaces))]) ### TODO for cont.
 
         ###TODO Move this part to reset()?
         if self.config["state_space_type"] == "discrete":
@@ -214,7 +204,9 @@ class RLToyEnv(gym.Env):
                 warnings.warn("WARNING: int(terminal_state_density * state_space_size) was 0. Setting num_terminal_states to be 1!")
                 self.num_terminal_states = 1
             self.config["is_terminal_state"] = np.array([self.config["state_space_size"] - 1 - i for i in range(self.num_terminal_states)]) # terminal states inited to be at the "end" of the sorted states
-            print("Inited terminal states to:", self.config["is_terminal_state"], "total", self.num_terminal_states)
+            print("Inited terminal states to self.config['is_terminal_state']:", self.config["is_terminal_state"], "total", self.num_terminal_states)
+            self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
+
         else: # if continuous space
             # print("#TODO for cont. spaces: term states")
             self.term_spaces = []
@@ -231,9 +223,16 @@ class RLToyEnv(gym.Env):
                     self.term_spaces.append(BoxExtended(low=lows, high=highs, seed=12 + config["seed"], dtype=np.float64)) #seed #hack #TODO
                 print("self.term_spaces samples:", self.term_spaces[0].sample(), self.term_spaces[-1].sample())
 
+            self.is_terminal_state = lambda s: np.any([self.term_spaces[i].contains(s) for i in range(len(self.term_spaces))]) ### TODO for cont. #test?
+
+
+
     def init_init_state_dist(self):
         if self.config["state_space_type"] == "discrete":
             self.config["init_state_dist"] = np.array([1 / (self.config["state_space_size"] - self.num_terminal_states) for i in range(self.config["state_space_size"] - self.num_terminal_states)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use!
+        #TODO make init_state_dist the default sample() for state space?
+            self.init_state_dist = self.config["init_state_dist"] if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath? self.init_state_dist is not used anywhere right now, self.config["init_state_dist"] is used!
+            print("self.init_state_dist:", self.config["init_state_dist"])
         else: # if continuous space
             # print("#TODO for cont. spaces: init_state_dist")
             pass # this is handled in reset where we resample if we sample a term. state
@@ -473,9 +472,9 @@ class RLToyEnv(gym.Env):
             while True: # Be careful about infinite loops
                 term_space_was_sampled = False
                 self.curr_state = self.observation_space.sample() #random
-                for i in range(len(self.term_spaces)):
+                for i in range(len(self.term_spaces)): # Could this sampling be made more efficient? In general, the non-terminal space could have any shape and assiging equal sampling probability to each point in this space is pretty hard.
                     if self.term_spaces[i].contains(self.curr_state):
-                        print("A state was sampled in term state subspace. Therefore, resampling. State was, subspace was:", self.curr_state, i) ##TODO Move this logic into a new class in Gym spaces that can contain subspaces for term states! (with warning/error if term subspaces cover whole state space)
+                        print("A state was sampled in term state subspace. Therefore, resampling. State was, subspace was:", self.curr_state, i) ##TODO Move this logic into a new class in Gym spaces that can contain subspaces for term states! (with warning/error if term subspaces cover whole state space, or even a lot of it)
                         term_space_was_sampled = True
                         break
                 if not term_space_was_sampled:
