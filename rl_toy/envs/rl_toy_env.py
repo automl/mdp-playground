@@ -53,7 +53,7 @@ class RLToyEnv(gym.Env):
         #Discount factor Can be used by the algorithm if it wants it, more an intrinsic property of the algorithm. With delay, seq_len, etc., it's not clear how discount factor will work.
         """
 
-        if config is None:
+        if config is None: # sets defaults
             config = {}
 
             # Discrete spaces configs:
@@ -122,11 +122,7 @@ class RLToyEnv(gym.Env):
             self.time_unit = self.config["time_unit"]
             self.reward_scale = self.config["reward_scale"]
 
-        self.total_abs_noise_in_reward_episode = 0
-        self.total_abs_noise_in_transition_episode = 0 # only present in continuous spaces
-        self.total_reward_episode = 0
-        self.total_noisy_transitions_episode = 0
-        self.total_transitions_episode = 0
+        self.total_episodes = 0
 
         # self.max_real = 100.0 # Take these settings from config
         # self.min_real = 0.0
@@ -177,7 +173,7 @@ class RLToyEnv(gym.Env):
             self.init_state_dist = self.config["init_state_dist"] if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath? self.init_state_dist is not used anywhere right now, self.config["init_state_dist"] is used!
             print("self.init_state_dist:", self.config["init_state_dist"])
         #TODO sample at any time from "current"/converged distribution of states according to current policy
-        self.curr_state = self.reset() #TODO make this seedable (Gym env has its own seed?); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
+        self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes it does as also does space); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
         print("self.augmented_state, len", self.augmented_state, len(self.augmented_state))
 
         if self.config["state_space_type"] == "discrete":
@@ -186,7 +182,7 @@ class RLToyEnv(gym.Env):
         else:
             self.is_terminal_state = lambda s: np.any([self.term_spaces[i].contains(s) for i in range(len(self.term_spaces))]) ### TODO for cont.
 
-
+        ###TODO Move this part to reset()?
         if self.config["state_space_type"] == "discrete":
             delay = self.delay
             sequence_length = self.sequence_length
@@ -457,6 +453,15 @@ class RLToyEnv(gym.Env):
     def reset(self):
         # TODO reset is also returning info dict to be able to return state in addition to observation;
         # TODO Do not start in a terminal state.
+        # on episode "end" stuff (to not be invoked when reset() called when self.total_episodes = 0; end is quoted because it may not be a true episode end reached by reaching a terminal state, but reset() may have been called in the middle of an episode):
+        if not self.total_episodes == 0:
+            print("Noise stats for previous episode num.:", self.total_episodes, "(total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions):",
+                    self.total_abs_noise_in_reward_episode, self.total_abs_noise_in_transition_episode, self.total_reward_episode, self.total_noisy_transitions_episode,
+                    self.total_transitions_episode)
+
+        # on episode start stuff:
+        self.total_episodes += 1
+
         if self.config["state_space_type"] == "discrete":
             self.curr_state = self.np_random.choice(self.config["state_space_size"], p=self.config["init_state_dist"]) #random
             print("RESET called. State reset to:", self.curr_state)
@@ -480,13 +485,10 @@ class RLToyEnv(gym.Env):
             self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state)
 
-        print("Noise stats for previous episode (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions):",
-                self.total_abs_noise_in_reward_episode, self.total_abs_noise_in_transition_episode, self.total_reward_episode, self.total_noisy_transitions_episode,
-                self.total_transitions_episode)
         self.total_abs_noise_in_reward_episode = 0
         self.total_abs_noise_in_transition_episode = 0 # only present in continuous spaces
+        self.total_noisy_transitions_episode = 0 # only present in discrete spaces
         self.total_reward_episode = 0
-        self.total_noisy_transitions_episode = 0
         self.total_transitions_episode = 0
 
         return self.curr_state
