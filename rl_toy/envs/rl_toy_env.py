@@ -172,20 +172,6 @@ class RLToyEnv(gym.Env):
         self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes it does as also does space); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
         print("self.augmented_state, len", self.augmented_state, len(self.augmented_state))
 
-        if self.config["state_space_type"] == "discrete" and self.config["make_denser"] == True:
-            delay = self.delay
-            sequence_length = self.sequence_length
-            self.possible_remaining_sequences = [[] for i in range(sequence_length)]
-            for j in range(1):
-            #        if j == 0:
-                for k in range(sequence_length):
-                    for l in range(len(self.specific_sequences[k])):
-    #                    if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]:
-                            self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1])
-
-            print("self.possible_remaining_sequences", self.possible_remaining_sequences)
-            print(" self.delay, self.sequence_length:", self.delay, self.sequence_length)
-
         print("toy env instantiated with config:", self.config) #hack
 
         # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
@@ -258,7 +244,7 @@ class RLToyEnv(gym.Env):
                 state_space_size = self.config["state_space_size"] - self.num_terminal_states
                 len_ = self.sequence_length
                 permutations = list(range(state_space_size + 1 - len_, state_space_size + 1))
-                print("Permutations order, 1 random number out of possible perms, no. of possible perms", permutations, np.random.randint(np.prod(permutations)), np.prod(permutations))
+                print("Permutations order, 1 random number out of possible perms, no. of possible perms", permutations, np.random.randint(np.prod(permutations)), np.prod(permutations)) #random
                 num_possible_permutations = np.prod(permutations)
                 num_specific_sequences = int(self.config["reward_density"] * num_possible_permutations)
                 self.specific_sequences = [[] for i in range(self.sequence_length)]
@@ -492,6 +478,19 @@ class RLToyEnv(gym.Env):
 
         # This part just initializes self.possible_remaining_sequences to hold 1st state in all rewardable sequences, which will be checked for after 1st step of the episode to give rewards.
         ### TODO Move this part to reset()?
+        if self.config["state_space_type"] == "discrete" and self.config["make_denser"] == True:
+            delay = self.delay
+            sequence_length = self.sequence_length
+            self.possible_remaining_sequences = [[] for i in range(sequence_length)]
+            for j in range(1):
+            #        if j == 0:
+                for k in range(sequence_length):
+                    for l in range(len(self.specific_sequences[k])):
+    #                    if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]:
+                            self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1])
+
+            print("self.possible_remaining_sequences", self.possible_remaining_sequences)
+            print(" self.delay, self.sequence_length:", self.delay, self.sequence_length)
 
         return self.curr_state
 
@@ -545,6 +544,7 @@ if __name__ == "__main__":
 
     config = {}
     config["seed"] = 0 #seed, 7 worked for initially sampling within term state subspace
+    
     config["state_space_type"] = "discrete"
     config["action_space_type"] = "discrete"
     config["state_space_size"] = 6
