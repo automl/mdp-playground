@@ -5,6 +5,7 @@ from __future__ import print_function
 
 import warnings
 import numpy as np
+import scipy
 from scipy import stats
 import gym
 from gym.spaces import Discrete, BoxExtended, DiscreteExtended
@@ -398,8 +399,18 @@ class RLToyEnv(gym.Env):
             assert action.shape[0] == self.config['action_space_dim'], 'Action shape is: ' + str(action.shape[0]) + '. Expected: ' + str(self.config['action_space_dim'])
             if self.action_space.contains(action):
                 ###TODO implement for multiple orders, currently only for 1st order systems.
-                if self.dynamics_order == 1:
-                    next_state = state + action * self.time_unit / self.inertia
+                # if self.dynamics_order == 1:
+                #     next_state = state + action * self.time_unit / self.inertia
+
+                print('self.state_derivatives:', self.state_derivatives)
+                self.state_derivatives[-1] = action / self.inertia # action is presumed to be n-th order force
+                factorial_array = scipy.special.factorial(np.arange(1, self.config['transition_dynamics_order'] + 1)) # This is just to speed things up as scipy calculates the factorial only for largest array member
+                for i in reversed(range(self.config['transition_dynamics_order'])):
+                    for j in range(self.config['transition_dynamics_order'] - i):
+                        self.state_derivatives[i] += self.state_derivatives[i + j + 1] * (self.time_unit**j) / factorial_array[j] #+ state_derivatives_prev[i] Don't need to add previous value as it's already in there at the beginning
+                print('self.state_derivatives:', self.state_derivatives)
+                next_state = self.state_derivatives[0]
+
             else:
                 next_state = state
                 warnings.warn("WARNING: Action out of range of action space. Applying 0 action!!")
@@ -465,6 +476,11 @@ class RLToyEnv(gym.Env):
                 if not term_space_was_sampled:
                     break
 
+            # init the state derivatives needed for continuous spaces
+            zero_state = np.array([0.0] * (self.config['state_space_dim']))
+            self.state_derivatives = [zero_state for i in range(self.config['transition_dynamics_order'] + 1)]
+            self.state_derivatives[0] = self.curr_state
+
             print("RESET called. State reset to:", self.curr_state)
             self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state)
@@ -477,7 +493,7 @@ class RLToyEnv(gym.Env):
 
 
         # This part just initializes self.possible_remaining_sequences to hold 1st state in all rewardable sequences, which will be checked for after 1st step of the episode to give rewards.
-        ### TODO Move this part to reset()?
+        ### TODO Move this part to reset()? Done. But even before, this small bug shouldn't have caused a problem because the sub-sequences, i.e. prefixes, of length >1 in possible_remaining_sequences would have been checked against NaNs for the past states and would have not contributed to the reward.
         if self.config["state_space_type"] == "discrete" and self.config["make_denser"] == True:
             delay = self.delay
             sequence_length = self.sequence_length
@@ -539,41 +555,40 @@ def dist_of_pt_from_line(pt, ptA, ptB):
 #     print('pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist:', pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist)
     return dist
 
-
 if __name__ == "__main__":
 
     config = {}
     config["seed"] = 0 #seed, 7 worked for initially sampling within term state subspace
-    
-    config["state_space_type"] = "discrete"
-    config["action_space_type"] = "discrete"
-    config["state_space_size"] = 6
-    config["action_space_size"] = 6
-    config["reward_density"] = 0.25 # Number between 0 and 1
-    config["make_denser"] = True
-    config["terminal_state_density"] = 0.25 # Number between 0 and 1
-    config["completely_connected"] = True # Make every state reachable from every state
-    config["repeats_in_sequences"] = False
-    config["delay"] = 1
-    config["sequence_length"] = 3
-    config["reward_unit"] = 1.0
 
-
-    # config["state_space_type"] = "continuous"
-    # config["action_space_type"] = "continuous"
-    # config["state_space_dim"] = 4
-    # config["action_space_dim"] = 4
-    # config["transition_dynamics_order"] = 1
-    # config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
-    # # config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
-    # # config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
-    # config["time_unit"] = 1 # Discretization of time domain
-    # # config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
-    # # config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
-    #
+    # config["state_space_type"] = "discrete"
+    # config["action_space_type"] = "discrete"
+    # config["state_space_size"] = 6
+    # config["action_space_size"] = 6
+    # config["reward_density"] = 0.25 # Number between 0 and 1
+    # config["make_denser"] = True
+    # config["terminal_state_density"] = 0.25 # Number between 0 and 1
+    # config["completely_connected"] = True # Make every state reachable from every state
+    # config["repeats_in_sequences"] = False
     # config["delay"] = 1
-    # config["sequence_length"] = 10
-    # config["reward_scale"] = 1.0
+    # config["sequence_length"] = 3
+    # config["reward_unit"] = 1.0
+
+
+    config["state_space_type"] = "continuous"
+    config["action_space_type"] = "continuous"
+    config["state_space_dim"] = 4
+    config["action_space_dim"] = 4
+    config["transition_dynamics_order"] = 1
+    config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
+    # config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
+    # config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
+    config["time_unit"] = 1 # Discretization of time domain
+    # config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
+    # config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
+
+    config["delay"] = 1
+    config["sequence_length"] = 10
+    config["reward_scale"] = 1.0
 #    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
     # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
     # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
