@@ -55,7 +55,7 @@ class TestRLToyEnv(unittest.TestCase):
     def test_continuous_dynamics_order(self):
         ''''''
         config = {}
-        config["seed"] = 0 #seed, 7 worked for initially sampling within term state subspace
+        config["seed"] = 0
 
         config["state_space_type"] = "continuous"
         config["action_space_type"] = "continuous"
@@ -92,43 +92,45 @@ class TestRLToyEnv(unittest.TestCase):
     def test_discrete_dynamics(self):
         ''''''
         config = {}
-        config["seed"] = 0 #seed, 7 worked for initially sampling within term state subspace
+        config["seed"] = 0
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
         config["state_space_size"] = 6
         config["action_space_size"] = 6
-        config["reward_density"] = 0.25 # Number between 0 and 1
+        config["reward_density"] = 0.25
         config["make_denser"] = True
-        config["terminal_state_density"] = 0.25 # Number between 0 and 1
-        config["completely_connected"] = True # Make every state reachable from every state
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 1
         config["sequence_length"] = 3
         config["reward_unit"] = 1.0
 
-        config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
+        config["generate_random_mdp"] = True
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state']
         self.assertEqual(type(state), int, "Type of state should be numpy.ndarray.") #TODO Move this and the test_continuous_dynamics type checks to separate unit tests
 
-        action = np.array([1]) # just to test if acting "in a line" works
+        action = 1
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
-        self.assertEqual(next_state, 5, "Mismatch in state expected by transition dynamics.")
+        self.assertEqual(next_state, 5, "Mismatch in state expected by transition dynamics for step 1.")
         state = next_state
 
-        action = np.array([7]) # just to test if acting "in a line" works
+        action = 5
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
-        self.assertEqual(state, 6, "Mismatch in state expected by transition dynamics.")
+        self.assertEqual(next_state, 1, "Mismatch in state expected by transition dynamics for step 2.")
         state = next_state
+
+        #TODO Test for more timesteps or higher order derivatives
 
         env.reset()
         env.close()
 
 
-        #Unit tests
+    #Unit tests
 
 
 if __name__ == '__main__':
