@@ -215,7 +215,7 @@ class RLToyEnv(gym.Env):
         if self.config["state_space_type"] == "discrete":
             self.config["init_state_dist"] = np.array([1 / (self.config["state_space_size"] - self.num_terminal_states) for i in range(self.config["state_space_size"] - self.num_terminal_states)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use!
         #TODO make init_state_dist the default sample() for state space?
-            self.init_state_dist = self.config["init_state_dist"] if callable(config["init_state_dist"]) else lambda s: config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath? self.init_state_dist is not used anywhere right now, self.config["init_state_dist"] is used!
+            self.init_state_dist = self.config["init_state_dist"] if callable(self.config["init_state_dist"]) else lambda s: self.config["init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath? self.init_state_dist is not used anywhere right now, self.config["init_state_dist"] is used!
             print("self.init_state_dist:", self.config["init_state_dist"])
         else: # if continuous space
             # print("#TODO for cont. spaces: init_state_dist")
@@ -403,11 +403,13 @@ class RLToyEnv(gym.Env):
                 #     next_state = state + action * self.time_unit / self.inertia
 
                 print('self.state_derivatives:', self.state_derivatives)
+                # Except the last member of state_derivatives, the other occupy the same place in memory. Could create a new copy of them every time, but I think this should be more efficient and as long as tests don't fail should be fine.
                 self.state_derivatives[-1] = action / self.inertia # action is presumed to be n-th order force
                 factorial_array = scipy.special.factorial(np.arange(1, self.config['transition_dynamics_order'] + 1)) # This is just to speed things up as scipy calculates the factorial only for largest array member
-                for i in reversed(range(self.config['transition_dynamics_order'])):
+                for i in range(self.config['transition_dynamics_order']):
                     for j in range(self.config['transition_dynamics_order'] - i):
-                        self.state_derivatives[i] += self.state_derivatives[i + j + 1] * (self.time_unit**j) / factorial_array[j] #+ state_derivatives_prev[i] Don't need to add previous value as it's already in there at the beginning
+                        print(i, j, self.state_derivatives, (self.time_unit**(j + 1)), factorial_array)
+                        self.state_derivatives[i] += self.state_derivatives[i + j + 1] * (self.time_unit**(j + 1)) / factorial_array[j] #+ state_derivatives_prev[i] Don't need to add previous value as it's already in there at the beginning ##### TODO Keep an old self.state_derivatives and a new one otherwise higher order derivatives will be overwritten before being used by lower order ones.
                 print('self.state_derivatives:', self.state_derivatives)
                 next_state = self.state_derivatives[0]
 
@@ -478,7 +480,7 @@ class RLToyEnv(gym.Env):
 
             # init the state derivatives needed for continuous spaces
             zero_state = np.array([0.0] * (self.config['state_space_dim']))
-            self.state_derivatives = [zero_state for i in range(self.config['transition_dynamics_order'] + 1)]
+            self.state_derivatives = [zero_state.copy() for i in range(self.config['transition_dynamics_order'] + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
 
             print("RESET called. State reset to:", self.curr_state)
@@ -544,7 +546,7 @@ def dist_of_pt_from_line(pt, ptA, ptB):
     lineAB = ptA - ptB
     lineApt = ptA - pt
     dot_product = np.dot(lineAB, lineApt)
-    proj = dot_product / np.linalg.norm(lineAB)
+    proj = dot_product / np.linalg.norm(lineAB) ####TODO could lead to division by zero if line is a null vector!
     sq_dist = np.linalg.norm(lineApt)**2 - proj**2
     tolerance = -1e-13
     if sq_dist < 0:
