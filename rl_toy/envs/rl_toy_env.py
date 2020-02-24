@@ -49,6 +49,7 @@ class RLToyEnv(gym.Env):
         #Check TODO, fix and bottleneck tags
         Sources of #randomness: Seed for Env.observation_space (to generate P, for noise in P), Env.action_space (to generate initial random policy (done by the RL algorithm)), Env. (to generate R, for noise in R, initial state); ; Check # seed, # random
         ###TODO Separate out seeds for all the random processes!
+        ## TODO Terminal states: Gym expects _us_ to check for 'done' being true; rather set P(s, a) = s for any terminal state!
         ###IMP state_space_size should be large enough that after terminal state generation, we have enough num_specific_sequences rewardable!
         #TODO Implement logger, command line argument parser, config from YAML file?
         #Discount factor Can be used by the algorithm if it wants it, more an intrinsic property of the algorithm. With delay, seq_len, etc., it's not clear how discount factor will work.
@@ -290,6 +291,11 @@ class RLToyEnv(gym.Env):
                 for s in range(self.config["state_space_size"]):
                     for a in range(self.config["action_space_size"]):
                         self.config["transition_function"][s, a] = self.observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
+            for s in range(self.config["state_space_size"] - self.num_terminal_states, self.config["state_space_size"]):
+                for a in range(self.config["action_space_size"]):
+                    assert self.is_terminal_state(s) == True
+                    self.config["transition_function"][s, a] = s # Setting P(s, a) = s for terminal states, for P() to be meaningful even if someone doesn't check for 'done' being = True
+
             print(self.config["transition_function"], "init_transition_function", type(self.config["transition_function"][0, 0]))
         else: # if continuous space
             print("#TODO for cont. spaces")
@@ -307,16 +313,18 @@ class RLToyEnv(gym.Env):
 
         if self.config["state_space_type"] == "discrete":
             if not self.config["make_denser"]:
+                print(state_considered, "with delay", self.config["delay"])
                 if state_considered[0 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
                     # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
                     reward += self.reward_unit
                 else:
                     # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
                     pass
-            else: # if not make_denser
+            else: # if make_denser
                 for j in range(1, sequence_length + 1):
             # Check if augmented_states - delay up to different lengths in the past are present in sequence lists of that particular length; if so add them to the list of length
                     curr_seq_being_checked = state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay]
+                    # print("curr_seq_being_checked, self.possible_remaining_sequences[j - 1]:", curr_seq_being_checked, self.possible_remaining_sequences[j - 1])
                     if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
                         count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
                         # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_unit * j / self.sequence_length)
@@ -398,7 +406,7 @@ class RLToyEnv(gym.Env):
             assert len(action.shape) == 1, 'Action should be specified as a 1-D tensor. However, shape of action was: ' + str(action.shape)
             assert action.shape[0] == self.config['action_space_dim'], 'Action shape is: ' + str(action.shape[0]) + '. Expected: ' + str(self.config['action_space_dim'])
             if self.action_space.contains(action):
-                ###TODO implement for multiple orders, currently only for 1st order systems.
+                ### TODO implement for multiple orders, currently only for 1st order systems.
                 # if self.dynamics_order == 1:
                 #     next_state = state + action * self.time_unit / self.inertia
 

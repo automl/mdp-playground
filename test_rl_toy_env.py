@@ -103,7 +103,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["terminal_state_density"] = 0.25
         config["completely_connected"] = True
         config["repeats_in_sequences"] = False
-        config["delay"] = 1
+        config["delay"] = 0
         config["sequence_length"] = 3
         config["reward_unit"] = 1.0
 
@@ -112,16 +112,30 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()['curr_state']
         self.assertEqual(type(state), int, "Type of state should be numpy.ndarray.") #TODO Move this and the test_continuous_dynamics type checks to separate unit tests
 
+        action = 2
+        next_state, reward, done, info = env.step(action)
+        print("sars', done =", state, action, reward, next_state, done, "\n")
+        self.assertEqual(next_state, 1, "Mismatch in state expected by transition dynamics for step 1.")
+        state = next_state
+
+        action = 4
+        next_state, reward, done, info = env.step(action)
+        print("sars', done =", state, action, reward, next_state, done, "\n")
+        self.assertEqual(next_state, 2, "Mismatch in state expected by transition dynamics for step 2.")
+        state = next_state
+
         action = 1
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
-        self.assertEqual(next_state, 5, "Mismatch in state expected by transition dynamics for step 1.")
+        self.assertEqual(next_state, 5, "Mismatch in state expected by transition dynamics for step 3.")
+        self.assertEqual(done, True, "Mismatch in expectation that terminal state should have been reached by transition dynamics for step 3.")
         state = next_state
 
-        action = 5
+        # Try a random action to see that terminal state leads back to same terminal state
+        action = env.action_space.sample()
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
-        self.assertEqual(next_state, 1, "Mismatch in state expected by transition dynamics for step 2.")
+        self.assertEqual(next_state, state, "Mismatch in state expected by transition dynamics for step 4. Terminal state was reached in step 3 and any random action should lead back to same terminal state.")
         state = next_state
 
         #TODO Test for more timesteps or higher order derivatives
@@ -129,6 +143,187 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
+
+    def test_discrete_reward_delay(self):
+        ''''''
+        config = {}
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.25
+        config["make_denser"] = True
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 3
+        config["sequence_length"] = 1
+        config["reward_unit"] = 1.0
+
+        config["generate_random_mdp"] = True
+
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 2, 5, 4, 5, 2, 3, np.random.randint(config["action_space_size"]), 4] # 2nd last action is random just to check that last delayed reward works with any action
+        expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+    def test_discrete_rewardable_sequences(self):
+        ''''''
+        config = {}
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.25
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 0
+        config["sequence_length"] = 3
+        config["reward_unit"] = 1.0
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
+        expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when sequence length = 3.")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+    def test_discrete_p_noise(self):
+        ''''''
+        print('TEST_DISCRETE_P_NOISE')
+        config = {}
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.25
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 0
+        config["sequence_length"] = 1
+        config["reward_unit"] = 1.0
+        config["transition_noise"] = 0.5
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 6, 2, np.random.randint(config["action_space_size"])] #
+        expected_states = [2, 6, 6, 3] # Last state 3 is fixed for this test because of fixed seed for Env which selects the next noisy state.
+        for i in range(len(actions)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            self.assertEqual(next_state, expected_states[i], "Expected next state mismatch in time step: " + str(i + 1) + " when P noise = 0.5.")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+    def test_discrete_r_noise(self):
+        ''''''
+        print('TEST_DISCRETE_R_NOISE')
+        config = {}
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.25
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 0
+        config["sequence_length"] = 1
+        config["reward_unit"] = 1.0
+        config["reward_noise"] = lambda a: a.normal(0, 0.5)
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 6, 2, np.random.randint(config["action_space_size"])] #
+        expected_rewards = [-0.499716, 1.805124, -0.224812, 0.086749] # 2nd state produces 'true' reward
+        for i in range(len(actions)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg='Expected reward mismatch in time step: ' + str(i + 1) + ' when R noise = 0.5.')
+
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+    def test_discrete_all_meta_features(self):
+        '''
+        #TODO Currently only test for seq, del and r noises together. Include others! Gets complicated with P noise: trying to avoid terminal states while still following a rewardable sequence. Maybe try low P noise to test this?
+        '''
+        print('TEST_DISCRETE_ALL_META_FEATURES')
+
+        config = {}
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.25
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 1
+        config["sequence_length"] = 3
+        config["reward_unit"] = 1.0
+        # config["transition_noise"] = 0.1
+        config["reward_noise"] = lambda a: a.normal(0, 0.5)
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
+        expected_rewards = [0 + -0.292808, 0 + 0.770696, 0 + -1.01743611, 1 + -0.042768, 1 + 0.78761310, 0 + -0.510087, 1 - 0.089978, 1 - 0.51345136]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg="Expected reward mismatch in time step: " + str(i + 1) + " when sequence length = 3, delay = 1.")
+            state = next_state
+
+        env.reset()
+        env.close()
 
     #Unit tests
 
