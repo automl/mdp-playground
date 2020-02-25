@@ -9,6 +9,7 @@ sys.path.append('./rl_toy/envs/')
 from rl_toy_env import RLToyEnv
 
 import numpy as np
+import copy
 
 class TestRLToyEnv(unittest.TestCase):
 
@@ -39,7 +40,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state'] #env.reset()
-        self.assertEqual(type(state), np.ndarray, "Type of state should be numpy.ndarray.")
+        self.assertEqual(type(state), np.ndarray, "Type of continuous state should be numpy.ndarray.")
         for _ in range(20):
             # action = env.action_space.sample()
             action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
@@ -72,18 +73,26 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state'].copy() # copy is needed to have a copy of the old state, otherwise we get the np.array that has the same location in memory and is constantly updated by step()
+        state_derivatives = copy.deepcopy(env.state_derivatives)
 
         action = np.array([2.0, 1.0])
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
         np.testing.assert_allclose(next_state - state, (1/6) * np.array([1, 0.5]) * 1e-6)
+        np.testing.assert_allclose(env.state_derivatives[1] - state_derivatives[1], (1/2) * np.array([1, 0.5]) * 1e-4)
+        np.testing.assert_allclose(env.state_derivatives[2] - state_derivatives[2], np.array([1, 0.5]) * 1e-2)
         state = next_state.copy()
+        state_derivatives = copy.deepcopy(env.state_derivatives)
 
         action = np.array([2.0, 1.0])
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
         np.testing.assert_allclose(next_state - state, (7/6) * np.array([1, 0.5]) * 1e-6)
+        np.testing.assert_allclose(env.state_derivatives[1] - state_derivatives[1], (3/2) * np.array([1, 0.5]) * 1e-4)
+        np.testing.assert_allclose(env.state_derivatives[2] - state_derivatives[2], np.array([1, 0.5]) * 1e-2)
         state = next_state.copy()
+
+        #TODO Test for more timesteps? or higher order derivatives (.DONE)
 
         env.reset()
         env.close()
@@ -110,7 +119,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state']
-        self.assertEqual(type(state), int, "Type of state should be numpy.ndarray.") #TODO Move this and the test_continuous_dynamics type checks to separate unit tests
+        self.assertEqual(type(state), int, "Type of discrete state should be int.") #TODO Move this and the test_continuous_dynamics type checks to separate unit tests
 
         action = 2
         next_state, reward, done, info = env.step(action)
@@ -137,8 +146,6 @@ class TestRLToyEnv(unittest.TestCase):
         print("sars', done =", state, action, reward, next_state, done, "\n")
         self.assertEqual(next_state, state, "Mismatch in state expected by transition dynamics for step 4. Terminal state was reached in step 3 and any random action should lead back to same terminal state.")
         state = next_state
-
-        #TODO Test for more timesteps or higher order derivatives
 
         env.reset()
         env.close()
