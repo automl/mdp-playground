@@ -100,6 +100,7 @@ class RLToyEnv(gym.Env):
             #TODO asserts for the rest of the config settings
             # next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
 
+            
         assert config["sequence_length"] > 0, "config[\"sequence_length\"] <= 0. Set to: " + str(config["sequence_length"]) # also should be int
         if "completely_connected" in config and config["completely_connected"]:
             assert config["state_space_size"] == config["action_space_size"], "config[\"state_space_size\"] != config[\"action_space_size\"]. Please provide valid values! Vals: " + str(config["state_space_size"]) + " " + str(config["action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
@@ -147,7 +148,7 @@ class RLToyEnv(gym.Env):
 
 
         if config["action_space_type"] == "discrete":
-            self.action_space = DiscreteExtended(config["action_space_size"], seed=config["action_space_size"] + config["seed"]) #seed #hack #TODO
+            self.action_space = DiscreteExtended(config["action_space_size"], seed=1 + config["action_space_size"] + config["seed"]) #seed #hack #TODO
         else:
             self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
@@ -243,19 +244,22 @@ class RLToyEnv(gym.Env):
                     print("specific_sequence that will be rewarded", specific_sequence) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
                 print("Total no. of rewarded sequences:", len(self.specific_sequences[self.sequence_length - 1]), "Out of", num_possible_sequences)
             else: # if no repeats_in_sequences
-                state_space_size = self.config["state_space_size"] - self.num_terminal_states
+                non_term_state_space_size = self.config["state_space_size"] - self.num_terminal_states
                 len_ = self.sequence_length
-                permutations = list(range(state_space_size + 1 - len_, state_space_size + 1))
-                print("Permutations order, 1 random number out of possible perms, no. of possible perms", permutations, np.random.randint(np.prod(permutations)), np.prod(permutations)) #random
+                permutations = list(range(non_term_state_space_size + 1 - len_, non_term_state_space_size + 1))
+                print("No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms", permutations, np.random.randint(np.prod(permutations)), np.prod(permutations)) #random
                 num_possible_permutations = np.prod(permutations)
                 num_specific_sequences = int(self.config["reward_density"] * num_possible_permutations)
+                if num_specific_sequences > 1000:
+                    warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:', num_specific_sequences) #TODO Maybe even exit the program if too much memory is (expected to be) taken.
+
                 self.specific_sequences = [[] for i in range(self.sequence_length)]
                 sel_sequence_nums = self.np_random.choice(num_possible_permutations, size=num_specific_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
                 total_false = 0
                 for i in range(num_specific_sequences):
                     curr_permutation = sel_sequence_nums[i]
                     seq_ = []
-                    curr_rem_digits = list(range(state_space_size))
+                    curr_rem_digits = list(range(non_term_state_space_size))
                     for j in permutations[::-1]:
                         rem_ = curr_permutation % j
                         seq_.append(curr_rem_digits[rem_])
@@ -265,15 +269,16 @@ class RLToyEnv(gym.Env):
                 #         print(rem_, curr_permutation, j, seq_)
                 #     print("T/F:", seq_ in self.specific_sequences)
                     if seq_ not in self.specific_sequences[self.sequence_length - 1]: #hack
-                        total_false += 1 #TODO remove these extra checks
+                        total_false += 1 #TODO remove these extra checks and assert below
                     self.specific_sequences[self.sequence_length - 1].append(seq_)
                     print("specific_sequence that will be rewarded", seq_)
                 #print(len(set(self.specific_sequences))) #error
 
                 print("Number of generated sequences that did not clash with an existing one when it was generated:", total_false)
+                assert(total_false, 0, 'None of the generated sequences should have clacshed with an existing rewardable sequence when it was generated. No. of times a clash was detected:' + str(total_false))
                 print("Total no. of rewarded sequences:", len(self.specific_sequences[self.sequence_length - 1]), "Out of", num_possible_permutations)
         else: # if continuous space
-            print("#TODO for cont. spaces: noise")
+            print("#TODO for cont. spaces?: init_reward_function")
 
         self.R = lambda s, a: self.reward_function(s, a, only_query=False)
 
