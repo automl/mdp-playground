@@ -334,7 +334,9 @@ class TestRLToyEnv(unittest.TestCase):
 
 
     def test_discrete_multi_discrete(self):
-        ''''''
+        '''
+        Same as the test_discrete_reward_delay test above except with state_space_size and action_space_size specified as vectors and the actions slightly different near the end.
+        '''
         print('TEST_DISCRETE_MULTI_DISCRETE')
 
         config = {}
@@ -346,6 +348,47 @@ class TestRLToyEnv(unittest.TestCase):
         config["state_space_relevant_indices"] = [0, 1, 2]
         config["action_space_size"] = [2, 2, 2]
         config["action_space_relevant_indices"] = [0, 1, 2]
+        config["reward_density"] = 0.25
+        config["make_denser"] = True
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 3
+        config["sequence_length"] = 1
+        config["reward_unit"] = 1.0
+
+        config["generate_random_mdp"] = True
+
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 2, 5, 4, 5, 2, 3, 1, 4] # 2nd last action is random just to check that last delayed reward works with any action
+        expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+    def test_discrete_multi_discrete_irrelevant_dimensions(self):
+        '''
+        Same as the test_discrete_multi_discrete test above except with state_space_size and action_space_size having extra irrelevant dimensions
+        '''
+        print('TEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS')
+
+        config = {}
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = [2, 2, 2, 3]
+        config["state_space_relevant_indices"] = [0, 1, 2]
+        config["action_space_size"] = [2, 5, 2, 2]
+        config["action_space_relevant_indices"] = [0, 2, 3]
         config["reward_density"] = 0.25
         config["make_denser"] = True
         config["terminal_state_density"] = 0.25
