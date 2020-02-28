@@ -362,7 +362,7 @@ class TestRLToyEnv(unittest.TestCase):
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state']
 
-        actions = [6, 2, 5, 4, 5, 2, 3, 1, 4] # 2nd last action is random just to check that last delayed reward works with any action
+        actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
         expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
@@ -378,7 +378,7 @@ class TestRLToyEnv(unittest.TestCase):
         '''
         Same as the test_discrete_multi_discrete test above except with state_space_size and action_space_size having extra irrelevant dimensions
         '''
-        print('TEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS')
+        print('\033[31;1;4mTEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS\033[0m')
 
         config = {}
         config["seed"] = 0
@@ -400,10 +400,30 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True
 
+        try: # Testing for completely_connected options working properly when invalid config specified. #TODO Is this part needed?
+            env = RLToyEnv(config)
+            state = env.get_augmented_state()['curr_state']
+
+            actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
+            expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+            for i in range(len(expected_rewards)):
+                next_state, reward, done, info = env.step(actions[i])
+                print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+                self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+                state = next_state
+
+            env.reset()
+            env.close()
+
+        except AssertionError as e:
+            print('Caught Expected exception:', e)
+
+
+        config["state_space_size"] = [2, 2, 2, 5]
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state']
 
-        actions = [6, 2, 5, 4, 5, 2, 3, 1, 4] # 2nd last action is random just to check that last delayed reward works with any action
+        actions = [[1, 4, 1, 0], [0, 3, 1, 0], [1, 4, 0, 1], [1, 0 ,0, 0], [1, 2, 0, 1], [0, 3, 1, 0], [0, 1, 1, 1], [0, 4, 0, 1], [1, 4, 0, 0]]
         expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
@@ -413,6 +433,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         env.reset()
         env.close()
+
 
     #Unit tests
 
