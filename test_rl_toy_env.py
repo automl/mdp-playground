@@ -162,6 +162,7 @@ class TestRLToyEnv(unittest.TestCase):
 
     def test_discrete_reward_delay(self):
         ''''''
+        print('\033[31;1;4mTEST_DISCRETE_REWARD_DELAY\033[0m')
         config = {}
         config["seed"] = {}
         config["seed"]["env"] = 0
@@ -188,10 +189,12 @@ class TestRLToyEnv(unittest.TestCase):
 
         actions = [6, 2, 5, 4, 5, 2, 3, np.random.randint(config["action_space_size"]), 4] # 2nd last action is random just to check that last delayed reward works with any action
         expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        expected_states = [0, 2, 2, 5, 2, 5, 5, 0, 6]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done, "\n")
             self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+            # self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.") # will not work for 2nd last time step due to random action.
             state = next_state
 
         env.reset()
@@ -453,16 +456,41 @@ class TestRLToyEnv(unittest.TestCase):
             print('Caught Expected exception:', e)
 
 
+        # Test: Adds one irrelevant dimension
         config["state_space_size"] = [2, 2, 2, 5]
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state']
 
         actions = [[1, 4, 1, 0], [0, 3, 1, 0], [1, 4, 0, 1], [1, 0 ,0, 0], [1, 2, 0, 1], [0, 3, 1, 0], [0, 1, 1, 1], [0, 4, 0, 1], [1, 4, 0, 0]]
         expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        expected_states = [[0, 0, 0, 3], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 3], [0, 1, 0, 2], [1, 0, 1, 0], [1, 0, 1, 1], [0, 0, 0, 4], [1, 0, 0, 2]]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done, "\n")
             self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+            self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+        # Test: Lets even irrelevant dimensions be multi-dimensional
+        config["state_space_size"] = [2, 2, 2, 1, 5]
+        config["state_space_relevant_indices"] = [0, 1, 2]
+        config["action_space_size"] = [2, 5, 1, 1, 2, 2]
+        config["action_space_relevant_indices"] = [0, 4, 5]
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [[1, 4, 0, 0, 1, 0], [0, 3, 0, 0, 1, 0], [1, 4, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0], [1, 2, 0, 0, 0, 1], [0, 3, 0, 0, 1, 0], [0, 1, 0, 0, 1, 1], [0, 4, 0, 0, 0, 1], [1, 4, 0, 0, 0, 0]]
+        expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        expected_states = [[0, 0, 0, 0, 3], [0, 1, 0, 0, 1], [0, 1, 0, 0, 1], [1, 0, 1, 0, 3], [0, 1, 0, 0, 2], [1, 0, 1, 0, 0], [1, 0, 1, 0, 1], [0, 0, 0, 0, 4], [1, 0, 0, 0, 2]]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+            self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
             state = next_state
 
         env.reset()
