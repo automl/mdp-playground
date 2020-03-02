@@ -16,7 +16,10 @@ class TestRLToyEnv(unittest.TestCase):
     def test_continuous_dynamics(self):
         ''''''
         config = {}
-        config["seed"] = 0 #seed, 7 worked for initially sampling within term state subspace
+        config["seed"] = {}
+        config["seed"]["env"] = 0 #seed, 7 worked for initially sampling within term state subspace
+        config["seed"]["state_space"] = 10
+        config["seed"]["action_space"] = 11
 
         config["state_space_type"] = "continuous"
         config["action_space_type"] = "continuous"
@@ -56,7 +59,10 @@ class TestRLToyEnv(unittest.TestCase):
     def test_continuous_dynamics_order(self):
         ''''''
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["state_space"] = 10
+        config["seed"]["action_space"] = 11
 
         config["state_space_type"] = "continuous"
         config["action_space_type"] = "continuous"
@@ -101,7 +107,10 @@ class TestRLToyEnv(unittest.TestCase):
     def test_discrete_dynamics(self):
         ''''''
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 6
+        config["seed"]["relevant_action_space"] = 6
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
@@ -154,7 +163,10 @@ class TestRLToyEnv(unittest.TestCase):
     def test_discrete_reward_delay(self):
         ''''''
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
@@ -189,7 +201,10 @@ class TestRLToyEnv(unittest.TestCase):
     def test_discrete_rewardable_sequences(self):
         ''''''
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
@@ -224,7 +239,10 @@ class TestRLToyEnv(unittest.TestCase):
         ''''''
         print('TEST_DISCRETE_P_NOISE')
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
@@ -260,7 +278,10 @@ class TestRLToyEnv(unittest.TestCase):
         ''''''
         print('TEST_DISCRETE_R_NOISE')
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
@@ -300,7 +321,10 @@ class TestRLToyEnv(unittest.TestCase):
         print('TEST_DISCRETE_ALL_META_FEATURES')
 
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
@@ -340,7 +364,10 @@ class TestRLToyEnv(unittest.TestCase):
         print('TEST_DISCRETE_MULTI_DISCRETE')
 
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
@@ -381,7 +408,14 @@ class TestRLToyEnv(unittest.TestCase):
         print('\033[31;1;4mTEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS\033[0m')
 
         config = {}
-        config["seed"] = 0
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
+        config["seed"]["irrelevant_state_space"] = 52
+        config["seed"]["irrelevant_action_space"] = 65
+        config["seed"]["state_space"] = 87
+        config["seed"]["action_space"] = 89
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"

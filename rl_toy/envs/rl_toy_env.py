@@ -48,7 +48,7 @@ class RLToyEnv(gym.Env):
         Maybe make some parts init states, some term. states and a majority be neither and let rewarded sequences begin from "neither" states (so we can see if algo. can learn to reach a reward-dense region and stay in it) - maybe keep only 1 init and 1 term. state?
         Can also make discrete/continuous "Euclidean space" with transition function fixed - then problem is with generating sequences (need to maybe from each init. state have a few length n rewardable sequences) - if distance from init state to term. state is large compared to sequence_length, exploration becomes easier? - you do get a signal if term. state is closer (like cliff walking problem) - still, things depend on percentage reachability of rewarded sequences (which increases if close term. states chop off a big part of the search space)
         #Check TODO, fix and bottleneck tags
-        Sources of #randomness: Seed for Env.observation_space (to generate P, for noise in P), Env.action_space (to generate initial random policy (done by the RL algorithm)), Env. (to generate R, for noise in R, initial state), irrelevant state space?, irrelevant action space?; ; Check # seed, # random
+        Sources of #randomness (Description needs to be updated for relevant/irrelevant update to playground): Seed for Env.observation_space (to generate P, for noise in discrete P), Env.action_space (to generate initial random policy (done by the RL algorithm)), Env. (to generate R, for noise in R and continuous P, initial state), irrelevant state space?, irrelevant action space?, also for multi-discrete state and action spaces, self.term_spaces for continuous spaces - but multi-discrete state and term_spaces' sampling aren't used anywhere by Environment right now; ; Check # seed, # random
         ###TODO Separate out seeds for all the random processes? No, better to have one cryptographically secure PRNG I think! Or better yet, ask uuser to provide seeds for all processes, otherwise we can't get ALL possible distributions of random processes (state and action spaces, etc.) inside the Environment if we set all different seeds based on 1 seed because seeds for the processes inside will be set deterministically.
         ## TODO Terminal states: Gym expects _us_ to check for 'done' being true; rather set P(s, a) = s for any terminal state!
         ###IMP relevant_state_space_size should be large enough that after terminal state generation, we have enough num_specific_sequences rewardable!
@@ -105,6 +105,35 @@ class RLToyEnv(gym.Env):
             #TODO asserts for the rest of the config settings
             # next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
 
+            #seed old default settings used for paper, etc.:
+            config["seed"] = {}
+            config["seed"]["env"] = 0 # + config["seed"]
+            config["seed"]["state_space"] = config["relevant_state_space_size"] # + config["seed"] for discrete, 10 + config["seed"] in case of continuous
+            config["seed"]["action_space"] = 1 + config["relevant_action_space_size"] # + config["seed"] for discrete, 11 + config["seed"] in case of continuous
+            # 12 + config["seed"] for continuous self.term_spaces
+
+        if "seed" not in config:
+            config["seed"] = None #seed
+        if not isinstance(config["seed"], dict): # should be an int then. Gym doesn't accept np.int64, etc..
+            seed_ = config["seed"]
+            config["seed"] = {}
+            config["seed"]["env"] = seed_
+            self.seed(config["seed"]["env"]) #seed
+            # All these diff. seeds may not be needed (you could have one seed for the joint relevant + irrelevant parts). But they allow for easy separation of the relevant and irrelevant dimensions!!
+            config["seed"]["relevant_state_space"] = self.np_random.randint(sys.maxsize) #random
+            config["seed"]["relevant_action_space"] = self.np_random.randint(sys.maxsize) #random
+            config["seed"]["irrelevant_state_space"] = self.np_random.randint(sys.maxsize) #random
+            config["seed"]["irrelevant_action_space"] = self.np_random.randint(sys.maxsize) #random
+            config["seed"]["state_space"] = self.np_random.randint(sys.maxsize) #IMP This is currently used to sample only for continuous spaces and not used for discrete spaces by the Environment. User might want to sample from it for multi-discrete environments. #random
+            config["seed"]["action_space"] = self.np_random.randint(sys.maxsize) #IMP This IS currently used to sample random actions by the RL agent for both discrete and continuous environments (but not used anywhere by the Environment). #random
+        else: # if seed dict was passed
+            self.seed(config["seed"]["env"]) #seed
+
+        print('Seeds set to:', config["seed"])
+        # print(f'Seeds set to {config["seed"]=}') # Available from Python 3.8
+
+
+        #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
         config["action_space_type"] = config["action_space_type"].lower()
 
@@ -194,18 +223,13 @@ class RLToyEnv(gym.Env):
         #         raise TypeError("Argument to function should have been an int, float or list. Arg was: " + str(num1))
         #     return list1
 
-        if "seed" in config:
-            self.seed(config["seed"]) #seed
-        else:
-            self.seed()
-
         if config["state_space_type"] == "discrete":
             if config["irrelevant_state_space_size"] > 0:
-                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["relevant_state_space_size"] + config["seed"]) #seed #hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
-                self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=self.np_random.randint(sys.maxsize)) #seed # hack
-                self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=self.np_random.randint(sys.maxsize)) #seed # hack
+                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
+                self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=config["seed"]["irrelevant_state_space"]) #seed # hack
+                self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed # hack
             else:
-                self.observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["relevant_state_space_size"] + config["seed"]) #seed #hack
+                self.observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
                 self.relevant_observation_space = self.observation_space
                 # print('id(self.observation_space)', id(self.observation_space), 'id(self.relevant_observation_space)', id(self.relevant_observation_space), id(self.relevant_observation_space) == id(self.observation_space))
 
@@ -214,22 +238,22 @@ class RLToyEnv(gym.Env):
             # config["state_space_max"] = num_to_list(config["state_space_max"]) * config["state_space_dim"]
             # print("config[\"state_space_max\"]", config["state_space_max"])
 
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=10 + config["seed"], dtype=np.float64) #seed #hack #TODO # low and high are 1st 2 and required arguments
+            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=config["seed"]["state_space"], dtype=np.float64) #seed #hack #TODO # low and high are 1st 2 and required arguments
 
 
         if config["action_space_type"] == "discrete":
             if config["irrelevant_state_space_size"] > 0:
-                self.relevant_action_space = DiscreteExtended(config["relevant_action_space_size"], seed=1 + config["relevant_action_space_size"] + config["seed"]) #seed #hack
-                self.irrelevant_action_space = DiscreteExtended(config["irrelevant_action_space_size"], seed=self.np_random.randint(sys.maxsize)) #seed # hack
-                self.action_space = MultiDiscreteExtended(config["action_space_size"], seed=self.np_random.randint(sys.maxsize)) #seed # hack
+                self.relevant_action_space = DiscreteExtended(config["relevant_action_space_size"], seed=config["seed"]["relevant_action_space"]) #seed # hack
+                self.irrelevant_action_space = DiscreteExtended(config["irrelevant_action_space_size"], seed=config["seed"]["irrelevant_action_space"]) #seed # hack
+                self.action_space = MultiDiscreteExtended(config["action_space_size"], seed=config["seed"]["action_space"]) #seed # hack
             else:
-                self.action_space = DiscreteExtended(config["relevant_action_space_size"], seed=1 + config["relevant_action_space_size"] + config["seed"]) #seed #hack #TODO
+                self.action_space = DiscreteExtended(config["relevant_action_space_size"], seed=config["seed"]["relevant_action_space"]) #seed #hack #TODO
                 self.relevant_action_space = self.action_space
 
         else:
             self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
-            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=11 + config["seed"], dtype=np.float64) #seed #hack #TODO
+            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=config["seed"]["action_space"], dtype=np.float64) #seed # hack #TODO
 
 
         if not config["generate_random_mdp"]:
