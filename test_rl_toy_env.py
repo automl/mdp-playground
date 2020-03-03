@@ -11,13 +11,17 @@ from rl_toy_env import RLToyEnv
 import numpy as np
 import copy
 
+#TODO None of the tests do anything when done = True. Should try calling reset() in one of them and see that this works?
+
 class TestRLToyEnv(unittest.TestCase):
 
     def test_continuous_dynamics(self):
-        ''''''
+        '''
+        '''
+        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS\033[0m')
         config = {}
         config["seed"] = {}
-        config["seed"]["env"] = 0 #seed, 7 worked for initially sampling within term state subspace
+        config["seed"]["env"] = 0 # seed, 7 worked for initially sampling within term state subspace
         config["seed"]["state_space"] = 10
         config["seed"]["action_space"] = 11
 
@@ -27,11 +31,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["action_space_dim"] = 4
         config["transition_dynamics_order"] = 1
         config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
-        # config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
-        # config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
         config["time_unit"] = 1 # Discretization of time domain
-        # config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
-        # config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
 
         config["delay"] = 1
         config["sequence_length"] = 10
@@ -42,22 +42,123 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
         env = RLToyEnv(config)
-        state = env.get_augmented_state()['curr_state'] #env.reset()
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         self.assertEqual(type(state), np.ndarray, "Type of continuous state should be numpy.ndarray.")
         for _ in range(20):
             # action = env.action_space.sample()
             action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done, "\n")
-            state = next_state
-        np.testing.assert_allclose(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183192]))
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]))
         # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
-        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183192]), places=3) # Error
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
         env.reset()
         env.close()
 
+
+        # Test for irrelevant dimensions
+        config["state_space_dim"] = 7
+        config["action_space_dim"] = 7
+        config["state_space_relevant_indices"] = [0, 1, 2, 6]
+        config["action_space_relevant_indices"] = [0, 2, 3, 5]
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for _ in range(20):
+            # action = env.action_space.sample()
+            action = np.array([1] * 7) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292, 22.536444, 19.66147, 19.835966]))
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+
+        # Test using config values: state_space_max and action_space_max
+        config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
+        config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for _ in range(20):
+            # action = env.action_space.sample()
+            action = np.array([-1] * 7) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([-5] * 7))
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+
+        # Test for terminal states in presence of irrelevant dimensions
+        config["terminal_states"] = [[0.92834036, 2.16924632, -4.88226269, -0.12869191], [2.96422742, -2.17263562, -2.71264267, 0.07446024]] # The 1st element is taken from the relevant dimensions of the default initial state for the given seed. This is to trigger a resample in reset. The 2nd element is taken from the relevant dimensions of the state reached after 2 iterations below. This is to trigger reaching a terminal state and a subsequent reset.
+        config["term_state_edge"] = 1.0
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        state_derivatives = copy.deepcopy(env.state_derivatives)
+        # augmented_state = copy.deepcopy(env.augmented_state)
+
+        for _ in range(20):
+            # action = env.action_space.sample()
+            action = np.array([1] * 7) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
+            state = next_state.copy()
+            state_derivatives = copy.deepcopy(env.state_derivatives)
+            # augmented_state = copy.deepcopy(env.augmented_state)
+        np.testing.assert_allclose(state, np.array([5] * 7))
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+
+        # Test P noise
+        config["transition_noise"] = lambda a: a.normal([0] * 7, [0.5] * 7)
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        state_derivatives = copy.deepcopy(env.state_derivatives)
+        # augmented_state = copy.deepcopy(env.augmented_state)
+
+        expected_states = (np.array([ 1.96422742, -3.17263562, -3.71264267, -3.19641802,  0.09909165,
+               -3.02478309, -0.92553976]),
+                np.array([ 2.25715391, -1.72582608, -2.56190734, -2.5426217 ,  1.90596197,
+                -2.53510777,  0.09614787]),
+                np.array([ 2.90342939,  0.3748542 , -1.87656563, -1.48317271,  3.03932642,
+               -1.08032816,  1.04361135]),)
+
+        expected_noises = (np.array([-0.70707351,  0.44680953,  0.15073534, -0.34620368,  0.80687032,
+                -0.51032468,  0.02168763]),
+                np.array([-0.35372452,  1.10068028, -0.31465829,  0.05944899,  0.13336445,
+                0.45477961, -0.05253652]),
+                np.array([ 0.87593953, -0.32743438,  0.16137274,  0.20016199, -0.2355699 ,
+                0.15253411, -0.85818094]),)
+
+        for i in range(3):
+            # action = env.action_space.sample()
+            action = np.array([1] * 7) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
+            state = next_state.copy()
+            state_derivatives = copy.deepcopy(env.state_derivatives)
+            np.testing.assert_allclose(state, expected_states[i] + expected_noises[i], err_msg='Failed at step: ' + str(i), rtol=1e-5)
+            # augmented_state = copy.deepcopy(env.augmented_state)
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+
     def test_continuous_dynamics_order(self):
         ''''''
+        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_ORDER\033[0m')
         config = {}
         config["seed"] = {}
         config["seed"]["env"] = 0
@@ -87,6 +188,7 @@ class TestRLToyEnv(unittest.TestCase):
         np.testing.assert_allclose(next_state - state, (1/6) * np.array([1, 0.5]) * 1e-6)
         np.testing.assert_allclose(env.state_derivatives[1] - state_derivatives[1], (1/2) * np.array([1, 0.5]) * 1e-4)
         np.testing.assert_allclose(env.state_derivatives[2] - state_derivatives[2], np.array([1, 0.5]) * 1e-2)
+        np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
         state = next_state.copy()
         state_derivatives = copy.deepcopy(env.state_derivatives)
 
@@ -96,6 +198,7 @@ class TestRLToyEnv(unittest.TestCase):
         np.testing.assert_allclose(next_state - state, (7/6) * np.array([1, 0.5]) * 1e-6)
         np.testing.assert_allclose(env.state_derivatives[1] - state_derivatives[1], (3/2) * np.array([1, 0.5]) * 1e-4)
         np.testing.assert_allclose(env.state_derivatives[2] - state_derivatives[2], np.array([1, 0.5]) * 1e-2)
+        np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
         state = next_state.copy()
 
         #TODO Test for more timesteps? or higher order derivatives (.DONE)
@@ -162,7 +265,7 @@ class TestRLToyEnv(unittest.TestCase):
 
     def test_discrete_reward_delay(self):
         ''''''
-        print('\033[31;1;4mTEST_DISCRETE_REWARD_DELAY\033[0m')
+        print('\033[32;1;4mTEST_DISCRETE_REWARD_DELAY\033[0m')
         config = {}
         config["seed"] = {}
         config["seed"]["env"] = 0
@@ -349,7 +452,7 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()['curr_state']
 
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
-        expected_rewards = [0 + -0.292808, 0 + 0.770696, 0 + -1.01743611, 1 + -0.042768, 1 + 0.78761310, 0 + -0.510087, 1 - 0.089978, 1 - 0.51345136]
+        expected_rewards = [0 + -0.292808, 0 + 0.770696, 0 + -1.01743611, 1 + -0.042768, 1 + 0.78761320, 0 + -0.510087, 1 - 0.089978, 1 - 0.51345136]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done, "\n")
@@ -408,7 +511,7 @@ class TestRLToyEnv(unittest.TestCase):
         '''
         Same as the test_discrete_multi_discrete test above except with state_space_size and action_space_size having extra irrelevant dimensions
         '''
-        print('\033[31;1;4mTEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS\033[0m')
+        print('\033[32;1;4mTEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS\033[0m')
 
         config = {}
         config["seed"] = {}
