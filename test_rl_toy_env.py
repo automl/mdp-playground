@@ -33,7 +33,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
         config["time_unit"] = 1 # Discretization of time domain
 
-        config["delay"] = 1
+        config["delay"] = 0
         config["sequence_length"] = 10
         config["reward_scale"] = 1.0
     #    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
@@ -41,14 +41,17 @@ class TestRLToyEnv(unittest.TestCase):
         # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
 
         config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
+
+        # Test 1: general dynamics and reward
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         self.assertEqual(type(state), np.ndarray, "Type of continuous state should be numpy.ndarray.")
-        for _ in range(20):
+        for i in range(20):
             # action = env.action_space.sample()
             action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done, "\n")
+            np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]))
         # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
@@ -57,22 +60,104 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 
-        # Test for irrelevant dimensions
+        # Test 2: sequence lengths #TODO
+
+
+        # Test 3: that random actions lead to bad reward and then later a sequence of optimal actions leads to good reward. Also implicitly tests sequence lengths.
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(40):
+            if i < 20:
+                action = env.action_space.sample()
+            else:
+                action = np.array([1, 1, 1, 1])
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            if i >= 30:
+                np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
+            elif i >= 21: # reward should ideally start getting better at step 20 when we no longer apply random actions, but in this case, by chance, the 1st non-random action doesn't help
+                assert prev_reward < reward, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward) +  '. Prev. reward was: ' + str(prev_reward)
+            elif i >= 10:
+                assert reward < -1, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward)
+            state = next_state.copy()
+            prev_reward = reward
+        env.reset()
+        env.close()
+
+
+        # Test 4: same as 3 above except with delay
+        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_DELAY\033[0m')
+        config["delay"] = 1
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(40):
+            if i < 20:
+                action = env.action_space.sample()
+            else:
+                action = np.array([1, 1, 1, 1])
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            if i >= 31:
+                np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
+            elif i >= 22:
+                assert prev_reward < reward, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward) +  '. Prev. reward was: ' + str(prev_reward)
+            elif i >= 11:
+                assert reward < -1, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward)
+            state = next_state.copy()
+            prev_reward = reward
+        env.reset()
+        env.close()
+
+
+        # Test 5: R noise - same as 1 above except with reward noise
+        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_R_NOISE\033[0m')
+        config["reward_noise"] = lambda a: a.normal(0, 0.5)
+        config["delay"] = 0
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        expected_rewards = [-0.70707351, 0.44681, 0.150735, -0.346204, 0.80687]
+        for i in range(5):
+            # action = env.action_space.sample()
+            action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            np.testing.assert_allclose(expected_rewards[i], reward, atol=1e-6, err_msg='Step: ' + str(i))
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([6.59339006, 5.68189965, 6.49608203, 5.19183292]), atol=1e-5)
+        env.reset()
+        env.close()
+
+
+        # Test 6: for dynamics and reward in presence of irrelevant dimensions
+        del config["reward_noise"]
         config["state_space_dim"] = 7
         config["action_space_dim"] = 7
         config["state_space_relevant_indices"] = [0, 1, 2, 6]
-        config["action_space_relevant_indices"] = [0, 2, 3, 5]
+        config["action_space_relevant_indices"] = [0, 1, 2, 6]
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
-        for _ in range(20):
-            # action = env.action_space.sample()
-            action = np.array([1] * 7) # just to test if acting "in a line" works
+        for i in range(20):
+            action = env.action_space.sample()
+            action[config["action_space_relevant_indices"]] = 1.0 # test to see if acting "in a line" works for relevant dimensions
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done, "\n")
+            np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
             state = next_state.copy()
-        np.testing.assert_allclose(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292, 22.536444, 19.66147, 19.835966]))
-        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
-        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        np.testing.assert_allclose(state[config["state_space_relevant_indices"]], np.array([21.59339006, 20.68189965, 21.49608203, 19.835966]))
+        env.reset()
+        env.close()
+
+        # Test that random actions lead to bad reward in presence of irrelevant dimensions
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(20):
+            action = env.action_space.sample()
+            action[[3, 4, 5]] = 1.0 # test to see if acting "in a line" for relevant dimensions and not for relevant dimensions produces bad reward
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            if i > 10:
+                assert reward < -0.8, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward)
+            state = next_state.copy()
         env.reset()
         env.close()
 
@@ -155,7 +240,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
-###TODO Write test for continuous for checking reward with/without irrelevant dimensions, delay, r noise, seq_len?
+### TODO Write test for continuous for checking reward with/without irrelevant dimensions, delay, r noise, seq_len?
 
     def test_continuous_dynamics_order(self):
         ''''''

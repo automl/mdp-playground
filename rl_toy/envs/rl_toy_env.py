@@ -208,7 +208,8 @@ class RLToyEnv(gym.Env):
             assert config["irrelevant_state_space_size"] == config["irrelevant_action_space_size"], "config[\"irrelevant_state_space_size\"] != config[\"irrelevant_action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values! Vals: " + str(config["irrelevant_state_space_size"]) + " " + str(config["irrelevant_action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!" #TODO Currently, iirelevant dimensions have a P similar ot that of relevant dimensions. Should this be decoupled?
 
         if config["state_space_type"] == 'continuous':
-            assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(state_space_dim) + " action_space_dim was: " + str(action_space_dim)
+            assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
+            assert config["state_space_relevant_indices"] == config["action_space_relevant_indices"], "For continuous spaces, state_space_relevant_indices has to be = action_space_relevant_indices. state_space_relevant_indices was: " + str(config["state_space_relevant_indices"]) + " action_space_relevant_indices was: " + str(config["action_space_relevant_indices"])
 
         self.config = config
         self.sequence_length = config["sequence_length"]
@@ -494,7 +495,7 @@ class RLToyEnv(gym.Env):
 
         else: # if continuous space
             # print("#TODO for cont. spaces: noise")
-            ###TODO Reward for reaching a target point case (with make_dense); Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)?
+            ###TODO Reward for reaching a target point case (with make_dense); Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0.
             if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because even without transition there may be reward as R() is before P() in step()
                 pass #TODO
             else:
