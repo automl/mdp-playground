@@ -155,6 +155,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
+###TODO Write test for continuous for checking reward with/without irrelevant dimensions, delay, r noise, seq_len?
 
     def test_continuous_dynamics_order(self):
         ''''''

@@ -43,6 +43,7 @@ class RLToyEnv(gym.Env):
         #TODO Test cases to check all assumptions
         #TODO Mersenne Twister pseudo-random number generator used in Gym: not cryptographically secure!
         #TODO Different random seeds for S, A, P, R, rho_o and T? Currently 1 for env and 1 for its space.
+        ###TODO How to decide how much to penalise terminal states? It would be really important in guiding the search algorithm. Currently it's 0 reward for terminal states in discrete and continuous envs. Make it configurable.
         ###TODO Make sure terminal state is reachable by at least 1 path (no. of available actions affects avg. length of path from init. to term. state); no self transition loops?; Make sure each rewarded sequence is reachable; with equal S and A sizes we can make sure every state is reachable from every other state (just pick a random sequence to be the state tranition row for a state - solves previous problems sort of)
         Can check total no. of unique sequences of length, say, 3 reachable from diff. init. states based on the randomly generated transition function - could generate transition function and generate specific_sequences based on it.
         Maybe make some parts init states, some term. states and a majority be neither and let rewarded sequences begin from "neither" states (so we can see if algo. can learn to reach a reward-dense region and stay in it) - maybe keep only 1 init and 1 term. state?
@@ -53,7 +54,7 @@ class RLToyEnv(gym.Env):
         ## TODO Terminal states: Gym expects _us_ to check for 'done' being true; rather set P(s, a) = s for any terminal state!
         ###IMP relevant_state_space_size should be large enough that after terminal state generation, we have enough num_specific_sequences rewardable!
         ###IMP Having irrelevant "dimensions" and performing transition dynamics in them for discrete spaces. I think we should not let the dynamics of the irrelevant "dimensions" interfere with the dynamics of the relevant "dimensions". This allows for a clean spearation of what we want the algorithm to pay attention to vs. what we don't it to pay attention to. For continuous spaces, we don't need to have a sperate observation_space with separate dynamics because the way the current dynamics work, the irrelevant and relevant dimensions are cleanly separated.
-        ###IMP Variables I paid most attention to when adding irrelevant dimensions: config['state_space_size'], self.observation_space, self.curr_state. self.augmented_state
+        ###IMP Variables I paid most attention to when adding irrelevant dimensions: discrete: config['state_space_size'], self.observation_space, self.curr_state. self.augmented_state; for continuous also self.state_derivatives, config['state_space_dim']
         #TODO Implement logger; command line argument parser; config from YAML file? No, YAML wouldn't allow programmatically modifiable config.
         #Discount factor Can be used by the algorithm if it wants it, more an intrinsic property of the algorithm. With delay, seq_len, etc., it's not clear how discount factor will work.
         #catastrophic forgetting: Could have multiple Envs as multiple tasks to tackle it.
@@ -112,6 +113,7 @@ class RLToyEnv(gym.Env):
             config["seed"]["action_space"] = 1 + config["relevant_action_space_size"] # + config["seed"] for discrete, 11 + config["seed"] in case of continuous
             # 12 + config["seed"] for continuous self.term_spaces
 
+
         if "seed" not in config:
             config["seed"] = None #seed
         if not isinstance(config["seed"], dict): # should be an int then. Gym doesn't accept np.int64, etc..
@@ -131,6 +133,10 @@ class RLToyEnv(gym.Env):
 
         print('Seeds set to:', config["seed"])
         # print(f'Seeds set to {config["seed"]=}') # Available from Python 3.8
+
+
+        if "term_state_reward" not in config:
+            config["term_state_reward"] = 0.0
 
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
@@ -317,7 +323,7 @@ class RLToyEnv(gym.Env):
                 print("self.term_spaces samples:", self.term_spaces[0].sample(), self.term_spaces[-1].sample())
 
             self.is_terminal_state = lambda s: np.any([self.term_spaces[i].contains(s[self.config["state_space_relevant_indices"]]) for i in range(len(self.term_spaces))]) ### TODO for cont. #test?
-            ####TODO test for terminal states!!
+            #### TODO test for terminal states!!
 
 
     def init_init_state_dist(self):
@@ -494,7 +500,7 @@ class RLToyEnv(gym.Env):
             else:
                 # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
                 #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_dist calc.?.
-                data_ = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, :]
+                data_ = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
                 data_mean = data_.mean(axis=0)
                 uu, dd, vv = np.linalg.svd(data_ - data_mean)
                 print('uu.shape, dd.shape, vv.shape =', uu.shape, dd.shape, vv.shape)
@@ -664,7 +670,11 @@ class RLToyEnv(gym.Env):
         '''
         Intended to return the full augmented state which would be Markovian. For noisy processes, this would need the noise distribution and random seed too? Also add the irrelevant state parts, etc.? #TODO
         '''
-        return {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
+        if self.config["state_space_type"] == "discrete":
+            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
+        else:
+            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
+        return augmented_state_dict
 
     def reset(self):
         # TODO reset is also returning info dict to be able to return state in addition to observation;
@@ -751,6 +761,8 @@ class RLToyEnv(gym.Env):
 
 
         self.done = self.is_terminal_state(self.curr_state)
+        if self.done:
+            self.reward += self.config["term_state_reward"]
         return self.curr_state, self.reward, self.done, {"curr_state": self.curr_state}
 
     def seed(self, seed=None):
