@@ -39,6 +39,7 @@ class TestRLToyEnv(unittest.TestCase):
     #    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
         # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
         # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
+        config["reward_function"] = "move_along_a_line"
 
         config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
 
@@ -73,11 +74,11 @@ class TestRLToyEnv(unittest.TestCase):
                 action = np.array([1, 1, 1, 1])
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done, "\n")
-            if i >= 30:
+            if i >= 29:
                 np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
-            elif i >= 21: # reward should ideally start getting better at step 20 when we no longer apply random actions, but in this case, by chance, the 1st non-random action doesn't help
+            elif i >= 20: # reward should ideally start getting better at step 20 when we no longer apply random actions, but in this case, by chance, the 1st non-random action doesn't help
                 assert prev_reward < reward, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward) +  '. Prev. reward was: ' + str(prev_reward)
-            elif i >= 10:
+            elif i >= 9:
                 assert reward < -1, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward)
             state = next_state.copy()
             prev_reward = reward
@@ -97,11 +98,11 @@ class TestRLToyEnv(unittest.TestCase):
                 action = np.array([1, 1, 1, 1])
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done, "\n")
-            if i >= 31:
+            if i >= 30:
                 np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
-            elif i >= 22:
+            elif i >= 21:
                 assert prev_reward < reward, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward) +  '. Prev. reward was: ' + str(prev_reward)
-            elif i >= 11:
+            elif i >= 10:
                 assert reward < -1, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward)
             state = next_state.copy()
             prev_reward = reward
@@ -262,6 +263,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["delay"] = 0
         config["sequence_length"] = 3
         config["reward_scale"] = 1.0
+        config["reward_function"] = "move_along_a_line"
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(config)
@@ -287,11 +289,75 @@ class TestRLToyEnv(unittest.TestCase):
         np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
         state = next_state.copy()
 
-        #TODO Test for more timesteps? or higher order derivatives (.DONE)
+        #TODO Test for more timesteps? (>seq_len so that reward function kicks in) or higher order derivatives (.DONE)
 
         env.reset()
         env.close()
 
+
+    def test_continuous_dynamics_target_point(self):
+        ''''''
+        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_TARGET_POINT\033[0m')
+        config = {}
+        config["seed"] = {}
+        config["seed"]["env"] = 3
+        config["seed"]["state_space"] = 10000
+        config["seed"]["action_space"] = 101
+
+        config["state_space_type"] = "continuous"
+        config["action_space_type"] = "continuous"
+        config["state_space_dim"] = 2
+        config["action_space_dim"] = 2
+        config["transition_dynamics_order"] = 1
+        config["inertia"] = 2.0
+        config["time_unit"] = 0.1
+
+        config["delay"] = 0
+        config["sequence_length"] = 1 # seq_len is always going to be 1 for move_to_a_point R. assert for this?
+        config["reward_scale"] = 1.0
+        config["reward_function"] = "move_to_a_point"
+        config["target_point"] = [-0.29792, 1.71012]
+        config["make_denser"] = True
+
+        config["generate_random_mdp"] = True
+
+        # Test : dense reward
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(20):
+            # action = env.action_space.sample()
+            action = np.array([0.5]*2) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test. That is also the reward given at each step.
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([-0.29792, 1.71012]), atol=1e-6)
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+        # Test : sparse reward
+        config["make_denser"] = False
+        config["target_radius"] = 0.072 # to give reward in 3rd last step. At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test.
+        config["reward_unit"] = 2.0
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(20):
+            # action = env.action_space.sample()
+            action = np.array([0.5]*2) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            if i < 17:
+                np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg='Step: ' + str(i))
+            else:
+                np.testing.assert_allclose(2.0, reward, atol=1e-6, err_msg='Step: ' + str(i))
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([-0.29792, 1.71012]), atol=1e-6)
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
 
     def test_discrete_dynamics(self):
         ''''''
@@ -377,7 +443,7 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()['curr_state']
 
         actions = [6, 2, 5, 4, 5, 2, 3, np.random.randint(config["action_space_size"]), 4] # 2nd last action is random just to check that last delayed reward works with any action
-        expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
         expected_states = [0, 2, 2, 5, 2, 5, 5, 0, 6]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
@@ -392,6 +458,7 @@ class TestRLToyEnv(unittest.TestCase):
 
     def test_discrete_rewardable_sequences(self):
         ''''''
+        print('\033[32;1;4mTEST_DISCRETE_REWARDABLE_SEQUENCES\033[0m')
         config = {}
         config["seed"] = {}
         config["seed"]["env"] = 0
@@ -416,7 +483,7 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()['curr_state']
 
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
-        expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
+        expected_rewards = [0, 1, 1, 0, 1, 0, 0, 0]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done, "\n")
@@ -493,8 +560,8 @@ class TestRLToyEnv(unittest.TestCase):
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state']
 
-        actions = [6, 6, 2, np.random.randint(config["action_space_size"])] #
-        expected_rewards = [-0.499716, 1.805124, -0.224812, 0.086749] # 2nd state produces 'true' reward
+        actions = [6, 6, 2, 1] #
+        expected_rewards = [1 + -0.499716, 0.805124, -0.224812, 0.086749] # 2nd state produces 'true' reward
         for i in range(len(actions)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done, "\n")
@@ -505,6 +572,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
+###TODO Test for make_denser
 
     def test_discrete_all_meta_features(self):
         '''
@@ -537,8 +605,9 @@ class TestRLToyEnv(unittest.TestCase):
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state']
 
+
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
-        expected_rewards = [0 + -0.292808, 0 + 0.770696, 0 + -1.01743611, 1 + -0.042768, 1 + 0.78761320, 0 + -0.510087, 1 - 0.089978, 1 - 0.51345136]
+        expected_rewards = [0 + -0.292808, 0 + 0.770696, 1 + -1.01743611, 1 + -0.042768, 0 + 0.78761320, 1 + -0.510087, 0 - 0.089978, 0 + 0.48654863]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done, "\n")
@@ -582,7 +651,7 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()['curr_state']
 
         actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
-        expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done, "\n")
@@ -651,7 +720,7 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()['curr_state']
 
         actions = [[1, 4, 1, 0], [0, 3, 1, 0], [1, 4, 0, 1], [1, 0 ,0, 0], [1, 2, 0, 1], [0, 3, 1, 0], [0, 1, 1, 1], [0, 4, 0, 1], [1, 4, 0, 0]]
-        expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
         expected_states = [[0, 0, 0, 3], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 3], [0, 1, 0, 2], [1, 0, 1, 0], [1, 0, 1, 1], [0, 0, 0, 4], [1, 0, 0, 2]]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
@@ -664,7 +733,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 
-        # Test: Lets even irrelevant dimensions be multi-dimensional
+        # Test: This test lets even irrelevant dimensions be multi-dimensional
         config["state_space_size"] = [2, 2, 2, 1, 5]
         config["state_space_relevant_indices"] = [0, 1, 2]
         config["action_space_size"] = [2, 5, 1, 1, 2, 2]
@@ -673,7 +742,7 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()['curr_state']
 
         actions = [[1, 4, 0, 0, 1, 0], [0, 3, 0, 0, 1, 0], [1, 4, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0], [1, 2, 0, 0, 0, 1], [0, 3, 0, 0, 1, 0], [0, 1, 0, 0, 1, 1], [0, 4, 0, 0, 0, 1], [1, 4, 0, 0, 0, 0]]
-        expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+        expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
         expected_states = [[0, 0, 0, 0, 3], [0, 1, 0, 0, 1], [0, 1, 0, 0, 1], [1, 0, 1, 0, 3], [0, 1, 0, 0, 2], [1, 0, 1, 0, 0], [1, 0, 1, 0, 1], [0, 0, 0, 0, 4], [1, 0, 0, 0, 2]]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])

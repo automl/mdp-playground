@@ -48,6 +48,7 @@ class RLToyEnv(gym.Env):
         Can check total no. of unique sequences of length, say, 3 reachable from diff. init. states based on the randomly generated transition function - could generate transition function and generate specific_sequences based on it.
         Maybe make some parts init states, some term. states and a majority be neither and let rewarded sequences begin from "neither" states (so we can see if algo. can learn to reach a reward-dense region and stay in it) - maybe keep only 1 init and 1 term. state?
         Can also make discrete/continuous "Euclidean space" with transition function fixed - then problem is with generating sequences (need to maybe from each init. state have a few length n rewardable sequences) - if distance from init state to term. state is large compared to sequence_length, exploration becomes easier? - you do get a signal if term. state is closer (like cliff walking problem) - still, things depend on percentage reachability of rewarded sequences (which increases if close term. states chop off a big part of the search space)
+        ###IMP For having state-action sequences rewardable, need to keep sequences of length 2n + 1 in augmented_state (n + 1 states interleaved with n actions); if P(s, a) is deterministic, state sequences map 1-to-1 with state-action sequences.
         #Check TODO, fix and bottleneck tags
         Sources of #randomness (Description needs to be updated for relevant/irrelevant update to playground): Seed for Env.observation_space (to generate discrete P, for noise in discrete P, initial state for continuous), Env.action_space (to generate initial random policy (done by the RL algorithm)), Env. (to generate R for discrete, for noise in R and continuous P, initial state for discrete), irrelevant state space?, irrelevant action space?, also for multi-discrete state and action spaces, self.term_spaces for continuous spaces - but multi-discrete state and term_spaces' sampling aren't used anywhere by Environment right now; ; Check # seed, # random
         ###TODO Separate out seeds for all the random processes? No, better to have one cryptographically secure PRNG I think! Or better yet, ask uuser to provide seeds for all processes, otherwise we can't get ALL possible distributions of random processes (state and action spaces, etc.) inside the Environment if we set all different seeds based on 1 seed because seeds for the processes inside will be set deterministically.
@@ -138,6 +139,14 @@ class RLToyEnv(gym.Env):
         if "term_state_reward" not in config:
             config["term_state_reward"] = 0.0
 
+        if "delay" not in config:
+            config["delay"] = 0
+
+        if "sequence_length" not in config:
+            config["sequence_length"] = 1
+
+        if "reward_unit" not in config:
+            config["reward_unit"] = 1.0
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
@@ -210,11 +219,13 @@ class RLToyEnv(gym.Env):
         if config["state_space_type"] == 'continuous':
             assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
             assert config["state_space_relevant_indices"] == config["action_space_relevant_indices"], "For continuous spaces, state_space_relevant_indices has to be = action_space_relevant_indices. state_space_relevant_indices was: " + str(config["state_space_relevant_indices"]) + " action_space_relevant_indices was: " + str(config["action_space_relevant_indices"])
+            if config["reward_function"] == "move_to_a_point":
+                config["target_point"] = np.array(config["target_point"])
 
         self.config = config
         self.sequence_length = config["sequence_length"]
         self.delay = config["delay"]
-        self.augmented_state_length = config["sequence_length"] + config["delay"]
+        self.augmented_state_length = config["sequence_length"] + config["delay"] + 1
         if self.config["state_space_type"] == "discrete":
             self.reward_unit = self.config["reward_unit"]
         else: # cont. spaces
@@ -314,7 +325,7 @@ class RLToyEnv(gym.Env):
             # if ('term_state_edge' not in self.config):
             #     self.config["term_state_edge"] = 0
 
-            if 'terminal_states' in self.config: #test?
+            if 'terminal_states' in self.config: #test? ##TODO Could also generate terminal spaces based on a terminal_state_density given by user. But only for Boxes with limits? For Boxes without limits, could do it for a limited Box 1st and then repeat that pattern indefinitely along each dimension's axis.
                 for i in range(len(self.config["terminal_states"])): # List of centres of terminal state regions.
                     assert len(self.config["terminal_states"][i]) == len(self.config["state_space_relevant_indices"]), "Specified terminal state centres should have dimensionality = number of state_space_relevant_indices. That was not the case for centre no.: " + str(i) + ""
                     lows = np.array([self.config["terminal_states"][i][j] - self.config["term_state_edge"]/2 for j in range(len(self.config["state_space_relevant_indices"]))])
@@ -465,7 +476,7 @@ class RLToyEnv(gym.Env):
         if self.config["state_space_type"] == "discrete":
             if not self.config["make_denser"]:
                 print(state_considered, "with delay", self.config["delay"])
-                if state_considered[0 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
+                if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
                     # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
                     reward += self.reward_unit
                 else:
@@ -496,37 +507,37 @@ class RLToyEnv(gym.Env):
         else: # if continuous space
             # print("#TODO for cont. spaces: noise")
             ###TODO Reward for reaching a target point case (with make_dense); Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0.
-            if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because even without transition there may be reward as R() is before P() in step()
-                pass #TODO
-            else:
-                # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
-                #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_dist calc.?.
-                data_ = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
-                data_mean = data_.mean(axis=0)
-                uu, dd, vv = np.linalg.svd(data_ - data_mean)
-                print('uu.shape, dd.shape, vv.shape =', uu.shape, dd.shape, vv.shape)
-                line_end_pts = vv[0] * np.linspace(-1, 1, 2)[:, np.newaxis] # vv[0] = 1st eigenvector, corres. to Principal Component #hardcoded -100 to 100 to get a "long" line which should make calculations more robust(?: didn't seem to be the case for 1st few trials, so changed it to -1, 1; even tried up to 10000- seems to get less precise for larger numbers) to numerical issues in dist_of_pt_from_line() below; newaxis added so that expected broadcasting takes place
-                line_end_pts += data_mean
+            if self.config["reward_function"] == "move_along_a_line":
+                if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because augmented_state_length is always 1 greater than seq_len + del
+                    pass #TODO
+                else:
+                    # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
+                    #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_dist calc.?.
+                    data_ = np.array(self.augmented_state)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
+                    data_mean = data_.mean(axis=0)
+                    uu, dd, vv = np.linalg.svd(data_ - data_mean)
+                    print('uu.shape, dd.shape, vv.shape =', uu.shape, dd.shape, vv.shape)
+                    line_end_pts = vv[0] * np.linspace(-1, 1, 2)[:, np.newaxis] # vv[0] = 1st eigenvector, corres. to Principal Component #hardcoded -100 to 100 to get a "long" line which should make calculations more robust(?: didn't seem to be the case for 1st few trials, so changed it to -1, 1; even tried up to 10000 - seems to get less precise for larger numbers) to numerical issues in dist_of_pt_from_line() below; newaxis added so that expected broadcasting takes place
+                    line_end_pts += data_mean
 
-                total_dist = 0
-                for data_pt in data_: # find total distance of all data points from the fit line above
-                    total_dist += dist_of_pt_from_line(data_pt, line_end_pts[0], line_end_pts[-1])
-                print('total_dist of pts from fit line:', total_dist)
+                    total_dist = 0
+                    for data_pt in data_: # find total distance of all data points from the fit line above
+                        total_dist += dist_of_pt_from_line(data_pt, line_end_pts[0], line_end_pts[-1])
+                    print('total_dist of pts from fit line:', total_dist)
 
-                reward += ( - total_dist / self.sequence_length ) * self.reward_scale
+                    reward += ( - total_dist / self.sequence_length ) * self.reward_scale
 
-                # x = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 0]
-                # y = np.array(self.augmented_state)[0 : self.augmented_state_length - delay, 1]
-                # A = np.vstack([x, np.ones(len(x))]).T
-                # coeffs, sum_se, rank_A, singular_vals_A = np.linalg.lstsq(A, y, rcond=None)
-                # sum_se = sum_se[0]
-                # reward += (- np.sqrt(sum_se / self.sequence_length)) * self.reward_scale
-
-                # slope, intercept, r_value, p_value, std_err = stats.linregress(x,y)
-                # reward += (1 - std_err) * self.reward_scale
-
-                # print("rew, rew / seq_len", reward, reward / self.sequence_length)
-                # print(slope, intercept, r_value, p_value, std_err)
+            elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
+                if self.config["make_denser"] == True:
+                    reward = -np.linalg.norm(self.augmented_state[-1] - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
+                    reward += np.linalg.norm(self.augmented_state[-2] - self.config["target_point"]) # Reward is the distance moved towards the target point.
+                    # Should rather be the change in distance to target point, so reward given is +ve if "correct" action was taken and so reward function is more natural
+                    # It's true that giving the -ve distance as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural. But the value function is then higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
+                    #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
+                    #TODO also make_denser, sparse rewards only at target
+                else:
+                    if np.linalg.norm(self.augmented_state[-1] - self.config["target_point"]) < self.config["target_radius"]:
+                        reward = self.config["reward_unit"] # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
 
         noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
@@ -587,7 +598,7 @@ class RLToyEnv(gym.Env):
 
                 # print('self.state_derivatives:', self.state_derivatives)
                 # Except the last member of state_derivatives, the other occupy the same place in memory. Could create a new copy of them every time, but I think this should be more efficient and as long as tests don't fail should be fine.
-                self.state_derivatives[-1] = action / self.inertia # action is presumed to be n-th order force ##TODO Could easily scale this per dimension to give different kinds of dynamics per dimension
+                self.state_derivatives[-1] = action / self.inertia # action is presumed to be n-th order force ##TODO Could easily scale this per dimension to give different kinds of dynamics per dimension: maybe even sample this scale per dimension from a probability distribution to generate different random Ps?
                 factorial_array = scipy.special.factorial(np.arange(1, self.config['transition_dynamics_order'] + 1)) # This is just to speed things up as scipy calculates the factorial only for largest array member
                 for i in range(self.config['transition_dynamics_order']):
                     for j in range(self.config['transition_dynamics_order'] - i):
@@ -757,8 +768,8 @@ class RLToyEnv(gym.Env):
     def step(self, action):
         # assert self.action_space.contains(action) , str(action) + " not in" # TODO Need to implement check in for this environment
         #TODO check self.done and throw error if it's True? (Gym doesn't do it!); Otherwise, define self transitions in terminal states
-        self.reward = self.R(self.curr_state, action) #TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me)
         self.curr_state = self.P(self.curr_state, action)
+        self.reward = self.R(self.curr_state, action) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state to be able to do that. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
 
 
         self.done = self.is_terminal_state(self.curr_state)
