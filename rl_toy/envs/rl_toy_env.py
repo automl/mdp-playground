@@ -5,6 +5,9 @@ from __future__ import print_function
 
 import sys
 import warnings
+import logging
+import os
+from datetime import datetime
 import numpy as np
 import scipy
 from scipy import stats
@@ -56,7 +59,7 @@ class RLToyEnv(gym.Env):
         ###IMP relevant_state_space_size should be large enough that after terminal state generation, we have enough num_specific_sequences rewardable!
         ###IMP Having irrelevant "dimensions" and performing transition dynamics in them for discrete spaces. I think we should not let the dynamics of the irrelevant "dimensions" interfere with the dynamics of the relevant "dimensions". This allows for a clean spearation of what we want the algorithm to pay attention to vs. what we don't it to pay attention to. For continuous spaces, we don't need to have a sperate observation_space with separate dynamics because the way the current dynamics work, the irrelevant and relevant dimensions are cleanly separated.
         ###IMP Variables I paid most attention to when adding irrelevant dimensions: discrete: config['state_space_size'], self.observation_space, self.curr_state. self.augmented_state; for continuous also self.state_derivatives, config['state_space_dim']
-        #TODO Implement logger; command line argument parser; config from YAML file? No, YAML wouldn't allow programmatically modifiable config.
+        #TODO Implement self.logger; command line argument parser; config from YAML file? No, YAML wouldn't allow programmatically modifiable config.
         #Discount factor Can be used by the algorithm if it wants it, more an intrinsic property of the algorithm. With delay, seq_len, etc., it's not clear how discount factor will work.
         #catastrophic forgetting: Could have multiple Envs as multiple tasks to tackle it.
         #intrinsic curiosity: Could have transition dynamics that have uncontrollable parts of the state space with the actions: could be done by just injecting noise for uncontrollable parts of the state space?
@@ -115,6 +118,18 @@ class RLToyEnv(gym.Env):
             # 12 + config["seed"] for continuous self.term_spaces
 
 
+        if "log_level" not in config:
+            config["log_level"] = logging.CRITICAL #logging.NOTSET
+
+        if "log_filename" not in config:
+            config["log_filename"] = __name__ + '_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
+        # log_filename = "logs/output.log"
+        # os.makedirs(os.path.dirname(log_filename), exist_ok=True)
+
+        logging.basicConfig(filename=config["log_filename"], filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=config["log_level"])
+        self.logger = logging.getLogger(__name__)
+
+
         if "seed" not in config:
             config["seed"] = None #seed
         if not isinstance(config["seed"], dict): # should be an int then. Gym doesn't accept np.int64, etc..
@@ -132,7 +147,7 @@ class RLToyEnv(gym.Env):
         else: # if seed dict was passed
             self.seed(config["seed"]["env"]) #seed
 
-        print('Seeds set to:', config["seed"])
+        logging.warning('Seeds set to:' + str(config["seed"]))
         # print(f'Seeds set to {config["seed"]=}') # Available from Python 3.8
 
 
@@ -182,8 +197,8 @@ class RLToyEnv(gym.Env):
                 assert type(config["state_space_size"]) == int, 'config["state_space_size"] has to be provided as an int when we have a simple Discrete environment. Was:' + str(type(config["state_space_size"]))
                 config["relevant_state_space_size"] = config["state_space_size"]
                 config["irrelevant_state_space_size"] = 0
-            print('config["relevant_state_space_size"] inited to:', config["relevant_state_space_size"])
-            print('config["irrelevant_state_space_size"] inited to:', config["irrelevant_state_space_size"])
+            self.logger.info('config["relevant_state_space_size"] inited to:' + str(config["relevant_state_space_size"]))
+            self.logger.info('config["irrelevant_state_space_size"] inited to:' + str(config["irrelevant_state_space_size"]))
         else: # if continuous environment
             pass
 
@@ -204,8 +219,8 @@ class RLToyEnv(gym.Env):
                 assert type(config["action_space_size"]) == int, 'config["action_space_size"] has to be provided as an int when we have a simple Discrete environment. Was:' + str(type(config["action_space_size"]))
                 config["relevant_action_space_size"] = config["action_space_size"]
                 config["irrelevant_action_space_size"] = 0
-            print('config["relevant_action_space_size"] inited to:', config["relevant_action_space_size"])
-            print('config["irrelevant_action_space_size"] inited to:', config["irrelevant_action_space_size"])
+            self.logger.info('config["relevant_action_space_size"] inited to:' + str(config["relevant_action_space_size"]))
+            self.logger.info('config["irrelevant_action_space_size"] inited to:' + str(config["irrelevant_action_space_size"]))
         else: # if continuous environment
             pass
 
@@ -297,9 +312,9 @@ class RLToyEnv(gym.Env):
         #TODO sample at any time from "current"/converged distribution of states according to current policy
 
         self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes it does as also does space); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
-        print("self.augmented_state, len", self.augmented_state, len(self.augmented_state))
+        self.logger.info("self.augmented_state, len" + str(self.augmented_state) + str(len(self.augmented_state)))
 
-        print("toy env instantiated with config:", self.config) #hack
+        self.logger.info("toy env instantiated with config:" + str(self.config)) #hack
 
         # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
         # print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
@@ -314,7 +329,7 @@ class RLToyEnv(gym.Env):
                 warnings.warn("WARNING: int(terminal_state_density * relevant_state_space_size) was 0. Setting num_terminal_states to be 1!")
                 self.num_terminal_states = 1
             self.config["is_terminal_state"] = np.array([self.config["relevant_state_space_size"] - 1 - i for i in range(self.num_terminal_states)]) # terminal states inited to be at the "end" of the sorted states
-            print("Inited terminal states to self.config['is_terminal_state']:", self.config["is_terminal_state"], "total", self.num_terminal_states)
+            self.logger.info("Inited terminal states to self.config['is_terminal_state']:" + str(self.config["is_terminal_state"]) + "total" + str(self.num_terminal_states))
             self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
 
         else: # if continuous space
@@ -332,7 +347,7 @@ class RLToyEnv(gym.Env):
                     highs = np.array([self.config["terminal_states"][i][j] + self.config["term_state_edge"]/2 for j in range(len(self.config["state_space_relevant_indices"]))])
                     # print("Term state lows, highs:", lows, highs)
                     self.term_spaces.append(BoxExtended(low=lows, high=highs, seed=self.seed_, dtype=np.float64)) #seed #hack #TODO
-                print("self.term_spaces samples:", self.term_spaces[0].sample(), self.term_spaces[-1].sample())
+                self.logger.debug("self.term_spaces samples:" + str(self.term_spaces[0].sample()) + str(self.term_spaces[-1].sample()))
 
             self.is_terminal_state = lambda s: np.any([self.term_spaces[i].contains(s[self.config["state_space_relevant_indices"]]) for i in range(len(self.term_spaces))]) ### TODO for cont. #test?
             #### TODO test for terminal states!!
@@ -344,7 +359,7 @@ class RLToyEnv(gym.Env):
             self.config["relevant_init_state_dist"] = np.array([1 / (non_term_relevant_state_space_size) for i in range(non_term_relevant_state_space_size)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use!
         #TODO make init_state_dist the default sample() for state space?
             # self.relevant_init_state_dist = self.config["relevant_init_state_dist"] if callable(self.config["relevant_init_state_dist"]) else lambda s: self.config["relevant_init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath? self.relevant_init_state_dist is not used anywhere right now, self.config["relevant_init_state_dist"] is used!
-            print("self.relevant_init_state_dist:", self.config["relevant_init_state_dist"])
+            self.logger.info("self.relevant_init_state_dist:" + str(self.config["relevant_init_state_dist"]))
         else: # if continuous space
             # print("#TODO for cont. spaces: init_state_dist")
             pass # this is handled in reset where we resample if we sample a term. state
@@ -353,7 +368,7 @@ class RLToyEnv(gym.Env):
         if self.config["state_space_type"] == "discrete":
             if self.config["irrelevant_state_space_size"] > 0:
                 self.config["irrelevant_init_state_dist"] = np.array([1 / (self.config["irrelevant_state_space_size"]) for i in range(self.config["irrelevant_state_space_size"])]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use!
-                print("self.irrelevant_init_state_dist:", self.config["irrelevant_init_state_dist"])
+                self.logger.info("self.irrelevant_init_state_dist:" + str(self.config["irrelevant_init_state_dist"]))
 
 
     def init_reward_function(self):
@@ -375,12 +390,12 @@ class RLToyEnv(gym.Env):
                     #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
                     # specific_sequence = self.relevant_observation_space.sample(size=self.config["sequence_length"], replace=True) # Be careful that sequence_length is less than state space size
                     self.specific_sequences[self.sequence_length - 1].append(specific_sequence) #hack
-                    print("specific_sequence that will be rewarded", specific_sequence) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
-                print("Total no. of rewarded sequences:", len(self.specific_sequences[self.sequence_length - 1]), "Out of", num_possible_sequences)
+                    self.logger.info("specific_sequence that will be rewarded" + str(specific_sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+                self.logger.info("Total no. of rewarded sequences:" + str(len(self.specific_sequences[self.sequence_length - 1])) + str("Out of", num_possible_sequences))
             else: # if no repeats_in_sequences
                 len_ = self.sequence_length
                 permutations = list(range(non_term_relevant_state_space_size + 1 - len_, non_term_relevant_state_space_size + 1))
-                print("No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms", permutations, np.random.randint(np.prod(permutations)), np.prod(permutations)) #random
+                self.logger.info("No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms" + str(permutations) + str(np.random.randint(np.prod(permutations))) + str(np.prod(permutations))) #random
                 num_possible_permutations = np.prod(permutations)
                 num_specific_sequences = int(self.config["reward_density"] * num_possible_permutations)
                 if num_specific_sequences > 1000:
@@ -404,15 +419,15 @@ class RLToyEnv(gym.Env):
                     if seq_ in self.specific_sequences[self.sequence_length - 1]: #hack
                         total_clashes += 1 #TODO remove these extra checks and assert below
                     self.specific_sequences[self.sequence_length - 1].append(seq_)
-                    print("specific_sequence that will be rewarded", seq_)
+                    self.logger.info("specific_sequence that will be rewarded" + str(seq_))
                 #print(len(set(self.specific_sequences))) #error
                 # print(self.specific_sequences[self.sequence_length - 1])
 
-                print("Number of generated sequences that did not clash with an existing one when it was generated:", total_clashes)
+                self.logger.debug("Number of generated sequences that did not clash with an existing one when it was generated:" + str(total_clashes))
                 assert total_clashes == 0, 'None of the generated sequences should have clashed with an existing rewardable sequence when it was generated. No. of times a clash was detected:' + str(total_clashes)
-                print("Total no. of rewarded sequences:", len(self.specific_sequences[self.sequence_length - 1]), "Out of", num_possible_permutations)
+                self.logger.info("Total no. of rewarded sequences:" + str(len(self.specific_sequences[self.sequence_length - 1])) + "Out of" + str(num_possible_permutations))
         else: # if continuous space
-            print("#TODO for cont. spaces?: init_reward_function")
+            self.logger.debug("#TODO for cont. spaces?: init_reward_function") # reward functions are fixed for cont. right now with a few available choices.
 
         self.R = lambda s, a: self.reward_function(s, a, only_query=False)
 
@@ -435,9 +450,9 @@ class RLToyEnv(gym.Env):
                     assert self.is_terminal_state(s) == True
                     self.config["transition_function"][s, a] = s # Setting P(s, a) = s for terminal states, for P() to be meaningful even if someone doesn't check for 'done' being = True
 
-            print(self.config["transition_function"], "init_transition_function", type(self.config["transition_function"][0, 0]))
+            self.logger.info(str(self.config["transition_function"]) + "init_transition_function" + str(type(self.config["transition_function"][0, 0])))
         else: # if continuous space
-            print("#TODO for cont. spaces")
+            self.logger.debug("#TODO for cont. spaces")
 
 
         #irrelevant part
@@ -453,7 +468,7 @@ class RLToyEnv(gym.Env):
                         for a in range(self.config["irrelevant_action_space_size"]):
                             self.config["transition_function_irrelevant"][s, a] = self.irrelevant_observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
 
-                print(self.config["transition_function_irrelevant"], "init_transition_function _irrelevant", type(self.config["transition_function_irrelevant"][0, 0]))
+                self.logger.info(str(self.config["transition_function_irrelevant"]) + "init_transition_function _irrelevant" + str(type(self.config["transition_function_irrelevant"][0, 0])))
 
 
         self.P = lambda s, a: self.transition_function(s, a, only_query = False)
@@ -475,7 +490,7 @@ class RLToyEnv(gym.Env):
 
         if self.config["state_space_type"] == "discrete":
             if not self.config["make_denser"]:
-                print(state_considered, "with delay", self.config["delay"])
+                self.logger.debug(str(state_considered) + "with delay" + str(self.config["delay"]))
                 if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
                     # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
                     reward += self.reward_unit
@@ -501,8 +516,8 @@ class RLToyEnv(gym.Env):
                                 self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1]) # add it + an extra next state in that sequence to list of possible sequence prefixes to be checked for rewards above
                 ###IMP: Above routine for sequence prefix checking can be coded in a more human understandable manner, but this kind of pruning out of sequences which may not be attainable based on the current past trajectory, done above, should be in principle more efficient?
 
-                print("rew", reward)
-                print("self.possible_remaining_sequences", self.possible_remaining_sequences)
+                self.logger.info("rew" + str(reward))
+                self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
 
         else: # if continuous space
             # print("#TODO for cont. spaces: noise")
@@ -516,14 +531,14 @@ class RLToyEnv(gym.Env):
                     data_ = np.array(self.augmented_state)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
                     data_mean = data_.mean(axis=0)
                     uu, dd, vv = np.linalg.svd(data_ - data_mean)
-                    print('uu.shape, dd.shape, vv.shape =', uu.shape, dd.shape, vv.shape)
+                    self.logger.info('uu.shape, dd.shape, vv.shape =' + str(uu.shape) + str(dd.shape) + str(vv.shape))
                     line_end_pts = vv[0] * np.linspace(-1, 1, 2)[:, np.newaxis] # vv[0] = 1st eigenvector, corres. to Principal Component #hardcoded -100 to 100 to get a "long" line which should make calculations more robust(?: didn't seem to be the case for 1st few trials, so changed it to -1, 1; even tried up to 10000 - seems to get less precise for larger numbers) to numerical issues in dist_of_pt_from_line() below; newaxis added so that expected broadcasting takes place
                     line_end_pts += data_mean
 
                     total_dist = 0
                     for data_pt in data_: # find total distance of all data points from the fit line above
                         total_dist += dist_of_pt_from_line(data_pt, line_end_pts[0], line_end_pts[-1])
-                    print('total_dist of pts from fit line:', total_dist)
+                    self.logger.info('total_dist of pts from fit line:' + str(total_dist))
 
                     reward += ( - total_dist / self.sequence_length ) * self.reward_scale
 
@@ -567,7 +582,7 @@ class RLToyEnv(gym.Env):
                 new_next_state = self.relevant_observation_space.sample(prob=probs) #random
                 # print("noisy old next_state, new_next_state", next_state, new_next_state)
                 if next_state != new_next_state:
-                    print("NOISE inserted! old next_state, new_next_state", next_state, new_next_state)
+                    self.logger.info("NOISE inserted! old next_state, new_next_state" + str(next_state) + str(new_next_state))
                     self.total_noisy_transitions_episode += 1
                 # print("new probs:", probs, self.relevant_observation_space.sample(prob=probs))
                 next_state = new_next_state
@@ -616,7 +631,7 @@ class RLToyEnv(gym.Env):
             next_state += noise_in_transition ##IMP Noise is only applied to state and not to higher order derivatives
             ### TODO Check if next_state is within state space bounds
             if not self.observation_space.contains(next_state):
-                print("next_state out of bounds. next_state, clipping to", next_state, np.clip(next_state, -self.state_space_max, self.state_space_max))
+                self.logger.info("next_state out of bounds. next_state, clipping to" + str(next_state) + str(np.clip(next_state, -self.state_space_max, self.state_space_max)))
                 next_state = np.clip(next_state, -self.state_space_max, self.state_space_max) # Could also "reflect" next_state when it goes out of bounds. Would seem more logical for a "wall", but would need to take care of multiple reflections near a corner/edge.
                 # Resets all higher order derivatives to 0
                 zero_state = np.array([0.0] * (self.config['state_space_dim']))
@@ -694,9 +709,7 @@ class RLToyEnv(gym.Env):
 
         # on episode "end" stuff (to not be invoked when reset() called when self.total_episodes = 0; end is quoted because it may not be a true episode end reached by reaching a terminal state, but reset() may have been called in the middle of an episode):
         if not self.total_episodes == 0:
-            print("Noise stats for previous episode num.:", self.total_episodes, "(total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions):",
-                    self.total_abs_noise_in_reward_episode, self.total_abs_noise_in_transition_episode, self.total_reward_episode, self.total_noisy_transitions_episode,
-                    self.total_transitions_episode)
+            self.logger.info("Noise stats for previous episode num.:" + str(self.total_episodes) + "(total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions):" + str(self.total_abs_noise_in_reward_episode) + str(self.total_abs_noise_in_transition_episode) + str(self.total_reward_episode) + str(self.total_noisy_transitions_episode) + str(self.total_transitions_episode))
 
         # on episode start stuff:
         self.total_episodes += 1
@@ -708,24 +721,24 @@ class RLToyEnv(gym.Env):
                 if self.config["irrelevant_state_space_size"] > 0:
                     self.curr_state_irrelevant = self.np_random.choice(self.config["irrelevant_state_space_size"], p=self.config["irrelevant_init_state_dist"]) #random
                     self.curr_state = self.discrete_to_multi_discrete(self.curr_state_relevant, self.curr_state_irrelevant)
-                    print("RESET called. Relevant part of state reset to:", self.curr_state_relevant)
-                    print("Irrelevant part of state reset to:", self.curr_state_irrelevant)
+                    self.logger.info("RESET called. Relevant part of state reset to:" + str(self.curr_state_relevant))
+                    self.logger.info("Irrelevant part of state reset to:" + str(self.curr_state_irrelevant))
                 else:
                     self.curr_state = self.discrete_to_multi_discrete(self.curr_state_relevant)
-                    print("RESET called. Relevant part of state reset to:", self.curr_state_relevant)
+                    self.logger.info("RESET called. Relevant part of state reset to:" + str(self.curr_state_relevant))
 
-            print("RESET called. curr_state set to:", self.curr_state)
+            self.logger.info("RESET called. curr_state set to:" + str(self.curr_state))
             self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state_relevant)
             # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
         else: # if continuous space
-            print("#TODO for cont. spaces: reset")
+            self.logger.debug("#TODO for cont. spaces: reset")
             while True: # Be careful about infinite loops
                 term_space_was_sampled = False
                 self.curr_state = self.observation_space.sample() #random
                 for i in range(len(self.term_spaces)): # Could this sampling be made more efficient? In general, the non-terminal space could have any shape and assiging equal sampling probability to each point in this space is pretty hard.
                     if self.is_terminal_state(self.curr_state):
-                        print("A state was sampled in term state subspace. Therefore, resampling. State was, subspace was:", self.curr_state, i) ##TODO Move this logic into a new class in Gym spaces that can contain subspaces for term states! (with warning/error if term subspaces cover whole state space, or even a lot of it)
+                        self.logger.info("A state was sampled in term state subspace. Therefore, resampling. State was, subspace was:" + str(self.curr_state) + str(i)) ##TODO Move this logic into a new class in Gym spaces that can contain subspaces for term states! (with warning/error if term subspaces cover whole state space, or even a lot of it)
                         term_space_was_sampled = True
                         break
                 if not term_space_was_sampled:
@@ -736,7 +749,7 @@ class RLToyEnv(gym.Env):
             self.state_derivatives = [zero_state.copy() for i in range(self.config['transition_dynamics_order'] + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
 
-            print("RESET called. State reset to:", self.curr_state)
+            self.logger.info("RESET called. State reset to:" + str(self.curr_state))
             self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state.copy())
 
@@ -760,8 +773,8 @@ class RLToyEnv(gym.Env):
     #                    if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]:
                             self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1])
 
-            print("self.possible_remaining_sequences", self.possible_remaining_sequences)
-            print(" self.delay, self.sequence_length:", self.delay, self.sequence_length)
+            self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
+            self.logger.info(" self.delay, self.sequence_length:" + str(self.delay) + str(self.sequence_length))
 
         return self.curr_state
 
@@ -775,13 +788,14 @@ class RLToyEnv(gym.Env):
         self.done = self.is_terminal_state(self.curr_state)
         if self.done:
             self.reward += self.config["term_state_reward"]
+        self.logger.info('sas\'r:' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
         return self.curr_state, self.reward, self.done, {"curr_state": self.curr_state}
 
     def seed(self, seed=None):
         # If seed is None, you get a randomly generated seed from gym.utils...
         # if seed is not None:
         self.np_random, self.seed_ = gym.utils.seeding.np_random(seed) #random
-        print("Env SEED set to:", seed, "Returned seed from Gym:", self.seed_)
+        self.logger.info("Env SEED set to:" + str(seed) + "Returned seed from Gym:" + str(self.seed_))
         return self.seed_
 
 
@@ -819,7 +833,7 @@ def dist_of_pt_from_line(pt, ptA, ptB):
     tolerance = -1e-13
     if sq_dist < 0:
         if sq_dist < tolerance:
-            warnings.warn('The squared distance calculated in dist_of_pt_from_line() using Pythagoras\' theorem was less than the tolerance allowed. It was: ' + str(sq_dist) + '. Tolerance was: ' + str(tolerance))
+            logger.warn('The squared distance calculated in dist_of_pt_from_line() using Pythagoras\' theorem was less than the tolerance allowed. It was: ' + str(sq_dist) + '. Tolerance was: ' + str(tolerance))
         sq_dist = 0
     dist = np.sqrt(sq_dist)
 #     print('pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist:', pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist)

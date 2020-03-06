@@ -11,6 +11,10 @@ from rl_toy_env import RLToyEnv
 import numpy as np
 import copy
 
+from datetime import datetime
+log_filename = 'test_rl_toy_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
+
+
 #TODO None of the tests do anything when done = True. Should try calling reset() in one of them and see that this works?
 
 class TestRLToyEnv(unittest.TestCase):
@@ -20,6 +24,7 @@ class TestRLToyEnv(unittest.TestCase):
         '''
         print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS\033[0m')
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0 # seed, 7 worked for initially sampling within term state subspace
         config["seed"]["state_space"] = 10
@@ -51,7 +56,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]))
@@ -73,7 +78,7 @@ class TestRLToyEnv(unittest.TestCase):
             else:
                 action = np.array([1, 1, 1, 1])
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             if i >= 29:
                 np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
             elif i >= 20: # reward should ideally start getting better at step 20 when we no longer apply random actions, but in this case, by chance, the 1st non-random action doesn't help
@@ -97,7 +102,7 @@ class TestRLToyEnv(unittest.TestCase):
             else:
                 action = np.array([1, 1, 1, 1])
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             if i >= 30:
                 np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
             elif i >= 21:
@@ -121,7 +126,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             np.testing.assert_allclose(expected_rewards[i], reward, atol=1e-6, err_msg='Step: ' + str(i))
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([6.59339006, 5.68189965, 6.49608203, 5.19183292]), atol=1e-5)
@@ -141,7 +146,7 @@ class TestRLToyEnv(unittest.TestCase):
             action = env.action_space.sample()
             action[config["action_space_relevant_indices"]] = 1.0 # test to see if acting "in a line" works for relevant dimensions
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
             state = next_state.copy()
         np.testing.assert_allclose(state[config["state_space_relevant_indices"]], np.array([21.59339006, 20.68189965, 21.49608203, 19.835966]))
@@ -155,7 +160,7 @@ class TestRLToyEnv(unittest.TestCase):
             action = env.action_space.sample()
             action[[3, 4, 5]] = 1.0 # test to see if acting "in a line" for relevant dimensions and not for relevant dimensions produces bad reward
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             if i > 10:
                 assert reward < -0.8, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward)
             state = next_state.copy()
@@ -172,7 +177,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([-1] * 7) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([-5] * 7))
         # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
@@ -193,7 +198,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([1] * 7) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
             state = next_state.copy()
             state_derivatives = copy.deepcopy(env.state_derivatives)
@@ -230,7 +235,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([1] * 7) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
             state = next_state.copy()
             state_derivatives = copy.deepcopy(env.state_derivatives)
@@ -247,6 +252,7 @@ class TestRLToyEnv(unittest.TestCase):
         ''''''
         print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_ORDER\033[0m')
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["state_space"] = 10
@@ -272,7 +278,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         action = np.array([2.0, 1.0])
         next_state, reward, done, info = env.step(action)
-        print("sars', done =", state, action, reward, next_state, done, "\n")
+        print("sars', done =", state, action, reward, next_state, done)
         np.testing.assert_allclose(next_state - state, (1/6) * np.array([1, 0.5]) * 1e-6)
         np.testing.assert_allclose(env.state_derivatives[1] - state_derivatives[1], (1/2) * np.array([1, 0.5]) * 1e-4)
         np.testing.assert_allclose(env.state_derivatives[2] - state_derivatives[2], np.array([1, 0.5]) * 1e-2)
@@ -282,7 +288,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         action = np.array([2.0, 1.0])
         next_state, reward, done, info = env.step(action)
-        print("sars', done =", state, action, reward, next_state, done, "\n")
+        print("sars', done =", state, action, reward, next_state, done)
         np.testing.assert_allclose(next_state - state, (7/6) * np.array([1, 0.5]) * 1e-6)
         np.testing.assert_allclose(env.state_derivatives[1] - state_derivatives[1], (3/2) * np.array([1, 0.5]) * 1e-4)
         np.testing.assert_allclose(env.state_derivatives[2] - state_derivatives[2], np.array([1, 0.5]) * 1e-2)
@@ -299,6 +305,7 @@ class TestRLToyEnv(unittest.TestCase):
         ''''''
         print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_TARGET_POINT\033[0m')
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 3
         config["seed"]["state_space"] = 10000
@@ -328,7 +335,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([0.5]*2) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test. That is also the reward given at each step.
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([-0.29792, 1.71012]), atol=1e-6)
@@ -347,7 +354,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([0.5]*2) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             if i < 17:
                 np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg='Step: ' + str(i))
             else:
@@ -362,6 +369,7 @@ class TestRLToyEnv(unittest.TestCase):
     def test_discrete_dynamics(self):
         ''''''
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 6
@@ -387,19 +395,19 @@ class TestRLToyEnv(unittest.TestCase):
 
         action = 2
         next_state, reward, done, info = env.step(action)
-        print("sars', done =", state, action, reward, next_state, done, "\n")
+        print("sars', done =", state, action, reward, next_state, done)
         self.assertEqual(next_state, 1, "Mismatch in state expected by transition dynamics for step 1.")
         state = next_state
 
         action = 4
         next_state, reward, done, info = env.step(action)
-        print("sars', done =", state, action, reward, next_state, done, "\n")
+        print("sars', done =", state, action, reward, next_state, done)
         self.assertEqual(next_state, 2, "Mismatch in state expected by transition dynamics for step 2.")
         state = next_state
 
         action = 1
         next_state, reward, done, info = env.step(action)
-        print("sars', done =", state, action, reward, next_state, done, "\n")
+        print("sars', done =", state, action, reward, next_state, done)
         self.assertEqual(next_state, 5, "Mismatch in state expected by transition dynamics for step 3.")
         self.assertEqual(done, True, "Mismatch in expectation that terminal state should have been reached by transition dynamics for step 3.")
         state = next_state
@@ -407,7 +415,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Try a random action to see that terminal state leads back to same terminal state
         action = env.action_space.sample()
         next_state, reward, done, info = env.step(action)
-        print("sars', done =", state, action, reward, next_state, done, "\n")
+        print("sars', done =", state, action, reward, next_state, done)
         self.assertEqual(next_state, state, "Mismatch in state expected by transition dynamics for step 4. Terminal state was reached in step 3 and any random action should lead back to same terminal state.")
         state = next_state
 
@@ -419,6 +427,7 @@ class TestRLToyEnv(unittest.TestCase):
         ''''''
         print('\033[32;1;4mTEST_DISCRETE_REWARD_DELAY\033[0m')
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 8
@@ -447,7 +456,7 @@ class TestRLToyEnv(unittest.TestCase):
         expected_states = [0, 2, 2, 5, 2, 5, 5, 0, 6]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            print("sars', done =", state, actions[i], reward, next_state, done)
             self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
             # self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.") # will not work for 2nd last time step due to random action.
             state = next_state
@@ -460,6 +469,7 @@ class TestRLToyEnv(unittest.TestCase):
         ''''''
         print('\033[32;1;4mTEST_DISCRETE_REWARDABLE_SEQUENCES\033[0m')
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 8
@@ -486,7 +496,7 @@ class TestRLToyEnv(unittest.TestCase):
         expected_rewards = [0, 1, 1, 0, 1, 0, 0, 0]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            print("sars', done =", state, actions[i], reward, next_state, done)
             self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when sequence length = 3.")
             state = next_state
 
@@ -498,6 +508,7 @@ class TestRLToyEnv(unittest.TestCase):
         ''''''
         print('TEST_DISCRETE_P_NOISE')
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 8
@@ -525,7 +536,7 @@ class TestRLToyEnv(unittest.TestCase):
         expected_states = [2, 6, 6, 3] # Last state 3 is fixed for this test because of fixed seed for Env which selects the next noisy state.
         for i in range(len(actions)):
             next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            print("sars', done =", state, actions[i], reward, next_state, done)
             self.assertEqual(next_state, expected_states[i], "Expected next state mismatch in time step: " + str(i + 1) + " when P noise = 0.5.")
             state = next_state
 
@@ -537,6 +548,7 @@ class TestRLToyEnv(unittest.TestCase):
         ''''''
         print('TEST_DISCRETE_R_NOISE')
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 8
@@ -564,7 +576,7 @@ class TestRLToyEnv(unittest.TestCase):
         expected_rewards = [1 + -0.499716, 0.805124, -0.224812, 0.086749] # 2nd state produces 'true' reward
         for i in range(len(actions)):
             next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            print("sars', done =", state, actions[i], reward, next_state, done)
             np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg='Expected reward mismatch in time step: ' + str(i + 1) + ' when R noise = 0.5.')
 
             state = next_state
@@ -581,6 +593,7 @@ class TestRLToyEnv(unittest.TestCase):
         print('TEST_DISCRETE_ALL_META_FEATURES')
 
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 8
@@ -610,7 +623,7 @@ class TestRLToyEnv(unittest.TestCase):
         expected_rewards = [0 + -0.292808, 0 + 0.770696, 1 + -1.01743611, 1 + -0.042768, 0 + 0.78761320, 1 + -0.510087, 0 - 0.089978, 0 + 0.48654863]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            print("sars', done =", state, actions[i], reward, next_state, done)
             np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg="Expected reward mismatch in time step: " + str(i + 1) + " when sequence length = 3, delay = 1.")
             state = next_state
 
@@ -625,6 +638,7 @@ class TestRLToyEnv(unittest.TestCase):
         print('TEST_DISCRETE_MULTI_DISCRETE')
 
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 8
@@ -654,7 +668,7 @@ class TestRLToyEnv(unittest.TestCase):
         expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            print("sars', done =", state, actions[i], reward, next_state, done)
             self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
             state = next_state
 
@@ -669,6 +683,7 @@ class TestRLToyEnv(unittest.TestCase):
         print('\033[32;1;4mTEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS\033[0m')
 
         config = {}
+        config["log_filename"] = log_filename
         config["seed"] = {}
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 8
@@ -703,7 +718,7 @@ class TestRLToyEnv(unittest.TestCase):
             expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
             for i in range(len(expected_rewards)):
                 next_state, reward, done, info = env.step(actions[i])
-                print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+                print("sars', done =", state, actions[i], reward, next_state, done)
                 self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
                 state = next_state
 
@@ -724,7 +739,7 @@ class TestRLToyEnv(unittest.TestCase):
         expected_states = [[0, 0, 0, 3], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 3], [0, 1, 0, 2], [1, 0, 1, 0], [1, 0, 1, 1], [0, 0, 0, 4], [1, 0, 0, 2]]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            print("sars', done =", state, actions[i], reward, next_state, done)
             self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
             self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
             state = next_state
@@ -746,7 +761,7 @@ class TestRLToyEnv(unittest.TestCase):
         expected_states = [[0, 0, 0, 0, 3], [0, 1, 0, 0, 1], [0, 1, 0, 0, 1], [1, 0, 1, 0, 3], [0, 1, 0, 0, 2], [1, 0, 1, 0, 0], [1, 0, 1, 0, 1], [0, 0, 0, 0, 4], [1, 0, 0, 0, 2]]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done, "\n")
+            print("sars', done =", state, actions[i], reward, next_state, done)
             self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
             self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
             state = next_state
