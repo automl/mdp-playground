@@ -1,3 +1,10 @@
+......./rl_toy/envs/rl_toy_env.py:322: DeprecationWarning: elementwise comparison failed; this will raise an error in the future.
+  self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
+......
+----------------------------------------------------------------------
+Ran 12 tests in 0.302s
+
+OK
 [32;1;4mTEST_CONTINUOUS_DYNAMICS[0m
 Env SEED set to: 0 Returned seed from Gym: 0
 Seeds set to: {'env': 0, 'state_space': 10, 'action_space': 11}
@@ -385,7 +392,7 @@ Seeds set to: {'env': 0, 'state_space': 10, 'action_space': 11}
 #TODO for cont. spaces: reset
 RESET called. State reset to: [1.59339006 0.68189965 1.49608203 0.19183192]
 self.augmented_state, len [[nan, nan, nan, nan], [nan, nan, nan, nan], [nan, nan, nan, nan], [nan, nan, nan, nan], [nan, nan, nan, nan], [nan, nan, nan, nan], [nan, nan, nan, nan], [nan, nan, nan, nan], [nan, nan, nan, nan], [nan, nan, nan, nan], array([1.59339006, 0.68189965, 1.49608203, 0.19183192])] 11
-toy env instantiated with config: {'seed': {'env': 0, 'state_space': 10, 'action_space': 11}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 4, 'action_space_dim': 4, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'delay': 0, 'sequence_length': 10, 'reward_scale': 1.0, 'reward_function': 'move_along_a_line', 'generate_random_mdp': True, 'term_state_reward': 0.0, 'reward_unit': 1.0, 'state_space_relevant_indices': range(0, 4), 'action_space_relevant_indices': range(0, 4), 'reward_noise': <function TestRLToyEnv.test_continuous_dynamics.<locals>.<lambda> at 0x7f210fd7ed08>}
+toy env instantiated with config: {'seed': {'env': 0, 'state_space': 10, 'action_space': 11}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 4, 'action_space_dim': 4, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'delay': 0, 'sequence_length': 10, 'reward_scale': 1.0, 'reward_function': 'move_along_a_line', 'generate_random_mdp': True, 'term_state_reward': 0.0, 'reward_unit': 1.0, 'state_space_relevant_indices': range(0, 4), 'action_space_relevant_indices': range(0, 4), 'reward_noise': <function TestRLToyEnv.test_continuous_dynamics.<locals>.<lambda> at 0x7fa658adc9d8>}
 sars', done = [1.59339006 0.68189965 1.49608203 0.19183192] [1 1 1 1] -0.7070735117694138 [2.59339006 1.68189965 2.49608203 1.19183192] False 
 
 sars', done = [2.59339006 1.68189965 2.49608203 1.19183192] [1 1 1 1] 0.446809534622282 [3.59339006 2.68189965 3.49608203 2.19183192] False 
@@ -927,14 +934,14 @@ Seeds set to: {'env': 0, 'state_space': 10, 'action_space': 11}
 self.term_spaces samples: [ 0.48270042  2.63463726 -4.74957174 -0.33867457] [ 2.51858748 -1.70724468 -2.57995172 -0.13552242]
 #TODO for cont. spaces?: init_reward_function
 #TODO for cont. spaces
-#TODO for cont. spaces: reset..
+#TODO for cont. spaces: reset
 A state was sampled in term state subspace. Therefore, resampling. State was, subspace was: [ 0.92834036  2.16924632 -4.88226269  2.80702663  0.36006653  2.80813054
  -0.12869191] 0
 RESET called. State reset to: [ 0.96422742 -4.17263562 -4.71264267 -4.19641802 -0.90090835 -4.02478309
  -1.92553976]
 self.augmented_state, len [[nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan, nan, nan], array([ 0.96422742, -4.17263562, -4.71264267, -4.19641802, -0.90090835,
        -4.02478309, -1.92553976])] 11
-toy env instantiated with config: {'seed': {'env': 0, 'state_space': 10, 'action_space': 11}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 7, 'action_space_dim': 7, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'delay': 0, 'sequence_length': 10, 'reward_scale': 1.0, 'reward_function': 'move_along_a_line', 'generate_random_mdp': True, 'term_state_reward': 0.0, 'reward_unit': 1.0, 'state_space_relevant_indices': [0, 1, 2, 6], 'action_space_relevant_indices': [0, 1, 2, 6], 'state_space_max': 5, 'action_space_max': 1, 'terminal_states': [[0.92834036, 2.16924632, -4.88226269, -0.12869191], [2.96422742, -2.17263562, -2.71264267, 0.07446024]], 'term_state_edge': 1.0, 'transition_noise': <function TestRLToyEnv.test_continuous_dynamics.<locals>.<lambda> at 0x7f210fd7ebf8>}
+toy env instantiated with config: {'seed': {'env': 0, 'state_space': 10, 'action_space': 11}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 7, 'action_space_dim': 7, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'delay': 0, 'sequence_length': 10, 'reward_scale': 1.0, 'reward_function': 'move_along_a_line', 'generate_random_mdp': True, 'term_state_reward': 0.0, 'reward_unit': 1.0, 'state_space_relevant_indices': [0, 1, 2, 6], 'action_space_relevant_indices': [0, 1, 2, 6], 'state_space_max': 5, 'action_space_max': 1, 'terminal_states': [[0.92834036, 2.16924632, -4.88226269, -0.12869191], [2.96422742, -2.17263562, -2.71264267, 0.07446024]], 'term_state_edge': 1.0, 'transition_noise': <function TestRLToyEnv.test_continuous_dynamics.<locals>.<lambda> at 0x7fa658adcbf8>}
 sars', done = [ 0.96422742 -4.17263562 -4.71264267 -4.19641802 -0.90090835 -4.02478309
  -1.92553976] [1 1 1 1 1 1 1] 0.0 [ 1.25715391 -2.72582608 -3.56190734 -3.5426217   0.90596197 -3.53510777
  -0.90385213] False 
@@ -968,7 +975,7 @@ sars', done = [1.59339023 0.68189973] [2. 1.] 0.0 [1.59339139 0.68190032] False
 Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 0 0.0 0 2
 #TODO for cont. spaces: reset
 RESET called. State reset to: [1.49608203 0.19183192]
-[32;1;4mTEST_CONTINUOUS_DYNAMICS_TARGET_POINT[0m
+[32;1;4mTEST_CONTINUOUS_DYNAMICS_TARGET_POINT_DENSE[0m
 Env SEED set to: 3 Returned seed from Gym: 3
 Seeds set to: {'env': 3, 'state_space': 10000, 'action_space': 101}
 #TODO for cont. spaces?: init_reward_function
@@ -1025,9 +1032,114 @@ Seeds set to: {'env': 3, 'state_space': 10000, 'action_space': 101}
 #TODO for cont. spaces?: init_reward_function
 #TODO for cont. spaces
 #TODO for cont. spaces: reset
+RESET called. State reset to: [-0.79792045  1.21012003  0.44190558 -0.53462555 -0.00606591]
+self.augmented_state, len [[nan, nan, nan, nan, nan], array([-0.79792045,  1.21012003,  0.44190558, -0.53462555, -0.00606591])] 2
+toy env instantiated with config: {'seed': {'env': 3, 'state_space': 10000, 'action_space': 101}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 5, 'action_space_dim': 5, 'transition_dynamics_order': 1, 'inertia': 2.0, 'time_unit': 0.1, 'delay': 0, 'sequence_length': 1, 'reward_scale': 1.0, 'reward_function': 'move_to_a_point', 'target_point': array([1.71012 , 0.941906]), 'make_denser': True, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'reward_unit': 1.0, 'state_space_relevant_indices': [1, 2], 'action_space_relevant_indices': [1, 2]}
+sars', done = [-0.79792045  1.21012003  0.44190558 -0.53462555 -0.00606591] [0.5 0.5 0.5 0.5 0.5] 0.03535533905932342 [-0.77292045  1.23512003  0.46690558 -0.50962555  0.01893409] False 
+
+sars', done = [-0.77292045  1.23512003  0.46690558 -0.50962555  0.01893409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905932331 [-0.74792045  1.26012003  0.49190558 -0.48462555  0.04393409] False 
+
+sars', done = [-0.74792045  1.26012003  0.49190558 -0.48462555  0.04393409] [0.5 0.5 0.5 0.5 0.5] 0.035355339059322644 [-0.72292045  1.28512003  0.51690558 -0.45962555  0.06893409] False 
+
+sars', done = [-0.72292045  1.28512003  0.51690558 -0.45962555  0.06893409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905932209 [-0.69792045  1.31012003  0.54190558 -0.43462555  0.09393409] False 
+
+sars', done = [-0.69792045  1.31012003  0.54190558 -0.43462555  0.09393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905932142 [-0.67292045  1.33512003  0.56690558 -0.40962555  0.11893409] False 
+
+sars', done = [-0.67292045  1.33512003  0.56690558 -0.40962555  0.11893409] [0.5 0.5 0.5 0.5 0.5] 0.035355339059320534 [-0.64792045  1.36012003  0.59190558 -0.38462555  0.14393409] False 
+
+sars', done = [-0.64792045  1.36012003  0.59190558 -0.38462555  0.14393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905931948 [-0.62292045  1.38512003  0.61690558 -0.35962555  0.16893409] False 
+
+sars', done = [-0.62292045  1.38512003  0.61690558 -0.35962555  0.16893409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905931826 [-0.59792045  1.41012003  0.64190558 -0.33462555  0.19393409] False 
+
+sars', done = [-0.59792045  1.41012003  0.64190558 -0.33462555  0.19393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905931659 [-0.57292045  1.43512003  0.66690558 -0.30962555  0.21893409] False 
+
+sars', done = [-0.57292045  1.43512003  0.66690558 -0.30962555  0.21893409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905931437 [-0.54792045  1.46012003  0.69190558 -0.28462555  0.24393409] False 
+
+sars', done = [-0.54792045  1.46012003  0.69190558 -0.28462555  0.24393409] [0.5 0.5 0.5 0.5 0.5] 0.0353553390593116 [-0.52292045  1.48512003  0.71690558 -0.25962555  0.26893409] False 
+
+sars', done = [-0.52292045  1.48512003  0.71690558 -0.25962555  0.26893409] [0.5 0.5 0.5 0.5 0.5] 0.0353553390593076 [-0.49792045  1.51012003  0.74190558 -0.23462555  0.29393409] False 
+
+sars', done = [-0.49792045  1.51012003  0.74190558 -0.23462555  0.29393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905930199 [-0.47292045  1.53512003  0.76690558 -0.20962555  0.31893409] False 
+
+sars', done = [-0.47292045  1.53512003  0.76690558 -0.20962555  0.31893409] [0.5 0.5 0.5 0.5 0.5] 0.0353553390592935 [-0.44792045  1.56012003  0.79190558 -0.18462555  0.34393409] False 
+
+sars', done = [-0.44792045  1.56012003  0.79190558 -0.18462555  0.34393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905928001 [-0.42292045  1.58512003  0.81690558 -0.15962555  0.36893409] False 
+
+sars', done = [-0.42292045  1.58512003  0.81690558 -0.15962555  0.36893409] [0.5 0.5 0.5 0.5 0.5] 0.035355339059256335 [-0.39792045  1.61012003  0.84190558 -0.13462555  0.39393409] False 
+
+sars', done = [-0.39792045  1.61012003  0.84190558 -0.13462555  0.39393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905920901 [-0.37292045  1.63512003  0.86690558 -0.10962555  0.41893409] False 
+
+sars', done = [-0.37292045  1.63512003  0.86690558 -0.10962555  0.41893409] [0.5 0.5 0.5 0.5 0.5] 0.035355339059090676 [-0.34792045  1.66012003  0.89190558 -0.08462555  0.44393409] False 
+
+sars', done = [-0.34792045  1.66012003  0.89190558 -0.08462555  0.44393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905861741 [-0.32292045  1.68512003  0.91690558 -0.05962555  0.46893409] False 
+
+sars', done = [-0.32292045  1.68512003  0.91690558 -0.05962555  0.46893409] [0.5 0.5 0.5 0.5 0.5] 0.03535519322459993 [-0.29792045  1.71012003  0.94190558 -0.03462555  0.49393409] False 
+
+sars', done = [-0.29792045  1.71012003  0.94190558 -0.03462555  0.49393409] [0.5 0.5 0.5 0.5 0.5] -0.03535465062139076 [-0.27292045  1.73512003  0.96690558 -0.00962555  0.51893409] False 
+
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 0 0.6717519847290796 0 21
+#TODO for cont. spaces: reset
+RESET called. State reset to: [ 0.66707688 -2.03656313  0.1048439  -1.39285609  0.15490248]
+Env SEED set to: 3 Returned seed from Gym: 3
+Seeds set to: {'env': 3, 'state_space': 10000, 'action_space': 101}
+#TODO for cont. spaces?: init_reward_function
+#TODO for cont. spaces
+#TODO for cont. spaces: reset
+RESET called. State reset to: [-0.79792045  1.21012003  0.44190558 -0.53462555 -0.00606591]
+self.augmented_state, len [[nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], array([-0.79792045,  1.21012003,  0.44190558, -0.53462555, -0.00606591])] 12
+toy env instantiated with config: {'seed': {'env': 3, 'state_space': 10000, 'action_space': 101}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 5, 'action_space_dim': 5, 'transition_dynamics_order': 1, 'inertia': 2.0, 'time_unit': 0.1, 'delay': 10, 'sequence_length': 1, 'reward_scale': 1.0, 'reward_function': 'move_to_a_point', 'target_point': array([1.71012 , 0.941906]), 'make_denser': True, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'reward_unit': 1.0, 'state_space_relevant_indices': [1, 2], 'action_space_relevant_indices': [1, 2]}
+sars', done = [-0.79792045  1.21012003  0.44190558 -0.53462555 -0.00606591] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.77292045  1.23512003  0.46690558 -0.50962555  0.01893409] False 
+
+sars', done = [-0.77292045  1.23512003  0.46690558 -0.50962555  0.01893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.74792045  1.26012003  0.49190558 -0.48462555  0.04393409] False 
+
+sars', done = [-0.74792045  1.26012003  0.49190558 -0.48462555  0.04393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.72292045  1.28512003  0.51690558 -0.45962555  0.06893409] False 
+
+sars', done = [-0.72292045  1.28512003  0.51690558 -0.45962555  0.06893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.69792045  1.31012003  0.54190558 -0.43462555  0.09393409] False 
+
+sars', done = [-0.69792045  1.31012003  0.54190558 -0.43462555  0.09393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.67292045  1.33512003  0.56690558 -0.40962555  0.11893409] False 
+
+sars', done = [-0.67292045  1.33512003  0.56690558 -0.40962555  0.11893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.64792045  1.36012003  0.59190558 -0.38462555  0.14393409] False 
+
+sars', done = [-0.64792045  1.36012003  0.59190558 -0.38462555  0.14393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.62292045  1.38512003  0.61690558 -0.35962555  0.16893409] False 
+
+sars', done = [-0.62292045  1.38512003  0.61690558 -0.35962555  0.16893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.59792045  1.41012003  0.64190558 -0.33462555  0.19393409] False 
+
+sars', done = [-0.59792045  1.41012003  0.64190558 -0.33462555  0.19393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.57292045  1.43512003  0.66690558 -0.30962555  0.21893409] False 
+
+sars', done = [-0.57292045  1.43512003  0.66690558 -0.30962555  0.21893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.54792045  1.46012003  0.69190558 -0.28462555  0.24393409] False 
+
+sars', done = [-0.54792045  1.46012003  0.69190558 -0.28462555  0.24393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905932342 [-0.52292045  1.48512003  0.71690558 -0.25962555  0.26893409] False 
+
+sars', done = [-0.52292045  1.48512003  0.71690558 -0.25962555  0.26893409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905932331 [-0.49792045  1.51012003  0.74190558 -0.23462555  0.29393409] False 
+
+sars', done = [-0.49792045  1.51012003  0.74190558 -0.23462555  0.29393409] [0.5 0.5 0.5 0.5 0.5] 0.035355339059322644 [-0.47292045  1.53512003  0.76690558 -0.20962555  0.31893409] False 
+
+sars', done = [-0.47292045  1.53512003  0.76690558 -0.20962555  0.31893409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905932209 [-0.44792045  1.56012003  0.79190558 -0.18462555  0.34393409] False 
+
+sars', done = [-0.44792045  1.56012003  0.79190558 -0.18462555  0.34393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905932142 [-0.42292045  1.58512003  0.81690558 -0.15962555  0.36893409] False 
+
+sars', done = [-0.42292045  1.58512003  0.81690558 -0.15962555  0.36893409] [0.5 0.5 0.5 0.5 0.5] 0.035355339059320534 [-0.39792045  1.61012003  0.84190558 -0.13462555  0.39393409] False 
+
+sars', done = [-0.39792045  1.61012003  0.84190558 -0.13462555  0.39393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905931948 [-0.37292045  1.63512003  0.86690558 -0.10962555  0.41893409] False 
+
+sars', done = [-0.37292045  1.63512003  0.86690558 -0.10962555  0.41893409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905931826 [-0.34792045  1.66012003  0.89190558 -0.08462555  0.44393409] False 
+
+sars', done = [-0.34792045  1.66012003  0.89190558 -0.08462555  0.44393409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905931659 [-0.32292045  1.68512003  0.91690558 -0.05962555  0.46893409] False 
+
+sars', done = [-0.32292045  1.68512003  0.91690558 -0.05962555  0.46893409] [0.5 0.5 0.5 0.5 0.5] 0.03535533905931437 [-0.29792045  1.71012003  0.94190558 -0.03462555  0.49393409] False 
+
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 0 0.3535533905932021 0 20
+#TODO for cont. spaces: reset
+RESET called. State reset to: [ 0.66707688 -2.03656313  0.1048439  -1.39285609  0.15490248]
+[32;1;4mTEST_CONTINUOUS_DYNAMICS_TARGET_POINT_SPARSE[0m
+Env SEED set to: 3 Returned seed from Gym: 3
+Seeds set to: {'env': 3, 'state_space': 10000, 'action_space': 101}
+#TODO for cont. spaces?: init_reward_function
+#TODO for cont. spaces
+#TODO for cont. spaces: reset
 RESET called. State reset to: [-0.79792045  1.21012003]
 self.augmented_state, len [[nan, nan], array([-0.79792045,  1.21012003])] 2
-toy env instantiated with config: {'seed': {'env': 3, 'state_space': 10000, 'action_space': 101}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 2, 'action_space_dim': 2, 'transition_dynamics_order': 1, 'inertia': 2.0, 'time_unit': 0.1, 'delay': 0, 'sequence_length': 1, 'reward_scale': 1.0, 'reward_function': 'move_to_a_point', 'target_point': array([-0.29792,  1.71012]), 'make_denser': False, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'reward_unit': 2.0, 'state_space_relevant_indices': range(0, 2), 'action_space_relevant_indices': range(0, 2), 'target_radius': 0.072}..
+toy env instantiated with config: {'seed': {'env': 3, 'state_space': 10000, 'action_space': 101}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 2, 'action_space_dim': 2, 'transition_dynamics_order': 1, 'inertia': 2.0, 'time_unit': 0.1, 'delay': 0, 'sequence_length': 1, 'reward_function': 'move_to_a_point', 'make_denser': False, 'target_point': array([-0.29792,  1.71012]), 'target_radius': 0.072, 'reward_unit': 2.0, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'state_space_relevant_indices': range(0, 2), 'action_space_relevant_indices': range(0, 2)}
 sars', done = [-0.79792045  1.21012003] [0.5 0.5] 0.0 [-0.77292045  1.23512003] False 
 
 sars', done = [-0.77292045  1.23512003] [0.5 0.5] 0.0 [-0.74792045  1.26012003] False 
@@ -1071,6 +1183,168 @@ sars', done = [-0.32292045  1.68512003] [0.5 0.5] 2.0 [-0.29792045  1.71012003] 
 Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 0 6.0 0 20
 #TODO for cont. spaces: reset
 RESET called. State reset to: [ 0.44190558 -0.53462555]
+Env SEED set to: 3 Returned seed from Gym: 3
+Seeds set to: {'env': 3, 'state_space': 10000, 'action_space': 101}
+#TODO for cont. spaces?: init_reward_function
+#TODO for cont. spaces
+#TODO for cont. spaces: reset
+RESET called. State reset to: [-0.79792045  1.21012003]
+self.augmented_state, len [[nan, nan], [nan, nan], [nan, nan], [nan, nan], [nan, nan], [nan, nan], [nan, nan], [nan, nan], [nan, nan], [nan, nan], [nan, nan], array([-0.79792045,  1.21012003])] 12
+toy env instantiated with config: {'seed': {'env': 3, 'state_space': 10000, 'action_space': 101}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 2, 'action_space_dim': 2, 'transition_dynamics_order': 1, 'inertia': 2.0, 'time_unit': 0.1, 'delay': 10, 'sequence_length': 1, 'reward_function': 'move_to_a_point', 'make_denser': False, 'target_point': array([-0.29792,  1.71012]), 'target_radius': 0.072, 'reward_unit': 2.0, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'state_space_relevant_indices': range(0, 2), 'action_space_relevant_indices': range(0, 2)}
+sars', done = [-0.79792045  1.21012003] [0.5 0.5] 0.0 [-0.77292045  1.23512003] False 
+
+sars', done = [-0.77292045  1.23512003] [0.5 0.5] 0.0 [-0.74792045  1.26012003] False 
+
+sars', done = [-0.74792045  1.26012003] [0.5 0.5] 0.0 [-0.72292045  1.28512003] False 
+
+sars', done = [-0.72292045  1.28512003] [0.5 0.5] 0.0 [-0.69792045  1.31012003] False 
+
+sars', done = [-0.69792045  1.31012003] [0.5 0.5] 0.0 [-0.67292045  1.33512003] False 
+
+sars', done = [-0.67292045  1.33512003] [0.5 0.5] 0.0 [-0.64792045  1.36012003] False 
+
+sars', done = [-0.64792045  1.36012003] [0.5 0.5] 0.0 [-0.62292045  1.38512003] False 
+
+sars', done = [-0.62292045  1.38512003] [0.5 0.5] 0.0 [-0.59792045  1.41012003] False 
+
+sars', done = [-0.59792045  1.41012003] [0.5 0.5] 0.0 [-0.57292045  1.43512003] False 
+
+sars', done = [-0.57292045  1.43512003] [0.5 0.5] 0.0 [-0.54792045  1.46012003] False 
+
+sars', done = [-0.54792045  1.46012003] [0.5 0.5] 0.0 [-0.52292045  1.48512003] False 
+
+sars', done = [-0.52292045  1.48512003] [0.5 0.5] 0.0 [-0.49792045  1.51012003] False 
+
+sars', done = [-0.49792045  1.51012003] [0.5 0.5] 0.0 [-0.47292045  1.53512003] False 
+
+sars', done = [-0.47292045  1.53512003] [0.5 0.5] 0.0 [-0.44792045  1.56012003] False 
+
+sars', done = [-0.44792045  1.56012003] [0.5 0.5] 0.0 [-0.42292045  1.58512003] False 
+
+sars', done = [-0.42292045  1.58512003] [0.5 0.5] 0.0 [-0.39792045  1.61012003] False 
+
+sars', done = [-0.39792045  1.61012003] [0.5 0.5] 0.0 [-0.37292045  1.63512003] False 
+
+sars', done = [-0.37292045  1.63512003] [0.5 0.5] 0.0 [-0.34792045  1.66012003] False 
+
+sars', done = [-0.34792045  1.66012003] [0.5 0.5] 0.0 [-0.32292045  1.68512003] False 
+
+sars', done = [-0.32292045  1.68512003] [0.5 0.5] 0.0 [-0.29792045  1.71012003] False 
+
+sars', done = [-0.29792045  1.71012003] [0.5 0.5] 0.0 [-0.27292045  1.73512003] False 
+
+sars', done = [-0.27292045  1.73512003] [0.5 0.5] 0.0 [-0.24792045  1.76012003] False 
+
+sars', done = [-0.24792045  1.76012003] [0.5 0.5] 0.0 [-0.22292045  1.78512003] False 
+
+sars', done = [-0.22292045  1.78512003] [0.5 0.5] 0.0 [-0.19792045  1.81012003] False 
+
+sars', done = [-0.19792045  1.81012003] [0.5 0.5] 0.0 [-0.17292045  1.83512003] False 
+
+sars', done = [-0.17292045  1.83512003] [0.5 0.5] 0.0 [-0.14792045  1.86012003] False 
+
+sars', done = [-0.14792045  1.86012003] [0.5 0.5] 0.0 [-0.12292045  1.88512003] False 
+
+sars', done = [-0.12292045  1.88512003] [0.5 0.5] 2.0 [-0.09792045  1.91012003] False 
+
+sars', done = [-0.09792045  1.91012003] [0.5 0.5] 2.0 [-0.07292045  1.93512003] False 
+
+sars', done = [-0.07292045  1.93512003] [0.5 0.5] 2.0 [-0.04792045  1.96012003] False 
+
+sars', done = [-0.04792045  1.96012003] [0.5 0.5] 2.0 [-0.02292045  1.98512003] False 
+
+sars', done = [-0.02292045  1.98512003] [0.5 0.5] 2.0 [0.00207955 2.01012003] False 
+
+sars', done = [0.00207955 2.01012003] [0.5 0.5] 0.0 [0.02707955 2.03512003] False 
+
+sars', done = [0.02707955 2.03512003] [0.5 0.5] 0.0 [0.05207955 2.06012003] False 
+
+sars', done = [0.05207955 2.06012003] [0.5 0.5] 0.0 [0.07707955 2.08512003] False 
+
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 0 10.0 0 35
+#TODO for cont. spaces: reset
+RESET called. State reset to: [ 0.44190558 -0.53462555]
+Env SEED set to: 3 Returned seed from Gym: 3
+Seeds set to: {'env': 3, 'state_space': 10000, 'action_space': 101}
+#TODO for cont. spaces?: init_reward_function
+#TODO for cont. spaces
+#TODO for cont. spaces: reset
+RESET called. State reset to: [-0.79792045  1.21012003  0.44190558 -0.53462555 -0.00606591]
+self.augmented_state, len [[nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], [nan, nan, nan, nan, nan], array([-0.79792045,  1.21012003,  0.44190558, -0.53462555, -0.00606591])] 12
+toy env instantiated with config: {'seed': {'env': 3, 'state_space': 10000, 'action_space': 101}, 'state_space_type': 'continuous', 'action_space_type': 'continuous', 'state_space_dim': 5, 'action_space_dim': 5, 'transition_dynamics_order': 1, 'inertia': 2.0, 'time_unit': 0.1, 'delay': 10, 'sequence_length': 1, 'reward_function': 'move_to_a_point', 'make_denser': False, 'target_point': array([1.71012 , 0.941906]), 'target_radius': 0.072, 'reward_unit': 2.0, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'state_space_relevant_indices': [1, 2], 'action_space_relevant_indices': [1, 2]}
+sars', done = [-0.79792045  1.21012003  0.44190558 -0.53462555 -0.00606591] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.77292045  1.23512003  0.46690558 -0.50962555  0.01893409] False 
+
+sars', done = [-0.77292045  1.23512003  0.46690558 -0.50962555  0.01893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.74792045  1.26012003  0.49190558 -0.48462555  0.04393409] False 
+
+sars', done = [-0.74792045  1.26012003  0.49190558 -0.48462555  0.04393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.72292045  1.28512003  0.51690558 -0.45962555  0.06893409] False 
+
+sars', done = [-0.72292045  1.28512003  0.51690558 -0.45962555  0.06893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.69792045  1.31012003  0.54190558 -0.43462555  0.09393409] False 
+
+sars', done = [-0.69792045  1.31012003  0.54190558 -0.43462555  0.09393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.67292045  1.33512003  0.56690558 -0.40962555  0.11893409] False 
+
+sars', done = [-0.67292045  1.33512003  0.56690558 -0.40962555  0.11893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.64792045  1.36012003  0.59190558 -0.38462555  0.14393409] False 
+
+sars', done = [-0.64792045  1.36012003  0.59190558 -0.38462555  0.14393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.62292045  1.38512003  0.61690558 -0.35962555  0.16893409] False 
+
+sars', done = [-0.62292045  1.38512003  0.61690558 -0.35962555  0.16893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.59792045  1.41012003  0.64190558 -0.33462555  0.19393409] False 
+
+sars', done = [-0.59792045  1.41012003  0.64190558 -0.33462555  0.19393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.57292045  1.43512003  0.66690558 -0.30962555  0.21893409] False 
+
+sars', done = [-0.57292045  1.43512003  0.66690558 -0.30962555  0.21893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.54792045  1.46012003  0.69190558 -0.28462555  0.24393409] False 
+
+sars', done = [-0.54792045  1.46012003  0.69190558 -0.28462555  0.24393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.52292045  1.48512003  0.71690558 -0.25962555  0.26893409] False 
+
+sars', done = [-0.52292045  1.48512003  0.71690558 -0.25962555  0.26893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.49792045  1.51012003  0.74190558 -0.23462555  0.29393409] False 
+
+sars', done = [-0.49792045  1.51012003  0.74190558 -0.23462555  0.29393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.47292045  1.53512003  0.76690558 -0.20962555  0.31893409] False 
+
+sars', done = [-0.47292045  1.53512003  0.76690558 -0.20962555  0.31893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.44792045  1.56012003  0.79190558 -0.18462555  0.34393409] False 
+
+sars', done = [-0.44792045  1.56012003  0.79190558 -0.18462555  0.34393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.42292045  1.58512003  0.81690558 -0.15962555  0.36893409] False 
+
+sars', done = [-0.42292045  1.58512003  0.81690558 -0.15962555  0.36893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.39792045  1.61012003  0.84190558 -0.13462555  0.39393409] False 
+
+sars', done = [-0.39792045  1.61012003  0.84190558 -0.13462555  0.39393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.37292045  1.63512003  0.86690558 -0.10962555  0.41893409] False 
+
+sars', done = [-0.37292045  1.63512003  0.86690558 -0.10962555  0.41893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.34792045  1.66012003  0.89190558 -0.08462555  0.44393409] False 
+
+sars', done = [-0.34792045  1.66012003  0.89190558 -0.08462555  0.44393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.32292045  1.68512003  0.91690558 -0.05962555  0.46893409] False 
+
+sars', done = [-0.32292045  1.68512003  0.91690558 -0.05962555  0.46893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.29792045  1.71012003  0.94190558 -0.03462555  0.49393409] False 
+
+sars', done = [-0.29792045  1.71012003  0.94190558 -0.03462555  0.49393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.27292045  1.73512003  0.96690558 -0.00962555  0.51893409] False 
+
+sars', done = [-0.27292045  1.73512003  0.96690558 -0.00962555  0.51893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.24792045  1.76012003  0.99190558  0.01537445  0.54393409] False 
+
+sars', done = [-0.24792045  1.76012003  0.99190558  0.01537445  0.54393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.22292045  1.78512003  1.01690558  0.04037445  0.56893409] False 
+
+sars', done = [-0.22292045  1.78512003  1.01690558  0.04037445  0.56893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.19792045  1.81012003  1.04190558  0.06537445  0.59393409] False 
+
+sars', done = [-0.19792045  1.81012003  1.04190558  0.06537445  0.59393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.17292045  1.83512003  1.06690558  0.09037445  0.61893409] False 
+
+sars', done = [-0.17292045  1.83512003  1.06690558  0.09037445  0.61893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.14792045  1.86012003  1.09190558  0.11537445  0.64393409] False 
+
+sars', done = [-0.14792045  1.86012003  1.09190558  0.11537445  0.64393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [-0.12292045  1.88512003  1.11690558  0.14037445  0.66893409] False 
+
+sars', done = [-0.12292045  1.88512003  1.11690558  0.14037445  0.66893409] [0.5 0.5 0.5 0.5 0.5] 2.0 [-0.09792045  1.91012003  1.14190558  0.16537445  0.69393409] False 
+
+sars', done = [-0.09792045  1.91012003  1.14190558  0.16537445  0.69393409] [0.5 0.5 0.5 0.5 0.5] 2.0 [-0.07292045  1.93512003  1.16690558  0.19037445  0.71893409] False 
+
+sars', done = [-0.07292045  1.93512003  1.16690558  0.19037445  0.71893409] [0.5 0.5 0.5 0.5 0.5] 2.0 [-0.04792045  1.96012003  1.19190558  0.21537445  0.74393409] False 
+
+sars', done = [-0.04792045  1.96012003  1.19190558  0.21537445  0.74393409] [0.5 0.5 0.5 0.5 0.5] 2.0 [-0.02292045  1.98512003  1.21690558  0.24037445  0.76893409] False 
+
+sars', done = [-0.02292045  1.98512003  1.21690558  0.24037445  0.76893409] [0.5 0.5 0.5 0.5 0.5] 2.0 [0.00207955 2.01012003 1.24190558 0.26537445 0.79393409] False 
+
+sars', done = [0.00207955 2.01012003 1.24190558 0.26537445 0.79393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [0.02707955 2.03512003 1.26690558 0.29037445 0.81893409] False 
+
+sars', done = [0.02707955 2.03512003 1.26690558 0.29037445 0.81893409] [0.5 0.5 0.5 0.5 0.5] 0.0 [0.05207955 2.06012003 1.29190558 0.31537445 0.84393409] False 
+
+sars', done = [0.05207955 2.06012003 1.29190558 0.31537445 0.84393409] [0.5 0.5 0.5 0.5 0.5] 0.0 [0.07707955 2.08512003 1.31690558 0.34037445 0.86893409] False 
+
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 0 10.0 0 35
+#TODO for cont. spaces: reset
+RESET called. State reset to: [ 0.66707688 -2.03656313  0.1048439  -1.39285609  0.15490248]
 TEST_DISCRETE_ALL_META_FEATURES
 Env SEED set to: 0 Returned seed from Gym: 0
 Seeds set to: {'env': 0, 'relevant_state_space': 8, 'relevant_action_space': 8}
@@ -1081,7 +1355,7 @@ config["irrelevant_action_space_size"] inited to: 0
 Inited terminal states to self.config['is_terminal_state']: [7 6] total 2
 self.relevant_init_state_dist: [0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
  0.         0.        ]
-No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [4, 5, 6] 43 120
+No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [4, 5, 6] 87 120
 specific_sequence that will be rewarded [0, 1, 5]
 specific_sequence that will be rewarded [1, 0, 5]
 specific_sequence that will be rewarded [5, 3, 4]
@@ -1124,7 +1398,7 @@ Total no. of rewarded sequences: 30 Out of 120
  [7 7 7 7 7 7 7 7]] init_transition_function <class 'int'>
 RESET called. curr_state set to: 2
 self.augmented_state, len [nan, nan, nan, nan, 2] 5
-toy env instantiated with config: {'seed': {'env': 0, 'relevant_state_space': 8, 'relevant_action_space': 8}, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'state_space_size': 8, 'action_space_size': 8, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'completely_connected': True, 'repeats_in_sequences': False, 'delay': 1, 'sequence_length': 3, 'reward_unit': 1.0, 'reward_noise': <function TestRLToyEnv.test_discrete_all_meta_features.<locals>.<lambda> at 0x7f210fd99378>, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'state_space_relevant_indices': range(0, 8), 'action_space_relevant_indices': range(0, 8), 'relevant_state_space_size': 8, 'irrelevant_state_space_size': 0, 'relevant_action_space_size': 8, 'irrelevant_action_space_size': 0, 'is_terminal_state': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
+toy env instantiated with config: {'seed': {'env': 0, 'relevant_state_space': 8, 'relevant_action_space': 8}, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'state_space_size': 8, 'action_space_size': 8, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'completely_connected': True, 'repeats_in_sequences': False, 'delay': 1, 'sequence_length': 3, 'reward_unit': 1.0, 'reward_noise': <function TestRLToyEnv.test_discrete_all_meta_features.<locals>.<lambda> at 0x7fa658adc1e0>, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'state_space_relevant_indices': range(0, 8), 'action_space_relevant_indices': range(0, 8), 'relevant_state_space_size': 8, 'irrelevant_state_space_size': 0, 'relevant_action_space_size': 8, 'irrelevant_action_space_size': 0, 'is_terminal_state': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
        0.16666667, 0.        , 0.        ]), 'transition_function': array([[5, 4, 0, 6, 7, 3, 2, 1],
        [4, 7, 2, 6, 5, 1, 0, 3],
        [4, 7, 2, 1, 6, 5, 3, 0],
@@ -1167,7 +1441,7 @@ config["relevant_action_space_size"] inited to: 6
 config["irrelevant_action_space_size"] inited to: 0
 Inited terminal states to self.config['is_terminal_state']: [5] total 1
 self.relevant_init_state_dist: [0.2 0.2 0.2 0.2 0.2 0. ]
-No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [3, 4, 5] 24 60
+No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [3, 4, 5] 40 60
 specific_sequence that will be rewarded [4, 0, 3]
 specific_sequence that will be rewarded [3, 4, 2]
 specific_sequence that will be rewarded [3, 2, 4]
@@ -1182,9 +1456,7 @@ specific_sequence that will be rewarded [0, 3, 4]
 specific_sequence that will be rewarded [1, 0, 2]
 specific_sequence that will be rewarded [1, 4, 0]
 specific_sequence that will be rewarded [0, 2, 1]
-specific_sequence that will be rewarded../rl_toy/envs/rl_toy_env.py:318: DeprecationWarning: elementwise comparison failed; this will raise an error in the future.
-  self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
-. [2, 1, 0]
+specific_sequence that will be rewarded [2, 1, 0]
 Number of generated sequences that did not clash with an existing one when it was generated: 0
 Total no. of rewarded sequences: 15 Out of 60
 [[2 5 4 3 0 1]
@@ -1233,7 +1505,7 @@ config["irrelevant_action_space_size"] inited to: 0
 Inited terminal states to self.config['is_terminal_state']: [7 6] total 2
 self.relevant_init_state_dist: [0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
  0.         0.        ]
-No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [6] 5 6
+No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [6] 3 6
 specific_sequence that will be rewarded [2]
 Number of generated sequences that did not clash with an existing one when it was generated: 0
 Total no. of rewarded sequences: 1 Out of 6
@@ -1318,7 +1590,7 @@ Inited terminal states to self.config['is_terminal_state']: [7 6] total 2
 self.relevant_init_state_dist: [0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
  0.         0.        ]
 self.irrelevant_init_state_dist: [0.2 0.2 0.2 0.2 0.2]
-No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [6] 1 6
+No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [6] 0 6
 specific_sequence that will be rewarded [2]
 Number of generated sequences that did not clash with an existing one when it was generated: 0
 Total no. of rewarded sequences: 1 Out of 6
@@ -1472,7 +1744,7 @@ sars', done = [1, 0, 1, 0, 1] [0, 1, 0, 0, 1, 1] 1.0 [0, 0, 0, 0, 4] False
 
 rew 0.0
 self.possible_remaining_sequences [[[2]]]
-sars', done =... [0, 0, 0, 0, 4] [0, 4, 0, 0, 0, 1] 0.0 [1, 0, 0, 0, 2] False 
+sars', done = [0, 0, 0, 0, 4] [0, 4, 0, 0, 0, 1] 0.0 [1, 0, 0, 0, 2] False 
 
 rew 0.0
 self.possible_remaining_sequences [[[2]]]
@@ -1494,7 +1766,7 @@ config["irrelevant_action_space_size"] inited to: 0
 Inited terminal states to self.config['is_terminal_state']: [7 6] total 2
 self.relevant_init_state_dist: [0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
  0.         0.        ]
-No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [6] 1 6
+No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [6] 3 6
 specific_sequence that will be rewarded [2]
 Number of generated sequences that did not clash with an existing one when it was generated: 0
 Total no. of rewarded sequences: 1 Out of 6
@@ -1543,7 +1815,7 @@ config["irrelevant_action_space_size"] inited to: 0
 Inited terminal states to self.config['is_terminal_state']: [7 6] total 2
 self.relevant_init_state_dist: [0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
  0.         0.        ]
-No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [6] 0 6
+No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [6] 1 6
 specific_sequence that will be rewarded [2]
 Number of generated sequences that did not clash with an existing one when it was generated: 0
 Total no. of rewarded sequences: 1 Out of 6
@@ -1557,7 +1829,7 @@ Total no. of rewarded sequences: 1 Out of 6
  [7 7 7 7 7 7 7 7]] init_transition_function <class 'int'>
 RESET called. curr_state set to: 0
 self.augmented_state, len [nan, 0] 2
-toy env instantiated with config: {'seed': {'env': 0, 'relevant_state_space': 8, 'relevant_action_space': 8}, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'state_space_size': 8, 'action_space_size': 8, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'completely_connected': True, 'repeats_in_sequences': False, 'delay': 0, 'sequence_length': 1, 'reward_unit': 1.0, 'reward_noise': <function TestRLToyEnv.test_discrete_r_noise.<locals>.<lambda> at 0x7f210fac96a8>, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'state_space_relevant_indices': range(0, 8), 'action_space_relevant_indices': range(0, 8), 'relevant_state_space_size': 8, 'irrelevant_state_space_size': 0, 'relevant_action_space_size': 8, 'irrelevant_action_space_size': 0, 'is_terminal_state': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
+toy env instantiated with config: {'seed': {'env': 0, 'relevant_state_space': 8, 'relevant_action_space': 8}, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'state_space_size': 8, 'action_space_size': 8, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'completely_connected': True, 'repeats_in_sequences': False, 'delay': 0, 'sequence_length': 1, 'reward_unit': 1.0, 'reward_noise': <function TestRLToyEnv.test_discrete_r_noise.<locals>.<lambda> at 0x7fa6587edc80>, 'generate_random_mdp': True, 'term_state_reward': 0.0, 'state_space_relevant_indices': range(0, 8), 'action_space_relevant_indices': range(0, 8), 'relevant_state_space_size': 8, 'irrelevant_state_space_size': 0, 'relevant_action_space_size': 8, 'irrelevant_action_space_size': 0, 'is_terminal_state': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
        0.16666667, 0.        , 0.        ]), 'transition_function': array([[5, 4, 0, 6, 7, 3, 2, 1],
        [4, 7, 2, 6, 5, 1, 0, 3],
        [4, 7, 2, 1, 6, 5, 3, 0],
@@ -1614,12 +1886,7 @@ toy env instantiated with config: {'seed': {'env': 0, 'relevant_state_space': 8,
        [4, 1, 6, 2, 7, 3, 0, 5],
        [1, 6, 5, 0, 2, 7, 3, 4],
        [6, 6, 6, 6, 6, 6, 6, 6],
-       [7, 7, 7, 7, 7, 7, 7, 7]], dtype=object)}..
-----------------------------------------------------------------------
-Ran 11 tests in 0.187s
-
-OK
-
+       [7, 7, 7, 7, 7, 7, 7, 7]], dtype=object)}
 rew 0.0
 self.possible_remaining_sequences [[[2]]]
 sars', done = 0 6 0.0 2 False 
@@ -1670,7 +1937,7 @@ config["irrelevant_action_space_size"] inited to: 0
 Inited terminal states to self.config['is_terminal_state']: [7 6] total 2
 self.relevant_init_state_dist: [0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
  0.         0.        ]
-No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [4, 5, 6] 85 120
+No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms [4, 5, 6] 17 120
 specific_sequence that will be rewarded [0, 1, 5]
 specific_sequence that will be rewarded [1, 0, 5]
 specific_sequence that will be rewarded [5, 3, 4]
@@ -1740,11 +2007,11 @@ sars', done = 1 4 1.0 5 False
 [2, 1, 5, 5] with delay 0
 sars', done = 5 2 0.0 5 False 
 
-[1, 5, 5, 3] with delay 0
-sars', done = 5 6 0.0 3 False 
+[1, 5, 5, 6] with delay 0
+sars', done = 5 1 0.0 6 True 
 
-[5, 5, 3, 0] with delay 0
-sars', done = 3 5 0.0 0 False 
+[5, 5, 6, 6] with delay 0
+sars', done = 6 5 0.0 6 True 
 
 Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 0 3.0 0 8
 RESET called. curr_state set to: 4

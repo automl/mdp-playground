@@ -236,6 +236,7 @@ class RLToyEnv(gym.Env):
             assert config["state_space_relevant_indices"] == config["action_space_relevant_indices"], "For continuous spaces, state_space_relevant_indices has to be = action_space_relevant_indices. state_space_relevant_indices was: " + str(config["state_space_relevant_indices"]) + " action_space_relevant_indices was: " + str(config["action_space_relevant_indices"])
             if config["reward_function"] == "move_to_a_point":
                 config["target_point"] = np.array(config["target_point"])
+                assert config["target_point"].shape == (len(config["state_space_relevant_indices"]),), "target_point should have dimensionality = relevant_state_space dimensionality"
 
         self.config = config
         self.sequence_length = config["sequence_length"]
@@ -247,7 +248,10 @@ class RLToyEnv(gym.Env):
             self.dynamics_order = self.config["transition_dynamics_order"]
             self.inertia = self.config["inertia"]
             self.time_unit = self.config["time_unit"]
-            self.reward_scale = self.config["reward_scale"]
+            if "reward_scale" in self.config:
+                self.reward_scale = self.config["reward_scale"] ##TODO assert for which configurations should be available for which types of environments
+            if "reward_unit" in self.config:
+                self.reward_unit = self.config["reward_unit"]
 
         self.total_episodes = 0
 
@@ -485,8 +489,12 @@ class RLToyEnv(gym.Env):
         reward = 0.0
         # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
         state_considered = state if only_query else self.augmented_state # When we imagine a rollout, the user has to provide full augmented state as the argument!!
-        if not isinstance(state_considered, list):
-            state_considered = [state_considered] # to get around case when sequence is an int
+        # if not isinstance(state_considered, list):
+        #     state_considered = [state_considered] # to get around case when sequence is an int; it should always be a list except if a user passes in a state; would rather force them to pass a list: assert for it!!
+        # TODO These asserts are only needed if only_query is True, as users then pass in a state sequence
+        if only_query:
+            assert isinstance(state_considered, list), "state passed in should be a list of states containing at the very least the state at beginning of the transition, s, and the one after it, s'. type was: " + str(type(state_considered))
+            assert len(state_considered) == self.augmented_state_length, "Length of list of states passed should be equal to self.augmented_state_length. It was: " + str(len(state_considered))
 
         if self.config["state_space_type"] == "discrete":
             if not self.config["make_denser"]:
@@ -522,13 +530,14 @@ class RLToyEnv(gym.Env):
         else: # if continuous space
             # print("#TODO for cont. spaces: noise")
             ###TODO Reward for reaching a target point case (with make_dense); Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0.
-            if self.config["reward_function"] == "move_along_a_line":
-                if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because augmented_state_length is always 1 greater than seq_len + del
-                    pass #TODO
-                else:
+            if np.isnan(state_considered[0][0]): # Instead of below check, this is more robust for imaginary transitions
+            # if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because augmented_state_length is always 1 greater than seq_len + del
+                pass #TODO
+            else:
+                if self.config["reward_function"] == "move_along_a_line":
                     # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
                     #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_dist calc.?.
-                    data_ = np.array(self.augmented_state)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
+                    data_ = np.array(state_considered)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
                     data_mean = data_.mean(axis=0)
                     uu, dd, vv = np.linalg.svd(data_ - data_mean)
                     self.logger.info('uu.shape, dd.shape, vv.shape =' + str(uu.shape) + str(dd.shape) + str(vv.shape))
@@ -542,17 +551,22 @@ class RLToyEnv(gym.Env):
 
                     reward += ( - total_dist / self.sequence_length ) * self.reward_scale
 
-            elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
-                if self.config["make_denser"] == True:
-                    reward = -np.linalg.norm(self.augmented_state[-1] - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
-                    reward += np.linalg.norm(self.augmented_state[-2] - self.config["target_point"]) # Reward is the distance moved towards the target point.
-                    # Should rather be the change in distance to target point, so reward given is +ve if "correct" action was taken and so reward function is more natural
-                    # It's true that giving the -ve distance as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural. But the value function is then higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
-                    #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
-                    #TODO also make_denser, sparse rewards only at target
-                else:
-                    if np.linalg.norm(self.augmented_state[-1] - self.config["target_point"]) < self.config["target_radius"]:
-                        reward = self.config["reward_unit"] # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
+                elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
+                    assert self.config["sequence_length"] == 1
+                    if self.config["make_denser"] == True:
+                        old_relevant_state = np.array(state_considered)[-2 - delay, self.config["state_space_relevant_indices"]]
+                        new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
+                        reward = -np.linalg.norm(new_relevant_state - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
+                        reward += np.linalg.norm(old_relevant_state - self.config["target_point"]) # Reward is the distance moved towards the target point.
+                        reward *= self.reward_scale
+                        # Should rather be the change in distance to target point, so reward given is +ve if "correct" action was taken and so reward function is more natural
+                        # It's true that giving the -ve distance as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural. But the value function is then higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
+                        #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
+                        #TODO also make_denser, sparse rewards only at target
+                    else:
+                        new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
+                        if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
+                            reward = self.reward_unit # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
 
         noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
