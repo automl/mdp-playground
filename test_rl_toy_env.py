@@ -295,9 +295,9 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 
-    def test_continuous_dynamics_target_point(self):
+    def test_continuous_dynamics_target_point_dense(self):
         ''''''
-        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_TARGET_POINT\033[0m')
+        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_TARGET_POINT_DENSE\033[0m')
         config = {}
         config["seed"] = {}
         config["seed"]["env"] = 3
@@ -313,7 +313,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["time_unit"] = 0.1
 
         config["delay"] = 0
-        config["sequence_length"] = 1 # seq_len is always going to be 1 for move_to_a_point R. assert for this?
+        config["sequence_length"] = 1 # seq_len is always going to be 1 for move_to_a_point R. assert for this? #TODO
         config["reward_scale"] = 1.0
         config["reward_function"] = "move_to_a_point"
         config["target_point"] = [-0.29792, 1.71012]
@@ -332,15 +332,81 @@ class TestRLToyEnv(unittest.TestCase):
             np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test. That is also the reward given at each step.
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([-0.29792, 1.71012]), atol=1e-6)
-        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
-        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
         env.reset()
         env.close()
 
-        # Test : sparse reward
+        # Test irrelevant dimensions
+        config["state_space_dim"] = 5
+        config["action_space_dim"] = 5
+        config["state_space_relevant_indices"] = [1, 2]
+        config["action_space_relevant_indices"] = [1, 2]
+        config["target_point"] = [1.71012, 0.941906]
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(20):
+            # action = env.action_space.sample()
+            action = np.array([0.5]*5) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test. That is also the reward given at each step.
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([-0.29792 ,  1.71012 ,  0.941906, -0.034626,  0.493934]), atol=1e-6)
+        # check 1 extra step away from target point gives -ve reward
+        next_state, reward, done, info = env.step(action)
+        print("sars', done =", state, action, reward, next_state, done, "\n")
+        np.testing.assert_allclose(-0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this
+        env.reset()
+        env.close()
+
+
+        # Test delay
+        config["delay"] = 10
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(20):
+            # action = env.action_space.sample()
+            action = np.array([0.5]*5) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            if i < 10:
+                np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg='Step: ' + str(i)) # delay part
+            else:
+                np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test. That is also the reward given at each step.
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([-0.29792 ,  1.71012 ,  0.941906, -0.034626,  0.493934]), atol=1e-6)
+        env.reset()
+        env.close()
+
+
+
+    def test_continuous_dynamics_target_point_sparse(self):
+        ''''''
+        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_TARGET_POINT_SPARSE\033[0m')
+        config = {}
+        config["seed"] = {}
+        config["seed"]["env"] = 3
+        config["seed"]["state_space"] = 10000
+        config["seed"]["action_space"] = 101
+
+        config["state_space_type"] = "continuous"
+        config["action_space_type"] = "continuous"
+        config["state_space_dim"] = 2
+        config["action_space_dim"] = 2
+        config["transition_dynamics_order"] = 1
+        config["inertia"] = 2.0
+        config["time_unit"] = 0.1
+
+        config["delay"] = 0
+        config["sequence_length"] = 1 # seq_len is always going to be 1 for move_to_a_point R. assert for this?
+        config["reward_function"] = "move_to_a_point"
         config["make_denser"] = False
+        config["target_point"] = [-0.29792, 1.71012]
         config["target_radius"] = 0.072 # to give reward in 3rd last step. At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test.
         config["reward_unit"] = 2.0
+
+        config["generate_random_mdp"] = True
+
+        # Test : sparse reward
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(20):
@@ -358,6 +424,51 @@ class TestRLToyEnv(unittest.TestCase):
         # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
         env.reset()
         env.close()
+
+
+        # Test delay
+        config["delay"] = 10
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(35):
+            # action = env.action_space.sample()
+            action = np.array([0.5]*2) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            if i < 27 or i >31:
+                np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg='Step: ' + str(i))
+            elif i >=27 and i <=31:
+                np.testing.assert_allclose(2.0, reward, atol=1e-6, err_msg='Step: ' + str(i))
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([0.07708, 2.08512]), atol=1e-6)
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+
+        # Test irrelevant dimensions
+        config["state_space_dim"] = 5
+        config["action_space_dim"] = 5
+        config["state_space_relevant_indices"] = [1, 2]
+        config["action_space_relevant_indices"] = [1, 2]
+        config["target_point"] = [1.71012, 0.941906]
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        for i in range(35):
+            # action = env.action_space.sample()
+            action = np.array([0.5]*5) # just to test if acting "in a line" works
+            next_state, reward, done, info = env.step(action)
+            print("sars', done =", state, action, reward, next_state, done, "\n")
+            if i < 27 or i >31:
+                np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test. That is also the reward given at each step.
+            elif i >=27 and i <=31:
+                np.testing.assert_allclose(2.0, reward, atol=1e-6, err_msg='Step: ' + str(i))
+            state = next_state.copy()
+        np.testing.assert_allclose(state, np.array([0.07708 , 2.08512 , 1.316906, 0.340374, 0.868934]), atol=1e-6)
+        env.reset()
+        env.close()
+
 
     def test_discrete_dynamics(self):
         ''''''
@@ -573,6 +684,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 ###TODO Test for make_denser
+#TODO Tests for imaginary rollouts for discrete and continuous - for different Ps and Rs
 
     def test_discrete_all_meta_features(self):
         '''
