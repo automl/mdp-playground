@@ -354,13 +354,13 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([0.5]*5) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test. That is also the reward given at each step.
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([-0.29792 ,  1.71012 ,  0.941906, -0.034626,  0.493934]), atol=1e-6)
         # check 1 extra step away from target point gives -ve reward
         next_state, reward, done, info = env.step(action)
-        print("sars', done =", state, action, reward, next_state, done, "\n")
+        print("sars', done =", state, action, reward, next_state, done)
         np.testing.assert_allclose(-0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this
         env.reset()
         env.close()
@@ -374,7 +374,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([0.5]*5) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             if i < 10:
                 np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg='Step: ' + str(i)) # delay part
             else:
@@ -441,7 +441,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([0.5]*2) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             if i < 27 or i >31:
                 np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg='Step: ' + str(i))
             elif i >=27 and i <=31:
@@ -466,7 +466,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([0.5]*5) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
-            print("sars', done =", state, action, reward, next_state, done, "\n")
+            print("sars', done =", state, action, reward, next_state, done)
             if i < 27 or i >31:
                 np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test. That is also the reward given at each step.
             elif i >=27 and i <=31:
