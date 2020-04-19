@@ -1,18 +1,18 @@
 import unittest
 
 # import os
-# os.chdir(os.getcwd() + '/rl_toy/envs/')
+# os.chdir(os.getcwd() + '/mdp_playground/envs/')
 # rl_toy_env = __import__('rl_toy_env')
 
 import sys
-sys.path.append('./rl_toy/envs/')
+sys.path.append('./mdp_playground/envs/')
 from rl_toy_env import RLToyEnv
 
 import numpy as np
 import copy
 
 from datetime import datetime
-log_filename = 'test_rl_toy_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
+log_filename = 'test_mdp_playground_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
 
 
 #TODO None of the tests do anything when done = True. Should try calling reset() in one of them and see that this works?

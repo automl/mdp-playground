@@ -30,6 +30,6 @@ These can be plotted using the plot_experiments.ipynb Jupyter Notebook.
 
 It is recommended to OHE the states/actions for Discrete environments before using them in a function approximator since they are not ordinal.
 
-The file -MDP-Playground/rl_toy/envs/rl_toy_env.py contains the code for the Environments. It can be run as python rl_toy_env.py to instantiate Environments and run a random agent on them.
+The file -MDP-Playground/mdp_playground/envs/rl_toy_env.py contains the code for the Environments. It can be run as python rl_toy_env.py to instantiate Environments and run a random agent on them.
 
 Additional experiments can be run by changing the configurations within the run_experiments.py file.

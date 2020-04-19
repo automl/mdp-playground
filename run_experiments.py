@@ -4,17 +4,17 @@ from __future__ import print_function
 
 import numpy as np
 
-from ray.rllib.agents.trainer import Trainer, with_common_config
-from ray.rllib.utils.annotations import override
-from ray.rllib.agents.dqn import DQNTrainer
-from ray.rllib.offline import OutputWriter
+# from ray.rllib.agents.trainer import Trainer, with_common_config
+# from ray.rllib.utils.annotations import override
+# from ray.rllib.agents.dqn import DQNTrainer
+# from ray.rllib.offline import OutputWriter
 
 
 import ray
 from ray import tune
 from ray.rllib.utils.seed import seed as rllib_seed
-import rl_toy
-from rl_toy.envs import RLToyEnv
+import mdp_playground
+from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
 register_env("RLToy-v0", lambda config: RLToyEnv(config))
 

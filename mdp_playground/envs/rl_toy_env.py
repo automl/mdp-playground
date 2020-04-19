@@ -17,55 +17,70 @@ from gym.spaces import Discrete, BoxExtended, DiscreteExtended, MultiDiscreteExt
 
 
 class RLToyEnv(gym.Env):
-    """Example of a custom env"""
+    """
+    The base environment in MDP Playground. It is parameterised and can be instantiated to be an MDP with any of the possible meta-features.
+
+    The configuration for the environment is passed as a dict and contains all the information needed to determine the dynamics of the MDP the instantiated object will emulate. We list here the meta-features:
+        delay:
+        sequence_length:
+        transition_noise:
+        reward_noise:
+        sparsity:
+        reward_unit/reward_scale:
+        terminal_state_density:
+        term_state_reward:
+        term_state_edge: Only for continuous environments.
+        state_space_relevant_indices:
+        action_space_relevant_indices:
+
+    For more details on what each meta-feature means, please refer to the paper at: https://arxiv.org/abs/1909.07750.
+
+    Instead of implementing a new class for every type of MDP, the intent is to capture as many common meta-features across different types of enviroments as possible and to be able to control the difficulty of an envrionment by allowing fine-grained control over each of these meta-features.
+    The class extends OpenAI Gym's environment. Below, we list the important attributes and methods for this class.
+
+    Attributes
+    ----------
+    config : dict
+        the config contains all the details required to generate an environment
+
+    Methods
+    -------
+    init_terminal_states()
+        Initialises terminal states, T
+    init_init_state_dist()
+        Initialises initial state distribution, rho_0
+    init_transition_function()
+        Initialises transition function, P
+    init_reward_function()
+        Initialises reward function, R
+    transition_function(state, action, only_query=True)
+        the transition function of the MDP, P
+    P(state, action)
+        defined as a lambda function in the call to init_transition_function() and is equivalent to calling transition_function() with only_query = False
+    reward_function(state, action, only_query=True)
+        the reward function of the MDP, R
+    R(state, action)
+        defined as a lambda function in the call to init_reward_function() and is equivalent to calling reward_function() with only_query = False
+    get_augmented_state()
+        gets underlying Markovian state of the MDP
+    reset()
+        Resets enviroment state
+    seed()
+        Sets the seed for the numpy RNG used by the enviroment (state and action spaces have their own seeds as well)
+    step(action)
+        Performs 1 transition of the MDP
+    """
 
     def __init__(self, config = None):
-        """config can contain S, A, P, R, an initial distribution function over states (discrete or continuous), set of terminal states, gamma?,
-        info to simulate a fixed/non-fixed delay in rewards (becomes non-Markovian then, need to keep a "delay" amount of previous states in memory),
-        a non-determinism in state transitions, a non-determinism in rewards,
-
-
-        To evaluate a learning algorithm we can compare its learnt models' KL-divergences with the true ones, or compare learnt Q and V with true ones.
-
-
-        config["action_space_type"] = "discrete" or "continuous"
-        config["state_space_type"] = "discrete" or "continuous"
-        config["state_space_size"] = 6
-        config["action_space_size"] = 6
-
-        # config["state_space_dim"] = 2
-        # config["action_space_dim"] = 1
-
-        config["transition_function"]
-        config["reward_function"]
-
-        reward_range: A tuple corresponding to the min and max possible rewards?
-
-        Do not want to write a new class with different parameters every time, so pass the desired functions in config! Could make a randomly generated function MDP class vs a fixed function one
-        #tags # seed # hack # random # fix # TODO # IMP (more hashes means more important),
-        #TODO Test cases to check all assumptions
-        #TODO Mersenne Twister pseudo-random number generator used in Gym: not cryptographically secure!
-        #TODO Different random seeds for S, A, P, R, rho_o and T? Currently 1 for env and 1 for its space.
-        ###TODO How to decide how much to penalise terminal states? It would be really important in guiding the search algorithm. Currently it's 0 reward for terminal states in discrete and continuous envs. Make it configurable.
-        ###TODO Make sure terminal state is reachable by at least 1 path (no. of available actions affects avg. length of path from init. to term. state); no self transition loops?; Make sure each rewarded sequence is reachable; with equal S and A sizes we can make sure every state is reachable from every other state (just pick a random sequence to be the state tranition row for a state - solves previous problems sort of)
-        Can check total no. of unique sequences of length, say, 3 reachable from diff. init. states based on the randomly generated transition function - could generate transition function and generate specific_sequences based on it.
-        Maybe make some parts init states, some term. states and a majority be neither and let rewarded sequences begin from "neither" states (so we can see if algo. can learn to reach a reward-dense region and stay in it) - maybe keep only 1 init and 1 term. state?
-        Can also make discrete/continuous "Euclidean space" with transition function fixed - then problem is with generating sequences (need to maybe from each init. state have a few length n rewardable sequences) - if distance from init state to term. state is large compared to sequence_length, exploration becomes easier? - you do get a signal if term. state is closer (like cliff walking problem) - still, things depend on percentage reachability of rewarded sequences (which increases if close term. states chop off a big part of the search space)
-        ###IMP For having state-action sequences rewardable, need to keep sequences of length 2n + 1 in augmented_state (n + 1 states interleaved with n actions); if P(s, a) is deterministic, state sequences map 1-to-1 with state-action sequences.
-        #Check TODO, fix and bottleneck tags
-        Sources of #randomness (Description needs to be updated for relevant/irrelevant update to playground): Seed for Env.observation_space (to generate discrete P, for noise in discrete P, initial state for continuous), Env.action_space (to generate initial random policy (done by the RL algorithm)), Env. (to generate R for discrete, for noise in R and continuous P, initial state for discrete), irrelevant state space?, irrelevant action space?, also for multi-discrete state and action spaces, self.term_spaces for continuous spaces - but multi-discrete state and term_spaces' sampling aren't used anywhere by Environment right now; ; Check # seed, # random
-        ###TODO Separate out seeds for all the random processes? No, better to have one cryptographically secure PRNG I think! Or better yet, ask uuser to provide seeds for all processes, otherwise we can't get ALL possible distributions of random processes (state and action spaces, etc.) inside the Environment if we set all different seeds based on 1 seed because seeds for the processes inside will be set deterministically.
-        ## TODO Terminal states: Gym expects _us_ to check for 'done' being true; rather set P(s, a) = s for any terminal state!
-        ###IMP relevant_state_space_size should be large enough that after terminal state generation, we have enough num_specific_sequences rewardable!
-        ###IMP Having irrelevant "dimensions" and performing transition dynamics in them for discrete spaces. I think we should not let the dynamics of the irrelevant "dimensions" interfere with the dynamics of the relevant "dimensions". This allows for a clean spearation of what we want the algorithm to pay attention to vs. what we don't it to pay attention to. For continuous spaces, we don't need to have a sperate observation_space with separate dynamics because the way the current dynamics work, the irrelevant and relevant dimensions are cleanly separated.
-        ###IMP Variables I paid most attention to when adding irrelevant dimensions: discrete: config['state_space_size'], self.observation_space, self.curr_state. self.augmented_state; for continuous also self.state_derivatives, config['state_space_dim']
-        #TODO Implement self.logger; command line argument parser; config from YAML file? No, YAML wouldn't allow programmatically modifiable config.
-        #Discount factor Can be used by the algorithm if it wants it, more an intrinsic property of the algorithm. With delay, seq_len, etc., it's not clear how discount factor will work.
-        #catastrophic forgetting: Could have multiple Envs as multiple tasks to tackle it.
-        #intrinsic curiosity: Could have transition dynamics that have uncontrollable parts of the state space with the actions: could be done by just injecting noise for uncontrollable parts of the state space?
+        """
+        Parameters
+        ----------
+        config : dict
+            the class attribute above is initialised to this value after inserting defaults
         """
 
-        if config is None: # sets defaults
+        # Set default settings for config to be able to use class without any config passed
+        if config is None:
             config = {}
 
             # Discrete spaces configs:
@@ -117,7 +132,7 @@ class RLToyEnv(gym.Env):
             config["seed"]["action_space"] = 1 + config["relevant_action_space_size"] # + config["seed"] for discrete, 11 + config["seed"] in case of continuous
             # 12 + config["seed"] for continuous self.term_spaces
 
-
+        # Set other default settings for config to use if config is passed without any values for them
         if "log_level" not in config:
             config["log_level"] = logging.CRITICAL #logging.NOTSET
 
