@@ -6,14 +6,15 @@ from __future__ import print_function
 import sys
 import warnings
 import logging
-import os
+# import os
+import copy
 from datetime import datetime
 import numpy as np
 import scipy
 from scipy import stats
 import gym
-from gym.spaces import Discrete, BoxExtended, DiscreteExtended, MultiDiscreteExtended
-#from gym.utils import seeding
+from gym.spaces import BoxExtended, DiscreteExtended, MultiDiscreteExtended
+# from gym.utils import seeding
 
 
 class RLToyEnv(gym.Env):
@@ -29,19 +30,23 @@ class RLToyEnv(gym.Env):
         reward_unit/reward_scale:
         terminal_state_density:
         term_state_reward:
-        term_state_edge: Only for continuous environments.
+        term_state_edge:
         state_space_relevant_indices:
         action_space_relevant_indices:
 
     For more details on what each meta-feature means, please refer to the paper at: https://arxiv.org/abs/1909.07750.
 
-    Instead of implementing a new class for every type of MDP, the intent is to capture as many common meta-features across different types of enviroments as possible and to be able to control the difficulty of an envrionment by allowing fine-grained control over each of these meta-features.
+    Instead of implementing a new class for every type of MDP, the intent is to capture as many common meta-features across different types of environments as possible and to be able to control the difficulty of an envrionment by allowing fine-grained control over each of these meta-features. The focus is to be as flexible as possible. Mixed continuous and discrete state and action spaces are currently not supported.
     The class extends OpenAI Gym's environment. Below, we list the important attributes and methods for this class.
 
     Attributes
     ----------
     config : dict
         the config contains all the details required to generate an environment
+    rewardable_sequences : list of lists of lists
+        holds the rewardable sequences. Here, the 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), the 2nd index is for the diff. sequences possible for that sequence length, the 3rd index is over the sequence itself.
+    possible_remaining_sequences : list of lists of lists
+        holds, at the current time step, the sequences which might be rewarded at the next time step. Intended to prune out from all the possible rewardable sequences, only the ones we may currently be on. Indices correspond to the ones for rewardable_sequences.
 
     Methods
     -------
@@ -72,7 +77,8 @@ class RLToyEnv(gym.Env):
     """
 
     def __init__(self, config = None):
-        """
+        """Initialises the MDP to be emulated using the settings provided in config
+
         Parameters
         ----------
         config : dict
@@ -270,36 +276,24 @@ class RLToyEnv(gym.Env):
 
         self.total_episodes = 0
 
-        # self.max_real = 100.0 # Take these settings from config
-        # self.min_real = 0.0
-
-        # def num_to_list(num1): #TODO Move this to a Utils file.
-        #     if type(num1) == int or type(num1) == float:
-        #         list1 = [num1]
-        #     elif not isinstance(num1, list):
-        #         raise TypeError("Argument to function should have been an int, float or list. Arg was: " + str(num1))
-        #     return list1
-
         if config["state_space_type"] == "discrete":
             if config["irrelevant_state_space_size"] > 0:
-                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
+                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
                 self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=config["seed"]["irrelevant_state_space"]) #seed # hack
-                self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed # hack
+                self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
             else:
                 self.observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
                 self.relevant_observation_space = self.observation_space
                 # print('id(self.observation_space)', id(self.observation_space), 'id(self.relevant_observation_space)', id(self.relevant_observation_space), id(self.relevant_observation_space) == id(self.observation_space))
 
-        else:
+        else: # cont. spaces
             self.state_space_max = config["state_space_max"] if 'state_space_max' in config else np.inf # should we select a random max? #test?
-            # config["state_space_max"] = num_to_list(config["state_space_max"]) * config["state_space_dim"]
-            # print("config[\"state_space_max\"]", config["state_space_max"])
 
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=config["seed"]["state_space"], dtype=np.float64) #seed # hack #TODO # low and high are 1st 2 and required arguments
+            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=config["seed"]["state_space"], dtype=np.float64) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
 
 
         if config["action_space_type"] == "discrete":
-            if config["irrelevant_state_space_size"] > 0:
+            if config["irrelevant_state_space_size"] > 0: # This has to be for irrelevant_state_space_size and not irrelevant_action_space_size, because there has to be at least 1 irrelevant state to allow transitions in that space!
                 self.relevant_action_space = DiscreteExtended(config["relevant_action_space_size"], seed=config["seed"]["relevant_action_space"]) #seed # hack
                 self.irrelevant_action_space = DiscreteExtended(config["irrelevant_action_space_size"], seed=config["seed"]["irrelevant_action_space"]) #seed # hack
                 self.action_space = MultiDiscreteExtended(config["action_space_size"], seed=config["seed"]["action_space"]) #seed # hack
@@ -307,41 +301,33 @@ class RLToyEnv(gym.Env):
                 self.action_space = DiscreteExtended(config["relevant_action_space_size"], seed=config["seed"]["relevant_action_space"]) #seed # hack #TODO
                 self.relevant_action_space = self.action_space
 
-        else:
+        else: # cont. spaces
             self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
             self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=config["seed"]["action_space"], dtype=np.float64) #seed # hack #TODO
 
 
         if not config["generate_random_mdp"]:
-            #TODO When having a fixed delay/specific sequences, we need to have transition function from tuples of states of diff. lengths to next tuple of states. We can have this tupleness to have Markovianness on 1 or both of dynamics and reward functions.
-            # P(s, a) = s' for deterministic transitions; or a probability dist. function over s' for non-deterministic #TODO keep it a probability function for deterministic too? pdf would be Dirac-Delta at specific points! Can be done in sympy but not scipy I think. Or overload function to return Prob dist.(s') function when called as P(s, a); or pdf or pmf(s, a, s') value when called as P(s, a, s')
             self.P = config["transition_function"] if callable(config["transition_function"]) else lambda s, a: config["transition_function"][s, a] # callable may not be optimal always since it was deprecated in Python 3.0 and 3.1
-            # R(s, a) or (s, a , s') = r for deterministic rewards; or a probability dist. function over r for non-deterministic and then the return value of P() is a function, too! #TODO What happens when config is out of scope? Maybe use as self.config?
             self.R = config["reward_function"] if callable(config["reward_function"]) else lambda s, a: config["reward_function"][s, a]
-            ##### TODO self.P and R were untended to be used as the dynamics functions inside step() - that's why were being inited by user-defined function here; but currently P is being used as dynamics for imagined transitions and transition_function is used for actual transitions in step() instead. So, setting P to manually configured transition means it won't be used in step() as was intended!
         else:
             #TODO Generate state and action space sizes also randomly?
-            ###IMP Order of below inits is important!!
+            ###IMP The order in which the following inits are called is important, so don't change!!
             self.init_terminal_states()
-            self.init_init_state_dist() #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; For continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (for the limits for respective dimension).
-            self.init_reward_function()
+            self.init_init_state_dist() #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; After looking into Gym code, I can say that for continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (and is done for the defined limits for the respective dimension).
             self.init_transition_function()
+            self.init_reward_function()
 
-        #TODO sample at any time from "current"/converged distribution of states according to current policy
+        self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
 
-        self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes it does as also does space); extend Discrete, etc. spaces to sample states at init or at any time acc. to curr. policy?;
         self.logger.info("self.augmented_state, len" + str(self.augmented_state) + str(len(self.augmented_state)))
+        self.logger.info("MDP Playground toy env instantiated with config:" + str(self.config)) #hack
 
-        self.logger.info("toy env instantiated with config:" + str(self.config)) #hack
-
-        # Reward: Have some randomly picked sequences that lead to rewards (can make it sparse or non-sparse setting). Sequence length depends on how difficult we want to make it.
-        # print("self.P:", np.array([[self.P(i, j) for j in range(5)] for i in range(5)]), self.config["transition_function"])
-        # print("self.R:", np.array([[self.R(i, j) for j in range(5)] for i in range(5)]), self.config["reward_function"])
-        # self.R = self.reward_function
-        # print("self.R:", self.R(0, 1))
 
     def init_terminal_states(self):
+        """Initialises terminal state set to be the 'last' states for discrete environments. For continuous environments, terminal states will be in a hypercube centred around config['terminal_states'] with the edge of the hypercube of length config['term_state_edge'].
+
+        """
         if self.config["state_space_type"] == "discrete":
             self.num_terminal_states = int(self.config["terminal_state_density"] * self.config["relevant_state_space_size"])
             if self.num_terminal_states == 0: # Have at least 1 terminal state
@@ -352,14 +338,10 @@ class RLToyEnv(gym.Env):
             self.is_terminal_state = self.config["is_terminal_state"] if callable(self.config["is_terminal_state"]) else lambda s: s in self.config["is_terminal_state"]
 
         else: # if continuous space
-            # print("#TODO for cont. spaces: term states")
+            # print("# TODO for cont. spaces: term states")
             self.term_spaces = []
-            # if 'terminal_states' not in self.config:
-            #     self.config["terminal_states"] = []
-            # if ('term_state_edge' not in self.config):
-            #     self.config["term_state_edge"] = 0
 
-            if 'terminal_states' in self.config: #test? ##TODO Could also generate terminal spaces based on a terminal_state_density given by user. But only for Boxes with limits? For Boxes without limits, could do it for a limited Box 1st and then repeat that pattern indefinitely along each dimension's axis.
+            if 'terminal_states' in self.config: ##TODO For continuous spaces, could also generate terminal spaces based on a terminal_state_density given by user (Currently the user has to design the terminal states they specify such that they would have a given density in space.). But only for Boxes with limits? For Boxes without limits, could do it for a limited subspace of the inifinite Box 1st and then repeat that pattern indefinitely along each dimension's axis. #test?
                 for i in range(len(self.config["terminal_states"])): # List of centres of terminal state regions.
                     assert len(self.config["terminal_states"][i]) == len(self.config["state_space_relevant_indices"]), "Specified terminal state centres should have dimensionality = number of state_space_relevant_indices. That was not the case for centre no.: " + str(i) + ""
                     lows = np.array([self.config["terminal_states"][i][j] - self.config["term_state_edge"]/2 for j in range(len(self.config["state_space_relevant_indices"]))])
@@ -369,30 +351,78 @@ class RLToyEnv(gym.Env):
                 self.logger.debug("self.term_spaces samples:" + str(self.term_spaces[0].sample()) + str(self.term_spaces[-1].sample()))
 
             self.is_terminal_state = lambda s: np.any([self.term_spaces[i].contains(s[self.config["state_space_relevant_indices"]]) for i in range(len(self.term_spaces))]) ### TODO for cont. #test?
-            #### TODO test for terminal states!!
 
 
     def init_init_state_dist(self):
+        """Initialises initial state distrbution, rho_0, to be uniform over the non-terminal states for discrete environments. For both discrete and continuous environemnts, the uniform sampling over non-terminal states is taken care of in reset() when setting the initial state for an episode.
+
+        """
+        # relevant dimensions part
         if self.config["state_space_type"] == "discrete":
             non_term_relevant_state_space_size = self.config["relevant_state_space_size"] - self.num_terminal_states
-            self.config["relevant_init_state_dist"] = np.array([1 / (non_term_relevant_state_space_size) for i in range(non_term_relevant_state_space_size)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use!
-        #TODO make init_state_dist the default sample() for state space?
-            # self.relevant_init_state_dist = self.config["relevant_init_state_dist"] if callable(self.config["relevant_init_state_dist"]) else lambda s: self.config["relevant_init_state_dist"][s] #TODO make the probs. sum to 1 by using Sympy/mpmath? self.relevant_init_state_dist is not used anywhere right now, self.config["relevant_init_state_dist"] is used!
+            self.config["relevant_init_state_dist"] = np.array([1 / (non_term_relevant_state_space_size) for i in range(non_term_relevant_state_space_size)] + [0 for i in range(self.num_terminal_states)]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use?
+            #TODO make init_state_dist the default sample() for state space?
             self.logger.info("self.relevant_init_state_dist:" + str(self.config["relevant_init_state_dist"]))
         else: # if continuous space
-            # print("#TODO for cont. spaces: init_state_dist")
             pass # this is handled in reset where we resample if we sample a term. state
 
-        #irrelevant part
+        #irrelevant dimensions part
         if self.config["state_space_type"] == "discrete":
             if self.config["irrelevant_state_space_size"] > 0:
                 self.config["irrelevant_init_state_dist"] = np.array([1 / (self.config["irrelevant_state_space_size"]) for i in range(self.config["irrelevant_state_space_size"])]) #TODO Currently only uniform distribution over non-terminal states; Use Dirichlet distribution to select prob. distribution to use!
                 self.logger.info("self.irrelevant_init_state_dist:" + str(self.config["irrelevant_init_state_dist"]))
 
 
+    def init_transition_function(self):
+        """Initialises transition function, P by selecting random next states for every (state, action) tuple for discrete environments. For continuous environments, we have 1 option for the transition function which varies depending on dynamics order and inertia and time_unit for a point object.
+
+        """
+
+        # relevant dimensions part
+        if self.config["state_space_type"] == "discrete":
+            self.config["transition_function"] = np.zeros(shape=(self.config["relevant_state_space_size"], self.config["relevant_action_space_size"]), dtype=object)
+            self.config["transition_function"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
+            if self.config["completely_connected"]:
+                for s in range(self.config["relevant_state_space_size"]):
+                    self.config["transition_function"][s] = self.relevant_observation_space.sample(size=self.config["relevant_action_space_size"], replace=False) #random #TODO Preferably use the seed of the Env for this?
+            else:
+                for s in range(self.config["relevant_state_space_size"]):
+                    for a in range(self.config["relevant_action_space_size"]):
+                        self.config["transition_function"][s, a] = self.relevant_observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
+            for s in range(self.config["relevant_state_space_size"] - self.num_terminal_states, self.config["relevant_state_space_size"]):
+                for a in range(self.config["relevant_action_space_size"]):
+                    assert self.is_terminal_state(s) == True
+                    self.config["transition_function"][s, a] = s # Setting P(s, a) = s for terminal states, for P() to be meaningful even if someone doesn't check for 'done' being = True
+
+            self.logger.info(str(self.config["transition_function"]) + "init_transition_function" + str(type(self.config["transition_function"][0, 0])))
+        else: # if continuous space
+            # self.logger.debug("# TODO for cont. spaces") # transition function is fixed parameterisation for cont. right now.
+            pass
+
+        #irrelevant dimensions part
+        if self.config["state_space_type"] == "discrete":
+            if self.config["irrelevant_state_space_size"] > 0: # What about irrelevant_ACTION_space_size > 0? Doesn't matter because only if an irrelevant state exists will an irrelevant action be used. #test to see if setting either irrelevant space to 0 causes crashes.
+                self.config["transition_function_irrelevant"] = np.zeros(shape=(self.config["irrelevant_state_space_size"], self.config["irrelevant_action_space_size"]), dtype=object)
+                self.config["transition_function_irrelevant"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
+                if self.config["completely_connected"]:
+                    for s in range(self.config["irrelevant_state_space_size"]):
+                        self.config["transition_function_irrelevant"][s] = self.irrelevant_observation_space.sample(size=self.config["irrelevant_action_space_size"], replace=False) #random #TODO Preferably use the seed of the Env for this?
+                else:
+                    for s in range(self.config["irrelevant_state_space_size"]):
+                        for a in range(self.config["irrelevant_action_space_size"]):
+                            self.config["transition_function_irrelevant"][s, a] = self.irrelevant_observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
+
+                self.logger.info(str(self.config["transition_function_irrelevant"]) + "init_transition_function _irrelevant" + str(type(self.config["transition_function_irrelevant"][0, 0])))
+
+
+        self.P = lambda s, a: self.transition_function(s, a, only_query = False)
+
     def init_reward_function(self):
+        """Initialises reward function, R by selecting random sequences to be rewardable for discrete environments. For continuous environments, we have fixed available options for the reward function.
+
+        """
+
         #TODO Maybe refactor this code and put useful reusable permutation generators, etc. in one library
-        #print(self.config["reward_function"], "init_reward_function")
         if self.config["state_space_type"] == "discrete":
             non_term_relevant_state_space_size = self.config["relevant_state_space_size"] - self.num_terminal_states
             if self.config["repeats_in_sequences"]:
@@ -446,155 +476,34 @@ class RLToyEnv(gym.Env):
                 assert total_clashes == 0, 'None of the generated sequences should have clashed with an existing rewardable sequence when it was generated. No. of times a clash was detected:' + str(total_clashes)
                 self.logger.info("Total no. of rewarded sequences:" + str(len(self.specific_sequences[self.sequence_length - 1])) + "Out of" + str(num_possible_permutations))
         else: # if continuous space
-            self.logger.debug("#TODO for cont. spaces?: init_reward_function") # reward functions are fixed for cont. right now with a few available choices.
+            # self.logger.debug("# TODO for cont. spaces?: init_reward_function") # reward functions are fixed for cont. right now with a few available choices.
+            pass
 
         self.R = lambda s, a: self.reward_function(s, a, only_query=False)
 
 
-    def init_transition_function(self):
-
-        # Future sequences don't depend on past sequences, only the next state depends on the past sequence of length, say n. n would depend on what order the dynamics are - 1st order would mean only 2 previous states needed to determine next state
-        if self.config["state_space_type"] == "discrete":
-            self.config["transition_function"] = np.zeros(shape=(self.config["relevant_state_space_size"], self.config["relevant_action_space_size"]), dtype=object)
-            self.config["transition_function"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
-            if self.config["completely_connected"]:
-                for s in range(self.config["relevant_state_space_size"]):
-                    self.config["transition_function"][s] = self.relevant_observation_space.sample(size=self.config["relevant_action_space_size"], replace=False) #random #TODO Preferably use the seed of the Env for this?
-            else:
-                for s in range(self.config["relevant_state_space_size"]):
-                    for a in range(self.config["relevant_action_space_size"]):
-                        self.config["transition_function"][s, a] = self.relevant_observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
-            for s in range(self.config["relevant_state_space_size"] - self.num_terminal_states, self.config["relevant_state_space_size"]):
-                for a in range(self.config["relevant_action_space_size"]):
-                    assert self.is_terminal_state(s) == True
-                    self.config["transition_function"][s, a] = s # Setting P(s, a) = s for terminal states, for P() to be meaningful even if someone doesn't check for 'done' being = True
-
-            self.logger.info(str(self.config["transition_function"]) + "init_transition_function" + str(type(self.config["transition_function"][0, 0])))
-        else: # if continuous space
-            self.logger.debug("#TODO for cont. spaces")
-
-
-        #irrelevant part
-        if self.config["state_space_type"] == "discrete":
-            if self.config["irrelevant_state_space_size"] > 0: # What about irrelevant_ACTION_space_size > 0? Doesn't matter because only if an irrelevant state exists will an irrelevant action be used. #test to see if setting either irrelevant space to 0 causes crashes.
-                self.config["transition_function_irrelevant"] = np.zeros(shape=(self.config["irrelevant_state_space_size"], self.config["irrelevant_action_space_size"]), dtype=object)
-                self.config["transition_function_irrelevant"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
-                if self.config["completely_connected"]:
-                    for s in range(self.config["irrelevant_state_space_size"]):
-                        self.config["transition_function_irrelevant"][s] = self.irrelevant_observation_space.sample(size=self.config["irrelevant_action_space_size"], replace=False) #random #TODO Preferably use the seed of the Env for this?
-                else:
-                    for s in range(self.config["irrelevant_state_space_size"]):
-                        for a in range(self.config["irrelevant_action_space_size"]):
-                            self.config["transition_function_irrelevant"][s, a] = self.irrelevant_observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
-
-                self.logger.info(str(self.config["transition_function_irrelevant"]) + "init_transition_function _irrelevant" + str(type(self.config["transition_function_irrelevant"][0, 0])))
-
-
-        self.P = lambda s, a: self.transition_function(s, a, only_query = False)
-
-    def reward_function(self, state, action, only_query=True): #TODO Make reward depend on state_action sequence instead of just state sequence? Maybe only use the action sequence for penalising action magnitude?
-        # Transform multi-discrete to discrete if needed
-        if self.config["state_space_type"] == "discrete":
-            if isinstance(self.config["state_space_size"], list):
-                if self.config["irrelevant_state_space_size"] == 0:
-                    state, action, _, _ = self.multi_discrete_to_discrete(state, action)
-
-        delay = self.delay
-        sequence_length = self.sequence_length
-        reward = 0.0
-        # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
-        state_considered = state if only_query else self.augmented_state # When we imagine a rollout, the user has to provide full augmented state as the argument!!
-        # if not isinstance(state_considered, list):
-        #     state_considered = [state_considered] # to get around case when sequence is an int; it should always be a list except if a user passes in a state; would rather force them to pass a list: assert for it!!
-        # TODO These asserts are only needed if only_query is True, as users then pass in a state sequence
-        if only_query:
-            assert isinstance(state_considered, list), "state passed in should be a list of states containing at the very least the state at beginning of the transition, s, and the one after it, s'. type was: " + str(type(state_considered))
-            assert len(state_considered) == self.augmented_state_length, "Length of list of states passed should be equal to self.augmented_state_length. It was: " + str(len(state_considered))
-
-        if self.config["state_space_type"] == "discrete":
-            if not self.config["make_denser"]:
-                self.logger.debug(str(state_considered) + "with delay" + str(self.config["delay"]))
-                if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
-                    # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
-                    reward += self.reward_unit
-                else:
-                    # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
-                    pass
-            else: # if make_denser
-                for j in range(1, sequence_length + 1):
-            # Check if augmented_states - delay up to different lengths in the past are present in sequence lists of that particular length; if so add them to the list of length
-                    curr_seq_being_checked = state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay]
-                    # print("curr_seq_being_checked, self.possible_remaining_sequences[j - 1]:", curr_seq_being_checked, self.possible_remaining_sequences[j - 1])
-                    if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
-                        count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
-                        # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_unit * j / self.sequence_length)
-                        reward += count_ * self.reward_unit * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
-
-                self.possible_remaining_sequences = [[] for i in range(sequence_length)] #TODO for variable sequence length just maintain a list of lists of lists rewarded_sequences
-                for j in range(0, sequence_length):
-            #        if j == 0:
-                    for k in range(sequence_length):
-                        for l in range(len(self.specific_sequences[k])): # self.specific_sequences[i][j][k] where 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), 2nd index is for the diff. sequences possible for that sequence length, 3rd index is over the sequence
-                            if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]: # if curr_seq_being_checked matches a rewardable sequence up to a length j in the past, i.e., is a prefix of the rewardable sequence,
-                                self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1]) # add it + an extra next state in that sequence to list of possible sequence prefixes to be checked for rewards above
-                ###IMP: Above routine for sequence prefix checking can be coded in a more human understandable manner, but this kind of pruning out of sequences which may not be attainable based on the current past trajectory, done above, should be in principle more efficient?
-
-                self.logger.info("rew" + str(reward))
-                self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
-
-        else: # if continuous space
-            # print("#TODO for cont. spaces: noise")
-            ###TODO Reward for reaching a target point case (with make_dense); Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0.
-            if np.isnan(state_considered[0][0]): # Instead of below check, this is more robust for imaginary transitions
-            # if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because augmented_state_length is always 1 greater than seq_len + del
-                pass #TODO
-            else:
-                if self.config["reward_function"] == "move_along_a_line":
-                    # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
-                    #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_dist calc.?.
-                    data_ = np.array(state_considered)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
-                    data_mean = data_.mean(axis=0)
-                    uu, dd, vv = np.linalg.svd(data_ - data_mean)
-                    self.logger.info('uu.shape, dd.shape, vv.shape =' + str(uu.shape) + str(dd.shape) + str(vv.shape))
-                    line_end_pts = vv[0] * np.linspace(-1, 1, 2)[:, np.newaxis] # vv[0] = 1st eigenvector, corres. to Principal Component #hardcoded -100 to 100 to get a "long" line which should make calculations more robust(?: didn't seem to be the case for 1st few trials, so changed it to -1, 1; even tried up to 10000 - seems to get less precise for larger numbers) to numerical issues in dist_of_pt_from_line() below; newaxis added so that expected broadcasting takes place
-                    line_end_pts += data_mean
-
-                    total_dist = 0
-                    for data_pt in data_: # find total distance of all data points from the fit line above
-                        total_dist += dist_of_pt_from_line(data_pt, line_end_pts[0], line_end_pts[-1])
-                    self.logger.info('total_dist of pts from fit line:' + str(total_dist))
-
-                    reward += ( - total_dist / self.sequence_length ) * self.reward_scale
-
-                elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
-                    assert self.config["sequence_length"] == 1
-                    if self.config["make_denser"] == True:
-                        old_relevant_state = np.array(state_considered)[-2 - delay, self.config["state_space_relevant_indices"]]
-                        new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
-                        reward = -np.linalg.norm(new_relevant_state - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
-                        reward += np.linalg.norm(old_relevant_state - self.config["target_point"]) # Reward is the distance moved towards the target point.
-                        reward *= self.reward_scale
-                        # Should rather be the change in distance to target point, so reward given is +ve if "correct" action was taken and so reward function is more natural
-                        # It's true that giving the -ve distance as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural. But the value function is then higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
-                        #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
-                        #TODO also make_denser, sparse rewards only at target
-                    else:
-                        new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
-                        if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
-                            reward = self.reward_unit # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
-
-
-        noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
-        self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
-        self.total_reward_episode += reward
-        reward += noise_in_reward
-        return reward
-
     def transition_function(self, state, action, only_query=True):
-        # only_query when true performs an imaginary transition i.e. augmented state etc. are not updated;
-        # print("Before transition", self.augmented_state)
+        """The transition function, P.
 
-        # Transform multi-discrete to discrete if needed
+        Performs a transition according to the initialised P for discrete environments (with dynamics independent for relevant vs irrelevant dimension sub-spaces). For continuous environments, we have a fixed available option for the dynamics (which is the same for relevant or irrelevant dimensions):
+        The order of the system decides the dynamics. For an nth order system, the nth order derivative of the state is set to the action value / inertia for time_unit seconds. And then the dynamics are integrated over the time_unit to obtain the next state.
+
+        Parameters
+        ----------
+        state : list
+            The state that the environment will use to perform a transition.
+        action : list
+            The action that the environment will use to perform a transition.
+        only_query: boolean
+            Option for the user to perform "imaginary" transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide the state to this function to be able to perform a rollout. For continuous environments, this is NOT currently supported. ##TODO
+
+        Returns
+        -------
+        int or np.array
+            The state at the end of the current transition
+        """
+
+        # Transform multi-discrete to discrete for discrete state spaces with irrelevant dimensions
         if self.config["state_space_type"] == "discrete":
             if isinstance(self.config["state_space_size"], list):
                 if self.config["irrelevant_state_space_size"] > 0:
@@ -617,7 +526,7 @@ class RLToyEnv(gym.Env):
                 next_state = new_next_state
                 # assert np.sum(probs) == 1, str(np.sum(probs)) + " is not equal to " + str(1)
 
-            #irrelevant part
+            #irrelevant dimensions part
             if self.config["irrelevant_state_space_size"] > 0:
                 if self.config["irrelevant_action_space_size"] > 0: # only if there's an irrelevant action does a transition take place (even a noisy one)
                     next_state_irrelevant = self.config["transition_function_irrelevant"][state_irrelevant, action_irrelevant]
@@ -684,18 +593,140 @@ class RLToyEnv(gym.Env):
                     next_state = self.discrete_to_multi_discrete(next_state, next_state_irrelevant)
                 else:
                     next_state = self.discrete_to_multi_discrete(next_state)
-            # print("After transition", self.augmented_state)
-        #TODO Check ergodicity of MDP/policy? Can calculate probability of a rewardable specific sequence occurring (for a random policy)
-        # print("TEEEEEST:", self.config["transition_function"], [state, action])
-        # if next_state in self.config["is_terminal_state"]:
-        #     print("NEXT_STATE:", next_state, next_state in self.config["is_terminal_state"])
+
         return next_state
 
+    def reward_function(self, state, action, only_query=True):
+        """The reward function, R.
+
+        Rewards the sequences selected to be rewardable at initialisation for discrete environments. For continuous environments, we have fixed available options for the reward function:
+            move_to_a_point rewards for moving to a predefined location. It has sparse and dense settings.
+            move_along_a_line rewards moving along ANY direction in space as long as it's a fixed direction for sequence_length consecutive steps.
+
+        Parameters
+        ----------
+        state : list
+            The augmented state that the environment uses to calculate its reward. Normally, just the sequence of past states of length delay + sequence_length + 1.
+        action : list
+            It's currently NOT used to calculate the reward. Since the underlying MDP dynamics are deterministic a state and action map 1-to-1 with the next state and just a sequence of states should be enough to calculate the reward. But it might be useful in the future, e.g., to penalise action magnitudes
+        only_query: boolean
+            Option for the user to perform "imaginary" transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide a list of states to this function to be able to perform a rollout.
+
+        Returns
+        -------
+        double
+            The reward at the end of the current transition
+
+        #TODO Make reward depend on the action sequence too instead of just state sequence, as it is currently? Maybe only use the action sequence for penalising action magnitude?
+        """
+
+        # Transform multi-discrete to discrete if needed. This is only needed for only_query = True to be able to transform multi-discrete state and action passed by user into underlying discrete state and action!
+        if only_query: #test
+            if self.config["state_space_type"] == "discrete":
+                if isinstance(self.config["state_space_size"], list):
+                    # The following part is commented out because irrelevant parts are not needed in the reward_function.
+                    # if self.config["irrelevant_state_space_size"] > 0:
+                    #     state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(state, action, irrelevant_parts=True)
+                    # else:
+                    for i in range(len(state)):
+                        state[i], action, _, _ = self.multi_discrete_to_discrete(state[i], action)
+
+        delay = self.delay
+        sequence_length = self.sequence_length
+        reward = 0.0
+        # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
+        state_considered = state if only_query else self.augmented_state # When we imagine a rollout, the user has to provide full augmented state as the argument!!
+        # if not isinstance(state_considered, list):
+        #     state_considered = [state_considered] # to get around case when sequence is an int; it should always be a list except if a user passes in a state; would rather force them to pass a list: assert for it!!
+        # TODO These asserts are only needed if only_query is True, as users then pass in a state sequence
+        if only_query:
+            assert isinstance(state_considered, list), "state passed in should be a list of states containing at the very least the state at beginning of the transition, s, and the one after it, s'. type was: " + str(type(state_considered))
+            assert len(state_considered) == self.augmented_state_length, "Length of list of states passed should be equal to self.augmented_state_length. It was: " + str(len(state_considered))
+
+        if self.config["state_space_type"] == "discrete":
+            if not self.config["make_denser"]:
+                self.logger.debug(str(state_considered) + "with delay" + str(self.config["delay"]))
+                if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
+                    # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
+                    reward += self.reward_unit
+                else:
+                    # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
+                    pass
+            else: # if make_denser
+                for j in range(1, sequence_length + 1):
+            # Check if augmented_states - delay up to different lengths in the past are present in sequence lists of that particular length; if so add them to the list of length
+                    curr_seq_being_checked = state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay]
+                    # print("curr_seq_being_checked, self.possible_remaining_sequences[j - 1]:", curr_seq_being_checked, self.possible_remaining_sequences[j - 1])
+                    if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
+                        count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
+                        # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_unit * j / self.sequence_length)
+                        reward += count_ * self.reward_unit * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
+
+                self.possible_remaining_sequences = [[] for i in range(sequence_length)] #TODO for variable sequence length just maintain a list of lists of lists rewarded_sequences
+                for j in range(0, sequence_length):
+            #        if j == 0:
+                    for k in range(sequence_length):
+                        for l in range(len(self.specific_sequences[k])): # self.specific_sequences[i][j][k] where 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), 2nd index is for the diff. sequences possible for that sequence length, 3rd index is over the sequence
+                            if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]: # if curr_seq_being_checked matches a rewardable sequence up to a length j in the past, i.e., is a prefix of the rewardable sequence,
+                                self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1]) # add it + an extra next state in that sequence to list of possible sequence prefixes to be checked for rewards above
+                ###IMP: Above routine for sequence prefix checking can be coded in a more human understandable manner, but this kind of pruning out of "sequences which may not be attainable" based on the current past trajectory, done above, should be in principle more efficient?
+
+                self.logger.info("rew" + str(reward))
+                self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
+
+        else: # if continuous space
+            ###TODO Reward for reaching a target point case (with make_dense); Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0.
+            if np.isnan(state_considered[0][0]): # Instead of below commented out check, this is more robust for imaginary transitions
+            # if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because augmented_state_length is always 1 greater than seq_len + del
+                pass #TODO
+            else:
+                if self.config["reward_function"] == "move_along_a_line":
+                    # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
+                    #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_dist calc.?.
+                    data_ = np.array(state_considered)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
+                    data_mean = data_.mean(axis=0)
+                    uu, dd, vv = np.linalg.svd(data_ - data_mean)
+                    self.logger.info('uu.shape, dd.shape, vv.shape =' + str(uu.shape) + str(dd.shape) + str(vv.shape))
+                    line_end_pts = vv[0] * np.linspace(-1, 1, 2)[:, np.newaxis] # vv[0] = 1st eigenvector, corres. to Principal Component #hardcoded -100 to 100 to get a "long" line which should make calculations more robust(?: didn't seem to be the case for 1st few trials, so changed it to -1, 1; even tried up to 10000 - seems to get less precise for larger numbers) to numerical issues in dist_of_pt_from_line() below; newaxis added so that expected broadcasting takes place
+                    line_end_pts += data_mean
+
+                    total_dist = 0
+                    for data_pt in data_: # find total distance of all data points from the fit line above
+                        total_dist += dist_of_pt_from_line(data_pt, line_end_pts[0], line_end_pts[-1])
+                    self.logger.info('total_dist of pts from fit line:' + str(total_dist))
+
+                    reward += ( - total_dist / self.sequence_length ) * self.reward_scale
+
+                elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
+                    assert self.config["sequence_length"] == 1
+                    if self.config["make_denser"] == True:
+                        old_relevant_state = np.array(state_considered)[-2 - delay, self.config["state_space_relevant_indices"]]
+                        new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
+                        reward = -np.linalg.norm(new_relevant_state - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
+                        reward += np.linalg.norm(old_relevant_state - self.config["target_point"]) # Reward is the distance moved towards the target point.
+                        reward *= self.reward_scale
+                        # Should rather be the change in distance to target point, so reward given is +ve if "correct" action was taken and so reward function is more natural
+                        # It's true that giving the -ve distance as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural. But the value function is then higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
+                        #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
+                        #TODO also make_denser, sparse rewards only at target
+                    else:
+                        new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
+                        if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
+                            reward = self.reward_unit # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
+
+
+        noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
+        self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
+        self.total_reward_episode += reward
+        reward += noise_in_reward
+        return reward
+
     def discrete_to_multi_discrete(self, relevant_part, irrelevant_part=None):
+        '''Transforms relevant and irrelevant parts of state (NOT action) space from discrete to its multi-discrete representation which is the externally visible observation_space from the environment when multi-discrete environments are selected.
+
+        #TODO Generalise function to also be able to transform actions. Right now not a priority because actions are not returned in P, only the next state is.
         '''
-        Transforms relevant and irrelevant parts of state (NOT action) space from discrete to its multi-discrete representation which is the externally visible observation_space from the Environment
-        #TODO Generalise function to also be able to transform actions
-        '''
+
         relevant_part = transform_discrete_to_multi_discrete(relevant_part, self.relevant_state_space_maxes)
         combined_ = relevant_part
         if self.config["irrelevant_state_space_size"] > 0:
@@ -708,9 +739,9 @@ class RLToyEnv(gym.Env):
         return list(combined_)
 
     def multi_discrete_to_discrete(self, state, action, irrelevant_parts=False):
+        '''Transforms multi-discrete representations of state and action to their discrete equivalents. Needed at the beginnings of P and R to convert externally visible observation_space from the environment to the internally used observation space that is used inside P and R.
         '''
-        Transforms multi-discrete representations of state and action to their discrete equivalents. Needed at the beginnings of P and R to convert externally visible observation_space from the Environment to the internal observation_space that is used inside P and R
-        '''
+
         relevant_part_state = transform_multi_discrete_to_discrete(np.array(state)[np.array(self.config['state_space_relevant_indices'])], self.relevant_state_space_maxes)
         relevant_part_action = transform_multi_discrete_to_discrete(np.array(action)[np.array(self.config['action_space_relevant_indices'])], self.relevant_action_space_maxes)
         irrelevant_part_state = None
@@ -722,21 +753,16 @@ class RLToyEnv(gym.Env):
 
         return relevant_part_state, relevant_part_action, irrelevant_part_state, irrelevant_part_action
 
-    def get_augmented_state(self):
-        '''
-        Intended to return the full augmented state which would be Markovian. For noisy processes, this would need the noise distribution and random seed too? Also add the irrelevant state parts, etc.? #TODO
-        '''
-        if self.config["state_space_type"] == "discrete":
-            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
-        else:
-            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
-        return augmented_state_dict
-
     def reset(self):
-        # TODO reset is also returning info dict to be able to return state in addition to observation;
-        # TODO Do not start in a terminal state.
+        '''Resets the environment for the beginning of an episode and samples a start state from rho_0. For discrete environments uses the defined rho_0 directly. For continuous environments, samples a state and resamples until a non-terminal state is sampled.
 
-        # on episode "end" stuff (to not be invoked when reset() called when self.total_episodes = 0; end is quoted because it may not be a true episode end reached by reaching a terminal state, but reset() may have been called in the middle of an episode):
+        Returns
+        -------
+        int or np.array
+            The start state for a new episode.
+        '''
+
+        # on episode "end" stuff (to not be invoked when reset() called when self.total_episodes = 0; end is in quotes because it may not be a true episode end reached by reaching a terminal state, but reset() may have been called in the middle of an episode):
         if not self.total_episodes == 0:
             self.logger.info("Noise stats for previous episode num.:" + str(self.total_episodes) + "(total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions):" + str(self.total_abs_noise_in_reward_episode) + str(self.total_abs_noise_in_transition_episode) + str(self.total_reward_episode) + str(self.total_noisy_transitions_episode) + str(self.total_transitions_episode))
 
@@ -759,7 +785,7 @@ class RLToyEnv(gym.Env):
             self.logger.info("RESET called. curr_state set to:" + str(self.curr_state))
             self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state_relevant)
-            # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays
+            # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays which is not possible with np.array!
         else: # if continuous space
             self.logger.debug("#TODO for cont. spaces: reset")
             while True: # Be careful about infinite loops
@@ -789,8 +815,7 @@ class RLToyEnv(gym.Env):
         self.total_transitions_episode = 0
 
 
-        # This part just initializes self.possible_remaining_sequences to hold 1st state in all rewardable sequences, which will be checked for after 1st step of the episode to give rewards.
-        ### TODO Move this part to reset()? Done. But even before, this small bug shouldn't have caused a problem because the sub-sequences, i.e. prefixes, of length >1 in possible_remaining_sequences would have been checked against NaNs for the past states and would have not contributed to the reward.
+        # This part initializes self.possible_remaining_sequences to hold 1st state in all rewardable sequences, which will be checked for after 1st step of the episode to give rewards.
         if self.config["state_space_type"] == "discrete" and self.config["make_denser"] == True:
             delay = self.delay
             sequence_length = self.sequence_length
@@ -808,21 +833,60 @@ class RLToyEnv(gym.Env):
         return self.curr_state
 
     def step(self, action):
-        # assert self.action_space.contains(action) , str(action) + " not in" # TODO Need to implement check in for this environment
-        #TODO check self.done and throw error if it's True? (Gym doesn't do it!); Otherwise, define self transitions in terminal states
+        """The step function for the environment.
+
+        Parameters
+        ----------
+        action : int or np.array
+            The action that the environment will use to perform a transition.
+
+        Returns
+        -------
+        int or np.array, double, boolean, dict
+            The next state, reward, whether the episode terminated and additional info dict at the end of the current transition
+        """
         self.curr_state = self.P(self.curr_state, action)
-        self.reward = self.R(self.curr_state, action) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state to be able to do that. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
+        self.reward = self.R(self.curr_state, action) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
 
 
         self.done = self.is_terminal_state(self.curr_state)
         if self.done:
             self.reward += self.config["term_state_reward"]
         self.logger.info('sas\'r:' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
-        return self.curr_state, self.reward, self.done, {"curr_state": self.curr_state}
+        return self.curr_state, self.reward, self.done, self.get_augmented_state()
+
+    def get_augmented_state(self):
+        '''Intended to return the full augmented state which would be Markovian. (However, it's not Markovian wrt the noise in P and R because we're not returning the underlying RNG.) Currently, returns the augmented state which is the sequence of length "delay + sequence_length + 1" of past states for both discrete and continuous environments. Additonally, the current state derivatives are also returned for continuous enviroments.
+
+        Returns
+        -------
+        dict
+            Contains at the end of the current transition
+
+        #TODO For noisy processes, this would need the noise distribution and random seed too. Also add the irrelevant state parts, etc.? We don't need the irrelevant parts for the state to be Markovian.
+        '''
+        if self.config["state_space_type"] == "discrete":
+            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
+        else:
+            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
+        return augmented_state_dict
 
     def seed(self, seed=None):
+        """Initialises the Numpy RNG for the environment by calling a utility for this in Gym.
+
+        The environment has its own RNG and so do the state and action spaces held by the environment.
+
+        Parameters
+        ----------
+        seed : int
+            seed to initialise the np_random instance held by the environment. Cannot use numpy.int64 or similar because Gym doesn't accept it.
+
+        Returns
+        -------
+        int
+            The seed returned by Gym
+        """
         # If seed is None, you get a randomly generated seed from gym.utils...
-        # if seed is not None:
         self.np_random, self.seed_ = gym.utils.seeding.np_random(seed) #random
         self.logger.info("Env SEED set to:" + str(seed) + "Returned seed from Gym:" + str(self.seed_))
         return self.seed_
@@ -842,18 +906,10 @@ def transform_discrete_to_multi_discrete(scalar, vector_maxes):
     return np.argwhere(np.arange(np.prod(vector_maxes)).reshape(vector_maxes) == scalar).flatten()
 
 
-# class OT4RL():
-#     """Functions to perform calculations of metrics like Wasserstein distance. Useful for tracking learning progress by getting the distance between learnt and true models."""
-#
-#     def __init__(self, config = None):
-
-def mean_sinkhorn_dist(model_1_P, model_2_P, model_1_R=None, model_2_R=None, weighted=True):
-    """Calculates the mean approx. Wasserstein dist. between P(s, a) distributions over all the possible (s, a) values, each dist. weighted by the |R(s, a)| magnitudes. Can optionally be unweighted.
-       If model_1_R=None and model_2_R=None, then model_1_P and model_2_P can be general models for which averaged approx. Wasserstein dist. (i.e. sinkhorn divergence) is calculated, for e.g., they could even be models of R().
-    """
-
-#distance of a point from a line: https://softwareengineering.stackexchange.com/questions/168572/distance-from-point-to-n-dimensional-line
 def dist_of_pt_from_line(pt, ptA, ptB):
+    '''Returns shortest distance of a point from a line defined by 2 points - ptA and ptB. Based on: https://softwareengineering.stackexchange.com/questions/168572/distance-from-point-to-n-dimensional-line
+    '''
+
     lineAB = ptA - ptB
     lineApt = ptA - pt
     dot_product = np.dot(lineAB, lineApt)
@@ -873,10 +929,11 @@ if __name__ == "__main__":
     config = {}
     config["seed"] = 0 #seed, 7 worked for initially sampling within term state subspace
 
+    # Simple discrete environment usage example
     # config["state_space_type"] = "discrete"
     # config["action_space_type"] = "discrete"
-    # config["relevant_state_space_size"] = 6
-    # config["relevant_action_space_size"] = 6
+    # config["state_space_size"] = 6
+    # config["action_space_size"] = 6
     # config["reward_density"] = 0.25 # Number between 0 and 1
     # config["make_denser"] = True
     # config["terminal_state_density"] = 0.25 # Number between 0 and 1
@@ -885,42 +942,39 @@ if __name__ == "__main__":
     # config["delay"] = 1
     # config["sequence_length"] = 3
     # config["reward_unit"] = 1.0
+    # # config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
+    # # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
 
-
-    config["state_space_type"] = "continuous"
-    config["action_space_type"] = "continuous"
-    config["state_space_dim"] = 4
-    config["action_space_dim"] = 4
-    config["transition_dynamics_order"] = 1
-    config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
+    # Simple continuous environment usage example
+    # config["state_space_type"] = "continuous"
+    # config["action_space_type"] = "continuous"
+    # config["state_space_dim"] = 2
+    # config["action_space_dim"] = 2
+    # config["transition_dynamics_order"] = 1
+    # config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
     # config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
     # config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
-    config["time_unit"] = 1 # Discretization of time domain
+    # config["time_unit"] = 1 # Discretization of time domain
     # config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
     # config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
-
-    config["delay"] = 1
-    config["sequence_length"] = 10
-    config["reward_scale"] = 1.0
-#    config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
-    # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
-    # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
+    #
+    # config["delay"] = 1
+    # config["sequence_length"] = 10
+    # config["reward_scale"] = 1.0
+    # # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
+    # # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
+    # config["reward_function"] = "move_along_a_line"
 
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
     env = RLToyEnv(config)
-#    env.seed(0)
-#    from rl_toy.envs import RLToyEnv
-#    env = gym.make("RLToy-v0")
-#    print("env.spec.max_episode_steps, env.unwrapped:", env.spec.max_episode_steps, env.unwrapped)
-    state = env.get_augmented_state()['curr_state']
-    # print("TEST", type(state))
+    state = copy.copy(env.get_augmented_state()['curr_state'])
     for _ in range(20):
         # env.render() # For GUI
-        action = env.action_space.sample() # take a #random action # TODO currently DiscreteExtended returns a sampled array
+        action = env.action_space.sample() # take a #random action
         # action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done, "\n")
-        state = next_state
+        state = copy.copy(next_state)
     env.reset()
     env.close()
 
