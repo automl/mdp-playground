@@ -43,6 +43,8 @@ class RLToyEnv(gym.Env):
     ----------
     config : dict
         the config contains all the details required to generate an environment
+    seed : int or dict
+        recommended to set to int, which would set seeds for the env, relevant and irrelevant and externally visible observation and action spaces automatically. If fine-grained control over the seeds is necessary, a dict, with key values as in the source code further below, can be passed
     rewardable_sequences : list of lists of lists
         holds the rewardable sequences. Here, the 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), the 2nd index is for the diff. sequences possible for that sequence length, the 3rd index is over the sequence itself.
     possible_remaining_sequences : list of lists of lists

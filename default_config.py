@@ -6,6 +6,8 @@ sequence_lengths = [1, 2, 3, 4]#i for i in range(1,4)]
 reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
 # make_reward_dense = [True, False]
 terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
+transition_noises = [0]#, 0.01, 0.02, 0.10, 0.25]
+reward_noises = [0]#, 1, 5, 10, 25] # Std dev. of normal dist.
 algorithms = ["DQN"]
 seeds = [i for i in range(num_seeds)]
 # Others, keep the rest fixed for these: learning_starts, target_network_update_freq, double_dqn, fcnet_hiddens, fcnet_activation, use_lstm, lstm_seq_len, sample_batch_size/train_batch_size, learning rate
