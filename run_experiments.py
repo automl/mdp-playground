@@ -1,3 +1,7 @@
+'''Script to run experiments in MDP Playground.
+
+Takes a configuration file and experiment name as arguments.
+'''
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -16,12 +20,12 @@ import sys, os
 import argparse
 import configparser
 
-parser = argparse.ArgumentParser(description='Run experiments for MDP Playground')
+parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
                    help='Configuration file containing configuration space to run. It must be a Python file so config can be given programmatically. '
-                   'Remove the .py extension when providing the filename. See default_config.py for an example.')
-parser.add_argument('-o', '--output-file', dest='csv_stats_file', action='store', default='temp234',
-                   help='Prefix of output file. It will save stats to 2 CSV files, with the filenames as the one given as argument'
+                   'Remove the .py extension when providing the filename. See default_config.py for an example. Config files for various experiments are present in the experiments directory.')
+parser.add_argument('-e', '--exp-name', dest='exp_name', action='store', default='temp234',
+                   help='The user-chosen name of the experiment. This is used as the prefix of the output files. It will save stats to 2 CSV files, with the filenames as the one given as argument'
                    'and another file with an extra "_eval" in the filename that contains evaluation stats during the training. Appends to existing files or creates new ones if they don\'t exist.')
 
 args = parser.parse_args()
@@ -43,21 +47,21 @@ print("Number of seeds for environment:", config.num_seeds)
 # print(os.path.abspath(args.config_file)) # 'experiments/dqn_seq_del.py'
 # sys.exit(0)
 
-args.csv_stats_file = os.path.abspath(args.csv_stats_file)
-print("Stats file being written to:", args.csv_stats_file)
+args.exp_name = os.path.abspath(args.exp_name)
+print("Stats file being written to:", args.exp_name)
 
 
 from ray.rllib.models.preprocessors import OneHotPreprocessor
 from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
-ray.init() #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so had to work around by giving full filename in args.csv_stats_file.
+ray.init() #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so had to work around by giving full filename in args.exp_name.
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density ')
 print(config.algorithms, config.state_space_sizes, config.action_space_sizes, config.delays, config.sequence_lengths, config.reward_densities, config.terminal_state_densities)
 
 
-hack_filename = args.csv_stats_file + '.csv'
+hack_filename = args.exp_name + '.csv'
 fout = open(hack_filename, 'a') #hardcoded
 fout.write('# training_iteration, Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density, transition_noise, reward_noise, dummy_seed, timesteps_total, episode_reward_mean, episode_len_mean\n')
 fout.close()
@@ -99,7 +103,7 @@ def on_train_result(info):
     # print(os.getcwd())
 
     # We did not manage to find an easy way to log evaluation stats for Ray without the following hack which demarcates the end of a training iteration in the evaluation stats file
-    hack_filename_eval = args.csv_stats_file + '_eval.csv'
+    hack_filename_eval = args.exp_name + '_eval.csv'
     fout = open(hack_filename_eval, 'a') #hardcoded
     fout.write('#HACK STRING EVAL' + "\n")
     fout.close()
@@ -114,7 +118,7 @@ def on_episode_end(info):
         # print("###on_episode_end info", info["env"].get_unwrapped()[0].config["make_denser"], info["episode"].total_reward, info["episode"].length) #, info["episode"]._agent_reward_history)
         reward_this_episode = info["episode"].total_reward
         length_this_episode = info["episode"].length
-        hack_filename_eval = args.csv_stats_file + '_eval.csv'
+        hack_filename_eval = args.exp_name + '_eval.csv'
         fout = open(hack_filename_eval, 'a') #hardcoded
         fout.write(str(reward_this_episode) + ' ' + str(length_this_episode) + "\n")
         fout.close()
