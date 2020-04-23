@@ -43,12 +43,15 @@ print("Number of seeds for environment:", config.num_seeds)
 # print(os.path.abspath(args.config_file)) # 'experiments/dqn_seq_del.py'
 # sys.exit(0)
 
+args.csv_stats_file = os.path.abspath(args.csv_stats_file)
+print("Stats file being written to:", args.csv_stats_file)
+
 
 from ray.rllib.models.preprocessors import OneHotPreprocessor
 from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
-ray.init(local_mode=True)
+ray.init() #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so had to work around by giving full filename in args.csv_stats_file.
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, terminal_state_density ')
 print(config.algorithms, config.state_space_sizes, config.action_space_sizes, config.delays, config.sequence_lengths, config.reward_densities, config.terminal_state_densities)
@@ -91,6 +94,9 @@ def on_train_result(info):
     fout.write(str(transition_noise) + ' ' + str(reward_noise) + ' ' + str(dummy_seed) + ' ' + str(timesteps_total) + ' ' + str(episode_reward_mean) +
                ' ' + str(episode_len_mean) + '\n')
     fout.close()
+
+    # print("##### hack_filename: ", hack_filename)
+    # print(os.getcwd())
 
     # We did not manage to find an easy way to log evaluation stats for Ray without the following hack which demarcates the end of a training iteration in the evaluation stats file
     hack_filename_eval = args.csv_stats_file + '_eval.csv'
@@ -142,87 +148,79 @@ for algorithm in config.algorithms: #TODO each one has different config_spaces
             for delay in config.delays:
                 for sequence_length in config.sequence_lengths:
                     for reward_density in config.reward_densities:
-                        for terminal_state_density in config.terminal_state_densities:
-                            for transition_noise in config.transition_noises:
-                                for reward_noise in config.reward_noises:
-                                    for dummy_seed in config.seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
-                                        agent_config = config.agent_config
-                                        env_config = {
-                                            "env": "RLToy-v0",
-                                            "env_config": {
-                                                'dummy_seed': dummy_seed, # The seed is dummy because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
-                                                'seed': 0, #seed
-                                                'state_space_type': 'discrete',
-                                                'action_space_type': 'discrete',
-                                                'state_space_size': state_space_size,
-                                                'action_space_size': action_space_size,
-                                                'generate_random_mdp': True,
-                                                'delay': delay,
-                                                'sequence_length': sequence_length,
-                                                'reward_density': reward_density,
-                                                'terminal_state_density': terminal_state_density,
-                                                'repeats_in_sequences': False,
-                                                'reward_unit': 1.0,
-                                                'make_denser': False,
-                                                'completely_connected': True,
-                                                'transition_noise': transition_noise,
-                                                'reward_noise': tune.function(lambda a: a.normal(0, reward_noise)),
-                                                'reward_noise_std': reward_noise, #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above
-                                            },
-                                        }
+                        for make_denser in config.make_densers:
+                            for terminal_state_density in config.terminal_state_densities:
+                                for transition_noise in config.transition_noises:
+                                    for reward_noise in config.reward_noises:
+                                        for dummy_seed in config.seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
+                                            agent_config = config.agent_config
+                                            model_config = config.model_config
+                                            if model_config["model"]["use_lstm"]:
+                                                model_config["model"]["max_seq_len"] = delay + sequence_length
 
-                                        model_config = {
-                                            "model": {
-                                                "fcnet_hiddens": [256, 256],
-                                                "custom_preprocessor": "ohe",
-                                                "custom_options": {},  # extra options to pass to your preprocessor
-                                                "fcnet_activation": "tanh",
-                                                "use_lstm": False,
-                                                "max_seq_len": 20,
-                                                "lstm_cell_size": 256,
-                                                "lstm_use_prev_action_reward": False,
-                                            },
-                                        }
+                                            env_config = {
+                                                "env": "RLToy-v0",
+                                                "env_config": {
+                                                    'dummy_seed': dummy_seed, # The seed is dummy because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
+                                                    'seed': 0, #seed
+                                                    'state_space_type': 'discrete',
+                                                    'action_space_type': 'discrete',
+                                                    'state_space_size': state_space_size,
+                                                    'action_space_size': action_space_size,
+                                                    'generate_random_mdp': True,
+                                                    'delay': delay,
+                                                    'sequence_length': sequence_length,
+                                                    'reward_density': reward_density,
+                                                    'terminal_state_density': terminal_state_density,
+                                                    'repeats_in_sequences': False,
+                                                    'reward_unit': 1.0,
+                                                    'make_denser': make_denser,
+                                                    'completely_connected': True,
+                                                    'transition_noise': transition_noise,
+                                                    'reward_noise': tune.function(lambda a: a.normal(0, reward_noise)),
+                                                    'reward_noise_std': reward_noise, #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above
+                                                },
+                                            }
 
-                                        eval_config = {
-                                            "evaluation_interval": 1, # I think this means every x training_iterations
-                                            "evaluation_config": {
-                                            "exploration_fraction": 0,
-                                            "exploration_final_eps": 0,
-                                            "batch_mode": "complete_episodes",
-                                            'horizon': 100,
-                                              "env_config": {
-                                                "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-                                                'transition_noise': 0,
-                                                'reward_noise': tune.function(lambda a: a.normal(0, 0))
-                                                }
-                                            },
-                                        }
+                                            eval_config = {
+                                                "evaluation_interval": 1, # I think this means every x training_iterations
+                                                "evaluation_config": {
+                                                "exploration_fraction": 0,
+                                                "exploration_final_eps": 0,
+                                                "batch_mode": "complete_episodes",
+                                                'horizon': 100,
+                                                  "env_config": {
+                                                    "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+                                                    'transition_noise': 0,
+                                                    'reward_noise': tune.function(lambda a: a.normal(0, 0))
+                                                    }
+                                                },
+                                            }
 
-                                        extra_config = {
-                                            "callbacks": {
-                                #                 "on_episode_start": tune.function(on_episode_start),
-                                #                 "on_episode_step": tune.function(on_episode_step),
-                                                "on_episode_end": tune.function(on_episode_end),
-                                #                 "on_sample_end": tune.function(on_sample_end),
-                                                "on_train_result": tune.function(on_train_result),
-                                #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
-                                                    },
-                                        }
+                                            extra_config = {
+                                                "callbacks": {
+                                    #                 "on_episode_start": tune.function(on_episode_start),
+                                    #                 "on_episode_step": tune.function(on_episode_step),
+                                                    "on_episode_end": tune.function(on_episode_end),
+                                    #                 "on_sample_end": tune.function(on_sample_end),
+                                                    "on_train_result": tune.function(on_train_result),
+                                    #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+                                                        },
+                                            }
 
-                                        # tune_config = reduce(deepmerge, [agent_config, env_config, model_config, eval_config, extra_config])
-                                        tune_config = {**agent_config, **env_config, **model_config, **eval_config, **extra_config}
-                                        print("tune_config:",)
-                                        pp.pprint(tune_config)
+                                            # tune_config = reduce(deepmerge, [agent_config, env_config, model_config, eval_config, extra_config])
+                                            tune_config = {**agent_config, **model_config, **env_config, **eval_config, **extra_config}
+                                            print("tune_config:",)
+                                            pp.pprint(tune_config)
 
-                                        tune.run(
-                                            algorithm,
-                                            stop={
-                                                "timesteps_total": 20000,
-                                                  },
-                                            config=tune_config
-                                            #return_trials=True # add trials = tune.run( above
-                                        )
+                                            tune.run(
+                                                algorithm,
+                                                stop={
+                                                    "timesteps_total": 20000,
+                                                      },
+                                                config=tune_config
+                                                #return_trials=True # add trials = tune.run( above
+                                            )
 
 end = time.time()
 print("No. of seconds to run:", end - start)

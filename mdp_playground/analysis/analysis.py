@@ -3,6 +3,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 class MDPP_Analysis():
+    '''Utility class to load and plot data for analysis of experiments from MDP Playground
+
+    '''
     def __init__(self):
         pass
 
@@ -161,7 +164,7 @@ class MDPP_Analysis():
         y_axis_label = 'Reward'
 
         plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
-        print(stats_data.shape)
+        # print(stats_data.shape)
 
         mean_data_ = np.mean(stats_data[:, :, :, :, :, :, :, -2], axis=-1)
         to_plot_ = np.squeeze(mean_data_)
