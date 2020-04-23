@@ -12,6 +12,7 @@ variable_configs = {
 
 # fixed_configs hold the ConfigSpace values which don't vary over the runs.
 #TODO Just do a for loop over the merge of each of the variable_configs in Cartesian product with the fixed_configs.
+#TODO What about the case when the configspace isn't fixed, e.g., when diff. algs. such as DQN and A3C are used the HPs are diff.?! Would be a conditional configspace and cause problems for the cartesian product of the variable config.
 
 
 def deepmerge(a, b, path=None):

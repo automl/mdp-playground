@@ -5,7 +5,9 @@ import unittest
 # rl_toy_env = __import__('rl_toy_env')
 
 import sys
-sys.path.append('./mdp_playground/envs/')
+# insert at 1, 0 is the script path (or '' in REPL)
+sys.path.insert(1, './mdp_playground/envs/')
+# sys.path.append('./mdp_playground/envs/')
 from rl_toy_env import RLToyEnv
 
 import numpy as np

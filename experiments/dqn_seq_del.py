@@ -1,4 +1,4 @@
-num_seeds = 3
+num_seeds = 10
 state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
 action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
 delays = [0] + [2**i for i in range(4)]
@@ -30,6 +30,6 @@ agent_config = {
     "sample_batch_size": 4,
     "schedule_max_timesteps": 20000,
     "target_network_update_freq": 800,
-    "timesteps_per_iteration": 100,
+    "timesteps_per_iteration": 1000,
     "train_batch_size": 32,
 }

@@ -17,19 +17,31 @@ import argparse
 import configparser
 
 parser = argparse.ArgumentParser(description='Run experiments for MDP Playground')
-parser.add_argument('--config-file', dest='config_file', action='store', default='default_config',
+parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
                    help='Configuration file containing configuration space to run. It must be a Python file so config can be given programmatically. '
                    'Remove the .py extension when providing the filename. See default_config.py for an example.')
-parser.add_argument('--output-file', dest='csv_stats_file', action='store', default='temp234',
+parser.add_argument('-o', '--output-file', dest='csv_stats_file', action='store', default='temp234',
                    help='Prefix of output file. It will save stats to 2 CSV files, with the filenames as the one given as argument'
                    'and another file with an extra "_eval" in the filename that contains evaluation stats during the training. Appends to existing files or creates new ones if they don\'t exist.')
 
 args = parser.parse_args()
 print("Parsed args:", args)
 
+if args.config_file[-3:] == '.py':
+    args.config_file = args.config_file[:-3]
+
+config_file_path = os.path.abspath('/'.join(args.config_file.split('/')[:-1]))
+# print("config_file_path:", config_file_path)
+sys.path.insert(1, config_file_path)
 import importlib
-config = importlib.import_module(args.config_file, package=None)
+config = importlib.import_module(args.config_file.split('/')[-1], package=None)
 print("Number of seeds for environment:", config.num_seeds)
+
+
+# import default_config
+# print("default_config:", default_config)
+# print(os.path.abspath(args.config_file)) # 'experiments/dqn_seq_del.py'
+# sys.exit(0)
 
 
 from ray.rllib.models.preprocessors import OneHotPreprocessor
@@ -90,9 +102,10 @@ def on_train_result(info):
 
 
 # Ray callback to write evaluation stats to CSV file at end of every training iteration
+# on_episode_end is used because these results won't be available on_train_result but only after every episode has ended during evaluation (evaluation phase is checked for by using dummy_eval)
 def on_episode_end(info):
     if "dummy_eval" in info["env"].get_unwrapped()[0].config:
-        print("###on_episode_end info", info["env"].get_unwrapped()[0].config["make_denser"], info["episode"].total_reward, info["episode"].length) #, info["episode"]._agent_reward_history)
+        # print("###on_episode_end info", info["env"].get_unwrapped()[0].config["make_denser"], info["episode"].total_reward, info["episode"].length) #, info["episode"]._agent_reward_history)
         reward_this_episode = info["episode"].total_reward
         length_this_episode = info["episode"].length
         hack_filename_eval = args.csv_stats_file + '_eval.csv'
@@ -100,6 +113,28 @@ def on_episode_end(info):
         fout.write(str(reward_this_episode) + ' ' + str(length_this_episode) + "\n")
         fout.close()
 
+
+from functools import reduce
+def deepmerge(a, b, path=None):
+    '''Merges dict b into dict a
+
+    Based on: https://stackoverflow.com/questions/7204805/how-to-merge-dictionaries-of-dictionaries/7205107#7205107
+    '''
+    if path is None: path = []
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                deepmerge(a[key], b[key], path + [str(key)])
+            elif a[key] == b[key]:
+                pass # same leaf value
+            else:
+                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        else:
+            a[key] = b[key]
+    return a
+
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
 
 for algorithm in config.algorithms: #TODO each one has different config_spaces
     for state_space_size in config.state_space_sizes:
@@ -111,38 +146,12 @@ for algorithm in config.algorithms: #TODO each one has different config_spaces
                             for transition_noise in config.transition_noises:
                                 for reward_noise in config.reward_noises:
                                     for dummy_seed in config.seeds: #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
-                                        tune.run(
-                                            algorithm,
-                                            stop={
-                                                "timesteps_total": 20000,
-                                                  },
-                                            config={
-                                              "adam_epsilon": 1e-4,
-                                              "beta_annealing_fraction": 1.0,
-                                              "buffer_size": 1000000,
-                                              "double_q": False,
-                                              "dueling": False,
-                                              "exploration_final_eps": 0.01,
-                                              "exploration_fraction": 0.1,
-                                              "final_prioritized_replay_beta": 1.0,
-                                              "hiddens": None,
-                                              "learning_starts": 1000,
-                                              "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
-                                              "n_step": 1,
-                                              "noisy": False,
-                                              "num_atoms": 1,
-                                              "prioritized_replay": False,
-                                              "prioritized_replay_alpha": 0.5,
-                                              "sample_batch_size": 4,
-                                              "schedule_max_timesteps": 20000,
-                                              "target_network_update_freq": 800,
-                                              "timesteps_per_iteration": 100,
-                                              "train_batch_size": 32,
-
-                                              "env": "RLToy-v0",
-                                              "env_config": {
-                                                'dummy_seed': dummy_seed,
-                                                'seed': 1, #seed
+                                        agent_config = config.agent_config
+                                        env_config = {
+                                            "env": "RLToy-v0",
+                                            "env_config": {
+                                                'dummy_seed': dummy_seed, # The seed is dummy because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
+                                                'seed': 0, #seed
                                                 'state_space_type': 'discrete',
                                                 'action_space_type': 'discrete',
                                                 'state_space_size': state_space_size,
@@ -158,19 +167,39 @@ for algorithm in config.algorithms: #TODO each one has different config_spaces
                                                 'completely_connected': True,
                                                 'transition_noise': transition_noise,
                                                 'reward_noise': tune.function(lambda a: a.normal(0, reward_noise)),
-                                                # 'reward_noise_std': reward_noise,
-                                                },
-                                                "model": {
-                                                    "fcnet_hiddens": [256, 256],
-                                                    "custom_preprocessor": "ohe",
-                                                    "custom_options": {},  # extra options to pass to your preprocessor
-                                                    "fcnet_activation": "tanh",
-                                                    "use_lstm": False,
-                                                    "max_seq_len": 20,
-                                                    "lstm_cell_size": 256,
-                                                    "lstm_use_prev_action_reward": False,
-                                                },
+                                                'reward_noise_std': reward_noise, #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above
+                                            },
+                                        }
 
+                                        model_config = {
+                                            "model": {
+                                                "fcnet_hiddens": [256, 256],
+                                                "custom_preprocessor": "ohe",
+                                                "custom_options": {},  # extra options to pass to your preprocessor
+                                                "fcnet_activation": "tanh",
+                                                "use_lstm": False,
+                                                "max_seq_len": 20,
+                                                "lstm_cell_size": 256,
+                                                "lstm_use_prev_action_reward": False,
+                                            },
+                                        }
+
+                                        eval_config = {
+                                            "evaluation_interval": 1, # I think this means every x training_iterations
+                                            "evaluation_config": {
+                                            "exploration_fraction": 0,
+                                            "exploration_final_eps": 0,
+                                            "batch_mode": "complete_episodes",
+                                            'horizon': 100,
+                                              "env_config": {
+                                                "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+                                                'transition_noise': 0,
+                                                'reward_noise': tune.function(lambda a: a.normal(0, 0))
+                                                }
+                                            },
+                                        }
+
+                                        extra_config = {
                                             "callbacks": {
                                 #                 "on_episode_start": tune.function(on_episode_start),
                                 #                 "on_episode_step": tune.function(on_episode_step),
@@ -179,21 +208,21 @@ for algorithm in config.algorithms: #TODO each one has different config_spaces
                                                 "on_train_result": tune.function(on_train_result),
                                 #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
                                                     },
-                                            "evaluation_interval": 1, # I think this means every x training_iterations
-                                            "evaluation_config": {
-                                            "exploration_fraction": 0,
-                                            "exploration_final_eps": 0,
-                                            "batch_mode": "complete_episodes",
-                                            'horizon': 100,
-                                              "env_config": {
-                                                "dummy_eval": True, #hack
-                                                'transition_noise': 0,
-                                                'reward_noise': tune.function(lambda a: a.normal(0, 0))
-                                                }
-                                            },
-                                            },
-                                         #return_trials=True # add trials = tune.run( above
-                                         )
+                                        }
+
+                                        # tune_config = reduce(deepmerge, [agent_config, env_config, model_config, eval_config, extra_config])
+                                        tune_config = {**agent_config, **env_config, **model_config, **eval_config, **extra_config}
+                                        print("tune_config:",)
+                                        pp.pprint(tune_config)
+
+                                        tune.run(
+                                            algorithm,
+                                            stop={
+                                                "timesteps_total": 20000,
+                                                  },
+                                            config=tune_config
+                                            #return_trials=True # add trials = tune.run( above
+                                        )
 
 end = time.time()
 print("No. of seconds to run:", end - start)
