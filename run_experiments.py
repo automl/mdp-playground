@@ -20,7 +20,7 @@ import sys, os
 import argparse
 import configparser
 
-parser = argparse.ArgumentParser(description=__doc__)
+parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
 parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
                    help='Configuration file containing configuration space to run. It must be a Python file so config can be given programmatically. '
                    'Remove the .py extension when providing the filename. See default_config.py for an example. Config files for various experiments are present in the experiments directory.')

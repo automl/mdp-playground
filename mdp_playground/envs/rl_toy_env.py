@@ -19,25 +19,46 @@ from gym.spaces import BoxExtended, DiscreteExtended, MultiDiscreteExtended
 
 class RLToyEnv(gym.Env):
     """
-    The base environment in MDP Playground. It is parameterised and can be instantiated to be an MDP with any of the possible meta-features.
+    The base environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible meta-features. The class extends OpenAI Gym's environment.
 
-    The configuration for the environment is passed as a dict and contains all the information needed to determine the dynamics of the MDP the instantiated object will emulate. We list here the meta-features:
-        delay:
-        sequence_length:
-        transition_noise:
-        reward_noise:
-        sparsity:
-        reward_unit/reward_scale:
-        terminal_state_density:
-        term_state_reward:
-        term_state_edge:
-        state_space_relevant_indices:
-        action_space_relevant_indices:
+    The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP the instantiated object will emulate. We recommend looking at the examples in example.py to begin using the environment since the config options are mostly self-explanatory. For more details, we list here the meta-features and config options (their names here correspond to the keys to be passed in the config dict):
+        delay: Delays reward by this number of steps.
+        sequence_length: Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length rewardable at init if generate_random_mdp = true.
+        transition_noise: For discrete environments, a fraction = fraction of times environment, uniformly at random, transitions to a noisy state. For continuous environments, a lambda function added to next state.
+        reward_noise: A lambda function added to the reward given at every time step.
+        reward_density: The fraction of possible sequences of a given length that will be selected to be rewardable at init.
+        reward_scale: Scales default reward function by this value.
+        reward_shift: Shifts default reward function by this value.
+        terminal_state_density: For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states, w.l.o.g. because discrete states are categorical. For continuous, see terminal_states and term_state_edge for how to control terminal states.
+        term_state_reward: Adds this to the _current_ reward if a terminal state was reached at current time step.
+        state_space_relevant_indices: A list that provides the relevant "dimensions" for continuous and multi-discrete environments. The dynamics for these dimensions are independent of the dynamics for the remaining (irrelevant) dimensions.
+        action_space_relevant_indices: Same description as state_space_relevant_indices. For continuous environments, it should be equal to state_space_relevant_indices.
 
-    For more details on what each meta-feature means, please refer to the paper at: https://arxiv.org/abs/1909.07750.
+    Other important config:
+        Only for discrete environments:
+            generate_random_mdp: If true, generates a random MDP.
+            repeats_in_sequences: If true, allows sequences to have repeating states in them.
+            completely_connected: If true, sets the transition function such that every state can transition to every other state, including itself.
+            state_space_size: A number specifying size of state space for uni-discrete environments and a list for multi-discrete environments.
+            action_space_size: Same description as state_space_size.
+        Only for continuous environments:
+            state_space_dim: A number specifying dimensionality.
+            action_space_dim: Same description as state_space_dim.
+            terminal_states: The centres of hypercube subspaces which are terminal.
+            term_state_edge: The edge of the hypercube subspaces which are terminal.
+            transition_dynamics_order: An order of n implies that the n-th state derivative is set equal to the action/inertia.
+            inertia: inertia of the rigid body or point object simulated
+            time_unit: time duration over which the action is applied to the system
+            reward_function: A string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_pt.
+            target_point: The target point in case move_to_a_pt a is the reward_function. If make_denser is true, target_radius determines distance from target point at which reward is handed out.
+        make_denser: If true, makes the reward denser in environments. For discrete environments, hands out a reward for completing part of a sequence. For continuous environment, for reward function move_to_a_pt, it's based on the distance moved towards the target point.
+        seed: Recommended to be passed as an int which generates seeds to be used for various components of the environment. It is however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for it below to see how to do that.
+        log_filename: Prefix for the name of the log file to which logs are written.
+
+    The accompanying paper is available at at: https://arxiv.org/abs/1909.07750.
 
     Instead of implementing a new class for every type of MDP, the intent is to capture as many common meta-features across different types of environments as possible and to be able to control the difficulty of an envrionment by allowing fine-grained control over each of these meta-features. The focus is to be as flexible as possible. Mixed continuous and discrete state and action spaces are currently not supported.
-    The class extends OpenAI Gym's environment. Below, we list the important attributes and methods for this class.
+    Below, we list the important attributes and methods for this class.
 
     Attributes
     ----------
@@ -60,21 +81,21 @@ class RLToyEnv(gym.Env):
         Initialises transition function, P
     init_reward_function()
         Initialises reward function, R
-    transition_function(state, action, only_query=True)
+    transition_function(state, action, only_query=False)
         the transition function of the MDP, P
     P(state, action)
         defined as a lambda function in the call to init_transition_function() and is equivalent to calling transition_function() with only_query = False
-    reward_function(state, action, only_query=True)
+    reward_function(state, action, only_query=False)
         the reward function of the MDP, R
     R(state, action)
         defined as a lambda function in the call to init_reward_function() and is equivalent to calling reward_function() with only_query = False
     get_augmented_state()
         gets underlying Markovian state of the MDP
     reset()
-        Resets enviroment state
+        Resets environment state
     seed()
-        Sets the seed for the numpy RNG used by the enviroment (state and action spaces have their own seeds as well)
-    step(action)
+        Sets the seed for the numpy RNG used by the environment (state and action spaces have their own seeds as well)
+    step(action, only_query=False)
         Performs 1 transition of the MDP
     """
 
@@ -121,7 +142,7 @@ class RLToyEnv(gym.Env):
             config["delay"] = 0
             config["sequence_length"] = 3
             config["repeats_in_sequences"] = False
-            config["reward_unit"] = 1.0
+            config["reward_scale"] = 1.0
             config["reward_density"] = 0.25 # Number between 0 and 1
 #            config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
 #            config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
@@ -149,6 +170,7 @@ class RLToyEnv(gym.Env):
         # log_filename = "logs/output.log"
         # os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 
+        # print('config["log_level"]', config["log_level"])
         logging.basicConfig(filename=config["log_filename"], filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=config["log_level"])
         self.logger = logging.getLogger(__name__)
 
@@ -170,7 +192,7 @@ class RLToyEnv(gym.Env):
         else: # if seed dict was passed
             self.seed(config["seed"]["env"]) #seed
 
-        logging.warning('Seeds set to:' + str(config["seed"]))
+        self.logger.warning('Seeds set to:' + str(config["seed"]))
         # print(f'Seeds set to {config["seed"]=}') # Available from Python 3.8
 
 
@@ -183,8 +205,11 @@ class RLToyEnv(gym.Env):
         if "sequence_length" not in config:
             config["sequence_length"] = 1
 
-        if "reward_unit" not in config:
-            config["reward_unit"] = 1.0
+        if "reward_scale" not in config:
+            config["reward_scale"] = 1.0
+
+        if "reward_shift" not in config:
+            config["reward_shift"] = 0.0
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
@@ -266,15 +291,13 @@ class RLToyEnv(gym.Env):
         self.delay = config["delay"]
         self.augmented_state_length = config["sequence_length"] + config["delay"] + 1
         if self.config["state_space_type"] == "discrete":
-            self.reward_unit = self.config["reward_unit"]
+            self.reward_scale = self.config["reward_scale"]
         else: # cont. spaces
             self.dynamics_order = self.config["transition_dynamics_order"]
             self.inertia = self.config["inertia"]
             self.time_unit = self.config["time_unit"]
             if "reward_scale" in self.config:
-                self.reward_scale = self.config["reward_scale"] ##TODO assert for which configurations should be available for which types of environments
-            if "reward_unit" in self.config:
-                self.reward_unit = self.config["reward_unit"]
+                self.reward_scale = self.config["reward_scale"]
 
         self.total_episodes = 0
 
@@ -309,16 +332,20 @@ class RLToyEnv(gym.Env):
             self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=config["seed"]["action_space"], dtype=np.float64) #seed # hack #TODO
 
 
-        if not config["generate_random_mdp"]:
-            self.P = config["transition_function"] if callable(config["transition_function"]) else lambda s, a: config["transition_function"][s, a] # callable may not be optimal always since it was deprecated in Python 3.0 and 3.1
-            self.R = config["reward_function"] if callable(config["reward_function"]) else lambda s, a: config["reward_function"][s, a]
-        else:
-            #TODO Generate state and action space sizes also randomly?
-            ###IMP The order in which the following inits are called is important, so don't change!!
-            self.init_terminal_states()
-            self.init_init_state_dist() #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; After looking into Gym code, I can say that for continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (and is done for the defined limits for the respective dimension).
-            self.init_transition_function()
-            self.init_reward_function()
+        if config["action_space_type"] == "discrete":
+            if not config["generate_random_mdp"]:
+                self.logger.error("User defined P and R are currently not supported.")
+                sys.exit(1)
+                self.P = config["transition_function"] if callable(config["transition_function"]) else lambda s, a: config["transition_function"][s, a] # callable may not be optimal always since it was deprecated in Python 3.0 and 3.1
+                self.R = config["reward_function"] if callable(config["reward_function"]) else lambda s, a: config["reward_function"][s, a]
+            # else:
+        ##TODO Support imaginary rollouts for continuous envs. and user-defined P and R? Will do it depending on demand for it. In fact, for imagined rollouts, just completely separate out the stored augmented_state, curr_state, etc. so that it's easy for user to perform them instead of having to maintain their own state and action sequences.
+        #TODO Generate state and action space sizes also randomly?
+        ###IMP The order in which the following inits are called is important, so don't change!!
+        self.init_terminal_states()
+        self.init_init_state_dist() #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; After looking into Gym code, I can say that for continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (and is done for the defined limits for the respective dimension).
+        self.init_transition_function()
+        self.init_reward_function()
 
         self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
 
@@ -356,7 +383,7 @@ class RLToyEnv(gym.Env):
 
 
     def init_init_state_dist(self):
-        """Initialises initial state distrbution, rho_0, to be uniform over the non-terminal states for discrete environments. For both discrete and continuous environemnts, the uniform sampling over non-terminal states is taken care of in reset() when setting the initial state for an episode.
+        """Initialises initial state distrbution, rho_0, to be uniform over the non-terminal states for discrete environments. For both discrete and continuous environments, the uniform sampling over non-terminal states is taken care of in reset() when setting the initial state for an episode.
 
         """
         # relevant dimensions part
@@ -417,7 +444,7 @@ class RLToyEnv(gym.Env):
                 self.logger.info(str(self.config["transition_function_irrelevant"]) + "init_transition_function _irrelevant" + str(type(self.config["transition_function_irrelevant"][0, 0])))
 
 
-        self.P = lambda s, a: self.transition_function(s, a, only_query = False)
+        self.P = lambda s, a, only_query=False: self.transition_function(s, a, only_query)
 
     def init_reward_function(self):
         """Initialises reward function, R by selecting random sequences to be rewardable for discrete environments. For continuous environments, we have fixed available options for the reward function.
@@ -450,7 +477,7 @@ class RLToyEnv(gym.Env):
                 num_possible_permutations = np.prod(permutations)
                 num_specific_sequences = int(self.config["reward_density"] * num_possible_permutations)
                 if num_specific_sequences > 1000:
-                    warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:', num_specific_sequences) #TODO Maybe even exit the program if too much memory is (expected to be) taken.
+                    warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(num_specific_sequences)) #TODO Maybe even exit the program if too much memory is (expected to be) taken.; Took about 80s for 40k iterations of the for loop below on my laptop
 
                 self.specific_sequences = [[] for i in range(self.sequence_length)]
                 sel_sequence_nums = self.np_random.choice(num_possible_permutations, size=num_specific_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; # TODO this code could be replaced with self.np_random.permutation(non_term_relevant_state_space_size)[self.sequence_length]? Replacement becomes a problem then! We have to keep smpling until we have all unique rewardable sequences.
@@ -481,10 +508,10 @@ class RLToyEnv(gym.Env):
             # self.logger.debug("# TODO for cont. spaces?: init_reward_function") # reward functions are fixed for cont. right now with a few available choices.
             pass
 
-        self.R = lambda s, a: self.reward_function(s, a, only_query=False)
+        self.R = lambda s, a, only_query=False: self.reward_function(s, a, only_query)
 
 
-    def transition_function(self, state, action, only_query=True):
+    def transition_function(self, state, action, only_query=False):
         """The transition function, P.
 
         Performs a transition according to the initialised P for discrete environments (with dynamics independent for relevant vs irrelevant dimension sub-spaces). For continuous environments, we have a fixed available option for the dynamics (which is the same for relevant or irrelevant dimensions):
@@ -543,7 +570,7 @@ class RLToyEnv(gym.Env):
 
 
         else: # if continuous space
-            # print("#TODO for cont. spaces: noise")
+            ###TODO implement imagined transitions also for cont. spaces
             assert len(action.shape) == 1, 'Action should be specified as a 1-D tensor. However, shape of action was: ' + str(action.shape)
             assert action.shape[0] == self.config['action_space_dim'], 'Action shape is: ' + str(action.shape[0]) + '. Expected: ' + str(self.config['action_space_dim'])
             if self.action_space.contains(action):
@@ -598,7 +625,7 @@ class RLToyEnv(gym.Env):
 
         return next_state
 
-    def reward_function(self, state, action, only_query=True):
+    def reward_function(self, state, action, only_query=False):
         """The reward function, R.
 
         Rewards the sequences selected to be rewardable at initialisation for discrete environments. For continuous environments, we have fixed available options for the reward function:
@@ -622,7 +649,7 @@ class RLToyEnv(gym.Env):
         #TODO Make reward depend on the action sequence too instead of just state sequence, as it is currently? Maybe only use the action sequence for penalising action magnitude?
         """
 
-        # Transform multi-discrete to discrete if needed. This is only needed for only_query = True to be able to transform multi-discrete state and action passed by user into underlying discrete state and action!
+        # Transform multi-discrete to discrete if needed. This is only needed for only_query = True to be able to transform multi-discrete state and action passed by user into underlying discrete state and action! When only_query = False, we don't need to convert passed state and action because internal uni-discrete representation is used to calculate reward.
         if only_query: #test
             if self.config["state_space_type"] == "discrete":
                 if isinstance(self.config["state_space_size"], list):
@@ -647,10 +674,10 @@ class RLToyEnv(gym.Env):
 
         if self.config["state_space_type"] == "discrete":
             if not self.config["make_denser"]:
-                self.logger.debug(str(state_considered) + "with delay" + str(self.config["delay"]))
+                self.logger.debug(str(state_considered) + " with delay " + str(self.config["delay"]))
                 if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
                     # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
-                    reward += self.reward_unit
+                    reward += self.reward_scale
                 else:
                     # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
                     pass
@@ -661,8 +688,8 @@ class RLToyEnv(gym.Env):
                     # print("curr_seq_being_checked, self.possible_remaining_sequences[j - 1]:", curr_seq_being_checked, self.possible_remaining_sequences[j - 1])
                     if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
                         count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
-                        # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_unit * j / self.sequence_length)
-                        reward += count_ * self.reward_unit * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
+                        # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_scale * j / self.sequence_length)
+                        reward += count_ * self.reward_scale * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
 
                 self.possible_remaining_sequences = [[] for i in range(sequence_length)] #TODO for variable sequence length just maintain a list of lists of lists rewarded_sequences
                 for j in range(0, sequence_length):
@@ -714,14 +741,56 @@ class RLToyEnv(gym.Env):
                     else:
                         new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
                         if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
-                            reward = self.reward_unit # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
+                            reward = self.reward_scale # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
 
         noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
+        reward += self.config["reward_shift"]
         return reward
+
+    def step(self, action, only_query=False):
+        """The step function for the environment.
+
+        Parameters
+        ----------
+        action : int or np.array
+            The action that the environment will use to perform a transition.
+        only_query: boolean
+            Option for the user to perform "imaginary" transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide a list of states to this function to be able to perform a rollout.
+
+        Returns
+        -------
+        int or np.array, double, boolean, dict
+            The next state, reward, whether the episode terminated and additional info dict at the end of the current transition
+        """
+        self.curr_state = self.P(self.curr_state, action, only_query=only_query)
+        self.reward = self.R(self.curr_state, action, only_query=only_query) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
+
+
+        self.done = self.is_terminal_state(self.curr_state)
+        if self.done:
+            self.reward += self.config["term_state_reward"]
+        self.logger.info('sas\'r:' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
+        return self.curr_state, self.reward, self.done, self.get_augmented_state()
+
+    def get_augmented_state(self):
+        '''Intended to return the full augmented state which would be Markovian. (However, it's not Markovian wrt the noise in P and R because we're not returning the underlying RNG.) Currently, returns the augmented state which is the sequence of length "delay + sequence_length + 1" of past states for both discrete and continuous environments. Additonally, the current state derivatives are also returned for continuous environments.
+
+        Returns
+        -------
+        dict
+            Contains at the end of the current transition
+
+        #TODO For noisy processes, this would need the noise distribution and random seed too. Also add the irrelevant state parts, etc.? We don't need the irrelevant parts for the state to be Markovian.
+        '''
+        if self.config["state_space_type"] == "discrete":
+            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
+        else:
+            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
+        return augmented_state_dict
 
     def discrete_to_multi_discrete(self, relevant_part, irrelevant_part=None):
         '''Transforms relevant and irrelevant parts of state (NOT action) space from discrete to its multi-discrete representation which is the externally visible observation_space from the environment when multi-discrete environments are selected.
@@ -773,7 +842,7 @@ class RLToyEnv(gym.Env):
 
         if self.config["state_space_type"] == "discrete":
             self.curr_state_relevant = self.np_random.choice(self.config["relevant_state_space_size"], p=self.config["relevant_init_state_dist"]) #random
-            self.curr_state = self.curr_state_relevant
+            self.curr_state = self.curr_state_relevant # curr_state set here already in case if statement below is not entered
             if isinstance(self.config["state_space_size"], list):
                 if self.config["irrelevant_state_space_size"] > 0:
                     self.curr_state_irrelevant = self.np_random.choice(self.config["irrelevant_state_space_size"], p=self.config["irrelevant_init_state_dist"]) #random
@@ -834,45 +903,6 @@ class RLToyEnv(gym.Env):
 
         return self.curr_state
 
-    def step(self, action):
-        """The step function for the environment.
-
-        Parameters
-        ----------
-        action : int or np.array
-            The action that the environment will use to perform a transition.
-
-        Returns
-        -------
-        int or np.array, double, boolean, dict
-            The next state, reward, whether the episode terminated and additional info dict at the end of the current transition
-        """
-        self.curr_state = self.P(self.curr_state, action)
-        self.reward = self.R(self.curr_state, action) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
-
-
-        self.done = self.is_terminal_state(self.curr_state)
-        if self.done:
-            self.reward += self.config["term_state_reward"]
-        self.logger.info('sas\'r:' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
-        return self.curr_state, self.reward, self.done, self.get_augmented_state()
-
-    def get_augmented_state(self):
-        '''Intended to return the full augmented state which would be Markovian. (However, it's not Markovian wrt the noise in P and R because we're not returning the underlying RNG.) Currently, returns the augmented state which is the sequence of length "delay + sequence_length + 1" of past states for both discrete and continuous environments. Additonally, the current state derivatives are also returned for continuous enviroments.
-
-        Returns
-        -------
-        dict
-            Contains at the end of the current transition
-
-        #TODO For noisy processes, this would need the noise distribution and random seed too. Also add the irrelevant state parts, etc.? We don't need the irrelevant parts for the state to be Markovian.
-        '''
-        if self.config["state_space_type"] == "discrete":
-            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
-        else:
-            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
-        return augmented_state_dict
-
     def seed(self, seed=None):
         """Initialises the Numpy RNG for the environment by calling a utility for this in Gym.
 
@@ -892,7 +922,6 @@ class RLToyEnv(gym.Env):
         self.np_random, self.seed_ = gym.utils.seeding.np_random(seed) #random
         self.logger.info("Env SEED set to:" + str(seed) + "Returned seed from Gym:" + str(self.seed_))
         return self.seed_
-
 
 
 def transform_multi_discrete_to_discrete(vector, vector_maxes):
@@ -920,7 +949,7 @@ def dist_of_pt_from_line(pt, ptA, ptB):
     tolerance = -1e-13
     if sq_dist < 0:
         if sq_dist < tolerance:
-            logger.warn('The squared distance calculated in dist_of_pt_from_line() using Pythagoras\' theorem was less than the tolerance allowed. It was: ' + str(sq_dist) + '. Tolerance was: ' + str(tolerance))
+            logging.warning('The squared distance calculated in dist_of_pt_from_line() using Pythagoras\' theorem was less than the tolerance allowed. It was: ' + str(sq_dist) + '. Tolerance was: ' + str(tolerance)) # logging.warn() has been deprecated since Python 3.3 and we should use logging.warning.
         sq_dist = 0
     dist = np.sqrt(sq_dist)
 #     print('pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist:', pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist)
@@ -943,7 +972,7 @@ if __name__ == "__main__":
     # config["repeats_in_sequences"] = False
     # config["delay"] = 1
     # config["sequence_length"] = 3
-    # config["reward_unit"] = 1.0
+    # config["reward_scale"] = 1.0
     # # config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
     # # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
 

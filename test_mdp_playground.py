@@ -12,6 +12,7 @@ from rl_toy_env import RLToyEnv
 
 import numpy as np
 import copy
+import logging
 
 from datetime import datetime
 log_filename = 'test_mdp_playground_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
@@ -21,10 +22,10 @@ log_filename = 'test_mdp_playground_' + datetime.today().strftime('%m.%d.%Y_%I:%
 
 class TestRLToyEnv(unittest.TestCase):
 
-    def test_continuous_dynamics(self):
+    def test_continuous_dynamics_move_along_a_line(self):
         '''
         '''
-        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS\033[0m')
+        print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_MOVE_ALONG_A_LINE\033[0m')
         config = {}
         config["log_filename"] = log_filename
         config["seed"] = {}
@@ -47,8 +48,6 @@ class TestRLToyEnv(unittest.TestCase):
         # config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
         # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
         config["reward_function"] = "move_along_a_line"
-
-        config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
 
         # Test 1: general dynamics and reward
         env = RLToyEnv(config)
@@ -155,12 +154,12 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
-        # Test that random actions lead to bad reward in presence of irrelevant dimensions
+        # Test that random actions in relevant action space along with linear actions in irrelevant action space leads to bad reward for move_along_a_line reward function
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(20):
             action = env.action_space.sample()
-            action[[3, 4, 5]] = 1.0 # test to see if acting "in a line" for relevant dimensions and not for relevant dimensions produces bad reward
+            action[[3, 4, 5]] = 1.0 # test to see if acting "in a line" for irrelevant dimensions and not for relevant dimensions produces bad reward
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done)
             if i > 10:
@@ -273,7 +272,6 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_scale"] = 1.0
         config["reward_function"] = "move_along_a_line"
 
-        config["generate_random_mdp"] = True
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state'].copy() # copy is needed to have a copy of the old state, otherwise we get the np.array that has the same location in memory and is constantly updated by step()
         state_derivatives = copy.deepcopy(env.state_derivatives)
@@ -327,8 +325,6 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_function"] = "move_to_a_point"
         config["target_point"] = [-0.29792, 1.71012]
         config["make_denser"] = True
-
-        config["generate_random_mdp"] = True
 
         # Test : dense reward
         env = RLToyEnv(config)
@@ -411,9 +407,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["make_denser"] = False
         config["target_point"] = [-0.29792, 1.71012]
         config["target_radius"] = 0.072 # to give reward in 3rd last step. At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test.
-        config["reward_unit"] = 2.0
-
-        config["generate_random_mdp"] = True
+        config["reward_scale"] = 2.0
 
         # Test : sparse reward
         env = RLToyEnv(config)
@@ -480,7 +474,8 @@ class TestRLToyEnv(unittest.TestCase):
 
 
     def test_discrete_dynamics(self):
-        ''''''
+        '''Tests the P dynamics. Tests whether actions taken in terminal states lead back to the same terminal state. Tests if state in discrete environments is an int.
+        '''
         config = {}
         config["log_filename"] = log_filename
         config["seed"] = {}
@@ -499,7 +494,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 3
-        config["reward_unit"] = 1.0
+        config["reward_scale"] = 1.0
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(config)
@@ -557,7 +552,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 3
         config["sequence_length"] = 1
-        config["reward_unit"] = 1.0
+        config["reward_scale"] = 1.0
 
         config["generate_random_mdp"] = True
 
@@ -599,7 +594,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 3
-        config["reward_unit"] = 1.0
+        config["reward_scale"] = 1.0
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(config)
@@ -638,7 +633,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 1
-        config["reward_unit"] = 1.0
+        config["reward_scale"] = 1.0
         config["transition_noise"] = 0.5
 
         config["generate_random_mdp"] = True
@@ -678,7 +673,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 1
-        config["reward_unit"] = 1.0
+        config["reward_scale"] = 1.0
         config["reward_noise"] = lambda a: a.normal(0, 0.5)
 
         config["generate_random_mdp"] = True
@@ -698,13 +693,14 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 ###TODO Test for make_denser
-#TODO Tests for imaginary rollouts for discrete and continuous - for different Ps and Rs
+##TODO Tests for imaginary rollouts for discrete and continuous - for different Ps and Rs
 
-    def test_discrete_all_meta_features(self):
+    def test_discrete_multiple_meta_features(self):
+        '''Tests using multiple meta-features together.
+
+        #TODO Currently tests for seq, del and r noise, r scale, r shift together. Include others? Gets complicated with P noise: trying to avoid terminal states while still following a rewardable sequence. Maybe try low P noise to test this? Or low terminal state density?
         '''
-        #TODO Currently only test for seq, del and r noises together. Include others! Gets complicated with P noise: trying to avoid terminal states while still following a rewardable sequence. Maybe try low P noise to test this?
-        '''
-        print('TEST_DISCRETE_ALL_META_FEATURES')
+        print('TEST_DISCRETE_MULTIPLE_META_FEATURES')
 
         config = {}
         config["log_filename"] = log_filename
@@ -724,7 +720,8 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 1
         config["sequence_length"] = 3
-        config["reward_unit"] = 1.0
+        config["reward_scale"] = 2.5
+        config["reward_shift"] = -1.75
         # config["transition_noise"] = 0.1
         config["reward_noise"] = lambda a: a.normal(0, 0.5)
 
@@ -734,7 +731,10 @@ class TestRLToyEnv(unittest.TestCase):
 
 
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
-        expected_rewards = [0 + -0.292808, 0 + 0.770696, 1 + -1.01743611, 1 + -0.042768, 0 + 0.78761320, 1 + -0.510087, 0 - 0.089978, 0 + 0.48654863]
+        expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
+        expected_reward_noises = [-0.292808, 0.770696, -1.01743611, -0.042768, 0.78761320, -0.510087, -0.089978, 0.48654863]
+        for i in range(len(expected_rewards)):
+            expected_rewards[i] = expected_rewards[i] * config["reward_scale"] + config["reward_shift"] + expected_reward_noises[i]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -771,7 +771,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 3
         config["sequence_length"] = 1
-        config["reward_unit"] = 1.0
+        config["reward_scale"] = 1.0
 
         config["generate_random_mdp"] = True
 
@@ -820,7 +820,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 3
         config["sequence_length"] = 1
-        config["reward_unit"] = 1.0
+        config["reward_scale"] = 1.0
 
         config["generate_random_mdp"] = True
 
@@ -882,6 +882,48 @@ class TestRLToyEnv(unittest.TestCase):
 
         env.reset()
         env.close()
+
+
+    # def test_discrete_imaginary_rollouts(self):
+    #     '''### TODO complete test case
+    #     '''
+    #     print('\033[32;1;4mTEST_DISCRETE_IMAGINARY_ROLLOUTS\033[0m')
+    #
+    #     config = {}
+    #     config["log_filename"] = log_filename
+    #     # config["log_level"] = logging.NOTSET
+    #     config["seed"] = 0
+    #
+    #     config["state_space_type"] = "discrete"
+    #     config["action_space_type"] = "discrete"
+    #     config["state_space_size"] = 20
+    #     config["action_space_size"] = 20
+    #     config["reward_density"] = 1e-4 # 160392960 possible sequences for 18 non-terminal states and seq_len 7; 1028160 for seq_len 5
+    #     config["make_denser"] = False
+    #     config["terminal_state_density"] = 0.1
+    #     config["delay"] = 2
+    #     config["sequence_length"] = 5
+    #     config["reward_scale"] = 1.0
+    #     config["completely_connected"] = True
+    #     config["repeats_in_sequences"] = False
+    #
+    #     config["generate_random_mdp"] = True
+    #
+    #     env = RLToyEnv(config)
+    #     state = env.get_augmented_state()['curr_state']
+    #
+    #     actions = [0, 1, 17, 5, 3, 4, 3, 2]
+    #     expected_rewards = [0, 0, 0, 0, 0, 0]#, 1, 0, 0]
+    #     expected_states = [9, 2, 4, 5, 8, 9] # [2, 4, 5, 8, 9] is a rewardable sequence. init state is 9 and action 0 leads to state 2.
+    #     for i in range(len(expected_rewards)):
+    #         next_state, reward, done, info = env.step(actions[i])
+    #         print("sars', done =", state, actions[i], reward, next_state, done)
+    #         self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = " + str(config["delay"]))
+    #         self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = " + str(config["delay"]))
+    #         state = next_state
+    #
+    #     env.reset()
+    #     env.close()
 
 
     #Unit tests
