@@ -1,16 +1,19 @@
 num_seeds = 10
-state_space_sizes = [8]#, 10, 12, 14] # [2**i for i in range(1,6)]
-action_space_sizes = [8]#2, 4, 8, 16] # [2**i for i in range(1,6)]
-delays = [0] + [2**i for i in range(4)]
-sequence_lengths = [1, 2, 3, 4]#i for i in range(1,4)]
-reward_densities = [0.25] # np.linspace(0.0, 1.0, num=5)
-make_densers = [False]
-# make_reward_dense = [True, False]
-terminal_state_densities = [0.25] # np.linspace(0.1, 1.0, num=5)
-transition_noises = [0]#, 0.01, 0.02, 0.10, 0.25]
-reward_noises = [0]#, 1, 5, 10, 25] # Std dev. of normal dist.
-algorithms = ["DQN"]
-seeds = [i for i in range(num_seeds)]
+from collections import OrderedDict
+env_configs = OrderedDict({
+    'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
+    'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
+    'delay': [0] + [2**i for i in range(4)],
+    'sequence_length': [1, 2, 3, 4],#i for i in range(1,4)]
+    'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
+    'make_denser': [False],
+    'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
+    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
+    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
+    'dummy_seed': [i for i in range(num_seeds)],
+})
+
+algorithm = "DQN"
 agent_config = {
     "adam_epsilon": 1e-4,
     "buffer_size": 1000000,

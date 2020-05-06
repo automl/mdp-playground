@@ -33,7 +33,7 @@ class MDPP_Analysis():
 
         stats_file = dir_name + '/' + exp_name #Name of file to which benchmark stats were written
         self.stats_file = stats_file
-        datasets_info = np.loadtxt(stats_file + '.csv', dtype=object)
+        # datasets_info = np.loadtxt(stats_file + '.csv', dtype=object)
         # print(datasets_info[0])
         # print(datasets_info)
         # print(type(datasets_info))
@@ -60,10 +60,16 @@ class MDPP_Analysis():
         list_of_learning_curves.append(stats_pd.iloc[previous_i:i + 2, -cols_to_take:])
         self.final_rows_for_a_config = final_rows_for_a_config
 
-        self.config_names = ['Delay', 'Sequence Length', 'Reward Density', 'Terminal State Density', 'P Noise', 'R Noise', 'dummy_seed']
+        with open(stats_file + '.csv') as file_:
+            config_names = file_.readline().strip().split(', ')
+            config_names[0] = config_names[0][2:] # to remove '# ' that was written
+            config_names[-1] = config_names[-1][:-1] # to remove ',' that was written
+        # print("config_names:", config_names)
+        self.config_names = config_names # ['Delay', 'Sequence Length', 'Reward Density', 'Terminal State Density', 'P Noise', 'R Noise', 'dummy_seed']
         config_counts = []
         dims_values = []
-        for i in range(4, 11): #hardcoded corresponds to columns written to evaluation stats CSV file
+        # For the following seeds should always be last column read! 1st column should be >=1 (it should not be 0 because that is the training_iteration that was recorded and is not used here)
+        for i in range(1, 1 + len(config_names)): #hardcoded corresponds to columns written to evaluation stats CSV file
             dims_values.append(stats_pd[i].unique())
             config_counts.append(stats_pd[i].nunique())
 
@@ -143,6 +149,7 @@ class MDPP_Analysis():
         self.axis_labels = x_axis_labels
         self.tick_labels = x_tick_labels_
         self.dims_varied = dims_varied
+        # print(x_axis_labels, x_tick_labels_, dims_varied)
 
         return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval
 
@@ -166,9 +173,9 @@ class MDPP_Analysis():
         plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
         # print(stats_data.shape)
 
-        mean_data_ = np.mean(stats_data[:, :, :, :, :, :, :, -2], axis=-1)
+        mean_data_ = np.mean(stats_data[..., -2], axis=-1)
         to_plot_ = np.squeeze(mean_data_)
-        std_dev_ = np.std(stats_data[:, :, :, :, :, :, :, -2], axis=-1)
+        std_dev_ = np.std(stats_data[..., -2], axis=-1)
         to_plot_std_ = np.squeeze(std_dev_)
 
         plt.figure(figsize=(5, 1.5))
@@ -209,7 +216,7 @@ class MDPP_Analysis():
         '''
         plt.rcParams.update({'font.size': 18}) # default 12, 24 for paper, for poster: 30
 
-        mean_data_ = np.mean(stats_data[:, :, :, :, :, :, :, -2], axis=-1)
+        mean_data_ = np.mean(stats_data[..., -2], axis=-1)
         to_plot_ = np.squeeze(mean_data_)
         plt.imshow(np.atleast_2d(to_plot_), cmap='Purples', interpolation='none', vmin=0, vmax=np.max(to_plot_))
         plt.gca().set_xticklabels(self.tick_labels[1]) # dims 1 and 0 are exchanged here because Y-axis has plot for 1st varying dim and X-axis has plot for 2nd varying dim
@@ -222,7 +229,7 @@ class MDPP_Analysis():
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map.pdf', dpi=300, bbox_inches="tight")
         plt.show()
-        std_dev_ = np.std(stats_data[:, :, :, :, :, :, :, -2], axis=-1)
+        std_dev_ = np.std(stats_data[..., -2], axis=-1)
         to_plot_ = np.squeeze(std_dev_)
         # print(to_plot_, to_plot_.shape)
         plt.imshow(np.atleast_2d(to_plot_), cmap='Purples', interpolation='none', vmin=0, vmax=np.max(to_plot_)) # 60 for DQN, 100 for A3C
