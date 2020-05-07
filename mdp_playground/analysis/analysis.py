@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 class MDPP_Analysis():
     '''Utility class to load and plot data for analysis of experiments from MDP Playground
@@ -33,11 +34,24 @@ class MDPP_Analysis():
 
         stats_file = dir_name + '/' + exp_name #Name of file to which benchmark stats were written
         self.stats_file = stats_file
-        # datasets_info = np.loadtxt(stats_file + '.csv', dtype=object)
-        # print(datasets_info[0])
-        # print(datasets_info)
-        # print(type(datasets_info))
-        # print(datasets_info.shape)
+
+        if os.path.isfile(stats_file + '.csv'):
+            print("Loading data from a sequential run of experiment configurations.")
+        else:
+            print("Loading data from a distributed run of experiment configurations. Creating a combined CSV stats file.")
+            def join_files(file_prefix, file_suffix):
+                '''Utility to join files that were written with different experiment configs'''
+                with open(file_prefix + file_suffix, 'ab') as combined_file:
+                    i = 0
+                    while True:
+                        if os.path.isfile(file_prefix + '_' + str(i) + file_suffix):
+                            with open(file_prefix + '_' + str(i) + file_suffix, 'rb') as curr_file:
+                                combined_file.write(curr_file.read())
+                        else:
+                            break
+                        i += 1
+            join_files(stats_file,  '.csv')
+            join_files(stats_file, '_eval.csv')
 
         stats_pd = pd.read_csv(stats_file + '.csv', skip_blank_lines=True, header=None, comment='#', sep=' ')
         # print(stats_pd)
