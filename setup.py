@@ -9,7 +9,7 @@ extras_require = [
 
 setup(name='mdp_playground',
       version='0.0.1',
-      install_requires=['gym'], # _mdp_playground_extensions
+      install_requires=['gym_extensions_for_mdp_playground'],
       extras_require={
           'extras': extras_require,
       },

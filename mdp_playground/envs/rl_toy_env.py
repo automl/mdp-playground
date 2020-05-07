@@ -13,7 +13,7 @@ import numpy as np
 import scipy
 from scipy import stats
 import gym
-from gym.spaces import BoxExtended, DiscreteExtended, MultiDiscreteExtended
+from gym_extensions_for_mdp_playground.spaces import BoxExtended, DiscreteExtended, MultiDiscreteExtended
 # from gym.utils import seeding
 
 
@@ -418,6 +418,7 @@ class RLToyEnv(gym.Env):
                 for s in range(self.config["relevant_state_space_size"]):
                     for a in range(self.config["relevant_action_space_size"]):
                         self.config["transition_function"][s, a] = self.relevant_observation_space.sample() #random #TODO Preferably use the seed of the Env for this?
+            # Set the next state for terminal states to be themselves, for any action taken.
             for s in range(self.config["relevant_state_space_size"] - self.num_terminal_states, self.config["relevant_state_space_size"]):
                 for a in range(self.config["relevant_action_space_size"]):
                     assert self.is_terminal_state(s) == True
@@ -704,14 +705,14 @@ class RLToyEnv(gym.Env):
                 self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
 
         else: # if continuous space
-            ###TODO Reward for reaching a target point case (with make_dense); Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0.
+            ###TODO Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0. Since the principal component is always taken to be the direction of travel, this would mean a larger distance covered in that direction and hence would lead to +ve reward always and would mean larger random actions give a larger reward! Should penalise actions in proportion that scale then?
             if np.isnan(state_considered[0][0]): # Instead of below commented out check, this is more robust for imaginary transitions
             # if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because augmented_state_length is always 1 greater than seq_len + del
                 pass #TODO
             else:
                 if self.config["reward_function"] == "move_along_a_line":
                     # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
-                    #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_dist calc.?.
+                    #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_deviation calc.?.
                     data_ = np.array(state_considered)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
                     data_mean = data_.mean(axis=0)
                     uu, dd, vv = np.linalg.svd(data_ - data_mean)
@@ -719,12 +720,12 @@ class RLToyEnv(gym.Env):
                     line_end_pts = vv[0] * np.linspace(-1, 1, 2)[:, np.newaxis] # vv[0] = 1st eigenvector, corres. to Principal Component #hardcoded -100 to 100 to get a "long" line which should make calculations more robust(?: didn't seem to be the case for 1st few trials, so changed it to -1, 1; even tried up to 10000 - seems to get less precise for larger numbers) to numerical issues in dist_of_pt_from_line() below; newaxis added so that expected broadcasting takes place
                     line_end_pts += data_mean
 
-                    total_dist = 0
+                    total_deviation = 0
                     for data_pt in data_: # find total distance of all data points from the fit line above
-                        total_dist += dist_of_pt_from_line(data_pt, line_end_pts[0], line_end_pts[-1])
-                    self.logger.info('total_dist of pts from fit line:' + str(total_dist))
+                        total_deviation += dist_of_pt_from_line(data_pt, line_end_pts[0], line_end_pts[-1])
+                    self.logger.info('total_deviation of pts from fit line:' + str(total_deviation))
 
-                    reward += ( - total_dist / self.sequence_length ) * self.reward_scale
+                    reward += ( - total_deviation / self.sequence_length ) * self.reward_scale
 
                 elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
                     assert self.config["sequence_length"] == 1
@@ -734,10 +735,10 @@ class RLToyEnv(gym.Env):
                         reward = -np.linalg.norm(new_relevant_state - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
                         reward += np.linalg.norm(old_relevant_state - self.config["target_point"]) # Reward is the distance moved towards the target point.
                         reward *= self.reward_scale
-                        # Should rather be the change in distance to target point, so reward given is +ve if "correct" action was taken and so reward function is more natural
-                        # It's true that giving the -ve distance as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural. But the value function is then higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
+                        # Should rather be the change in distance to target point, so reward given is +ve if "correct" action was taken and so reward function is more natural (this _is_ the current implementation)
+                        # It's true that giving the total -ve distance from target as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural (as in the other case loss/reward go up quadratically with distance from target point while in this case it's linear). The value function is in both cases higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
                         #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
-                        #TODO also make_denser, sparse rewards only at target
+                        # TODO also make_denser, sparse rewards only at target
                     else:
                         new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
                         if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
@@ -941,19 +942,23 @@ def dist_of_pt_from_line(pt, ptA, ptB):
     '''Returns shortest distance of a point from a line defined by 2 points - ptA and ptB. Based on: https://softwareengineering.stackexchange.com/questions/168572/distance-from-point-to-n-dimensional-line
     '''
 
+    tolerance = 1e-13
     lineAB = ptA - ptB
     lineApt = ptA - pt
     dot_product = np.dot(lineAB, lineApt)
-    proj = dot_product / np.linalg.norm(lineAB) ####TODO could lead to division by zero if line is a null vector!
-    sq_dist = np.linalg.norm(lineApt)**2 - proj**2
-    tolerance = -1e-13
-    if sq_dist < 0:
-        if sq_dist < tolerance:
-            logging.warning('The squared distance calculated in dist_of_pt_from_line() using Pythagoras\' theorem was less than the tolerance allowed. It was: ' + str(sq_dist) + '. Tolerance was: ' + str(tolerance)) # logging.warn() has been deprecated since Python 3.3 and we should use logging.warning.
-        sq_dist = 0
-    dist = np.sqrt(sq_dist)
-#     print('pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist:', pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist)
-    return dist
+    if np.linalg.norm(lineAB) < tolerance:
+        return 0
+    else:
+        proj = dot_product / np.linalg.norm(lineAB) #### TODO could lead to division by zero if line is a null vector!
+        sq_dist = np.linalg.norm(lineApt)**2 - proj**2
+
+        if sq_dist < 0:
+            if sq_dist < tolerance:
+                logging.warning('The squared distance calculated in dist_of_pt_from_line() using Pythagoras\' theorem was less than the tolerance allowed. It was: ' + str(sq_dist) + '. Tolerance was: -' + str(tolerance)) # logging.warn() has been deprecated since Python 3.3 and we should use logging.warning.
+            sq_dist = 0
+        dist = np.sqrt(sq_dist)
+    #     print('pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist:', pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist)
+        return dist
 
 if __name__ == "__main__":
 
