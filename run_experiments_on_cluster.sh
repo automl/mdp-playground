@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
-#SBATCH --mem 4000M # Specify the real memory required per node. For CPU, use --mem-per-cpu
+#SBATCH --mem 12000M # Specify the real memory required per node. For CPU, use --mem-per-cpu
 #SBATCH -t 4-00:00 # time (D-HH:MM)
-#SBATCH -c 1 # number of CPUs/task
+#SBATCH -c 3 # number of CPUs/task
 #SBATCH -o log/%x.%N.%A.%a.out # STDOUT  (the folder log has to exist!) %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%N.%A.%a.err # STDERR  (the folder log has to exist!) %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -J mdp-playground-job-array # sets the job name. If not specified, the file name will be used as job name
@@ -27,7 +27,7 @@ echo "SLURM_JOB_NODELIST = ${SLURM_JOB_NODELIST}"
 
 python3 -V
 
-export PATH="/home/rajanr/anaconda2/bin:$PATH"
+export PATH="/home/rajanr/anaconda3/bin:$PATH"
 echo Paths: $PATH
 echo Parent program $0
 echo Shell used is $SHELL
@@ -51,8 +51,8 @@ echo "Line common to all tasks with SLURM_JOB_ID: ${SLURM_JOB_ID}, SLURM_ARRAY_J
 
 # ================================================== #
 # Begin actual Code
-mkdir -p unc_rl_${SLURM_ARRAY_JOB_ID}
-cd unc_rl_${SLURM_ARRAY_JOB_ID}
+mkdir -p mdpp_${SLURM_ARRAY_JOB_ID}
+cd mdpp_${SLURM_ARRAY_JOB_ID}
 # cd /home/rajanr/mdpp
 \time -v python3 /home/rajanr/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/rajanr/mdp-playground/experiments/${EXP_NAME} --config-num ${SLURM_ARRAY_TASK_ID}
 

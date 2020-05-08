@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning o
 parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
                    help='Configuration file containing configuration space to run experiments. It must be a Python file so config can be given programmatically. '
                    ' See default_config.py for an example. Config files for various experiments are present in the experiments directory.')
-parser.add_argument('-e', '--exp-name', dest='exp_name', action='store', default='temp234',
+parser.add_argument('-e', '--exp-name', dest='exp_name', action='store', default='mdpp_default_experiment',
                    help='The user-chosen name of the experiment. This is used as the prefix of the output files (the prefix also contains config_num if that is provided). It will save stats to 2 CSV files, with the filenames as the one given as argument'
                    ' and another file with an extra "_eval" in the filename that contains evaluation stats during the training. Appends to existing files or creates new ones if they don\'t exist.')
 parser.add_argument('-n', '--config-num', dest='config_num', action='store', default=None, type=int,
@@ -244,6 +244,7 @@ for current_config in cartesian_product_configs:
 
     tune.run(
         algorithm,
+        name=algorithm + str(args.config_num), ###IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
         stop={
             "timesteps_total": 20000,
               },
