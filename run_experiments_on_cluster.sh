@@ -1,18 +1,19 @@
 #!/bin/bash
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
-#SBATCH --mem 12000M # Specify the real memory required per node. For CPU, use --mem-per-cpu
+#SBATCH --mem 8000M # Specify the real memory required per node. For CPU, use --mem-per-cpu
 #SBATCH -t 4-00:00 # time (D-HH:MM)
-#SBATCH -c 3 # number of CPUs/task
+#SBATCH -c 2 # number of CPUs/task
 #SBATCH -o log/%x.%N.%A.%a.out # STDOUT  (the folder log has to exist!) %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%N.%A.%a.err # STDERR  (the folder log has to exist!) %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -J mdp-playground-job-array # sets the job name. If not specified, the file name will be used as job name
 #SBATCH -D /home/rajanr/mdpp # Change working_dir (I think this directory _has_ to exist and won't be created!)
 ##SBATCH --mail-type=END,FAIL # (receive mails about end and timeouts/crashes of your job)
-#SBATCH -a 0-59 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
+#SBATCH -a 0-9 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
 ##SBATCH --gres=gpu:1  # reserves one GPU
 
 export EXP_NAME='dqn_seq_del' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
+echo -e '\033[32m'
 # Print some information about the job to STDOUT
 echo "Workingdir: $PWD";
 echo "Started at $(date)";
@@ -27,7 +28,7 @@ echo "SLURM_JOB_NODELIST = ${SLURM_JOB_NODELIST}"
 
 python3 -V
 
-export PATH="/home/rajanr/anaconda3/bin:$PATH"
+#export PATH="/home/rajanr/anaconda3/bin:$PATH"
 echo Paths: $PATH
 echo Parent program $0
 echo Shell used is $SHELL
@@ -43,6 +44,7 @@ which python3
 python3 -V
 ping google.com -c 3
 
+echo -e '\033[0m'
 echo -e "Script file start:\n====================="
 cat $0
 echo -e "\n======================\nScript file end!"
