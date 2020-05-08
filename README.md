@@ -22,13 +22,13 @@ You can run experiments (currently uses Ray RLLib) using:
 ```
 python run_experiments.py -c <config_file> -e <exp_name> -n <config_num>
 ```
-The exp_name is a prefix for the filenames of CSV files where stats for the experiments are recorded.
-Each of the command line arguments has defaults. Please refer to the documentation inside [`run_experiments.py`] for further details. (Or run with the `-h` flag to bring up help.)
+The exp_name is a prefix for the filenames of CSV files where stats for the experiments are recorded.<br>
+Each of the command line arguments has defaults. Please refer to the documentation inside [`run_experiments.py`](run_experiments.py) for further details. (Or run with the `-h` flag to bring up help.)
 
-The config files for experiments from the [paper](https://arxiv.org/abs/1909.07750) are in the experiments directory.
-The name of the file corresponding to an experiment is formed as: <ALGORITHM_NAME>_<META_FEATURE_NAMES>.py
-The possible ALGORITHM_NAMEs are: dqn, rainbow, a3c and a3c_lstm
-The possible META_FEATURE_NAMES are: seq_del (for delay and sequence length varied together), p_r_noises (for P and R noises varied together), sparsity (for varying reward density) and make_denser (for varying make_denser)
+The config files for experiments from the [paper](https://arxiv.org/abs/1909.07750) are in the experiments directory.<br>
+The name of the file corresponding to an experiment is formed as: <algorithm_name>_<meta_feature_names>.py<br>
+The possible algorithm_names are: dqn, rainbow, a3c and a3c_lstm<br>
+The possible meta_feature_names are: seq_del (for delay and sequence length varied together), p_r_noises (for P and R noises varied together), sparsity (for varying reward density) and make_denser (for varying make_denser)<br>
 For example, for algorithm DQN when varying meta-features delay and sequence length, the corresponding experiment file is dqn_seq_del.py
 
 ## Plotting
