@@ -170,16 +170,6 @@ pp = pprint.PrettyPrinter(indent=4)
 
 for current_config in cartesian_product_configs:
     algorithm = config.algorithm
-    state_space_size = current_config[list(config.env_configs).index('state_space_size')]
-    action_space_size = current_config[list(config.env_configs).index('action_space_size')]
-    delay = current_config[list(config.env_configs).index('delay')]
-    sequence_length = current_config[list(config.env_configs).index('sequence_length')]
-    reward_density = current_config[list(config.env_configs).index('reward_density')]
-    make_denser = current_config[list(config.env_configs).index('make_denser')]
-    terminal_state_density = current_config[list(config.env_configs).index('terminal_state_density')]
-    transition_noise = current_config[list(config.env_configs).index('transition_noise')]
-    reward_noise = current_config[list(config.env_configs).index('reward_noise')]
-    dummy_seed = current_config[list(config.env_configs).index('dummy_seed')]
 
     agent_config = config.agent_config
     model_config = config.model_config
@@ -190,26 +180,22 @@ for current_config in cartesian_product_configs:
     env_config = {
         "env": "RLToy-v0",
         "env_config": {
-            'dummy_seed': dummy_seed, # The seed is dummy because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
             'seed': 0, #seed
             'state_space_type': 'discrete',
             'action_space_type': 'discrete',
-            'state_space_size': state_space_size,
-            'action_space_size': action_space_size,
             'generate_random_mdp': True,
-            'delay': delay,
-            'sequence_length': sequence_length,
-            'reward_density': reward_density,
-            'terminal_state_density': terminal_state_density,
             'repeats_in_sequences': False,
             'reward_unit': 1.0,
-            'make_denser': make_denser,
             'completely_connected': True,
-            'transition_noise': transition_noise,
-            'reward_noise': tune.function(lambda a: a.normal(0, reward_noise)),
-            'reward_noise_std': reward_noise, #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above
         },
     }
+    for key in config.env_configs: # There is a dummy seed in the env_config because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
+        if key == 'reward_noise':
+            reward_noise_ = current_config[list(config.env_configs).index(key)]
+            env_config["env_config"][key] = tune.function(lambda a: a.normal(0, reward_noise_))
+            env_config["env_config"]['reward_noise_std'] = reward_noise_ #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above
+        else:
+            env_config["env_config"][key] = current_config[list(config.env_configs).index(key)]
 
     eval_config = {
         "evaluation_interval": 1, # I think this means every x training_iterations

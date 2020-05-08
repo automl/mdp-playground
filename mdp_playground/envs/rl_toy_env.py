@@ -231,7 +231,7 @@ class RLToyEnv(gym.Env):
         # Set up the irrelevant dimensions parts: state space
         if config["state_space_type"] == "discrete":
             if isinstance(config["state_space_size"], list):
-                config["state_space_multi_discrete_sizes"] = config["state_space_size"]
+                # config["state_space_multi_discrete_sizes"] = config["state_space_size"]
                 self.relevant_state_space_maxes = np.array(config["state_space_size"])[np.array(config["state_space_relevant_indices"])]
                 config["relevant_state_space_size"] = int(np.prod(self.relevant_state_space_maxes))
                 config["state_space_irrelevant_indices"] = list(set(range(len(config["state_space_size"]))) - set(config["state_space_relevant_indices"]))
@@ -253,7 +253,7 @@ class RLToyEnv(gym.Env):
         # Set up the irrelevant dimensions parts: action space
         if config["action_space_type"] == "discrete":
             if isinstance(config["action_space_size"], list):
-                config["action_space_multi_discrete_sizes"] = config["action_space_size"]
+                # config["action_space_multi_discrete_sizes"] = config["action_space_size"]
                 self.relevant_action_space_maxes = np.array(config["action_space_size"])[np.array(config["action_space_relevant_indices"])]
                 config["relevant_action_space_size"] = int(np.prod(self.relevant_action_space_maxes))
                 config["action_space_irrelevant_indices"] = list(set(range(len(config["action_space_size"]))) - set(config["action_space_relevant_indices"]))
