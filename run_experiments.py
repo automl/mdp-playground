@@ -65,7 +65,7 @@ from ray.rllib.models.preprocessors import OneHotPreprocessor
 from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
-ray.init() #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so had to work around by giving full path + filename in stats_file_name.
+ray.init(object_store_memory=1e10, redis_max_memory=1e10,) #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so had to work around by giving full path + filename in stats_file_name.
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
 print(config.algorithm, config.env_configs['state_space_size'], config.env_configs['action_space_size'], config.env_configs['delay'], config.env_configs['sequence_length'], config.env_configs['reward_density'], config.env_configs['make_denser'], config.env_configs['terminal_state_density'], config.env_configs['transition_noise'], config.env_configs['reward_noise'], config.env_configs['dummy_seed'])
