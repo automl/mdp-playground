@@ -884,6 +884,55 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 
+    def test_discrete_image_representations(self):
+        ''''''
+        print('\033[32;1;4MTEST_DISCRETE_IMAGE_REPRESENTATIONS\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.25
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 1
+        config["sequence_length"] = 3
+        config["reward_scale"] = 2.5
+        config["reward_shift"] = -1.75
+        # config["transition_noise"] = 0.1
+        config["reward_noise"] = lambda a: a.normal(0, 0.5)
+
+        config["generate_random_mdp"] = True
+
+        config["image_representations"] = True
+        env = RLToyEnv(config)
+        state = env.get_augmented_state()['augmented_state'][-1]
+
+
+        actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
+        expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
+        expected_reward_noises = [-0.292808, 0.770696, -1.01743611, -0.042768, 0.78761320, -0.510087, -0.089978, 0.48654863]
+        for i in range(len(expected_rewards)):
+            expected_rewards[i] = expected_rewards[i] * config["reward_scale"] + config["reward_shift"] + expected_reward_noises[i]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg="Expected reward mismatch in time step: " + str(i + 1) + " when sequence length = 3, delay = 1.")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
     # def test_discrete_imaginary_rollouts(self):
     #     '''### TODO complete test case
     #     '''

@@ -13,7 +13,7 @@ import numpy as np
 import scipy
 from scipy import stats
 import gym
-from gym.spaces import BoxExtended, DiscreteExtended, MultiDiscreteExtended
+from gym.spaces import BoxExtended, DiscreteExtended, MultiDiscreteExtended, ImageMultiDiscrete
 # from gym.utils import seeding
 
 
@@ -211,6 +211,9 @@ class RLToyEnv(gym.Env):
         if "reward_shift" not in config:
             config["reward_shift"] = 0.0
 
+        if "image_representations" not in config:
+            config["image_representations"] = False
+
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
         config["action_space_type"] = config["action_space_type"].lower()
@@ -305,10 +308,17 @@ class RLToyEnv(gym.Env):
             if config["irrelevant_state_space_size"] > 0:
                 self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
                 self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=config["seed"]["irrelevant_state_space"]) #seed # hack
-                self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
+                if config["image_representations"]:
+                    underlying_obs_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed
+                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, 4, 400, 400)
+                else:
+                    self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
             else:
-                self.observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
-                self.relevant_observation_space = self.observation_space
+                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
+                if config["image_representations"]:
+                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, 4, 400, 400)
+                else:
+                    self.observation_space = self.relevant_observation_space
                 # print('id(self.observation_space)', id(self.observation_space), 'id(self.relevant_observation_space)', id(self.relevant_observation_space), id(self.relevant_observation_space) == id(self.observation_space))
 
         else: # cont. spaces
@@ -533,13 +543,18 @@ class RLToyEnv(gym.Env):
             The state at the end of the current transition
         """
 
-        # Transform multi-discrete to discrete for discrete state spaces with irrelevant dimensions
-        if self.config["state_space_type"] == "discrete":
-            if isinstance(self.config["state_space_size"], list):
-                if self.config["irrelevant_state_space_size"] > 0:
-                    state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(state, action, irrelevant_parts=True)
-                else:
-                    state, action, _, _ = self.multi_discrete_to_discrete(state, action)
+        # Transform multi-discrete to discrete for discrete state spaces with irrelevant dimensions; needed only for imaginary rollouts, otherwise, internal augmented state is used.
+        if only_query:
+            if self.config["state_space_type"] == "discrete":
+                if isinstance(self.config["state_space_size"], list):
+                    if self.config["irrelevant_state_space_size"] > 0:
+                        state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(state, action, irrelevant_parts=True)
+                    else:
+                        state, action, _, _ = self.multi_discrete_to_discrete(state, action)
+        else:
+            state = self.augmented_state[-1]
+
+
 
         if self.config["state_space_type"] == "discrete":
             next_state = self.config["transition_function"][state, action]
@@ -623,6 +638,10 @@ class RLToyEnv(gym.Env):
                     next_state = self.discrete_to_multi_discrete(next_state, next_state_irrelevant)
                 else:
                     next_state = self.discrete_to_multi_discrete(next_state)
+
+        # If the externally visible observation space is images, then convert to underlying (multi-)discrete state
+        if self.config["image_representations"]:
+            next_state = self.observation_space.get_concatenated_image(next_state)
 
         return next_state
 
@@ -771,7 +790,7 @@ class RLToyEnv(gym.Env):
         self.reward = self.R(self.curr_state, action, only_query=only_query) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
 
 
-        self.done = self.is_terminal_state(self.curr_state)
+        self.done = self.is_terminal_state(self.augmented_state[-1]) ####TODO curr_state is external state, while we need to check relevant state for terminality!
         if self.done:
             self.reward += self.config["term_state_reward"]
         self.logger.info('sas\'r:' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
@@ -858,6 +877,8 @@ class RLToyEnv(gym.Env):
             self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state_relevant)
             # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays which is not possible with np.array!
+            if self.config["image_representations"]:
+                self.curr_state = self.observation_space.get_concatenated_image(self.curr_state)
         else: # if continuous space
             self.logger.debug("#TODO for cont. spaces: reset")
             while True: # Be careful about infinite loops
