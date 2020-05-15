@@ -22,7 +22,7 @@ import configparser
 
 parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
 parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
-                   help='Configuration file containing configuration space to run experiments. It must be a Python file so config can be given programmatically. '
+                   help='Configuration file containing configuration space to run experiments. It must be a Python file so config can be given programmatically. The env_config is different from the other config dicts in there. It contains variable configs for each configuration option for the environment as a list over the possible values they should take. A Cartesian product of these lists is taken to generate various possible configurations to be run.'
                    ' See default_config.py for an example. Config files for various experiments are present in the experiments directory.')
 parser.add_argument('-e', '--exp-name', dest='exp_name', action='store', default='mdpp_default_experiment',
                    help='The user-chosen name of the experiment. This is used as the prefix of the output files (the prefix also contains config_num if that is provided). It will save stats to 2 CSV files, with the filenames as the one given as argument'
@@ -65,7 +65,7 @@ from ray.rllib.models.preprocessors import OneHotPreprocessor
 from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
-ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),) #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so had to work around by giving full path + filename in stats_file_name.
+ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), memory=int(8e9), local_mode=True) #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so had to work around by giving full path + filename in stats_file_name.; also has driver_object_store_memory=
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
 print(config.algorithm, config.env_configs['state_space_size'], config.env_configs['action_space_size'], config.env_configs['delay'], config.env_configs['sequence_length'], config.env_configs['reward_density'], config.env_configs['make_denser'], config.env_configs['terminal_state_density'], config.env_configs['transition_noise'], config.env_configs['reward_noise'], config.env_configs['dummy_seed'])

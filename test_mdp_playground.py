@@ -67,7 +67,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 
-        # Test 2: sequence lengths #TODO
+        # Test 2: sequence lengths # TODO done in next test.
 
 
         # Test 3: that random actions lead to bad reward and then later a sequence of optimal actions leads to good reward. Also implicitly tests sequence lengths.
@@ -188,7 +188,7 @@ class TestRLToyEnv(unittest.TestCase):
 
 
         # Test for terminal states in presence of irrelevant dimensions
-        config["terminal_states"] = [[0.92834036, 2.16924632, -4.88226269, -0.12869191], [2.96422742, -2.17263562, -2.71264267, 0.07446024]] # The 1st element is taken from the relevant dimensions of the default initial state for the given seed. This is to trigger a resample in reset. The 2nd element is taken from the relevant dimensions of the state reached after 2 iterations below. This is to trigger reaching a terminal state and a subsequent reset.
+        config["terminal_states"] = [[0.92834036, 2.16924632, -4.88226269, -0.12869191], [2.96422742, -2.17263562, -2.71264267, 0.07446024]] # The 1st element is taken from the relevant dimensions of the default initial state for the given seed. This is to trigger a resample in reset. The 2nd element is taken from the relevant dimensions of the state reached after 2 iterations below. This is to trigger reaching a terminal state.
         config["term_state_edge"] = 1.0
         env = RLToyEnv(config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
@@ -200,11 +200,13 @@ class TestRLToyEnv(unittest.TestCase):
             action = np.array([1] * 7) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done)
+            if _ == 1:
+                assert done, "Terminal state should have been reached at step " + str(_)
             np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
             state = next_state.copy()
             state_derivatives = copy.deepcopy(env.state_derivatives)
             # augmented_state = copy.deepcopy(env.augmented_state)
-        np.testing.assert_allclose(state, np.array([5] * 7))
+        np.testing.assert_allclose(state, np.array([5] * 7)) # 5 because of state_space_max
         # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
         # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
         env.reset()
@@ -886,7 +888,7 @@ class TestRLToyEnv(unittest.TestCase):
 
     def test_discrete_image_representations(self):
         ''''''
-        print('\033[32;1;4MTEST_DISCRETE_IMAGE_REPRESENTATIONS\033[0m')
+        print('\033[32;1;4mTEST_DISCRETE_IMAGE_REPRESENTATIONS\033[0m')
         config = {}
         config["log_filename"] = log_filename
         config["seed"] = {}
@@ -924,6 +926,9 @@ class TestRLToyEnv(unittest.TestCase):
             expected_rewards[i] = expected_rewards[i] * config["reward_scale"] + config["reward_shift"] + expected_reward_noises[i]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
+            assert next_state.shape == (400, 400), "Expected shape was (400, 400). Shape was:" + str(next_state.shape)
+            assert next_state.dtype == np.uint8, "Expected dtype: np.uint8. Was: " + str(next_state.dtype)
+            assert next_state.sum() >= 2550000 and next_state.sum() <= 2650000, "Expected sum over image pixels: >255k and <265k. Was: " + str(next_state.sum()) # Rotation changes the expected sum of 255 * 10201 = 2601255
             next_state = env.get_augmented_state()['augmented_state'][-1]
             print("sars', done =", state, actions[i], reward, next_state, done)
             np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg="Expected reward mismatch in time step: " + str(i + 1) + " when sequence length = 3, delay = 1.")

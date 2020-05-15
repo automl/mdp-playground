@@ -1,0 +1,85 @@
+num_seeds = 10
+from collections import OrderedDict
+env_configs = OrderedDict({
+    'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
+    'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
+    'delay': [0] + [2**i for i in range(4)],
+    'sequence_length': [1, 2, 3, 4],#i for i in range(1,4)]
+    'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
+    'make_denser': [False],
+    'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
+    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
+    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
+    'dummy_seed': [i for i in range(num_seeds)],
+    'image_representations': [True],
+})
+
+algorithm = "DQN"
+agent_config = {
+    "adam_epsilon": 1e-4,
+    "beta_annealing_fraction": 1.0,
+    "buffer_size": 1000000,
+    "double_q": False,
+    "dueling": False,
+    "exploration_final_eps": 0.01,
+    "exploration_fraction": 0.1,
+    "final_prioritized_replay_beta": 1.0,
+    "hiddens": None,
+    "learning_starts": 1000,
+    "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    "n_step": 1,
+    "noisy": False,
+    "num_atoms": 1,
+    "prioritized_replay": False,
+    "prioritized_replay_alpha": 0.5,
+    "sample_batch_size": 4,
+    "schedule_max_timesteps": 20000,
+    "target_network_update_freq": 800,
+    "timesteps_per_iteration": 1000,
+    "min_iter_time_s": 0,
+    "train_batch_size": 32,
+}
+
+
+# formula [(W−K+2P)/S]+1
+filters_84x84 = [
+    [16, [8, 8], 4], # changes from 84x84x1 with padding 4 to 22x22x16 (or 26x26x16 for 100x100x1)
+    [32, [4, 4], 2], # changes to 11x11x32 with padding 2 (or 13x13x32 for 100x100x1)
+    [256, [11, 11], 1], # changes to 1x1x256 with padding 0 (or 3x3x256 for 100x100x1); this is the only layer with valid padding in Ray!
+]
+
+filters_100x100 = [
+    [16, [8, 8], 4], # changes from 84x84x1 with padding 4 to 22x22x16 (or 26x26x16 for 100x100x1)
+    [32, [4, 4], 2], # changes to 11x11x32 with padding 2 (or 13x13x32 for 100x100x1)
+    [64, [13, 13], 1], # changes to 1x1x64 with padding 0 (or 3x3x64 for 100x100x1); this is the only layer with valid padding in Ray!
+]
+# [num_outputs(=8 in this case), [1, 1], 1] conv2d appended by Ray always followed by a Dense layer with 1 output
+
+filters_50x50 = [
+    [16, [4, 4], 2],
+    [32, [4, 4], 2],
+    [64, [13, 13], 1],
+]
+
+filters_400x400 = [
+    [16, [32, 32], 16],
+    [32, [4, 4], 2],
+    [64, [13, 13], 1],
+]
+
+model_config = {
+    "model": {
+        "fcnet_hiddens": [256, 256],
+        # "custom_preprocessor": "ohe",
+        "custom_options": {},  # extra options to pass to your preprocessor
+        "conv_activation": "relu",
+        "conv_filters": filters_100x100,
+        # "no_final_linear": False,
+        # "vf_share_layers": True,
+        # "fcnet_activation": "tanh",
+        "use_lstm": False,
+        "max_seq_len": 20,
+        "lstm_cell_size": 256,
+        "lstm_use_prev_action_reward": False,
+    },
+}

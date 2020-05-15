@@ -310,13 +310,13 @@ class RLToyEnv(gym.Env):
                 self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=config["seed"]["irrelevant_state_space"]) #seed # hack
                 if config["image_representations"]:
                     underlying_obs_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed
-                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, 4, 400, 400)
+                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, transforms=',shift', seed=0)
                 else:
                     self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
             else:
                 self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
                 if config["image_representations"]:
-                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, 4, 400, 400)
+                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, transforms=',shift', seed=0)
                 else:
                     self.observation_space = self.relevant_observation_space
                 # print('id(self.observation_space)', id(self.observation_space), 'id(self.relevant_observation_space)', id(self.relevant_observation_space), id(self.relevant_observation_space) == id(self.observation_space))
@@ -544,15 +544,17 @@ class RLToyEnv(gym.Env):
         """
 
         # Transform multi-discrete to discrete for discrete state spaces with irrelevant dimensions; needed only for imaginary rollouts, otherwise, internal augmented state is used.
-        if only_query:
+        # if only_query:
+
+        if self.config["image_representations"]:
+            state = self.augmented_state[-1] ###TODO this would cause a crash if multi-discrete is used with image_representations!
+        else:
             if self.config["state_space_type"] == "discrete":
                 if isinstance(self.config["state_space_size"], list):
                     if self.config["irrelevant_state_space_size"] > 0:
                         state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(state, action, irrelevant_parts=True)
                     else:
                         state, action, _, _ = self.multi_discrete_to_discrete(state, action)
-        else:
-            state = self.augmented_state[-1]
 
 
 
