@@ -189,6 +189,7 @@ class RLToyEnv(gym.Env):
             config["seed"]["irrelevant_action_space"] = self.np_random.randint(sys.maxsize) #random
             config["seed"]["state_space"] = self.np_random.randint(sys.maxsize) #IMP This is currently used to sample only for continuous spaces and not used for discrete spaces by the Environment. User might want to sample from it for multi-discrete environments. #random
             config["seed"]["action_space"] = self.np_random.randint(sys.maxsize) #IMP This IS currently used to sample random actions by the RL agent for both discrete and continuous environments (but not used anywhere by the Environment). #random
+            config["seed"]["image_representations"] = self.np_random.randint(sys.maxsize) #random
         else: # if seed dict was passed
             self.seed(config["seed"]["env"]) #seed
 
@@ -310,13 +311,13 @@ class RLToyEnv(gym.Env):
                 self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=config["seed"]["irrelevant_state_space"]) #seed # hack
                 if config["image_representations"]:
                     underlying_obs_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed
-                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, transforms=',shift', seed=0)
+                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], seed=config["seed"]["image_representations"]) #seed
                 else:
                     self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
             else:
                 self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
                 if config["image_representations"]:
-                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, transforms=',shift', seed=0)
+                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], seed=config["seed"]["image_representations"]) #seed
                 else:
                     self.observation_space = self.relevant_observation_space
                 # print('id(self.observation_space)', id(self.observation_space), 'id(self.relevant_observation_space)', id(self.relevant_observation_space), id(self.relevant_observation_space) == id(self.observation_space))
@@ -434,7 +435,7 @@ class RLToyEnv(gym.Env):
                     assert self.is_terminal_state(s) == True
                     self.config["transition_function"][s, a] = s # Setting P(s, a) = s for terminal states, for P() to be meaningful even if someone doesn't check for 'done' being = True
 
-            self.logger.info(str(self.config["transition_function"]) + "init_transition_function" + str(type(self.config["transition_function"][0, 0])))
+            self.logger.warning(str(self.config["transition_function"]) + "init_transition_function" + str(type(self.config["transition_function"][0, 0])))
         else: # if continuous space
             # self.logger.debug("# TODO for cont. spaces") # transition function is fixed parameterisation for cont. right now.
             pass
@@ -479,7 +480,7 @@ class RLToyEnv(gym.Env):
                     #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
                     # specific_sequence = self.relevant_observation_space.sample(size=self.config["sequence_length"], replace=True) # Be careful that sequence_length is less than state space size
                     self.specific_sequences[self.sequence_length - 1].append(specific_sequence) #hack
-                    self.logger.info("specific_sequence that will be rewarded" + str(specific_sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+                    self.logger.warning("specific_sequence that will be rewarded" + str(specific_sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
                 self.logger.info("Total no. of rewarded sequences:" + str(len(self.specific_sequences[self.sequence_length - 1])) + str("Out of", num_possible_sequences))
             else: # if no repeats_in_sequences
                 len_ = self.sequence_length
@@ -508,7 +509,7 @@ class RLToyEnv(gym.Env):
                     if seq_ in self.specific_sequences[self.sequence_length - 1]: #hack
                         total_clashes += 1 #TODO remove these extra checks and assert below
                     self.specific_sequences[self.sequence_length - 1].append(seq_)
-                    self.logger.info("specific_sequence that will be rewarded" + str(seq_))
+                    self.logger.warning("specific_sequence that will be rewarded " + str(seq_))
                 #print(len(set(self.specific_sequences))) #error
                 # print(self.specific_sequences[self.sequence_length - 1])
 

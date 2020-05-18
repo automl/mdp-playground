@@ -12,6 +12,9 @@ env_configs = OrderedDict({
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
     'image_representations': [True],
+    'image_transforms': ['shift'],
+    'image_width': [50],
+    'image_height': [50],
 })
 
 algorithm = "DQN"
@@ -32,7 +35,7 @@ agent_config = {
     "num_atoms": 1,
     "prioritized_replay": False,
     "prioritized_replay_alpha": 0.5,
-    "sample_batch_size": 4,
+    "rollout_fragment_length": 4, # Renamed from sample_batch_size in some Ray version
     "schedule_max_timesteps": 20000,
     "target_network_update_freq": 800,
     "timesteps_per_iteration": 1000,
@@ -41,7 +44,7 @@ agent_config = {
 }
 
 
-# formula [(W−K+2P)/S]+1
+# formula [(W−K+2P)/S]+1; for padding=same: P = ((S-1)*W - S + K)/2
 filters_84x84 = [
     [16, [8, 8], 4], # changes from 84x84x1 with padding 4 to 22x22x16 (or 26x26x16 for 100x100x1)
     [32, [4, 4], 2], # changes to 11x11x32 with padding 2 (or 13x13x32 for 100x100x1)
@@ -54,6 +57,12 @@ filters_100x100 = [
     [64, [13, 13], 1], # changes to 1x1x64 with padding 0 (or 3x3x64 for 100x100x1); this is the only layer with valid padding in Ray!
 ]
 # [num_outputs(=8 in this case), [1, 1], 1] conv2d appended by Ray always followed by a Dense layer with 1 output
+
+# filters_99x99 = [
+#     [16, [8, 8], 4], # 51x51x16
+#     [32, [4, 4], 2],
+#     [64, [13, 13], 1],
+# ]
 
 filters_50x50 = [
     [16, [4, 4], 2],
@@ -73,7 +82,7 @@ model_config = {
         # "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         "conv_activation": "relu",
-        "conv_filters": filters_100x100,
+        "conv_filters": filters_50x50,
         # "no_final_linear": False,
         # "vf_share_layers": True,
         # "fcnet_activation": "tanh",
