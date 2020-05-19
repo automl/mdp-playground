@@ -28,13 +28,14 @@ echo "SLURM_JOB_NODELIST = ${SLURM_JOB_NODELIST}"
 
 python3 -V
 
-#export PATH="/home/rajanr/anaconda3/bin:$PATH"
+#export PATH="/home/rajanr/anaconda2/bin:$PATH"
 echo Paths: $PATH
 echo Parent program $0
 echo Shell used is $SHELL
 # type -a source
 
 # source activate /home/rajanr/anaconda2/envs/py36
+# source activate /home/rajanr/anaconda3/envs/py36_toy_rl
 . /home/rajanr/anaconda3/etc/profile.d/conda.sh # for anaconda3
 conda activate /home/rajanr/anaconda3/envs/py36_toy_rl # should be conda activate and not source when using anaconda3?
 #/home/rajanr/anaconda3/bin/conda activate /home/rajanr/anaconda2/envs/py36
