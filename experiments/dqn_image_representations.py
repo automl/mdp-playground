@@ -1,20 +1,35 @@
+'''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
+'''
 num_seeds = 10
+
+import itertools
+transforms = ['shift', 'scale', 'flip', 'rotate']
+image_transforms = []
+for i in range(len(transforms) + 1):
+    curr_combos = list(itertools.combinations(transforms, i))
+    for j in range(len(curr_combos)):
+        curr_elem = ''
+        for k in range(i):
+            curr_elem += curr_combos[j][k] + ','
+        # print(curr_elem, i, j)
+        image_transforms.append(curr_elem)
+
 from collections import OrderedDict
 env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0] + [2**i for i in range(4)],
-    'sequence_length': [1, 2, 3, 4],#i for i in range(1,4)]
+    'delay': [0], # + [2**i for i in range(4)],
+    'sequence_length': [1], #, 2, 3, 4],#i for i in range(1,4)]
     'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
-    'dummy_seed': [i for i in range(num_seeds)],
     'image_representations': [True],
-    'image_transforms': ['shift'],
+    'image_transforms': image_transforms, # ['shift', 'scale', 'flip', 'rotate', 'shift,scale,rotate,flip']
     'image_width': [50],
     'image_height': [50],
+    'dummy_seed': [i for i in range(num_seeds)],
 })
 
 algorithm = "DQN"

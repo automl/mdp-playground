@@ -138,7 +138,7 @@ for key in config.env_configs:
 
 import itertools
 cartesian_product_configs = list(itertools.product(*value_tuples))
-# print(list(cartesian_product_configs))
+print("Total number of configs. to run:", len(cartesian_product_configs))
 
 if args.config_num is None:
     pass
