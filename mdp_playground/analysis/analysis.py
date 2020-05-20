@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+import warnings
 
 class MDPP_Analysis():
     '''Utility class to load and plot data for analysis of experiments from MDP Playground
@@ -46,10 +47,15 @@ class MDPP_Analysis():
                     while True:
                         if os.path.isfile(file_prefix + '_' + str(i) + file_suffix):
                             with open(file_prefix + '_' + str(i) + file_suffix, 'rb') as curr_file:
-                                combined_file.write(curr_file.read())
+                                byte_string = curr_file.read()
+                                newline_count = byte_string.count(10)
+                                if newline_count != 21 and file_suffix == '.csv': #hack to check only train files and not eval
+                                    warnings.warn('Expected 21 \\n chars in each stats file. Got only: ' + str(newline_count) + ' in file: ' + str(i))
+                                combined_file.write(byte_string)
                         else:
                             break
                         i += 1
+                    print(str(i) + " files were combined into 1 for file:" + file_prefix + '_n' + file_suffix)
             join_files(stats_file,  '.csv')
             join_files(stats_file, '_eval.csv')
 
@@ -57,8 +63,26 @@ class MDPP_Analysis():
         # print(stats_pd)
         # print(stats_pd[11].dtypes)
         # print(stats_pd.dtypes)
-        # print(stats_pd.shape[0])
+        print("Training stats read (rows, columns):", stats_pd.shape)
 
+        # Read column names
+        with open(stats_file + '.csv') as file_:
+            config_names = file_.readline().strip().split(', ')
+            config_names[0] = config_names[0][2:] # to remove '# ' that was written
+            # config_names[-1] = config_names[-1][:-1] # to remove ',' that was written
+        # print("config_names:", config_names)
+        self.config_names = config_names # ['Delay', 'Sequence Length', 'Reward Density', 'Terminal State Density', 'P Noise', 'R Noise', 'dummy_seed']
+        config_counts = []
+        dims_values = []
+        # For the following seeds should always be last column read! 1st column should be >=1 (it should not be 0 because that is the training_iteration that was recorded and is not used here)
+        for i in range(1, len(config_names) - 3): #hardcoded 3 for no. of stats written
+            dims_values.append(stats_pd[i].unique())
+            config_counts.append(stats_pd[i].nunique())
+
+        config_counts.append(3) #hardcoded number of training stats that were recorded
+        config_counts = tuple(config_counts)
+
+        # Slice into training stats and get end of training stats for individual training runs in the experiment
         final_rows_for_a_config = []
         previous_i = 0
         list_of_learning_curves = []
@@ -73,22 +97,6 @@ class MDPP_Analysis():
         final_rows_for_a_config.append(i + 1) # Always append the last row!
         # list_of_learning_curves.append(stats_pd.iloc[previous_i:i + 2, -cols_to_take:])
         self.final_rows_for_a_config = final_rows_for_a_config
-
-        with open(stats_file + '.csv') as file_:
-            config_names = file_.readline().strip().split(', ')
-            config_names[0] = config_names[0][2:] # to remove '# ' that was written
-            # config_names[-1] = config_names[-1][:-1] # to remove ',' that was written
-        # print("config_names:", config_names)
-        self.config_names = config_names # ['Delay', 'Sequence Length', 'Reward Density', 'Terminal State Density', 'P Noise', 'R Noise', 'dummy_seed']
-        config_counts = []
-        dims_values = []
-        # For the following seeds should always be last column read! 1st column should be >=1 (it should not be 0 because that is the training_iteration that was recorded and is not used here)
-        for i in range(1, 1 + len(config_names)): #hardcoded corresponds to columns written to evaluation stats CSV file
-            dims_values.append(stats_pd[i].unique())
-            config_counts.append(stats_pd[i].nunique())
-
-        config_counts.append(3) #hardcoded number of training stats that were recorded
-        config_counts = tuple(config_counts)
 
         # print(len(list_of_learning_curves))
         # print(len(final_rows_for_a_config))
@@ -118,6 +126,7 @@ class MDPP_Analysis():
             i += 1
 
         # print(len(hack_indices), hack_indices)
+        hack_indices = hack_indices[1:] #hardcoded removes the 1st hack_index which is at position 0 so that hack_indices_10 below doesn't begin with a -10; apparently Ray seems to have changed logging for evaluation (using on_episode_end) from 0.7.3 to 0.9.0
         hack_indices_10 = np.array(hack_indices) - 10
         # print(hack_indices_10.shape, hack_indices_10)
         # print(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))
@@ -126,6 +135,7 @@ class MDPP_Analysis():
         for i in range(len(hack_indices)):
             final_10_evals.append(eval_stats[hack_indices_10[i]:hack_indices[i]])
         #     print(final_10_evals[-1])
+        final_10_evals.append(eval_stats[hack_indices[i]:]) # appends the very last eval which begins at last hack_index
 
         final_10_evals = np.array(final_10_evals) # has 2 columns: episode reward and episode length
         # print(final_10_evals.shape, final_10_evals)
@@ -193,7 +203,8 @@ class MDPP_Analysis():
         std_dev_ = np.std(stats_data[..., -2], axis=-1)
         to_plot_std_ = np.squeeze(std_dev_)
 
-        plt.figure(figsize=(5, 1.5))
+        fig_width = len(self.tick_labels[0])
+        plt.figure(figsize=(fig_width, 1.5))
 
         print(to_plot_.shape)
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
@@ -207,7 +218,8 @@ class MDPP_Analysis():
         plt.show()
 
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
-            plt.figure(figsize=(5, 1.5))
+            fig_width = len(self.tick_labels[1])
+            plt.figure(figsize=(fig_width, 1.5))
             plt.bar(self.tick_labels[1], to_plot_[0, :], yerr=to_plot_std_[0, :])
             # plt.tight_layout()
             plt.xlabel(self.axis_labels[1])

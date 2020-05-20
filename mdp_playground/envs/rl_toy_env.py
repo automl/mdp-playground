@@ -795,7 +795,7 @@ class RLToyEnv(gym.Env):
 
         self.done = self.is_terminal_state(self.augmented_state[-1]) ####TODO curr_state is external state, while we need to check relevant state for terminality!
         if self.done:
-            self.reward += self.config["term_state_reward"]
+            self.reward += self.config["term_state_reward"] * self.reward_scale
         self.logger.info('sas\'r:' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
         return self.curr_state, self.reward, self.done, self.get_augmented_state()
 

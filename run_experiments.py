@@ -41,7 +41,7 @@ if args.config_file[-3:] == '.py':
 
 config_file_path = os.path.abspath('/'.join(args.config_file.split('/')[:-1]))
 # print("config_file_path:", config_file_path)
-sys.path.insert(1, config_file_path)
+sys.path.insert(1, config_file_path) #hack
 import importlib
 config = importlib.import_module(args.config_file.split('/')[-1], package=None)
 print("Number of seeds for environment:", config.num_seeds)
@@ -65,7 +65,7 @@ from ray.rllib.models.preprocessors import OneHotPreprocessor
 from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
-ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), memory=int(8e9), local_mode=True) #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=
+ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), memory=int(8e9)) #local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
 print(config.algorithm, config.env_configs['state_space_size'], config.env_configs['action_space_size'], config.env_configs['delay'], config.env_configs['sequence_length'], config.env_configs['reward_density'], config.env_configs['make_denser'], config.env_configs['terminal_state_density'], config.env_configs['transition_noise'], config.env_configs['reward_noise'], config.env_configs['dummy_seed'])
@@ -80,6 +80,7 @@ fout.write('timesteps_total, episode_reward_mean, episode_len_mean\n')
 fout.close()
 
 config_env_configs = config.env_configs #hack
+config_algorithm = config.algorithm #hack
 # sys.exit(0)
 
 import time
@@ -92,7 +93,7 @@ def on_train_result(info):
 
     # Writes every iteration, would slow things down. #hack
     fout = open(hack_filename, 'a') #hardcoded
-    fout.write(str(training_iteration) + ' ')
+    fout.write(str(training_iteration) + ' ' + config_algorithm + ' ')
     for key in config_env_configs:
         if key == 'reward_noise':
             fout.write(str(info["result"]["config"]["env_config"]['reward_noise_std']) + ' ') #hack
