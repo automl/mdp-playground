@@ -30,8 +30,8 @@ env_configs = OrderedDict({
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'image_representations': [True],
     'image_transforms': image_transforms, # ['shift', 'scale', 'flip', 'rotate', 'shift,scale,rotate,flip']
-    'image_width': [50],
-    'image_height': [50],
+    'image_width': [100],
+    'image_height': [100],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -100,7 +100,7 @@ model_config = {
         # "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         "conv_activation": "relu",
-        "conv_filters": filters_50x50,
+        "conv_filters": filters_100x100,
         # "no_final_linear": False,
         # "vf_share_layers": True,
         # "fcnet_activation": "tanh",
