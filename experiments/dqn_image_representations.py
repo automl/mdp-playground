@@ -8,7 +8,10 @@ image_transforms = []
 for i in range(len(transforms) + 1):
     curr_combos = list(itertools.combinations(transforms, i))
     for j in range(len(curr_combos)):
-        curr_elem = 'dummy' # this is written to a CSV file with ' ' separater, therefore it needs to have some value in there.
+        if i == 0:
+            curr_elem = 'none' # this is written to a CSV file with ' ' separater, therefore it needs to have some value in there.
+        else:
+            curr_elem = ''
         for k in range(i):
             curr_elem += curr_combos[j][k] + ','
         # print(curr_elem, i, j)

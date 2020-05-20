@@ -62,22 +62,22 @@ class MDPP_Analysis():
         final_rows_for_a_config = []
         previous_i = 0
         list_of_learning_curves = []
-        cols_to_take = 8
+        # cols_to_take = 8
 
         for i in range(stats_pd.shape[0] - 1):
             if stats_pd.iloc[i, -3] > stats_pd.iloc[i + 1, -3]: #hardcoded: 3rd last column is no. of timesteps for the current run
-                list_of_learning_curves.append(stats_pd.iloc[previous_i:i+1, -cols_to_take:])
+                # list_of_learning_curves.append(stats_pd.iloc[previous_i:i+1, -cols_to_take:])
                 previous_i = i + 1
                 final_rows_for_a_config.append(i)
         # print("i, previous_i:", i, previous_i)
         final_rows_for_a_config.append(i + 1) # Always append the last row!
-        list_of_learning_curves.append(stats_pd.iloc[previous_i:i + 2, -cols_to_take:])
+        # list_of_learning_curves.append(stats_pd.iloc[previous_i:i + 2, -cols_to_take:])
         self.final_rows_for_a_config = final_rows_for_a_config
 
         with open(stats_file + '.csv') as file_:
             config_names = file_.readline().strip().split(', ')
             config_names[0] = config_names[0][2:] # to remove '# ' that was written
-            config_names[-1] = config_names[-1][:-1] # to remove ',' that was written
+            # config_names[-1] = config_names[-1][:-1] # to remove ',' that was written
         # print("config_names:", config_names)
         self.config_names = config_names # ['Delay', 'Sequence Length', 'Reward Density', 'Terminal State Density', 'P Noise', 'R Noise', 'dummy_seed']
         config_counts = []
@@ -136,6 +136,7 @@ class MDPP_Analysis():
         # print("len(final_10_evals)", final_10_evals.shape, type(final_10_evals))
         mean_data_eval = np.mean(final_10_evals, axis=1) # this is mean over last 10 eval episodes
 #         print(np.array(stats_pd.iloc[:, -3]))
+        # Adds timesteps_total to the eval stats which did not have them:
         mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -3])).T, mean_data_eval), axis=1)
 #         print(mean_data_eval.shape, len(final_rows_for_a_config))
 
