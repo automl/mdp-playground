@@ -169,6 +169,14 @@ class MDPP_Analysis():
             if self.config_counts[i]> 1:
                 x_axis_labels.append(self.config_names[i])
                 x_tick_labels_.append([str(j) for j in self.dims_values[i]])
+                for i in range(len(x_tick_labels_[-1])):
+                    if len(x_tick_labels_[-1][i]) > 2: #hack
+                        abridged_str = x_tick_labels_[-1][i].split(',')
+                        if abridged_str[-1] == '':
+                            abridged_str = abridged_str[:-1]
+                        for j in range(len(abridged_str)):
+                            abridged_str[j] = abridged_str[j][:2]
+                        x_tick_labels_[-1][i] = ','.join(abridged_str)
                 dims_varied.append(i)
 
         self.axis_labels = x_axis_labels
@@ -204,6 +212,7 @@ class MDPP_Analysis():
         to_plot_std_ = np.squeeze(std_dev_)
 
         fig_width = len(self.tick_labels[0])
+        # plt.figure()
         plt.figure(figsize=(fig_width, 1.5))
 
         print(to_plot_.shape)

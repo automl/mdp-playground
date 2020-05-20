@@ -926,7 +926,7 @@ class TestRLToyEnv(unittest.TestCase):
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
         expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
         expected_reward_noises = [-0.292808, 0.770696, -1.01743611, -0.042768, 0.78761320, -0.510087, -0.089978, 0.48654863]
-        expected_image_sums = [105060, 232050, 78795]
+        expected_image_sums = [152745, 282030, 528870] # [105060, 232050, 78795]
         for i in range(len(expected_rewards)):
             expected_rewards[i] = expected_rewards[i] * config["reward_scale"] + config["reward_shift"] + expected_reward_noises[i]
         for i in range(len(expected_rewards)):
