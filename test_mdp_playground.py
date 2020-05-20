@@ -895,6 +895,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["seed"]["env"] = 0
         config["seed"]["relevant_state_space"] = 8
         config["seed"]["relevant_action_space"] = 8
+        config["seed"]["image_representations"] = 0
 
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
@@ -915,6 +916,9 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
 
         config["image_representations"] = True
+        config["image_width"] = 100
+        config["image_height"] = 100
+        config["image_transforms"] = 'shift,scale,rotate,flip'
         env = RLToyEnv(config)
         state = env.get_augmented_state()['augmented_state'][-1]
 
@@ -922,13 +926,15 @@ class TestRLToyEnv(unittest.TestCase):
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
         expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
         expected_reward_noises = [-0.292808, 0.770696, -1.01743611, -0.042768, 0.78761320, -0.510087, -0.089978, 0.48654863]
+        expected_image_sums = [105060, 232050, 78795]
         for i in range(len(expected_rewards)):
             expected_rewards[i] = expected_rewards[i] * config["reward_scale"] + config["reward_shift"] + expected_reward_noises[i]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
-            assert next_state.shape == (400, 400), "Expected shape was (400, 400). Shape was:" + str(next_state.shape)
+            assert next_state.shape == (100, 100, 1), "Expected shape was (100, 100, 1). Shape was:" + str(next_state.shape)
             assert next_state.dtype == np.uint8, "Expected dtype: np.uint8. Was: " + str(next_state.dtype)
-            assert next_state.sum() >= 2550000 and next_state.sum() <= 2650000, "Expected sum over image pixels: >255k and <265k. Was: " + str(next_state.sum()) # Rotation changes the expected sum of 255 * 10201 = 2601255
+            if i < len(expected_image_sums):
+                assert next_state.sum() == expected_image_sums[i], "Expected sum over image pixels: " + str(expected_image_sums[i]) + ". Was: " + str(next_state.sum()) # Rotation changes the expected sum of 255 * 10201 = 2601255
             next_state = env.get_augmented_state()['augmented_state'][-1]
             print("sars', done =", state, actions[i], reward, next_state, done)
             np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg="Expected reward mismatch in time step: " + str(i + 1) + " when sequence length = 3, delay = 1.")
@@ -936,6 +942,10 @@ class TestRLToyEnv(unittest.TestCase):
 
         env.reset()
         env.close()
+
+            # import PIL.Image as Image
+            # img1 = Image.fromarray(np.squeeze(next_state), 'L')
+            # img1.show()
 
 
     # def test_discrete_imaginary_rollouts(self):
