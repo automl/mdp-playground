@@ -169,20 +169,29 @@ class MDPP_Analysis():
             if self.config_counts[i]> 1:
                 x_axis_labels.append(self.config_names[i])
                 x_tick_labels_.append([str(j) for j in self.dims_values[i]])
-                for i in range(len(x_tick_labels_[-1])):
-                    if len(x_tick_labels_[-1][i]) > 2: #hack
-                        abridged_str = x_tick_labels_[-1][i].split(',')
+                for j in range(len(x_tick_labels_[-1])):
+                    if len(x_tick_labels_[-1][j]) > 2: #hack
+                        abridged_str = x_tick_labels_[-1][j].split(',')
                         if abridged_str[-1] == '':
                             abridged_str = abridged_str[:-1]
-                        for j in range(len(abridged_str)):
-                            abridged_str[j] = abridged_str[j][:2]
-                        x_tick_labels_[-1][i] = ','.join(abridged_str)
+                        for k in range(len(abridged_str)):
+                            if abridged_str[k] == 'scale':
+                                abridged_str[k] = 'S'
+                            elif abridged_str[k] == 'shift':
+                                abridged_str[k] = 's'
+                            elif abridged_str[k] == 'rotate':
+                                abridged_str[k] = 'r'
+                            elif abridged_str[k] == 'flip':
+                                abridged_str[k] = 'f'
+                            # abridged_str[j] = abridged_str[j][:2]
+                        x_tick_labels_[-1][j] = ''.join(abridged_str)
                 dims_varied.append(i)
 
         self.axis_labels = x_axis_labels
         self.tick_labels = x_tick_labels_
         self.dims_varied = dims_varied
-        # print(x_axis_labels, x_tick_labels_, dims_varied)
+        for d,v,i in zip(x_axis_labels, x_tick_labels_, dims_varied):
+            print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in data:", i)
 
         return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval
 
@@ -215,7 +224,7 @@ class MDPP_Analysis():
         # plt.figure()
         plt.figure(figsize=(fig_width, 1.5))
 
-        print(to_plot_.shape)
+        # print(to_plot_.shape)
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
             plt.bar(self.tick_labels[0], to_plot_[:, 0], yerr=to_plot_std_[:, 0])
         else:
@@ -251,16 +260,22 @@ class MDPP_Analysis():
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
         '''
         plt.rcParams.update({'font.size': 18}) # default 12, 24 for paper, for poster: 30
+        cmap = 'Purples' # 'Blues' # 
 
         mean_data_ = np.mean(stats_data[..., -2], axis=-1)
         to_plot_ = np.squeeze(mean_data_)
-        plt.imshow(np.atleast_2d(to_plot_), cmap='Purples', interpolation='none', vmin=0, vmax=np.max(to_plot_))
-        plt.gca().set_xticklabels(self.tick_labels[1]) # dims 1 and 0 are exchanged here because Y-axis has plot for 1st varying dim and X-axis has plot for 2nd varying dim
+        if len(to_plot_.shape) > 2:
+            # warning.warn("Data contains variation in more than 2 dimensions (apart from seeds). May lead to plotting error!")
+            raise ValueError("Data contains variation in more than 2 dimensions (apart from seeds). This is currently not supported") #TODO Add 2-D plots for all combinations of 2 varying dims?
+        plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_))
+        if len(self.tick_labels) == 2:
+            plt.gca().set_xticklabels(self.tick_labels[1]) # dims 1 and 0 are exchanged here because Y-axis has plot for 1st varying dim and X-axis has plot for 2nd varying dim
         plt.gca().set_yticklabels(self.tick_labels[0])
         cbar = plt.colorbar()
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 25
         cbar.set_label('Reward', rotation=270)
-        plt.xlabel(self.axis_labels[1])
+        if len(self.axis_labels) == 2:
+            plt.xlabel(self.axis_labels[1])
         plt.ylabel(self.axis_labels[0])
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map.pdf', dpi=300, bbox_inches="tight")
@@ -268,13 +283,15 @@ class MDPP_Analysis():
         std_dev_ = np.std(stats_data[..., -2], axis=-1)
         to_plot_ = np.squeeze(std_dev_)
         # print(to_plot_, to_plot_.shape)
-        plt.imshow(np.atleast_2d(to_plot_), cmap='Purples', interpolation='none', vmin=0, vmax=np.max(to_plot_)) # 60 for DQN, 100 for A3C
-        plt.gca().set_xticklabels(self.tick_labels[1])
+        plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_)) # 60 for DQN, 100 for A3C
+        if len(self.tick_labels) == 2:
+            plt.gca().set_xticklabels(self.tick_labels[1])
         plt.gca().set_yticklabels(self.tick_labels[0])
         cbar = plt.colorbar()
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 30
         cbar.set_label('Reward Std Dev.', rotation=270)
-        plt.xlabel(self.axis_labels[1])
+        if len(self.axis_labels) == 2:
+            plt.xlabel(self.axis_labels[1])
         plt.ylabel(self.axis_labels[0])
         # plt.tight_layout()
         if save_fig:
@@ -331,7 +348,12 @@ class MDPP_Analysis():
                 ax[i_index][j_index].set_xlabel("Train Timesteps")
                 ax[i_index][j_index].set_ylabel("Reward")
         #         ax[i_index][j_index].set_title('Delay ' + str(delays[i_index]) + ', Sequence Length ' + str(sequence_lengths[j_index]))
-                ax[i_index][j_index].set_title(self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][i_index]) + ', ' + self.config_names[self.dims_varied[1]] + ' '  + str(self.dims_values[self.dims_varied[1]][j_index]))
+                title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][i_index])
+                if len(self.dims_varied) > 1:
+                    title_2nd_dim = self.config_names[self.dims_varied[1]] + ' '  + str(self.dims_values[self.dims_varied[1]][j_index])
+                else:
+                    title_2nd_dim = ''
+                ax[i_index][j_index].set_title(title_1st_dim + ', ' + title_2nd_dim)
         #         ax[i_index][j_index].set_title('Sequence Length ' + str(seq_lens[j_index]))
         #         ax[i_index][j_index].set_title('Reward Density ' + str(reward_densities[j_index]))
 
