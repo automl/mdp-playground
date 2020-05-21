@@ -38,27 +38,28 @@ env_configs = OrderedDict({
 algorithm = "DQN"
 agent_config = {
     "adam_epsilon": 1e-4,
-    "beta_annealing_fraction": 1.0,
     "buffer_size": 1000000,
-    "double_q": False,
-    "dueling": False,
+    "double_q": True,
+    "dueling": True,
+    "lr": 1e-3,
     "exploration_final_eps": 0.01,
     "exploration_fraction": 0.1,
-    "final_prioritized_replay_beta": 1.0,
-    "hiddens": None,
-    "learning_starts": 1000,
-    "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
-    "n_step": 1,
-    "noisy": False,
-    "num_atoms": 1,
-    "prioritized_replay": False,
-    "prioritized_replay_alpha": 0.5,
-    "sample_batch_size": 4, # Renamed from sample_batch_size in some Ray version
     "schedule_max_timesteps": 20000,
-    "target_network_update_freq": 800,
+    # "hiddens": None,
+    "learning_starts": 500,
+    "target_network_update_freq": 80,
+    "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
+    "noisy": True,
+    "num_atoms": 10, # [5, 10, 20]
+    "prioritized_replay": True,
+    "prioritized_replay_alpha": 0.75, #
+    "prioritized_replay_beta": 0.4,
+    "final_prioritized_replay_beta": 1.0, #
+    "beta_annealing_fraction": 1.0, #
+    "sample_batch_size": 4,
     "timesteps_per_iteration": 1000,
-    "min_iter_time_s": 0,
     "train_batch_size": 32,
+    "min_iter_time_s": 0,
 }
 
 

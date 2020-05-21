@@ -38,7 +38,7 @@ agent_config = {
     "sample_batch_size": 4,
     "timesteps_per_iteration": 1000,
     "train_batch_size": 32,
-    "min_iter_time_s": 1,
+    "min_iter_time_s": 0,
 }
 
 model_config = {
