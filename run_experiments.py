@@ -7,6 +7,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import copy
 
 import ray
 from ray import tune
@@ -31,6 +32,10 @@ parser.add_argument('-n', '--config-num', dest='config_num', action='store', def
                    help='Used for running the configurations of experiments in parallel. This is appended to the prefix of the output files (after exp_name).'
                    ' A Cartesian product of different configuration values for the experiment will be taken and ordered as a list and this number corresponds to the configuration number in this list.'
                    ' Please look in to the code for details.')
+# parser.add_argument('-t', '--tune-hps', dest='tune_hps', action='store', default=False, type=bool,
+#                    help='Used for tuning the hyperparameters that can be used for experiments later.'
+#                    ' A Cartesian product of different configuration values for the experiment will be taken and ordered as a list and this number corresponds to the configuration number in this list.'
+#                    ' Please look in to the code for details.')
 
 
 args = parser.parse_args()
@@ -65,23 +70,43 @@ from ray.rllib.models.preprocessors import OneHotPreprocessor
 from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
-ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True) #, memory=int(8e9), local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=
+if config.algorithm == 'DQN':
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True) #, memory=int(8e9), local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=
+elif config.algorithm == 'A3C': #hack
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9))
+
+
+var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
+
+if "env" in config.var_configs:
+    var_env_configs = config.var_configs["env"] #hack
+else:
+    var_env_configs = []
+if "agent" in config.var_configs:
+    var_agent_configs = config.var_configs["agent"] #hack
+else:
+    var_agent_configs = []
+if "model" in config.var_configs:
+    var_model_configs = config.var_configs["model"] #hack
+else:
+    var_model_configs = []
+
+config_algorithm = config.algorithm #hack
+# sys.exit(0)
+
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
-print(config.algorithm, config.env_configs['state_space_size'], config.env_configs['action_space_size'], config.env_configs['delay'], config.env_configs['sequence_length'], config.env_configs['reward_density'], config.env_configs['make_denser'], config.env_configs['terminal_state_density'], config.env_configs['transition_noise'], config.env_configs['reward_noise'], config.env_configs['dummy_seed'])
+print(config.algorithm, var_env_configs['state_space_size'], var_env_configs['action_space_size'], var_env_configs['delay'], var_env_configs['sequence_length'], var_env_configs['reward_density'], var_env_configs['make_denser'], var_env_configs['terminal_state_density'], var_env_configs['transition_noise'], var_env_configs['reward_noise'], var_env_configs['dummy_seed'])
 
 
 hack_filename = stats_file_name + '.csv'
 fout = open(hack_filename, 'a') #hardcoded
 fout.write('# training_iteration, algorithm, ')
-for key in config.env_configs:
+for key in var_env_configs:
     fout.write(key + ', ')
 fout.write('timesteps_total, episode_reward_mean, episode_len_mean\n')
 fout.close()
 
-config_env_configs = config.env_configs #hack
-config_algorithm = config.algorithm #hack
-# sys.exit(0)
 
 import time
 start = time.time()
@@ -94,12 +119,19 @@ def on_train_result(info):
     # Writes every iteration, would slow things down. #hack
     fout = open(hack_filename, 'a') #hardcoded
     fout.write(str(training_iteration) + ' ' + config_algorithm + ' ')
-    for key in config_env_configs:
-        if key == 'reward_noise':
-            fout.write(str(info["result"]["config"]["env_config"]['reward_noise_std']) + ' ') #hack
-        else:
-            fout.write(str(info["result"]["config"]["env_config"][key]) + ' ')
+    for config_type, config_dict in var_configs_deepcopy.items():
+        for key in config_dict:
+            if config_type == "env":
+                if key == 'reward_noise':
+                    fout.write(str(info["result"]["config"]["env_config"]['reward_noise_std']) + ' ') #hack
+                else:
+                    fout.write(str(info["result"]["config"]["env_config"][key]) + ' ')
+            elif config_type == "agent":
+                fout.write(str(info["result"]["config"][key]) + ' ')
+            elif config_type == "model":
+                fout.write(str(info["result"]["config"]["model"][key]) + ' ')
 
+    # Write train stats
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
     episode_len_mean = info["result"]["episode_len_mean"]
@@ -134,8 +166,10 @@ def on_episode_end(info):
 
 
 value_tuples = []
-for key in config.env_configs:
-    value_tuples.append(config.env_configs[key])
+for config_type, config_dict in config.var_configs.items():
+    for key in config_dict:
+        assert type(config.var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
+        value_tuples.append(config.var_configs[config_type][key])
 
 import itertools
 cartesian_product_configs = list(itertools.product(*value_tuples))
@@ -174,29 +208,31 @@ for current_config in cartesian_product_configs:
 
     agent_config = config.agent_config
     model_config = config.model_config
-    if model_config["model"]["use_lstm"]:
+    if model_config["model"]["use_lstm"]: #hack
         model_config["model"]["max_seq_len"] = delay + sequence_length
-
+    env_config = config.env_config
     # sys.exit(0)
-    env_config = {
-        "env": "RLToy-v0",
-        "env_config": {
-            'seed': 0, #seed
-            'state_space_type': 'discrete',
-            'action_space_type': 'discrete',
-            'generate_random_mdp': True,
-            'repeats_in_sequences': False,
-            'reward_unit': 1.0,
-            'completely_connected': True,
-        },
-    }
-    for key in config.env_configs: # There is a dummy seed in the env_config because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
-        if key == 'reward_noise':
-            reward_noise_ = current_config[list(config.env_configs).index(key)]
-            env_config["env_config"][key] = tune.function(lambda a: a.normal(0, reward_noise_))
-            env_config["env_config"]['reward_noise_std'] = reward_noise_ #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above
-        else:
-            env_config["env_config"][key] = current_config[list(config.env_configs).index(key)]
+
+    for config_type, config_dict in config.var_configs.items():
+        for key in config_dict:
+        # if config_type == "env_config": # There is a dummy seed in the env_config because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
+            if config_type == "env":
+                if key == 'reward_noise':
+                    reward_noise_ = current_config[list(var_env_configs).index(key)] # this works because env_configs are 1st in the OrderedDict
+                    env_config["env_config"][key] = tune.function(lambda a: a.normal(0, reward_noise_))
+                    env_config["env_config"]['reward_noise_std'] = reward_noise_ #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above
+                else:
+                    env_config["env_config"][key] = current_config[list(var_env_configs).index(key)]
+
+            elif config_type == "agent":
+                num_configs_done = len(list(var_env_configs))
+                agent_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+
+            elif config_type == "model":
+                num_configs_done = len(list(var_env_configs)) + len(list(var_agent_configs))
+                model_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+
+
 
     eval_config = {
         "evaluation_interval": 1, # I think this means every x training_iterations
@@ -231,7 +267,7 @@ for current_config in cartesian_product_configs:
 
     if algorithm == 'DQN':
         timesteps_total = 20000
-    elif algorithm == 'A3C':
+    elif algorithm == 'A3C': #hack
         timesteps_total = 150000
 
     tune.run(

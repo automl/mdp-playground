@@ -18,7 +18,7 @@ for i in range(len(transforms) + 1):
         image_transforms.append(curr_elem)
 
 from collections import OrderedDict
-env_configs = OrderedDict({
+var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
     'delay': [0], # + [2**i for i in range(4)],
@@ -34,6 +34,23 @@ env_configs = OrderedDict({
     'image_height': [100],
     'dummy_seed': [i for i in range(num_seeds)],
 })
+
+var_configs = OrderedDict({
+"env": var_env_configs
+})
+
+env_config = {
+    "env": "RLToy-v0",
+    "env_config": {
+        'seed': 0, #seed
+        'state_space_type': 'discrete',
+        'action_space_type': 'discrete',
+        'generate_random_mdp': True,
+        'repeats_in_sequences': False,
+        'reward_scale': 1.0,
+        'completely_connected': True,
+    },
+}
 
 algorithm = "A3C"
 agent_config = {
