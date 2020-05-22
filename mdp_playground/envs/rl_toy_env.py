@@ -105,7 +105,7 @@ class RLToyEnv(gym.Env):
         Parameters
         ----------
         config : dict
-            the class attribute above is initialised to this value after inserting defaults
+            the member variable config is initialised to this value after inserting defaults
         """
 
         # Set default settings for config to be able to use class without any config passed
@@ -163,57 +163,85 @@ class RLToyEnv(gym.Env):
 
         # Set other default settings for config to use if config is passed without any values for them
         if "log_level" not in config:
-            config["log_level"] = logging.CRITICAL #logging.NOTSET
+            self.log_level = logging.CRITICAL #logging.NOTSET
+        else:
+            self.log_level = config["log_level"]
 
         if "log_filename" not in config:
-            config["log_filename"] = __name__ + '_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
+            self.log_filename = __name__ + '_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
+        else:
+            self.log_filename = config["log_filename"]
         # log_filename = "logs/output.log"
         # os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 
-        # print('config["log_level"]', config["log_level"])
-        logging.basicConfig(filename=config["log_filename"], filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=config["log_level"])
+        # print('self.log_level', self.log_level)
+        logging.basicConfig(filename=self.log_filename, filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=self.log_level)
         self.logger = logging.getLogger(__name__)
 
+        #seed
+        if "seed" not in config: #####IMP It's very important to not modify the config dict since it may be shared across multiple instances of the Env in the same process and could leed to very hard to catch bugs
+            self.seed_int = None
+            need_to_gen_seeds = True
+        elif type(config["seed"]) == dict:
+            self.seed_dict = config["seed"]
+            need_to_gen_seeds = False
+        elif type(config["seed"]) == int: # should be an int then. Gym doesn't accept np.int64, etc..
+            self.seed_int = config["seed"]
+            need_to_gen_seeds = True
+        else:
+            raise TypeError("Unsupported data type for seed: ", type(config["seed"]))
 
-        if "seed" not in config:
-            config["seed"] = None #seed
-        if not isinstance(config["seed"], dict): # should be an int then. Gym doesn't accept np.int64, etc..
-            seed_ = config["seed"]
-            config["seed"] = {}
-            config["seed"]["env"] = seed_
-            self.seed(config["seed"]["env"]) #seed
+        #seed
+        if need_to_gen_seeds:
+            self.seed_dict = {}
+            self.seed_dict["env"] = self.seed_int
+            self.seed(self.seed_dict["env"])
             ##IMP All these diff. seeds may not be needed (you could have one seed for the joint relevant + irrelevant parts). But they allow for easy separation of the relevant and irrelevant dimensions!! _And_ the seed remaining the same for the underlying discrete environment makes it easier to write tests!
-            config["seed"]["relevant_state_space"] = self.np_random.randint(sys.maxsize) #random
-            config["seed"]["relevant_action_space"] = self.np_random.randint(sys.maxsize) #random
-            config["seed"]["irrelevant_state_space"] = self.np_random.randint(sys.maxsize) #random
-            config["seed"]["irrelevant_action_space"] = self.np_random.randint(sys.maxsize) #random
-            config["seed"]["state_space"] = self.np_random.randint(sys.maxsize) #IMP This is currently used to sample only for continuous spaces and not used for discrete spaces by the Environment. User might want to sample from it for multi-discrete environments. #random
-            config["seed"]["action_space"] = self.np_random.randint(sys.maxsize) #IMP This IS currently used to sample random actions by the RL agent for both discrete and continuous environments (but not used anywhere by the Environment). #random
-            config["seed"]["image_representations"] = self.np_random.randint(sys.maxsize) #random
+            self.seed_dict["relevant_state_space"] = self.np_random.randint(sys.maxsize) #random
+            self.seed_dict["relevant_action_space"] = self.np_random.randint(sys.maxsize) #random
+            self.seed_dict["irrelevant_state_space"] = self.np_random.randint(sys.maxsize) #random
+            self.seed_dict["irrelevant_action_space"] = self.np_random.randint(sys.maxsize) #random
+            self.seed_dict["state_space"] = self.np_random.randint(sys.maxsize) #IMP This is currently used to sample only for continuous spaces and not used for discrete spaces by the Environment. User might want to sample from it for multi-discrete environments. #random
+            self.seed_dict["action_space"] = self.np_random.randint(sys.maxsize) #IMP This IS currently used to sample random actions by the RL agent for both discrete and continuous environments (but not used anywhere by the Environment). #random
+            self.seed_dict["image_representations"] = self.np_random.randint(sys.maxsize) #random
+            print("Mersenne0, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
         else: # if seed dict was passed
-            self.seed(config["seed"]["env"]) #seed
+            self.seed(self.seed_dict["env"])
+            print("Mersenne0 (dict), dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
 
-        self.logger.warning('Seeds set to:' + str(config["seed"]))
-        # print(f'Seeds set to {config["seed"]=}') # Available from Python 3.8
+        self.logger.warning('Seeds set to:' + str(self.seed_dict))
+        # print(f'Seeds set to {self.seed_dict=}') # Available from Python 3.8
 
 
         if "term_state_reward" not in config:
-            config["term_state_reward"] = 0.0
+            self.term_state_reward = 0.0
+        else:
+            self.term_state_reward = config["term_state_reward"]
 
         if "delay" not in config:
-            config["delay"] = 0
+            self.delay = 0
+        else:
+            self.delay = config["delay"]
 
         if "sequence_length" not in config:
-            config["sequence_length"] = 1
+            self.sequence_length = 1
+        else:
+            self.sequence_length = config["sequence_length"]
 
         if "reward_scale" not in config:
-            config["reward_scale"] = 1.0
+            self.reward_scale = 1.0
+        else:
+            self.reward_scale = config["reward_scale"]
 
         if "reward_shift" not in config:
-            config["reward_shift"] = 0.0
+            self.reward_shift = 0.0
+        else:
+            self.reward_shift = config["reward_shift"]
 
         if "image_representations" not in config:
-            config["image_representations"] = False
+            self.image_representations = False
+        else:
+            self.image_representations = config["image_representations"]
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
@@ -278,7 +306,7 @@ class RLToyEnv(gym.Env):
 
 
         assert config["action_space_type"] == config["state_space_type"], 'config["state_space_type"] != config["action_space_type"]. Currently mixed space types are not supported.'
-        assert config["sequence_length"] > 0, "config[\"sequence_length\"] <= 0. Set to: " + str(config["sequence_length"]) # also should be int
+        assert self.sequence_length > 0, "config[\"sequence_length\"] <= 0. Set to: " + str(self.sequence_length) # also should be int
         if "completely_connected" in config and config["completely_connected"]:
             assert config["relevant_state_space_size"] == config["relevant_action_space_size"], "config[\"relevant_state_space_size\"] != config[\"relevant_action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values. Vals: " + str(config["relevant_state_space_size"]) + " " + str(config["relevant_action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
             assert config["irrelevant_state_space_size"] == config["irrelevant_action_space_size"], "config[\"irrelevant_state_space_size\"] != config[\"irrelevant_action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values! Vals: " + str(config["irrelevant_state_space_size"]) + " " + str(config["irrelevant_action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!" #TODO Currently, iirelevant dimensions have a P similar ot that of relevant dimensions. Should this be decoupled?
@@ -291,33 +319,29 @@ class RLToyEnv(gym.Env):
                 assert config["target_point"].shape == (len(config["state_space_relevant_indices"]),), "target_point should have dimensionality = relevant_state_space dimensionality"
 
         self.config = config
-        self.sequence_length = config["sequence_length"]
-        self.delay = config["delay"]
-        self.augmented_state_length = config["sequence_length"] + config["delay"] + 1
+        self.augmented_state_length = self.sequence_length + self.delay + 1
         if self.config["state_space_type"] == "discrete":
-            self.reward_scale = self.config["reward_scale"]
+            pass
         else: # cont. spaces
             self.dynamics_order = self.config["transition_dynamics_order"]
             self.inertia = self.config["inertia"]
             self.time_unit = self.config["time_unit"]
-            if "reward_scale" in self.config:
-                self.reward_scale = self.config["reward_scale"]
 
         self.total_episodes = 0
 
         if config["state_space_type"] == "discrete":
             if config["irrelevant_state_space_size"] > 0:
-                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
-                self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=config["seed"]["irrelevant_state_space"]) #seed # hack
-                if config["image_representations"]:
-                    underlying_obs_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed
-                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], seed=config["seed"]["image_representations"]) #seed
+                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=self.seed_dict["relevant_state_space"]) #seed # hack
+                self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=self.seed_dict["irrelevant_state_space"]) #seed # hack
+                if self.image_representations:
+                    underlying_obs_space = MultiDiscreteExtended(config["state_space_size"], seed=self.seed_dict["state_space"]) #seed
+                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], seed=self.seed_dict["image_representations"]) #seed
                 else:
-                    self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=config["seed"]["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
+                    self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=self.seed_dict["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
             else:
-                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=config["seed"]["relevant_state_space"]) #seed # hack
-                if config["image_representations"]:
-                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], seed=config["seed"]["image_representations"]) #seed
+                self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=self.seed_dict["relevant_state_space"]) #seed # hack
+                if self.image_representations:
+                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], seed=self.seed_dict["image_representations"]) #seed
                 else:
                     self.observation_space = self.relevant_observation_space
                 # print('id(self.observation_space)', id(self.observation_space), 'id(self.relevant_observation_space)', id(self.relevant_observation_space), id(self.relevant_observation_space) == id(self.observation_space))
@@ -325,22 +349,22 @@ class RLToyEnv(gym.Env):
         else: # cont. spaces
             self.state_space_max = config["state_space_max"] if 'state_space_max' in config else np.inf # should we select a random max? #test?
 
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=config["seed"]["state_space"], dtype=np.float64) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
+            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=self.seed_dict["state_space"], dtype=np.float64) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
 
 
         if config["action_space_type"] == "discrete":
             if config["irrelevant_state_space_size"] > 0: # This has to be for irrelevant_state_space_size and not irrelevant_action_space_size, because there has to be at least 1 irrelevant state to allow transitions in that space!
-                self.relevant_action_space = DiscreteExtended(config["relevant_action_space_size"], seed=config["seed"]["relevant_action_space"]) #seed # hack
-                self.irrelevant_action_space = DiscreteExtended(config["irrelevant_action_space_size"], seed=config["seed"]["irrelevant_action_space"]) #seed # hack
-                self.action_space = MultiDiscreteExtended(config["action_space_size"], seed=config["seed"]["action_space"]) #seed # hack
+                self.relevant_action_space = DiscreteExtended(config["relevant_action_space_size"], seed=self.seed_dict["relevant_action_space"]) #seed # hack
+                self.irrelevant_action_space = DiscreteExtended(config["irrelevant_action_space_size"], seed=self.seed_dict["irrelevant_action_space"]) #seed # hack
+                self.action_space = MultiDiscreteExtended(config["action_space_size"], seed=self.seed_dict["action_space"]) #seed # hack
             else:
-                self.action_space = DiscreteExtended(config["relevant_action_space_size"], seed=config["seed"]["relevant_action_space"]) #seed # hack #TODO
+                self.action_space = DiscreteExtended(config["relevant_action_space_size"], seed=self.seed_dict["relevant_action_space"]) #seed # hack #TODO
                 self.relevant_action_space = self.action_space
 
         else: # cont. spaces
             self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
-            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=config["seed"]["action_space"], dtype=np.float64) #seed # hack #TODO
+            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=self.seed_dict["action_space"], dtype=np.float64) #seed # hack #TODO
 
 
         if config["action_space_type"] == "discrete":
@@ -356,12 +380,14 @@ class RLToyEnv(gym.Env):
         self.init_terminal_states()
         self.init_init_state_dist() #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; After looking into Gym code, I can say that for continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (and is done for the defined limits for the respective dimension).
         self.init_transition_function()
+        print("Mersenne1, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
         self.init_reward_function()
 
         self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
 
         self.logger.info("self.augmented_state, len" + str(self.augmented_state) + str(len(self.augmented_state)))
         self.logger.info("MDP Playground toy env instantiated with config:" + str(self.config)) #hack
+        print("MDP Playground toy env instantiated with config:" + str(self.config)) #hack
 
 
     def init_terminal_states(self):
@@ -435,7 +461,7 @@ class RLToyEnv(gym.Env):
                     assert self.is_terminal_state(s) == True
                     self.config["transition_function"][s, a] = s # Setting P(s, a) = s for terminal states, for P() to be meaningful even if someone doesn't check for 'done' being = True
 
-            self.logger.warning(str(self.config["transition_function"]) + "init_transition_function" + str(type(self.config["transition_function"][0, 0])))
+            print(str(self.config["transition_function"]) + "init_transition_function" + str(type(self.config["transition_function"][0, 0])))
         else: # if continuous space
             # self.logger.debug("# TODO for cont. spaces") # transition function is fixed parameterisation for cont. right now.
             pass
@@ -462,37 +488,41 @@ class RLToyEnv(gym.Env):
         """Initialises reward function, R by selecting random sequences to be rewardable for discrete environments. For continuous environments, we have fixed available options for the reward function.
 
         """
+        print("Mersenne2, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
 
         #TODO Maybe refactor this code and put useful reusable permutation generators, etc. in one library
         if self.config["state_space_type"] == "discrete":
             non_term_relevant_state_space_size = self.config["relevant_state_space_size"] - self.num_terminal_states
             if self.config["repeats_in_sequences"]:
-                num_possible_sequences = (self.relevant_observation_space.n - self.num_terminal_states) ** self.config["sequence_length"] #TODO if sequence cannot have replacement, use permutations; use state + action sequences? Subtracting the no. of terminal states from state_space size here to get "usable" states for sequences, having a terminal state even at end of reward sequence doesn't matter because to get reward we need to transition to next state which isn't possible for a terminal state.
+                num_possible_sequences = (self.relevant_observation_space.n - self.num_terminal_states) ** self.sequence_length #TODO if sequence cannot have replacement, use permutations; use state + action sequences? Subtracting the no. of terminal states from state_space size here to get "usable" states for sequences, having a terminal state even at end of reward sequence doesn't matter because to get reward we need to transition to next state which isn't possible for a terminal state.
                 num_specific_sequences = int(self.config["reward_density"] * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
                 self.specific_sequences = [[] for i in range(self.sequence_length)]
                 sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
                 for i in range(num_specific_sequences):
                     curr_sequence_num = sel_sequence_nums[i]
                     specific_sequence = []
-                    while len(specific_sequence) != self.config["sequence_length"]:
+                    while len(specific_sequence) != self.sequence_length:
                         specific_sequence.append(curr_sequence_num % (non_term_relevant_state_space_size)) ####TODO
                         curr_sequence_num = curr_sequence_num // (non_term_relevant_state_space_size)
                     #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
-                    # specific_sequence = self.relevant_observation_space.sample(size=self.config["sequence_length"], replace=True) # Be careful that sequence_length is less than state space size
+                    # specific_sequence = self.relevant_observation_space.sample(size=self.sequence_length, replace=True) # Be careful that sequence_length is less than state space size
                     self.specific_sequences[self.sequence_length - 1].append(specific_sequence) #hack
                     self.logger.warning("specific_sequence that will be rewarded" + str(specific_sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
                 self.logger.info("Total no. of rewarded sequences:" + str(len(self.specific_sequences[self.sequence_length - 1])) + str("Out of", num_possible_sequences))
             else: # if no repeats_in_sequences
                 len_ = self.sequence_length
                 permutations = list(range(non_term_relevant_state_space_size + 1 - len_, non_term_relevant_state_space_size + 1))
-                self.logger.info("No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), 1 random number out of possible perms, no. of possible perms" + str(permutations) + str(np.random.randint(np.prod(permutations))) + str(np.prod(permutations))) #random
+                self.logger.info("No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), no. of possible perms" + str(permutations) + str(np.prod(permutations)))
                 num_possible_permutations = np.prod(permutations)
                 num_specific_sequences = int(self.config["reward_density"] * num_possible_permutations)
                 if num_specific_sequences > 1000:
                     warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(num_specific_sequences)) #TODO Maybe even exit the program if too much memory is (expected to be) taken.; Took about 80s for 40k iterations of the for loop below on my laptop
 
                 self.specific_sequences = [[] for i in range(self.sequence_length)]
+                print("Mersenne3:", self.np_random.get_state()[2])
                 sel_sequence_nums = self.np_random.choice(num_possible_permutations, size=num_specific_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; # TODO this code could be replaced with self.np_random.permutation(non_term_relevant_state_space_size)[self.sequence_length]? Replacement becomes a problem then! We have to keep smpling until we have all unique rewardable sequences.
+                print("Mersenne4:", self.np_random.get_state()[2])
+
                 total_clashes = 0
                 for i in range(num_specific_sequences):
                     curr_permutation = sel_sequence_nums[i]
@@ -509,7 +539,7 @@ class RLToyEnv(gym.Env):
                     if seq_ in self.specific_sequences[self.sequence_length - 1]: #hack
                         total_clashes += 1 #TODO remove these extra checks and assert below
                     self.specific_sequences[self.sequence_length - 1].append(seq_)
-                    self.logger.warning("specific_sequence that will be rewarded " + str(seq_))
+                    print("specific_sequence that will be rewarded " + str(seq_))
                 #print(len(set(self.specific_sequences))) #error
                 # print(self.specific_sequences[self.sequence_length - 1])
 
@@ -547,7 +577,7 @@ class RLToyEnv(gym.Env):
         # Transform multi-discrete to discrete for discrete state spaces with irrelevant dimensions; needed only for imaginary rollouts, otherwise, internal augmented state is used.
         # if only_query:
 
-        if self.config["image_representations"]:
+        if self.image_representations:
             state = self.augmented_state[-1] ###TODO this would cause a crash if multi-discrete is used with image_representations!
         else:
             if self.config["state_space_type"] == "discrete":
@@ -600,9 +630,9 @@ class RLToyEnv(gym.Env):
                 # print('self.state_derivatives:', self.state_derivatives)
                 # Except the last member of state_derivatives, the other occupy the same place in memory. Could create a new copy of them every time, but I think this should be more efficient and as long as tests don't fail should be fine.
                 self.state_derivatives[-1] = action / self.inertia # action is presumed to be n-th order force ##TODO Could easily scale this per dimension to give different kinds of dynamics per dimension: maybe even sample this scale per dimension from a probability distribution to generate different random Ps?
-                factorial_array = scipy.special.factorial(np.arange(1, self.config['transition_dynamics_order'] + 1)) # This is just to speed things up as scipy calculates the factorial only for largest array member
-                for i in range(self.config['transition_dynamics_order']):
-                    for j in range(self.config['transition_dynamics_order'] - i):
+                factorial_array = scipy.special.factorial(np.arange(1, self.dynamics_order + 1)) # This is just to speed things up as scipy calculates the factorial only for largest array member
+                for i in range(self.dynamics_order):
+                    for j in range(self.dynamics_order - i):
                         # print('i, j, self.state_derivatives, (self.time_unit**(j + 1)), factorial_array:', i, j, self.state_derivatives, (self.time_unit**(j + 1)), factorial_array)
                         self.state_derivatives[i] += self.state_derivatives[i + j + 1] * (self.time_unit**(j + 1)) / factorial_array[j] #+ state_derivatives_prev[i] Don't need to add previous value as it's already in there at the beginning ##### TODO Keep an old self.state_derivatives and a new one otherwise higher order derivatives will be overwritten before being used by lower order ones.
                 # print('self.state_derivatives:', self.state_derivatives)
@@ -621,7 +651,7 @@ class RLToyEnv(gym.Env):
                 next_state = np.clip(next_state, -self.state_space_max, self.state_space_max) # Could also "reflect" next_state when it goes out of bounds. Would seem more logical for a "wall", but would need to take care of multiple reflections near a corner/edge.
                 # Resets all higher order derivatives to 0
                 zero_state = np.array([0.0] * (self.config['state_space_dim']))
-                self.state_derivatives = [zero_state.copy() for i in range(self.config['transition_dynamics_order'] + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
+                self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
                 self.state_derivatives[0] = next_state
 
 
@@ -643,7 +673,7 @@ class RLToyEnv(gym.Env):
                     next_state = self.discrete_to_multi_discrete(next_state)
 
         # If the externally visible observation space is images, then convert to underlying (multi-)discrete state
-        if self.config["image_representations"]:
+        if self.image_representations:
             next_state = self.observation_space.get_concatenated_image(next_state)
 
         return next_state
@@ -697,12 +727,12 @@ class RLToyEnv(gym.Env):
 
         if self.config["state_space_type"] == "discrete":
             if not self.config["make_denser"]:
-                self.logger.debug(str(state_considered) + " with delay " + str(self.config["delay"]))
+                self.logger.debug(str(state_considered) + " with delay " + str(self.delay))
                 if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
-                    # print(state_considered, "with delay", self.config["delay"], "rewarded with:", 1)
+                    # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
                     reward += self.reward_scale
                 else:
-                    # print(state_considered, "with delay", self.config["delay"], "NOT rewarded.")
+                    # print(state_considered, "with delay", self.delay, "NOT rewarded.")
                     pass
             else: # if make_denser
                 for j in range(1, sequence_length + 1):
@@ -750,7 +780,7 @@ class RLToyEnv(gym.Env):
                     reward += ( - total_deviation / self.sequence_length ) * self.reward_scale
 
                 elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
-                    assert self.config["sequence_length"] == 1
+                    assert self.sequence_length == 1
                     if self.config["make_denser"] == True:
                         old_relevant_state = np.array(state_considered)[-2 - delay, self.config["state_space_relevant_indices"]]
                         new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
@@ -771,7 +801,7 @@ class RLToyEnv(gym.Env):
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
-        reward += self.config["reward_shift"]
+        reward += self.reward_shift
         return reward
 
     def step(self, action, only_query=False):
@@ -795,7 +825,7 @@ class RLToyEnv(gym.Env):
 
         self.done = self.is_terminal_state(self.augmented_state[-1]) ####TODO curr_state is external state, while we need to check relevant state for terminality!
         if self.done:
-            self.reward += self.config["term_state_reward"] * self.reward_scale
+            self.reward += self.term_state_reward * self.reward_scale
         self.logger.info('sas\'r:' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
         return self.curr_state, self.reward, self.done, self.get_augmented_state()
 
@@ -880,7 +910,7 @@ class RLToyEnv(gym.Env):
             self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state_relevant)
             # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays which is not possible with np.array!
-            if self.config["image_representations"]:
+            if self.image_representations:
                 self.curr_state = self.observation_space.get_concatenated_image(self.curr_state)
         else: # if continuous space
             self.logger.debug("#TODO for cont. spaces: reset")
@@ -897,7 +927,7 @@ class RLToyEnv(gym.Env):
 
             # init the state derivatives needed for continuous spaces
             zero_state = np.array([0.0] * (self.config['state_space_dim']))
-            self.state_derivatives = [zero_state.copy() for i in range(self.config['transition_dynamics_order'] + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
+            self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
 
             self.logger.info("RESET called. State reset to:" + str(self.curr_state))
@@ -945,7 +975,7 @@ class RLToyEnv(gym.Env):
         """
         # If seed is None, you get a randomly generated seed from gym.utils...
         self.np_random, self.seed_ = gym.utils.seeding.np_random(seed) #random
-        self.logger.info("Env SEED set to:" + str(seed) + "Returned seed from Gym:" + str(self.seed_))
+        print("Env SEED set to: " + str(seed) + ". Returned seed from Gym: " + str(self.seed_))
         return self.seed_
 
 

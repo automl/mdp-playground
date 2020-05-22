@@ -229,11 +229,16 @@ for current_config in cartesian_product_configs:
     print("tune_config:",)
     pp.pprint(tune_config)
 
+    if algorithm == 'DQN':
+        timesteps_total = 20000
+    elif algorithm == 'A3C':
+        timesteps_total = 150000
+
     tune.run(
         algorithm,
         name=algorithm + str(args.config_num), ###IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
         stop={
-            "timesteps_total": 20000,
+            "timesteps_total": timesteps_total,
               },
         config=tune_config
         #return_trials=True # add trials = tune.run( above

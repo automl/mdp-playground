@@ -37,7 +37,7 @@ agent_config = {
     # Workers sample async. Note that this increases the effective
     # sample_batch_size by up to 5x due to async buffering of batches.
     "sample_async": True,
-    "timesteps_per_iteration": 1000,
+    "timesteps_per_iteration": 7500,
     "num_workers": 3,
     "num_envs_per_worker": 5,
 
