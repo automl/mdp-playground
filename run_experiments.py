@@ -102,8 +102,9 @@ print(config.algorithm, var_env_configs['state_space_size'], var_env_configs['ac
 hack_filename = stats_file_name + '.csv'
 fout = open(hack_filename, 'a') #hardcoded
 fout.write('# training_iteration, algorithm, ')
-for key in var_env_configs:
-    fout.write(key + ', ')
+for config_type, config_dict in var_configs_deepcopy.items():
+    for key in config_dict:
+        fout.write(key + ', ')
 fout.write('timesteps_total, episode_reward_mean, episode_len_mean\n')
 fout.close()
 
@@ -129,7 +130,8 @@ def on_train_result(info):
             elif config_type == "agent":
                 fout.write(str(info["result"]["config"][key]) + ' ')
             elif config_type == "model":
-                fout.write(str(info["result"]["config"]["model"][key]) + ' ')
+                if key == 'conv_filters':
+                    fout.write(str(info["result"]["config"]["model"][key]).replace(' ', '') + ' ')
 
     # Write train stats
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
@@ -230,7 +232,7 @@ for current_config in cartesian_product_configs:
 
             elif config_type == "model":
                 num_configs_done = len(list(var_env_configs)) + len(list(var_agent_configs))
-                model_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+                model_config["model"][key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
 
 
@@ -272,7 +274,7 @@ for current_config in cartesian_product_configs:
 
     tune.run(
         algorithm,
-        name=algorithm + str(args.config_num), ###IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
+        name=algorithm + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
         stop={
             "timesteps_total": timesteps_total,
               },
