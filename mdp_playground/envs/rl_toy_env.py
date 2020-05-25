@@ -351,13 +351,13 @@ class RLToyEnv(gym.Env):
                 self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=self.seed_dict["irrelevant_state_space"]) #seed # hack
                 if self.image_representations:
                     underlying_obs_space = MultiDiscreteExtended(config["state_space_size"], seed=self.seed_dict["state_space"]) #seed
-                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=10, seed=self.seed_dict["image_representations"]) #seed
+                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=20, seed=self.seed_dict["image_representations"]) #seed
                 else:
                     self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=self.seed_dict["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
             else:
                 self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=self.seed_dict["relevant_state_space"]) #seed # hack
                 if self.image_representations:
-                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=10, seed=self.seed_dict["image_representations"]) #seed
+                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=20, seed=self.seed_dict["image_representations"]) #seed
                 else:
                     self.observation_space = self.relevant_observation_space
                 # print('id(self.observation_space)', id(self.observation_space), 'id(self.relevant_observation_space)', id(self.relevant_observation_space), id(self.relevant_observation_space) == id(self.observation_space))
