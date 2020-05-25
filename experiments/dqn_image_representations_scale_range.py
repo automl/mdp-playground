@@ -15,7 +15,7 @@ var_env_configs = OrderedDict({
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'image_representations': [True],
     'image_transforms': ['scale'], #, 'scale', 'flip', 'rotate'],
-    'image_scale_range': [(0.8, 1.25), (0.75, 1.3333333333333333), (0.6666666666666666, 1.5), (0.5, 2)],
+    'image_scale_range': [(0.8,1.5), (0.6,2), (0.4,2.5), (0.2,3)], # [(0.8, 1.25), (0.75, 1.3333333333333333), (0.6666666666666666,1.5), (0.5, 2)], # [(0.8, 1.25), (0.6, 1.5), (0.4, 1.75), (0.2, 2)],
     'image_width': [100],
     'image_height': [100],
     'dummy_seed': [i for i in range(num_seeds)],
