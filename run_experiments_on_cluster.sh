@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
 #SBATCH --mem 8000M # Specify the real memory required per node. For CPU, use --mem-per-cpu
-#SBATCH -t 0-00:10 # time (D-HH:MM)
+#SBATCH -t 0-00:20 # time (D-HH:MM)
 #SBATCH -c 2 # number of CPUs/task
 #SBATCH -o log/%x.%N.%A.%a.out # STDOUT  (the folder log has to exist!) %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%N.%A.%a.err # STDERR  (the folder log has to exist!) %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
@@ -11,7 +11,7 @@
 #SBATCH -a 0-161 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
 ##SBATCH --gres=gpu:1  # reserves one GPU
 
-export EXP_NAME='dqn_image_representations' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='dqn_image_representations_tune_hps' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
