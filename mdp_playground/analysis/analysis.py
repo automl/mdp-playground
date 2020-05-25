@@ -37,7 +37,7 @@ class MDPP_Analysis():
         self.stats_file = stats_file
 
         if os.path.isfile(stats_file + '.csv'):
-            print("Loading data from a sequential run of experiment configurations.")
+            print("Loading data from a sequential run/already combined runs of experiment configurations.")
         else:
             print("Loading data from a distributed run of experiment configurations. Creating a combined CSV stats file.")
             def join_files(file_prefix, file_suffix):
@@ -56,6 +56,8 @@ class MDPP_Analysis():
                             break
                         i += 1
                     print(str(i) + " files were combined into 1 for file:" + file_prefix + '_n' + file_suffix)
+                    if i==0:
+                        raise FileNotFoundError("No files to combine were present. Please check your location and/or filenames that they are correct.")
             join_files(stats_file,  '.csv')
             join_files(stats_file, '_eval.csv')
 
@@ -71,7 +73,7 @@ class MDPP_Analysis():
             config_names[0] = config_names[0][2:] # to remove '# ' that was written
             # config_names[-1] = config_names[-1][:-1] # to remove ',' that was written
         # print("config_names:", config_names)
-        self.config_names = config_names # ['Delay', 'Sequence Length', 'Reward Density', 'Terminal State Density', 'P Noise', 'R Noise', 'dummy_seed']
+        self.config_names = config_names[1:] # ; begins at 1 to ignore training iteration num. ['Delay', 'Sequence Length', 'Reward Density', 'Terminal State Density', 'P Noise', 'R Noise', 'dummy_seed']
         config_counts = []
         dims_values = []
         # For the following seeds should always be last column read! 1st column should be >=1 (it should not be 0 because that is the training_iteration that was recorded and is not used here)
@@ -147,7 +149,8 @@ class MDPP_Analysis():
         # print("len(final_10_evals)", final_10_evals.shape, type(final_10_evals))
         mean_data_eval = np.mean(final_10_evals, axis=1) # this is mean over last 10 eval episodes
 #         print(np.array(stats_pd.iloc[:, -3]))
-        # Adds timesteps_total to the eval stats which did not have them:
+
+        # Adds timesteps_total column to the eval stats which did not have them:
         mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -3])).T, mean_data_eval), axis=1)
 #         print(mean_data_eval.shape, len(final_rows_for_a_config))
 
@@ -192,7 +195,7 @@ class MDPP_Analysis():
         self.tick_labels = x_tick_labels_
         self.dims_varied = dims_varied
         for d,v,i in zip(x_axis_labels, x_tick_labels_, dims_varied):
-            print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in data:", i)
+            print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
 
         return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval
 
@@ -216,7 +219,7 @@ class MDPP_Analysis():
         plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
         # print(stats_data.shape)
 
-        mean_data_ = np.mean(stats_data[..., -2], axis=-1)
+        mean_data_ = np.mean(stats_data[..., -2], axis=-1) # the slice sub-selects episode_reward_means from the last axis of diff. metrics saved and then the axis of seeds becomes axis=-1 ( before slice it was -2).
         to_plot_ = np.squeeze(mean_data_)
         std_dev_ = np.std(stats_data[..., -2], axis=-1)
         to_plot_std_ = np.squeeze(std_dev_)

@@ -2,21 +2,6 @@
 '''
 num_seeds = 10
 
-import itertools
-transforms = ['shift', 'scale', 'flip', 'rotate']
-image_transforms = []
-for i in range(len(transforms) + 1):
-    curr_combos = list(itertools.combinations(transforms, i))
-    for j in range(len(curr_combos)):
-        if i == 0:
-            curr_elem = 'none' # this is written to a CSV file with ' ' separater, therefore it needs to have some value in there.
-        else:
-            curr_elem = ''
-        for k in range(i):
-            curr_elem += curr_combos[j][k] + ','
-        # print(curr_elem, i, j)
-        image_transforms.append(curr_elem)
-
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
@@ -29,7 +14,8 @@ var_env_configs = OrderedDict({
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'image_representations': [True],
-    'image_transforms': image_transforms, # ['shift', 'scale', 'flip', 'rotate', 'shift,scale,rotate,flip']
+    'image_transforms': ['shift'], #, 'scale', 'flip', 'rotate'],
+    'image_sh_quant': [4, 8, 16],
     'image_width': [100],
     'image_height': [100],
     'dummy_seed': [i for i in range(num_seeds)],

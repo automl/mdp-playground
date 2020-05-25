@@ -175,7 +175,7 @@ class RLToyEnv(gym.Env):
         # os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 
         # print('self.log_level', self.log_level)
-        logging.basicConfig(filename=self.log_filename, filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=self.log_level)
+        logging.basicConfig(filename='/tmp/' + self.log_filename, filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=self.log_level)
         self.logger = logging.getLogger(__name__)
 
         #seed
@@ -242,6 +242,22 @@ class RLToyEnv(gym.Env):
             self.image_representations = False
         else:
             self.image_representations = config["image_representations"]
+
+        if "image_sh_quant" not in config:
+            self.image_sh_quant = 1
+        else:
+            self.image_sh_quant = config["image_sh_quant"]
+
+        if "image_ro_quant" not in config:
+            self.image_ro_quant = 1
+        else:
+            self.image_ro_quant = config["image_ro_quant"]
+
+        if "image_scale_range" not in config:
+            self.image_scale_range = None # (0.5, 1.5)
+        else:
+            self.image_scale_range = config["image_scale_range"]
+
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
@@ -335,13 +351,13 @@ class RLToyEnv(gym.Env):
                 self.irrelevant_observation_space = DiscreteExtended(config["irrelevant_state_space_size"], seed=self.seed_dict["irrelevant_state_space"]) #seed # hack
                 if self.image_representations:
                     underlying_obs_space = MultiDiscreteExtended(config["state_space_size"], seed=self.seed_dict["state_space"]) #seed
-                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], seed=self.seed_dict["image_representations"]) #seed
+                    self.observation_space = ImageMultiDiscrete(underlying_obs_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, seed=self.seed_dict["image_representations"]) #seed
                 else:
                     self.observation_space = MultiDiscreteExtended(config["state_space_size"], seed=self.seed_dict["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs "observation"_space as a member. I'd prefer "state"_space
             else:
                 self.relevant_observation_space = DiscreteExtended(config["relevant_state_space_size"], seed=self.seed_dict["relevant_state_space"]) #seed # hack
                 if self.image_representations:
-                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], seed=self.seed_dict["image_representations"]) #seed
+                    self.observation_space = ImageMultiDiscrete(self.relevant_observation_space, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, seed=self.seed_dict["image_representations"]) #seed
                 else:
                     self.observation_space = self.relevant_observation_space
                 # print('id(self.observation_space)', id(self.observation_space), 'id(self.relevant_observation_space)', id(self.relevant_observation_space), id(self.relevant_observation_space) == id(self.observation_space))

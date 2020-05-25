@@ -41,6 +41,7 @@ var_configs = OrderedDict({
 
 env_config = {
     "env": "RLToy-v0",
+    "horizon": 100,
     "env_config": {
         'seed': 0, #seed
         'state_space_type': 'discrete',
