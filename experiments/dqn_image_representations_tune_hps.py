@@ -1,21 +1,6 @@
-'''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 10
-
-import itertools
-transforms = ['shift', 'scale', 'flip', 'rotate']
-image_transforms = []
-for i in range(len(transforms) + 1):
-    curr_combos = list(itertools.combinations(transforms, i))
-    for j in range(len(curr_combos)):
-        if i == 0:
-            curr_elem = 'none' # this is written to a CSV file with ' ' separater, therefore it needs to have some value in there.
-        else:
-            curr_elem = ''
-        for k in range(i):
-            curr_elem += curr_combos[j][k] + ','
-        # print(curr_elem, i, j)
-        image_transforms.append(curr_elem)
+'''
+num_seeds = 3
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
