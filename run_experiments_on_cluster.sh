@@ -8,10 +8,10 @@
 #SBATCH -J mdp-playground-job-array # sets the job name. If not specified, the file name will be used as job name
 #SBATCH -D /home/rajanr/mdpp # Change working_dir (I think this directory _has_ to exist and won't be created!)
 ##SBATCH --mail-type=END,FAIL # (receive mails about end and timeouts/crashes of your job)
-#SBATCH -a 0-49 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
+#SBATCH -a 0-59 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
 ##SBATCH --gres=gpu:1  # reserves one GPU
 
-export EXP_NAME='dqn_image_representations_ro_quant' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='dqn_image_representations' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
