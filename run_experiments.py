@@ -126,7 +126,7 @@ def on_train_result(info):
                 if key == 'reward_noise':
                     fout.write(str(info["result"]["config"]["env_config"]['reward_noise_std']) + ' ') #hack
                 else:
-                    fout.write(str(info["result"]["config"]["env_config"][key]) + ' ')
+                    fout.write(str(info["result"]["config"]["env_config"][key]).replace(' ', '') + ' ')
             elif config_type == "agent":
                 fout.write(str(info["result"]["config"][key]) + ' ')
             elif config_type == "model":

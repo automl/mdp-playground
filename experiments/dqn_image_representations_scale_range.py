@@ -1,6 +1,6 @@
 '''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 10
+num_seeds = 100
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
@@ -15,9 +15,9 @@ var_env_configs = OrderedDict({
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'image_representations': [True],
     'image_transforms': ['scale'], #, 'scale', 'flip', 'rotate'],
-    'image_scale_range': [(0.25, 4), (0.3333333333333333, 3), (0.5, 2), (0.75, 1.3333333333333333)], # [(0.8, 1.25), (0.75, 1.3333333333333333), (0.6666666666666666,1.5), (0.5, 2)], # [(0.8, 1.25), (0.6, 1.5), (0.4, 1.75), (0.2, 2)], # [(0.8,1.5), (0.6,2), (0.4,2.5), (0.2,3)]
-    'image_width': [400],
-    'image_height': [400],
+    'image_scale_range': [(0.8, 1.25), (0.75, 1.3333333333333333), (0.6666666666666666,1.5), (0.5, 2)], # for 400x400: [(0.25, 4), (0.3333333333333333, 3), (0.5, 2), (0.75, 1.3333333333333333)], # 100x100, radius 20: [(0.8, 1.25), (0.75, 1.3333333333333333), (0.6666666666666666,1.5), (0.5, 2)], # 100x100, radius 20: [(0.8, 1.25), (0.6, 1.5), (0.4, 1.75), (0.2, 2)], # 100x100, radius 10: [(0.8,1.5), (0.6,2), (0.4,2.5), (0.2,3)]
+    'image_width': [100],
+    'image_height': [100],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -104,7 +104,7 @@ model_config = {
         # "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         "conv_activation": "relu",
-        "conv_filters": filters_400x400,
+        "conv_filters": filters_100x100,
         # "no_final_linear": False,
         # "vf_share_layers": True,
         # "fcnet_activation": "tanh",
