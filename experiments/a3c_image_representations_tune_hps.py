@@ -14,7 +14,7 @@ var_env_configs = OrderedDict({
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'image_representations': [True],
-    'image_transforms': ['shift', 'scale'], # , 'flip', 'rotate', 'shift,scale,rotate,flip']
+    'image_transforms': ['none'], # , 'flip', 'rotate', 'shift,scale,rotate,flip']
     'image_width': [100],
     'image_height': [100],
     'dummy_seed': [i for i in range(num_seeds)],
@@ -23,14 +23,12 @@ var_env_configs = OrderedDict({
 var_agent_configs = OrderedDict({
     # Learning rate
     "lr": [1e-3, 1e-4, 1e-5], #
-    # Learning rate schedule
-    "lr_schedule": [None],
     # GAE(gamma) parameter
     "lambda": [0.0, 0.5, 0.95, 1.0], #
     # Value Function Loss coefficient
-    "vf_loss_coeff": [0.5], #[0.1, 0.5, 2.5]
+    "vf_loss_coeff": [0.1, 0.5, 2.5], # [0.5]
     # Entropy coefficient
-    "entropy_coeff": [0.1], #[0.001, 0.01, 0.1, 1]
+    "entropy_coeff": [0.01, 0.1, 1], # [0.1] [0.001, 0.01, 0.1, 1]
 })
 
 
@@ -102,6 +100,8 @@ agent_config = {
     # Size of rollout batch
     "sample_batch_size": 10, # maybe num_workers * sample_batch_size * num_envs_per_worker * grads_per_step
     "train_batch_size": 100, # seems to have no effect
+    # Learning rate schedule
+    "lr_schedule": [None],
     # Use PyTorch as backend - no LSTM support
     "use_pytorch": False,
     # Max global norm for each gradient calculated by worker
