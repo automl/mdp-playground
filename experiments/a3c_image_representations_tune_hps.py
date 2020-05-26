@@ -26,9 +26,9 @@ var_agent_configs = OrderedDict({
     # GAE(gamma) parameter
     "lambda": [0.0, 0.5, 0.95, 1.0], #
     # Value Function Loss coefficient
-    "vf_loss_coeff": [0.1, 0.5, 2.5], # [0.5]
+    "vf_loss_coeff": [0.5], # [0.1, 0.5, 2.5]
     # Entropy coefficient
-    "entropy_coeff": [0.01, 0.1, 1], # [0.1] [0.001, 0.01, 0.1, 1]
+    "entropy_coeff": [0.1], # [0.1] [0.001, 0.01, 0.1, 1]
 })
 
 
@@ -101,7 +101,7 @@ agent_config = {
     "sample_batch_size": 10, # maybe num_workers * sample_batch_size * num_envs_per_worker * grads_per_step
     "train_batch_size": 100, # seems to have no effect
     # Learning rate schedule
-    "lr_schedule": [None],
+    "lr_schedule": None,
     # Use PyTorch as backend - no LSTM support
     "use_pytorch": False,
     # Max global norm for each gradient calculated by worker

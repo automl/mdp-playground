@@ -245,6 +245,7 @@ class RLToyEnv(gym.Env):
 
         if "image_sh_quant" not in config:
             if 'shift' in config["image_transforms"]:
+                warnings.warn("Setting image shift quantisation to default of 1, since no config value provided for it.")
                 self.image_sh_quant = 1
             else:
                 self.image_sh_quant = None
@@ -253,6 +254,7 @@ class RLToyEnv(gym.Env):
 
         if "image_ro_quant" not in config:
             if 'rotate' in config["image_transforms"]:
+                warnings.warn("Setting image rotate quantisation to default of 1, since no config value provided for it.")
                 self.image_ro_quant = 1
             else:
                 self.image_ro_quant = None
