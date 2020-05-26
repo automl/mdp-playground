@@ -66,7 +66,7 @@ agent_config = {
     # Max global norm for each gradient calculated by worker
     "grad_clip": 10.0, # low prio.
     # Learning rate
-    "lr": 0.001, #
+    "lr": 0.0001, #
     # Learning rate schedule
     "lr_schedule": None,
     # Value Function Loss coefficient
