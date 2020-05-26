@@ -244,11 +244,13 @@ class RLToyEnv(gym.Env):
             self.image_representations = config["image_representations"]
 
         if "image_sh_quant" not in config:
+            assert 'shift' in config["image_transforms"]
             self.image_sh_quant = 1
         else:
             self.image_sh_quant = config["image_sh_quant"]
 
         if "image_ro_quant" not in config:
+            assert 'rotate' in config["image_transforms"]
             self.image_ro_quant = 1
         else:
             self.image_ro_quant = config["image_ro_quant"]
