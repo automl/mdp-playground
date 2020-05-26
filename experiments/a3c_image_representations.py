@@ -29,7 +29,8 @@ var_env_configs = OrderedDict({
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'image_representations': [True],
-    'image_transforms': image_transforms, # ['shift', 'scale', 'flip', 'rotate', 'shift,scale,rotate,flip']
+    'image_transforms': ['none', 'shift', 'scale', 'flip', 'rotate', 'shift,scale,rotate,flip'], # image_transforms,
+    'image_scale_range': [(0.5, 2)],
     'image_width': [100],
     'image_height': [100],
     'dummy_seed': [i for i in range(num_seeds)],
@@ -65,7 +66,7 @@ agent_config = {
     # Max global norm for each gradient calculated by worker
     "grad_clip": 10.0, # low prio.
     # Learning rate
-    "lr": 0.0001, #
+    "lr": 0.001, #
     # Learning rate schedule
     "lr_schedule": None,
     # Value Function Loss coefficient
