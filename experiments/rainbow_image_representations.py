@@ -60,14 +60,14 @@ agent_config = {
     "buffer_size": 1000000,
     "double_q": True,
     "dueling": True,
-    "lr": 1e-3,
+    "lr": 1e-4,
     "exploration_final_eps": 0.01,
     "exploration_fraction": 0.1,
     "schedule_max_timesteps": 20000,
     # "hiddens": None,
     "learning_starts": 500,
-    "target_network_update_freq": 80,
-    "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
+    "target_network_update_freq": 800,
+    "n_step": 1, # delay + sequence_length [1, 2, 4, 8]
     "noisy": True,
     "num_atoms": 10, # [5, 10, 20]
     "prioritized_replay": True,
