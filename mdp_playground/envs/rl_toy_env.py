@@ -243,28 +243,28 @@ class RLToyEnv(gym.Env):
         else:
             self.image_representations = config["image_representations"]
 
-        if "image_sh_quant" not in config:
-            if 'shift' in config["image_transforms"]:
-                warnings.warn("Setting image shift quantisation to default of 1, since no config value provided for it.")
-                self.image_sh_quant = 1
+            if "image_sh_quant" not in config:
+                if 'shift' in config["image_transforms"]:
+                    warnings.warn("Setting image shift quantisation to default of 1, since no config value provided for it.")
+                    self.image_sh_quant = 1
+                else:
+                    self.image_sh_quant = None
             else:
-                self.image_sh_quant = None
-        else:
-            self.image_sh_quant = config["image_sh_quant"]
+                self.image_sh_quant = config["image_sh_quant"]
 
-        if "image_ro_quant" not in config:
-            if 'rotate' in config["image_transforms"]:
-                warnings.warn("Setting image rotate quantisation to default of 1, since no config value provided for it.")
-                self.image_ro_quant = 1
+            if "image_ro_quant" not in config:
+                if 'rotate' in config["image_transforms"]:
+                    warnings.warn("Setting image rotate quantisation to default of 1, since no config value provided for it.")
+                    self.image_ro_quant = 1
+                else:
+                    self.image_ro_quant = None
             else:
-                self.image_ro_quant = None
-        else:
-            self.image_ro_quant = config["image_ro_quant"]
+                self.image_ro_quant = config["image_ro_quant"]
 
-        if "image_scale_range" not in config:
-            self.image_scale_range = None # (0.5, 1.5)
-        else:
-            self.image_scale_range = config["image_scale_range"]
+            if "image_scale_range" not in config:
+                self.image_scale_range = None # (0.5, 1.5)
+            else:
+                self.image_scale_range = config["image_scale_range"]
 
 
         #TODO Make below code more compact by reusing parts for state and action spaces?

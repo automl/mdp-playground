@@ -1,21 +1,6 @@
-'''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 10
-
-import itertools
-transforms = ['shift', 'scale', 'flip', 'rotate']
-image_transforms = []
-for i in range(len(transforms) + 1):
-    curr_combos = list(itertools.combinations(transforms, i))
-    for j in range(len(curr_combos)):
-        if i == 0:
-            curr_elem = 'none' # this is written to a CSV file with ' ' separater, therefore it needs to have some value in there.
-        else:
-            curr_elem = ''
-        for k in range(i):
-            curr_elem += curr_combos[j][k] + ','
-        # print(curr_elem, i, j)
-        image_transforms.append(curr_elem)
+'''
+num_seeds = 3
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
@@ -29,58 +14,22 @@ var_env_configs = OrderedDict({
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'image_representations': [True],
-    'image_transforms': ['none', 'shift', 'scale', 'flip', 'rotate', 'shift,scale,rotate,flip'], # image_transforms,
-    'image_scale_range': [(0.5, 2)],
+    'image_transforms': ['none'], # , 'flip', 'rotate', 'shift,scale,rotate,flip']
     'image_width': [100],
     'image_height': [100],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
-var_configs = OrderedDict({
-"env": var_env_configs
+var_agent_configs = OrderedDict({
+    # Learning rate
+    "lr": [1e-3, 1e-4, 1e-5], #
+    # GAE(gamma) parameter
+    "lambda": [0.0, 0.5, 0.95, 1.0], #
+    # Value Function Loss coefficient
+    "vf_loss_coeff": [0.5], # [0.1, 0.5, 2.5]
+    # Entropy coefficient
+    "entropy_coeff": [0.1], # [0.1] [0.001, 0.01, 0.1, 1]
 })
-
-env_config = {
-    "env": "RLToy-v0",
-    "horizon": 100,
-    "env_config": {
-        'seed': 0, #seed
-        'state_space_type': 'discrete',
-        'action_space_type': 'discrete',
-        'generate_random_mdp': True,
-        'repeats_in_sequences': False,
-        'reward_scale': 1.0,
-        'completely_connected': True,
-    },
-}
-
-algorithm = "DQN"
-agent_config = {
-    "adam_epsilon": 1e-4,
-    "buffer_size": 1000000,
-    "double_q": True,
-    "dueling": True,
-    "lr": 1e-3,
-    "exploration_final_eps": 0.01,
-    "exploration_fraction": 0.1,
-    "schedule_max_timesteps": 20000,
-    # "hiddens": None,
-    "learning_starts": 500,
-    "target_network_update_freq": 80,
-    "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
-    "noisy": True,
-    "num_atoms": 10, # [5, 10, 20]
-    "prioritized_replay": True,
-    "prioritized_replay_alpha": 0.75, #
-    "prioritized_replay_beta": 0.4,
-    "final_prioritized_replay_beta": 1.0, #
-    "beta_annealing_fraction": 1.0, #
-
-    "sample_batch_size": 4,
-    "timesteps_per_iteration": 1000,
-    "train_batch_size": 32,
-    "min_iter_time_s": 0,
-}
 
 
 # formula [(W−K+2P)/S]+1; for padding=same: P = ((S-1)*W - S + K)/2
@@ -103,6 +52,12 @@ filters_100x100 = [
 #     [64, [13, 13], 1],
 # ]
 
+filters_100x100_large = [
+    [16, [8, 8], 4],
+    [32, [4, 4], 2],
+    [256, [13, 13], 1],
+]
+
 filters_50x50 = [
     [16, [4, 4], 2],
     [32, [4, 4], 2],
@@ -115,19 +70,68 @@ filters_400x400 = [
     [64, [13, 13], 1],
 ]
 
+
+var_model_configs = OrderedDict({
+    "conv_filters": [filters_100x100, filters_100x100_large],
+    "lstm_cell_size": [64, 128, 256],
+})
+
+var_configs = OrderedDict({
+"env": var_env_configs,
+"agent": var_agent_configs,
+"model": var_model_configs,
+})
+
+env_config = {
+    "env": "RLToy-v0",
+    "horizon": 100,
+    "env_config": {
+        'seed': 0, #seed
+        'state_space_type': 'discrete',
+        'action_space_type': 'discrete',
+        'generate_random_mdp': True,
+        'repeats_in_sequences': False,
+        'reward_scale': 1.0,
+        'completely_connected': True,
+    },
+}
+
+algorithm = "A3C"
+agent_config = {
+    # Size of rollout batch
+    "sample_batch_size": 10, # maybe num_workers * sample_batch_size * num_envs_per_worker * grads_per_step
+    "train_batch_size": 100, # seems to have no effect
+    # Learning rate schedule
+    "lr_schedule": None,
+    # Use PyTorch as backend - no LSTM support
+    "use_pytorch": False,
+    # Max global norm for each gradient calculated by worker
+    "grad_clip": 10.0, # low prio.
+    # Min time per iteration
+    "min_iter_time_s": 0,
+    # Workers sample async. Note that this increases the effective
+    # sample_batch_size by up to 5x due to async buffering of batches.
+    "sample_async": True,
+    "timesteps_per_iteration": 7500,
+    "num_workers": 3,
+    "num_envs_per_worker": 5,
+
+    "optimizer": {
+        "grads_per_step": 10
+    },
+}
+
+
 model_config = {
     "model": {
-        "fcnet_hiddens": [256, 256],
+        "fcnet_hiddens": [[128, 128, 128]],
         # "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         "conv_activation": "relu",
-        "conv_filters": filters_100x100,
         # "no_final_linear": False,
         # "vf_share_layers": True,
         # "fcnet_activation": "tanh",
         "use_lstm": False,
-        "max_seq_len": 20,
-        "lstm_cell_size": 256,
         "lstm_use_prev_action_reward": False,
     },
 }

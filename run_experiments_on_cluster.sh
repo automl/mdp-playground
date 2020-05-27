@@ -1,17 +1,17 @@
 #!/bin/bash
-#SBATCH -p ml_cpu-ivy # ml_cpu-ivy # partition (queue)
-#SBATCH --mem 16000M # Specify the real memory required per node. For CPU, use --mem-per-cpu
+#SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
+#SBATCH --mem 24000M # Specify the real memory required per node. For CPU, use --mem-per-cpu
 #SBATCH -t 0-00:20 # time (D-HH:MM)
-#SBATCH -c 4 # number of CPUs/task
+#SBATCH -c 6 # number of CPUs/task
 #SBATCH -o log/%x.%A.%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%A.%a.err # STDERR  (the folder log has to exist!)  %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -J mdp-playground-job-array # sets the job name. If not specified, the file name will be used as job name
 #SBATCH -D /home/rajanr/mdpp # Change working_dir (I think this directory _has_ to exist and won't be created!)
 ##SBATCH --mail-type=END,FAIL # (receive mails about end and timeouts/crashes of your job)
-#SBATCH -a 0-59 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
+#SBATCH -a 0-215 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
 ##SBATCH --gres=gpu:1  # reserves one GPU
 
-export EXP_NAME='a3c_lstm_image_representations' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='a3c_lstm_image_representations_tune_hps' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
