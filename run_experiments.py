@@ -210,8 +210,6 @@ for current_config in cartesian_product_configs:
 
     agent_config = config.agent_config
     model_config = config.model_config
-    if model_config["model"]["use_lstm"]: #hack
-        model_config["model"]["max_seq_len"] = delay + sequence_length
     env_config = config.env_config
     # sys.exit(0)
 
@@ -234,6 +232,9 @@ for current_config in cartesian_product_configs:
                 num_configs_done = len(list(var_env_configs)) + len(list(var_agent_configs))
                 model_config["model"][key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
+
+    if model_config["model"]["use_lstm"]: #hack
+        model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
 
 
     eval_config = {

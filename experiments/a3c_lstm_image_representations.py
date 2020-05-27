@@ -130,9 +130,9 @@ model_config = {
         # "no_final_linear": False,
         # "vf_share_layers": True,
         # "fcnet_activation": "tanh",
-        "use_lstm": False,
-        "max_seq_len": 20,
-        "lstm_cell_size": 256,
-        "lstm_use_prev_action_reward": False,
+        "use_lstm": True,
+        # "max_seq_len": 20,
+        "lstm_cell_size": 64,
+        "lstm_use_prev_action_reward": True,
     },
 }
