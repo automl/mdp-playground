@@ -62,7 +62,7 @@ agent_config = {
     # Use PyTorch as backend - no LSTM support
     "use_pytorch": False,
     # GAE(gamma) parameter
-    "lambda": 0.0, #
+    "lambda": 0.5, #
     # Max global norm for each gradient calculated by worker
     "grad_clip": 10.0, # low prio.
     # Learning rate
@@ -132,7 +132,7 @@ model_config = {
         # "fcnet_activation": "tanh",
         "use_lstm": True,
         # "max_seq_len": 20,
-        "lstm_cell_size": 64,
+        "lstm_cell_size": 128,
         "lstm_use_prev_action_reward": True,
     },
 }

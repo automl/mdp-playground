@@ -130,8 +130,8 @@ def on_train_result(info):
             elif config_type == "agent":
                 fout.write(str(info["result"]["config"][key]) + ' ')
             elif config_type == "model":
-                if key == 'conv_filters':
-                    fout.write(str(info["result"]["config"]["model"][key]).replace(' ', '') + ' ')
+                # if key == 'conv_filters':
+                fout.write(str(info["result"]["config"]["model"][key]).replace(' ', '') + ' ')
 
     # Write train stats
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
