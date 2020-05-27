@@ -22,13 +22,13 @@ var_env_configs = OrderedDict({
 
 var_agent_configs = OrderedDict({
     # Learning rate
-    "lr": [1e-3, 1e-4, 1e-5], #
+    "lr": [1e-3], #
     # GAE(gamma) parameter
-    "lambda": [0.0, 0.5, 0.95, 1.0], #
+    "lambda": [0.0], #
     # Value Function Loss coefficient
-    "vf_loss_coeff": [0.5], # [0.1, 0.5, 2.5]
+    "vf_loss_coeff": [0.1, 0.5, 2.5],
     # Entropy coefficient
-    "entropy_coeff": [0.1], # [0.1] [0.001, 0.01, 0.1, 1]
+    "entropy_coeff": [0.001, 0.01, 0.1, 1],
 })
 
 
@@ -71,14 +71,14 @@ filters_400x400 = [
 ]
 
 
-var_model_configs = OrderedDict({
-    "conv_filters": [filters_100x100, filters_100x100_large],
-})
+# var_model_configs = OrderedDict({
+#     "conv_filters": [filters_100x100, filters_100x100_large],
+# })
 
 var_configs = OrderedDict({
 "env": var_env_configs,
 "agent": var_agent_configs,
-"model": var_model_configs,
+# "model": var_model_configs,
 })
 
 env_config = {
@@ -126,6 +126,7 @@ model_config = {
         "fcnet_hiddens": [[128, 128, 128]],
         # "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
+        "conv_filters": filters_100x100,
         "conv_activation": "relu",
         # "no_final_linear": False,
         # "vf_share_layers": True,
