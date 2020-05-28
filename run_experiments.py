@@ -74,6 +74,8 @@ if config.algorithm == 'DQN':
     ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True) #, memory=int(8e9), local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=
 elif config.algorithm == 'A3C': #hack
     ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9))
+else:
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True)
 
 
 var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
@@ -96,7 +98,14 @@ config_algorithm = config.algorithm #hack
 
 
 print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
-print(config.algorithm, var_env_configs['state_space_size'], var_env_configs['action_space_size'], var_env_configs['delay'], var_env_configs['sequence_length'], var_env_configs['reward_density'], var_env_configs['make_denser'], var_env_configs['terminal_state_density'], var_env_configs['transition_noise'], var_env_configs['reward_noise'], var_env_configs['dummy_seed'])
+
+configs_to_print = ''
+for config_type, config_dict in var_configs_deepcopy.items():
+    if config_type == 'env':
+        for key in config_dict:
+            configs_to_print += str(config_dict[key]) + ', '
+
+print(config.algorithm, configs_to_print)
 
 
 hack_filename = stats_file_name + '.csv'
@@ -125,6 +134,8 @@ def on_train_result(info):
             if config_type == "env":
                 if key == 'reward_noise':
                     fout.write(str(info["result"]["config"]["env_config"]['reward_noise_std']) + ' ') #hack
+                elif key == 'transition_noise' and info["result"]["config"]["env_config"]["state_space_type"] == "continuous":
+                    fout.write(str(info["result"]["config"]["env_config"]['transition_noise_std']) + ' ') #hack
                 else:
                     fout.write(str(info["result"]["config"]["env_config"][key]).replace(' ', '') + ' ')
             elif config_type == "agent":
@@ -220,7 +231,11 @@ for current_config in cartesian_product_configs:
                 if key == 'reward_noise':
                     reward_noise_ = current_config[list(var_env_configs).index(key)] # this works because env_configs are 1st in the OrderedDict
                     env_config["env_config"][key] = tune.function(lambda a: a.normal(0, reward_noise_))
-                    env_config["env_config"]['reward_noise_std'] = reward_noise_ #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above
+                    env_config["env_config"]['reward_noise_std'] = reward_noise_ #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above ###TODO Could remove the hack by creating a class for the noises and changing its repr()
+                elif key == 'transition_noise' and env_config["env_config"]["state_space_type"] == "continuous":
+                    transition_noise_ = current_config[list(var_env_configs).index(key)]
+                    env_config["env_config"][key] = tune.function(lambda a: a.normal(0, transition_noise_))
+                    env_config["env_config"]['transition_noise_std'] = transition_noise_ #hack
                 else:
                     env_config["env_config"][key] = current_config[list(var_env_configs).index(key)]
 
@@ -246,8 +261,8 @@ for current_config in cartesian_product_configs:
         'horizon': 100,
           "env_config": {
             "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-            'transition_noise': 0,
-            'reward_noise': tune.function(lambda a: a.normal(0, 0))
+            'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+            'reward_noise': tune.function(lambda a: a.normal(0, 0)),
             }
         },
     }
@@ -272,6 +287,8 @@ for current_config in cartesian_product_configs:
         timesteps_total = 20000
     elif algorithm == 'A3C': #hack
         timesteps_total = 150000
+    elif algorithm == 'DDPG': #hack
+        timesteps_total = 20000
 
     tune.run(
         algorithm,

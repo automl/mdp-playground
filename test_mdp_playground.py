@@ -58,7 +58,7 @@ class TestRLToyEnv(unittest.TestCase):
             action = np.array([1, 1, 1, 1]) # just to test if acting "in a line" works
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done)
-            np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
+            np.testing.assert_allclose(0.0, reward, atol=1e-5, err_msg='Step: ' + str(i))
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]))
         # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
@@ -81,7 +81,7 @@ class TestRLToyEnv(unittest.TestCase):
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done)
             if i >= 29:
-                np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
+                np.testing.assert_allclose(0.0, reward, atol=1e-5, err_msg='Step: ' + str(i))
             elif i >= 20: # reward should ideally start getting better at step 20 when we no longer apply random actions, but in this case, by chance, the 1st non-random action doesn't help
                 assert prev_reward < reward, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward) +  '. Prev. reward was: ' + str(prev_reward)
             elif i >= 9:
@@ -105,7 +105,7 @@ class TestRLToyEnv(unittest.TestCase):
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done)
             if i >= 30:
-                np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
+                np.testing.assert_allclose(0.0, reward, atol=1e-5, err_msg='Step: ' + str(i))
             elif i >= 21:
                 assert prev_reward < reward, 'Step: ' + str(i) + ' Expected reward mismatch. Reward was: ' + str(reward) +  '. Prev. reward was: ' + str(prev_reward)
             elif i >= 10:
@@ -148,7 +148,7 @@ class TestRLToyEnv(unittest.TestCase):
             action[config["action_space_relevant_indices"]] = 1.0 # test to see if acting "in a line" works for relevant dimensions
             next_state, reward, done, info = env.step(action)
             print("sars', done =", state, action, reward, next_state, done)
-            np.testing.assert_allclose(0.0, reward, atol=1e-7, err_msg='Step: ' + str(i))
+            np.testing.assert_allclose(0.0, reward, atol=1e-5, err_msg='Step: ' + str(i))
             state = next_state.copy()
         np.testing.assert_allclose(state[config["state_space_relevant_indices"]], np.array([21.59339006, 20.68189965, 21.49608203, 19.835966]))
         env.reset()
@@ -281,7 +281,7 @@ class TestRLToyEnv(unittest.TestCase):
         action = np.array([2.0, 1.0])
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done)
-        np.testing.assert_allclose(next_state - state, (1/6) * np.array([1, 0.5]) * 1e-6)
+        np.testing.assert_allclose(next_state - state, (1/6) * np.array([1, 0.5]) * 1e-6, atol=1e-7)
         np.testing.assert_allclose(env.state_derivatives[1] - state_derivatives[1], (1/2) * np.array([1, 0.5]) * 1e-4)
         np.testing.assert_allclose(env.state_derivatives[2] - state_derivatives[2], np.array([1, 0.5]) * 1e-2)
         np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
@@ -291,7 +291,7 @@ class TestRLToyEnv(unittest.TestCase):
         action = np.array([2.0, 1.0])
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done)
-        np.testing.assert_allclose(next_state - state, (7/6) * np.array([1, 0.5]) * 1e-6)
+        np.testing.assert_allclose(next_state - state, (7/6) * np.array([1, 0.5]) * 1e-6, atol=1e-7)
         np.testing.assert_allclose(env.state_derivatives[1] - state_derivatives[1], (3/2) * np.array([1, 0.5]) * 1e-4)
         np.testing.assert_allclose(env.state_derivatives[2] - state_derivatives[2], np.array([1, 0.5]) * 1e-2)
         np.testing.assert_allclose(state_derivatives[0], env.augmented_state[-2]) # Tested here as well because
@@ -361,7 +361,7 @@ class TestRLToyEnv(unittest.TestCase):
         # check 1 extra step away from target point gives -ve reward
         next_state, reward, done, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done)
-        np.testing.assert_allclose(-0.035355, reward, atol=1e-6, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this
+        np.testing.assert_allclose(-0.035355, reward, atol=1e-5, err_msg='Step: ' + str(i)) # At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this
         env.reset()
         env.close()
 
@@ -919,6 +919,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["image_width"] = 100
         config["image_height"] = 100
         config["image_transforms"] = 'shift,scale,rotate,flip'
+        config["image_scale_range"] = (0.5,1.5)
         env = RLToyEnv(config)
         state = env.get_augmented_state()['augmented_state'][-1]
 
@@ -926,13 +927,16 @@ class TestRLToyEnv(unittest.TestCase):
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
         expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
         expected_reward_noises = [-0.292808, 0.770696, -1.01743611, -0.042768, 0.78761320, -0.510087, -0.089978, 0.48654863]
-        expected_image_sums = [152745, 282030, 528870] # [105060, 232050, 78795]
+        expected_image_sums = [122910, 212925, 111180] # [152745, 282030, 528870], [105060, 232050, 78795]
         for i in range(len(expected_rewards)):
             expected_rewards[i] = expected_rewards[i] * config["reward_scale"] + config["reward_shift"] + expected_reward_noises[i]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             assert next_state.shape == (100, 100, 1), "Expected shape was (100, 100, 1). Shape was:" + str(next_state.shape)
             assert next_state.dtype == np.uint8, "Expected dtype: np.uint8. Was: " + str(next_state.dtype)
+            # import PIL.Image as Image
+            # img1 = Image.fromarray(np.squeeze(next_state), 'L')
+            # img1.show()
             if i < len(expected_image_sums):
                 assert next_state.sum() == expected_image_sums[i], "Expected sum over image pixels: " + str(expected_image_sums[i]) + ". Was: " + str(next_state.sum()) # Rotation changes the expected sum of 255 * 10201 = 2601255
             next_state = env.get_augmented_state()['augmented_state'][-1]
@@ -943,9 +947,6 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
-            # import PIL.Image as Image
-            # img1 = Image.fromarray(np.squeeze(next_state), 'L')
-            # img1.show()
 
 
     # def test_discrete_imaginary_rollouts(self):

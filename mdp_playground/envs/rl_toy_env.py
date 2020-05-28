@@ -49,9 +49,9 @@ class RLToyEnv(gym.Env):
             transition_dynamics_order: An order of n implies that the n-th state derivative is set equal to the action/inertia.
             inertia: inertia of the rigid body or point object simulated
             time_unit: time duration over which the action is applied to the system
-            reward_function: A string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_pt.
-            target_point: The target point in case move_to_a_pt a is the reward_function. If make_denser is true, target_radius determines distance from target point at which reward is handed out.
-        make_denser: If true, makes the reward denser in environments. For discrete environments, hands out a reward for completing part of a sequence. For continuous environment, for reward function move_to_a_pt, it's based on the distance moved towards the target point.
+            reward_function: A string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
+            target_point: The target point in case move_to_a_point a is the reward_function. If make_denser is true, target_radius determines distance from target point at which reward is handed out.
+        make_denser: If true, makes the reward denser in environments. For discrete environments, hands out a reward for completing part of a sequence. For continuous environment, for reward function move_to_a_point, it's based on the distance moved towards the target point.
         seed: Recommended to be passed as an int which generates seeds to be used for various components of the environment. It is however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for it below to see how to do that.
         log_filename: Prefix for the name of the log file to which logs are written.
 
@@ -267,6 +267,8 @@ class RLToyEnv(gym.Env):
                 self.image_scale_range = config["image_scale_range"]
 
 
+        self.dtype = np.float32
+
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
         config["action_space_type"] = config["action_space_type"].lower()
@@ -339,7 +341,7 @@ class RLToyEnv(gym.Env):
             assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
             assert config["state_space_relevant_indices"] == config["action_space_relevant_indices"], "For continuous spaces, state_space_relevant_indices has to be = action_space_relevant_indices. state_space_relevant_indices was: " + str(config["state_space_relevant_indices"]) + " action_space_relevant_indices was: " + str(config["action_space_relevant_indices"])
             if config["reward_function"] == "move_to_a_point":
-                config["target_point"] = np.array(config["target_point"])
+                config["target_point"] = np.array(config["target_point"], dtype=self.dtype)
                 assert config["target_point"].shape == (len(config["state_space_relevant_indices"]),), "target_point should have dimensionality = relevant_state_space dimensionality"
 
         self.config = config
@@ -373,7 +375,7 @@ class RLToyEnv(gym.Env):
         else: # cont. spaces
             self.state_space_max = config["state_space_max"] if 'state_space_max' in config else np.inf # should we select a random max? #test?
 
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=self.seed_dict["state_space"], dtype=np.float64) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
+            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=self.seed_dict["state_space"], dtype=self.dtype) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
 
 
         if config["action_space_type"] == "discrete":
@@ -388,7 +390,7 @@ class RLToyEnv(gym.Env):
         else: # cont. spaces
             self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
-            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=self.seed_dict["action_space"], dtype=np.float64) #seed # hack #TODO
+            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=self.seed_dict["action_space"], dtype=self.dtype) #seed # hack #TODO
 
 
         if config["action_space_type"] == "discrete":
@@ -437,7 +439,7 @@ class RLToyEnv(gym.Env):
                     lows = np.array([self.config["terminal_states"][i][j] - self.config["term_state_edge"]/2 for j in range(len(self.config["state_space_relevant_indices"]))])
                     highs = np.array([self.config["terminal_states"][i][j] + self.config["term_state_edge"]/2 for j in range(len(self.config["state_space_relevant_indices"]))])
                     # print("Term state lows, highs:", lows, highs)
-                    self.term_spaces.append(BoxExtended(low=lows, high=highs, seed=self.seed_, dtype=np.float64)) #seed #hack #TODO
+                    self.term_spaces.append(BoxExtended(low=lows, high=highs, seed=self.seed_, dtype=self.dtype)) #seed #hack #TODO
                 self.logger.debug("self.term_spaces samples:" + str(self.term_spaces[0].sample()) + str(self.term_spaces[-1].sample()))
 
             self.is_terminal_state = lambda s: np.any([self.term_spaces[i].contains(s[self.config["state_space_relevant_indices"]]) for i in range(len(self.term_spaces))]) ### TODO for cont. #test?
@@ -664,7 +666,7 @@ class RLToyEnv(gym.Env):
 
             else: # if action is from outside allowed action_space
                 next_state = state
-                warnings.warn("WARNING: Action out of range of action space. Applying 0 action!!")
+                warnings.warn("WARNING: Action " + str(action) + " out of range of action space. Applying 0 action!!")
             # if "transition_noise" in self.config:
             noise_in_transition = self.config["transition_noise"](self.np_random) if "transition_noise" in self.config else 0 #random
             self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
@@ -674,7 +676,7 @@ class RLToyEnv(gym.Env):
                 self.logger.info("next_state out of bounds. next_state, clipping to" + str(next_state) + str(np.clip(next_state, -self.state_space_max, self.state_space_max)))
                 next_state = np.clip(next_state, -self.state_space_max, self.state_space_max) # Could also "reflect" next_state when it goes out of bounds. Would seem more logical for a "wall", but would need to take care of multiple reflections near a corner/edge.
                 # Resets all higher order derivatives to 0
-                zero_state = np.array([0.0] * (self.config['state_space_dim']))
+                zero_state = np.array([0.0] * (self.config['state_space_dim']), dtype=self.dtype)
                 self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
                 self.state_derivatives[0] = next_state
 
@@ -789,7 +791,7 @@ class RLToyEnv(gym.Env):
                 if self.config["reward_function"] == "move_along_a_line":
                     # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
                     #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_deviation calc.?.
-                    data_ = np.array(state_considered)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
+                    data_ = np.array(state_considered, dtype=self.dtype)[1 : self.augmented_state_length - delay, self.config["state_space_relevant_indices"]]
                     data_mean = data_.mean(axis=0)
                     uu, dd, vv = np.linalg.svd(data_ - data_mean)
                     self.logger.info('uu.shape, dd.shape, vv.shape =' + str(uu.shape) + str(dd.shape) + str(vv.shape))
@@ -806,8 +808,8 @@ class RLToyEnv(gym.Env):
                 elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
                     assert self.sequence_length == 1
                     if self.config["make_denser"] == True:
-                        old_relevant_state = np.array(state_considered)[-2 - delay, self.config["state_space_relevant_indices"]]
-                        new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
+                        old_relevant_state = np.array(state_considered, dtype=self.dtype)[-2 - delay, self.config["state_space_relevant_indices"]]
+                        new_relevant_state = np.array(state_considered, dtype=self.dtype)[-1 - delay, self.config["state_space_relevant_indices"]]
                         reward = -np.linalg.norm(new_relevant_state - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
                         reward += np.linalg.norm(old_relevant_state - self.config["target_point"]) # Reward is the distance moved towards the target point.
                         reward *= self.reward_scale
@@ -816,7 +818,7 @@ class RLToyEnv(gym.Env):
                         #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
                         # TODO also make_denser, sparse rewards only at target
                     else:
-                        new_relevant_state = np.array(state_considered)[-1 - delay, self.config["state_space_relevant_indices"]]
+                        new_relevant_state = np.array(state_considered, dtype=self.dtype)[-1 - delay, self.config["state_space_relevant_indices"]]
                         if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
                             reward = self.reward_scale # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
@@ -950,7 +952,7 @@ class RLToyEnv(gym.Env):
                     break
 
             # init the state derivatives needed for continuous spaces
-            zero_state = np.array([0.0] * (self.config['state_space_dim']))
+            zero_state = np.array([0.0] * (self.config['state_space_dim']), dtype=self.dtype)
             self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
 
