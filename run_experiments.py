@@ -286,6 +286,7 @@ for current_config in cartesian_product_configs:
             "explore": False,
             "exploration_fraction": 0,
             "exploration_final_eps": 0,
+            "evaluation_num_episodes": 10,
             "batch_mode": "complete_episodes",
             'horizon': 100,
             "env_config": {
