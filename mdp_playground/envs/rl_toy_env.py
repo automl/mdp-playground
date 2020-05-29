@@ -277,6 +277,11 @@ class RLToyEnv(gym.Env):
             else:
                 self.image_scale_range = config["image_scale_range"]
 
+        if "action_loss_weight" not in config:
+            self.action_loss_weight = 0.0
+        else:
+            self.action_loss_weight = config["action_loss_weight"]
+
 
         self.dtype = np.float32
 
@@ -833,6 +838,7 @@ class RLToyEnv(gym.Env):
                         if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
                             reward = self.reward_scale # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
+                    reward -= self.action_loss_weight * np.linalg.norm(np.array(action, dtype=self.dtype))
                     if np.linalg.norm(np.array(state, dtype=self.dtype)[self.config["state_space_relevant_indices"]] - self.config["target_point"]) < self.config["target_radius"]:
                         self.reached_terminal = True
 

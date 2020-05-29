@@ -19,6 +19,7 @@ var_env_configs = OrderedDict({
     "target_radius": [0.5],
     "state_space_max": [10],
     "action_space_max": [1],
+    "action_loss_weight": [0.01],#0.01,
     'time_unit': [1.0],
     'transition_dynamics_order': [1],
     'dummy_seed': [i for i in range(num_seeds)],
@@ -57,11 +58,11 @@ agent_config = {
     # Postprocess the policy network model output with these hidden layers. If
     # use_state_preprocessor is False, then these will be the *only* hidden
     # layers in the network.
-    "actor_hiddens": [400, 300],
+    "actor_hiddens": [64, 64],
     # Postprocess the critic network model output with these hidden layers;
     # again, if use_state_preprocessor is True, then the state will be
     # preprocessed by the model specified with the "model" config option first.
-    "critic_hiddens": [400, 300],
+    "critic_hiddens": [64, 64],
 
     # Apply a state preprocessor with spec given by the "model" config option
     # (like other RL algorithms). This is mostly useful if you have a weird
