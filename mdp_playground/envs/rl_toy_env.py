@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import sys
+import sys, os
 import warnings
 import logging
 # import os
@@ -161,22 +161,33 @@ class RLToyEnv(gym.Env):
             config["seed"]["action_space"] = 1 + config["relevant_action_space_size"] # + config["seed"] for discrete, 11 + config["seed"] in case of continuous
             # 12 + config["seed"] for continuous self.term_spaces
 
+        print("Current working directory:", os.getcwd())
+
         # Set other default settings for config to use if config is passed without any values for them
         if "log_level" not in config:
             self.log_level = logging.CRITICAL #logging.NOTSET
         else:
             self.log_level = config["log_level"]
 
-        if "log_filename" not in config:
-            self.log_filename = __name__ + '_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
-        else:
-            self.log_filename = config["log_filename"]
+        # print('self.log_level', self.log_level)
+        logging.getLogger(__name__).setLevel(self.log_level)
+        # fmtr = logging.Formatter(fmt='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', style='%')
+        # sh = logging.StreamHandler()
+        # sh.setFormatter(fmt=fmtr)
+        self.logger = logging.getLogger(__name__)
+        # self.logger.addHandler(sh)
+
+        if "log_filename" in config:
+        #     self.log_filename = __name__ + '_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
+        # else:
+            if not self.logger.handlers: # checks that handlers is [], before adding a file logger, otherwise we would have multiple loggers to file if multiple RLToyEnvs were instantiated by the same process.
+                self.log_filename = config["log_filename"]
+                # logging.basicConfig(filename='/tmp/' + self.log_filename, filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=self.log_level)
+                log_file_handler = logging.FileHandler(self.log_filename)
+                self.logger.addHandler(log_file_handler)
         # log_filename = "logs/output.log"
         # os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 
-        # print('self.log_level', self.log_level)
-        logging.basicConfig(filename='/tmp/' + self.log_filename, filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=self.log_level)
-        self.logger = logging.getLogger(__name__)
 
         #seed
         if "seed" not in config: #####IMP It's very important to not modify the config dict since it may be shared across multiple instances of the Env in the same process and could leed to very hard to catch bugs
@@ -411,9 +422,9 @@ class RLToyEnv(gym.Env):
 
         self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
 
-        self.logger.info("self.augmented_state, len" + str(self.augmented_state) + str(len(self.augmented_state)))
-        self.logger.info("MDP Playground toy env instantiated with config:" + str(self.config)) #hack
-        print("MDP Playground toy env instantiated with config:" + str(self.config)) #hack
+        self.logger.info("self.augmented_state, len: " + str(self.augmented_state) + ", " + str(len(self.augmented_state)))
+        self.logger.info("MDP Playground toy env instantiated with config: " + str(self.config)) #hack
+        # print("MDP Playground toy env instantiated with config:" + str(self.config)) # hack
 
 
     def init_terminal_states(self):
@@ -822,6 +833,9 @@ class RLToyEnv(gym.Env):
                         if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
                             reward = self.reward_scale # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
+                    if np.linalg.norm(state - self.config["target_point"]) < self.config["target_radius"]:
+                        self.reached_terminal = True
+
 
         noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
@@ -849,10 +863,10 @@ class RLToyEnv(gym.Env):
         self.reward = self.R(self.curr_state, action, only_query=only_query) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
 
 
-        self.done = self.is_terminal_state(self.augmented_state[-1]) ####TODO curr_state is external state, while we need to check relevant state for terminality!
+        self.done = self.is_terminal_state(self.augmented_state[-1]) or self.reached_terminal ####TODO curr_state is external state, while we need to check relevant state for terminality!
         if self.done:
             self.reward += self.term_state_reward * self.reward_scale
-        self.logger.info('sas\'r:' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
+        self.logger.info('sas\'r:   ' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
         return self.curr_state, self.reward, self.done, self.get_augmented_state()
 
     def get_augmented_state(self):
@@ -914,7 +928,7 @@ class RLToyEnv(gym.Env):
 
         # on episode "end" stuff (to not be invoked when reset() called when self.total_episodes = 0; end is in quotes because it may not be a true episode end reached by reaching a terminal state, but reset() may have been called in the middle of an episode):
         if not self.total_episodes == 0:
-            self.logger.info("Noise stats for previous episode num.:" + str(self.total_episodes) + "(total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions):" + str(self.total_abs_noise_in_reward_episode) + str(self.total_abs_noise_in_transition_episode) + str(self.total_reward_episode) + str(self.total_noisy_transitions_episode) + str(self.total_transitions_episode))
+            self.logger.info("Noise stats for previous episode num.: " + str(self.total_episodes) + " (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): " + str(self.total_abs_noise_in_reward_episode) + " " + str(self.total_abs_noise_in_transition_episode) + " " + str(self.total_reward_episode) + " " + str(self.total_noisy_transitions_episode) + " " + str(self.total_transitions_episode))
 
         # on episode start stuff:
         self.total_episodes += 1
@@ -932,7 +946,6 @@ class RLToyEnv(gym.Env):
                     self.curr_state = self.discrete_to_multi_discrete(self.curr_state_relevant)
                     self.logger.info("RESET called. Relevant part of state reset to:" + str(self.curr_state_relevant))
 
-            self.logger.info("RESET called. curr_state set to:" + str(self.curr_state))
             self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state_relevant)
             # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays which is not possible with np.array!
@@ -956,9 +969,11 @@ class RLToyEnv(gym.Env):
             self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
 
-            self.logger.info("RESET called. State reset to:" + str(self.curr_state))
             self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state.copy())
+
+        self.logger.info("RESET called. curr_state reset to: " + str(self.curr_state))
+        self.reached_terminal = False
 
         self.total_abs_noise_in_reward_episode = 0
         self.total_abs_noise_in_transition_episode = 0 # only present in continuous spaces

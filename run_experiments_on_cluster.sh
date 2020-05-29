@@ -11,7 +11,7 @@
 ##SBATCH --mem 16000M # Specify the real memory required per node, not needed as for our cluster, -c below takes priority and auto-sets the memory. For CPU, use --mem-per-cpu
 #SBATCH -a 0-59 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
 
-export EXP_NAME='rainbow_image_representations' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='age_representations' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
@@ -37,7 +37,7 @@ echo Shell used is $SHELL
 # source activate /home/rajanr/anaconda2/envs/py36
 # source activate /home/rajanr/anaconda3/envs/py36_toy_rl
 . /home/rajanr/anaconda3/etc/profile.d/conda.sh # for anaconda3
-conda activate /home/rajanr/anaconda3/envs/old_py36_toy_rl # should be conda activate and not source when using anaconda3?
+conda activate /home/rajanr/anaconda3/envs/py36_toy_rl # should be conda activate and not source when using anaconda3?
 #/home/rajanr/anaconda3/bin/conda activate /home/rajanr/anaconda2/envs/py36
 which python
 python -V

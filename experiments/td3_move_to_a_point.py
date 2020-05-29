@@ -14,7 +14,6 @@ var_env_configs = OrderedDict({
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'target_point': [[0, 0]],
-    "target_radius": 0.05,
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -36,13 +35,13 @@ env_config = {
         'time_unit': 1,
         'reward_scale': 1.0,
         "reward_function": 'move_to_a_point',
+        "target_radius": 0.05,
         # 'make_denser': True,
         "log_level": 'WARN',
-        "log_filename": '/tmp/ddpg_mv_pt.log',
     },
 }
 
-algorithm = "DDPG"
+algorithm = "TD3"
 agent_config = {
     # Learning rate for the critic (Q-function) optimizer.
     "critic_lr": 1e-3,
@@ -60,6 +59,12 @@ agent_config = {
     # again, if use_state_preprocessor is True, then the state will be
     # preprocessed by the model specified with the "model" config option first.
     "critic_hiddens": [400, 300],
+
+    "twin_q": True,
+    "policy_delay": 2,
+    "smooth_target_policy": True,
+    "target_noise": 0.2,
+    "target_noise_clip": 0.5,
 
     # Apply a state preprocessor with spec given by the "model" config option
     # (like other RL algorithms). This is mostly useful if you have a weird

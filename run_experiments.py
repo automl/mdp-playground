@@ -255,14 +255,14 @@ for current_config in cartesian_product_configs:
     eval_config = {
         "evaluation_interval": 1, # I think this means every x training_iterations
         "evaluation_config": {
-        "exploration_fraction": 0,
-        "exploration_final_eps": 0,
-        "batch_mode": "complete_episodes",
-        'horizon': 100,
-          "env_config": {
-            "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-            'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
-            'reward_noise': tune.function(lambda a: a.normal(0, 0)),
+            "exploration_fraction": 0,
+            "exploration_final_eps": 0,
+            "batch_mode": "complete_episodes",
+            'horizon': 100,
+            "env_config": {
+                "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+                'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+                'reward_noise': tune.function(lambda a: a.normal(0, 0)),
             }
         },
     }
@@ -276,6 +276,7 @@ for current_config in cartesian_product_configs:
             "on_train_result": tune.function(on_train_result),
 #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
                 },
+        # "log_level": 'WARN',
     }
 
     # tune_config = reduce(deepmerge, [agent_config, env_config, model_config, eval_config, extra_config])
@@ -287,7 +288,7 @@ for current_config in cartesian_product_configs:
         timesteps_total = 20000
     elif algorithm == 'A3C': #hack
         timesteps_total = 150000
-    elif algorithm == 'DDPG': #hack
+    else: #if algorithm == 'DDPG': #hack
         timesteps_total = 20000
 
     tune.run(
