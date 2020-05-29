@@ -215,10 +215,10 @@ class RLToyEnv(gym.Env):
             self.seed_dict["state_space"] = self.np_random.randint(sys.maxsize) #IMP This is currently used to sample only for continuous spaces and not used for discrete spaces by the Environment. User might want to sample from it for multi-discrete environments. #random
             self.seed_dict["action_space"] = self.np_random.randint(sys.maxsize) #IMP This IS currently used to sample random actions by the RL agent for both discrete and continuous environments (but not used anywhere by the Environment). #random
             self.seed_dict["image_representations"] = self.np_random.randint(sys.maxsize) #random
-            print("Mersenne0, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
+            # print("Mersenne0, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
         else: # if seed dict was passed
             self.seed(self.seed_dict["env"])
-            print("Mersenne0 (dict), dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
+            # print("Mersenne0 (dict), dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
 
         self.logger.warning('Seeds set to:' + str(self.seed_dict))
         # print(f'Seeds set to {self.seed_dict=}') # Available from Python 3.8
@@ -417,7 +417,7 @@ class RLToyEnv(gym.Env):
         self.init_terminal_states()
         self.init_init_state_dist() #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; After looking into Gym code, I can say that for continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (and is done for the defined limits for the respective dimension).
         self.init_transition_function()
-        print("Mersenne1, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
+        # print("Mersenne1, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
         self.init_reward_function()
 
         self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
@@ -525,7 +525,7 @@ class RLToyEnv(gym.Env):
         """Initialises reward function, R by selecting random sequences to be rewardable for discrete environments. For continuous environments, we have fixed available options for the reward function.
 
         """
-        print("Mersenne2, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
+        # print("Mersenne2, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
 
         #TODO Maybe refactor this code and put useful reusable permutation generators, etc. in one library
         if self.config["state_space_type"] == "discrete":
@@ -556,9 +556,9 @@ class RLToyEnv(gym.Env):
                     warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(num_specific_sequences)) #TODO Maybe even exit the program if too much memory is (expected to be) taken.; Took about 80s for 40k iterations of the for loop below on my laptop
 
                 self.specific_sequences = [[] for i in range(self.sequence_length)]
-                print("Mersenne3:", self.np_random.get_state()[2])
+                # print("Mersenne3:", self.np_random.get_state()[2])
                 sel_sequence_nums = self.np_random.choice(num_possible_permutations, size=num_specific_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; # TODO this code could be replaced with self.np_random.permutation(non_term_relevant_state_space_size)[self.sequence_length]? Replacement becomes a problem then! We have to keep smpling until we have all unique rewardable sequences.
-                print("Mersenne4:", self.np_random.get_state()[2])
+                # print("Mersenne4:", self.np_random.get_state()[2])
 
                 total_clashes = 0
                 for i in range(num_specific_sequences):
@@ -833,7 +833,7 @@ class RLToyEnv(gym.Env):
                         if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
                             reward = self.reward_scale # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
-                    if np.linalg.norm(state - self.config["target_point"]) < self.config["target_radius"]:
+                    if np.linalg.norm(np.array(state, dtype=self.dtype)[self.config["state_space_relevant_indices"]] - self.config["target_point"]) < self.config["target_radius"]:
                         self.reached_terminal = True
 
 

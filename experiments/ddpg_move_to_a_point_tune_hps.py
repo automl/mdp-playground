@@ -6,8 +6,6 @@ from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_dim': [2],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_dim': [2],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    "state_space_relevant_indices": [[0, 1]],
-    "action_space_relevant_indices": [[0, 1]],
     'delay': [0], # + [2**i for i in range(4)],
     # 'sequence_length': [1], #, 2, 3, 4],#i for i in range(1,4)]
     # 'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
@@ -24,8 +22,29 @@ var_env_configs = OrderedDict({
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
+
+
+var_agent_configs = OrderedDict({
+    # Learning rate for the critic (Q-function) optimizer.
+    "critic_lr": [1e-2, 1e-3, 1e-4],
+    # Update the target by \tau * policy + (1-\tau) * target_policy
+    "tau": [2e-2, 2e-3, 2e-4],
+    # How many steps of the model to sample before learning starts.
+    "learning_starts": [500, 1000, 2000],
+    # Postprocess the critic network model output with these hidden layers;
+    # again, if use_state_preprocessor is True, then the state will be
+    # preprocessed by the model specified with the "model" config option first.
+    "critic_hiddens": [[8, 8], [16, 16], [32, 32]], # , [64, 64], [128, 128]
+})
+
+
+# var_model_configs = OrderedDict({
+# })
+
 var_configs = OrderedDict({
-"env": var_env_configs
+"env": var_env_configs,
+"agent": var_agent_configs,
+# "model": var_model_configs,
 })
 
 env_config = {
@@ -46,22 +65,12 @@ env_config = {
 
 algorithm = "DDPG"
 agent_config = {
-    # Learning rate for the critic (Q-function) optimizer.
-    "critic_lr": 1e-3,
     # Learning rate for the actor (policy) optimizer.
-    "actor_lr": 1e-3,
-    # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.002,
-    # How many steps of the model to sample before learning starts.
-    "learning_starts": 1000,
+    "actor_lr": None, #[1e-2, 1e-3, 1e-4],
     # Postprocess the policy network model output with these hidden layers. If
     # use_state_preprocessor is False, then these will be the *only* hidden
     # layers in the network.
-    "actor_hiddens": [400, 300],
-    # Postprocess the critic network model output with these hidden layers;
-    # again, if use_state_preprocessor is True, then the state will be
-    # preprocessed by the model specified with the "model" config option first.
-    "critic_hiddens": [400, 300],
+    "actor_hiddens": None, #[[64, 64], [128, 128], [256, 256]],
 
     # Apply a state preprocessor with spec given by the "model" config option
     # (like other RL algorithms). This is mostly useful if you have a weird

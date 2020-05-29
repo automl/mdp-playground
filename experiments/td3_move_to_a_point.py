@@ -14,6 +14,11 @@ var_env_configs = OrderedDict({
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'target_point': [[0, 0]],
+    "target_radius": [0.5],
+    "state_space_max": [10],
+    "action_space_max": [1],
+    'time_unit': [1.0],
+    'transition_dynamics_order': [1],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -28,16 +33,12 @@ env_config = {
         'seed': 0, #seed
         'state_space_type': 'continuous',
         'action_space_type': 'continuous',
-        "state_space_max": 5,
-        "action_space_max": 1,
-        'transition_dynamics_order': 1,
         'inertia': 1,
-        'time_unit': 1,
         'reward_scale': 1.0,
         "reward_function": 'move_to_a_point',
-        "target_radius": 0.05,
         # 'make_denser': True,
-        "log_level": 'WARN',
+        # "log_level": 'INFO',
+        "log_filename": '/tmp/td3_mv_pt.log',
     },
 }
 

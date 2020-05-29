@@ -15,7 +15,7 @@ import copy
 import logging
 
 from datetime import datetime
-log_filename = 'test_mdp_playground_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
+log_filename = '/tmp/test_mdp_playground_' + datetime.today().strftime('%m.%d.%Y_%I:%M:%S_%f') + '.log' #TODO Make a directoy 'log/' and store there.
 
 
 #TODO None of the tests do anything when done = True. Should try calling reset() in one of them and see that this works?
@@ -326,6 +326,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_scale"] = 1.0
         config["reward_function"] = "move_to_a_point"
         config["target_point"] = [-0.29792, 1.71012]
+        config["target_radius"] = 0.05
         config["make_denser"] = True
 
         # Test : dense reward

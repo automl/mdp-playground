@@ -147,6 +147,7 @@ def on_train_result(info):
     # Write train stats
     timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
     episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
+    # print("Custom_metrics: ", info["result"]["step_reward_mean"], info["result"]["step_reward_max"], info["result"]["step_reward_min"])
     episode_len_mean = info["result"]["episode_len_mean"]
 
     fout.write(str(timesteps_total) + ' ' + str(episode_reward_mean) +
@@ -176,6 +177,24 @@ def on_episode_end(info):
         fout = open(hack_filename_eval, 'a') #hardcoded
         fout.write(str(reward_this_episode) + ' ' + str(length_this_episode) + "\n")
         fout.close()
+
+def on_episode_step(info):
+    episode = info["episode"]
+    if "step_reward" not in episode.custom_metrics:
+        episode.custom_metrics["step_reward"] = []
+        step_reward =  episode.total_reward
+    else:
+        step_reward =  episode.total_reward - np.sum(episode.custom_metrics["step_reward"])
+        episode.custom_metrics["step_reward"].append(step_reward) # This line should not be executed the 1st time this function is called because no step has actually taken place then (Ray 0.9.0)!!
+    # episode.custom_metrics = {}
+    # episode.user_data = {}
+    # episode.hist_data = {}
+    # Next 2 are the same, except 1st one is total episodic reward _per_ agent
+    # episode.agent_rewards = defaultdict(float)
+    # episode.total_reward += reward
+    # only hack to get per step reward seems to be to store prev total_reward and subtract it from that
+    # episode._agent_reward_history[agent_id].append(reward)
+
 
 
 value_tuples = []
@@ -247,14 +266,24 @@ for current_config in cartesian_product_configs:
                 num_configs_done = len(list(var_env_configs)) + len(list(var_agent_configs))
                 model_config["model"][key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
-
-    if model_config["model"]["use_lstm"]: #hack
+    #hacks begin:
+    if model_config["model"]["use_lstm"]:
         model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
 
+    if algorithm == 'DDPG':
+        agent_config["actor_lr"] = agent_config["critic_lr"] ###TODO Find a better way to enforce this??
+        agent_config["actor_hiddens"] = agent_config["critic_hiddens"]
+    # elif algorithm == 'SAC':
+
+    # else: #if algorithm == 'TD3':
+
+
+    # hacks end
 
     eval_config = {
         "evaluation_interval": 1, # I think this means every x training_iterations
         "evaluation_config": {
+            "explore": False,
             "exploration_fraction": 0,
             "exploration_final_eps": 0,
             "batch_mode": "complete_episodes",
@@ -270,7 +299,7 @@ for current_config in cartesian_product_configs:
     extra_config = {
         "callbacks": {
 #                 "on_episode_start": tune.function(on_episode_start),
-#                 "on_episode_step": tune.function(on_episode_step),
+            # "on_episode_step": tune.function(on_episode_step),
             "on_episode_end": tune.function(on_episode_end),
 #                 "on_sample_end": tune.function(on_sample_end),
             "on_train_result": tune.function(on_train_result),
