@@ -139,7 +139,7 @@ def on_train_result(info):
                 else:
                     fout.write(str(info["result"]["config"]["env_config"][key]).replace(' ', '') + ' ')
             elif config_type == "agent":
-                fout.write(str(info["result"]["config"][key]) + ' ')
+                fout.write(str(info["result"]["config"][key]).replace(' ', '') + ' ')
             elif config_type == "model":
                 # if key == 'conv_filters':
                 fout.write(str(info["result"]["config"]["model"][key]).replace(' ', '') + ' ')

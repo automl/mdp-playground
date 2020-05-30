@@ -129,7 +129,7 @@ class MDPP_Analysis():
 
         # print(len(hack_indices), hack_indices)
 
-        # hack_indices = hack_indices[1:] #hardcoded removes the 1st hack_index which is at position 0 so that hack_indices_10 below doesn't begin with a -10; apparently Ray seems to have changed logging for evaluation (using on_episode_end) from 0.7.3 to 0.9.0
+        hack_indices = hack_indices[1:] #hardcoded removes the 1st hack_index which is at position 0 so that hack_indices_10 below doesn't begin with a -10; apparently Ray seems to have changed logging for evaluation (using on_episode_end) from 0.7.3 to 0.9.0
         hack_indices_10 = np.array(hack_indices) - 10
         # print(hack_indices_10.shape, hack_indices_10)
         # print(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))
@@ -138,7 +138,7 @@ class MDPP_Analysis():
         for i in range(len(hack_indices)):
             final_10_evals.append(eval_stats[hack_indices_10[i]:hack_indices[i]])
         #     print(final_10_evals[-1])
-        # final_10_evals.append(eval_stats[hack_indices[i]:]) # appends the very last eval which begins at last hack_index for Ray 0.9.0
+        final_10_evals.append(eval_stats[hack_indices[i]:]) # appends the very last eval which begins at last hack_index for Ray 0.9.0
 
         final_10_evals = np.array(final_10_evals) # has 2 columns: episode reward and episode length
         # print(final_10_evals.shape, final_10_evals)
