@@ -16,7 +16,7 @@ var_env_configs = OrderedDict({
     'transition_noise': [0, 0.02, 0.10, 0.25, 0.5, 1, 2, 5],
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'target_point': [[0, 0]],
-    "target_radius": [0.05],
+    "target_radius": [1.0],
     "state_space_max": [10],
     "action_space_max": [1],
     "action_loss_weight": [0.0],#0.01,
