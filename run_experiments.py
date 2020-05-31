@@ -151,7 +151,7 @@ def on_train_result(info):
     episode_len_mean = info["result"]["episode_len_mean"]
 
     fout.write(str(timesteps_total) + ' ' + str(episode_reward_mean) +
-               ' ' + str(episode_len_mean) + '\n')
+               ' ' + str(episode_len_mean) + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
     fout.close()
 
     # print("##### hack_filename: ", hack_filename)

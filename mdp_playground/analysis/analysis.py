@@ -11,7 +11,7 @@ class MDPP_Analysis():
     def __init__(self):
         pass
 
-    def load_data(self, dir_name, exp_name):
+    def load_data(self, dir_name, exp_name, num_metrics=3):
         '''Loads training and evaluation data from given file
 
         Parameters
@@ -77,12 +77,13 @@ class MDPP_Analysis():
         config_counts = []
         dims_values = []
         # For the following seeds should always be last column read! 1st column should be >=1 (it should not be 0 because that is the training_iteration that was recorded and is not used here)
-        for i in range(1, len(config_names) - 3): #hardcoded 3 for no. of stats written
+        for i in range(1, len(config_names) - num_metrics): # hardcoded 3 for no. of stats written
             dims_values.append(stats_pd[i].unique())
             config_counts.append(stats_pd[i].nunique())
 
-        config_counts.append(3) #hardcoded number of training stats that were recorded
+        config_counts.append(num_metrics) #hardcoded number of training stats that were recorded
         config_counts = tuple(config_counts)
+        self.metric_names = config_names[-num_metrics:]
 
         # Slice into training stats and get end of training stats for individual training runs in the experiment
         final_rows_for_a_config = []
@@ -91,7 +92,7 @@ class MDPP_Analysis():
         # cols_to_take = 8
 
         for i in range(stats_pd.shape[0] - 1):
-            if stats_pd.iloc[i, -3] > stats_pd.iloc[i + 1, -3]: #hardcoded: 3rd last column is no. of timesteps for the current run
+            if stats_pd.iloc[i, -num_metrics] > stats_pd.iloc[i + 1, -num_metrics]: # hardcoded: -num_metrics column always HAS to be no. of timesteps for the current run
                 # list_of_learning_curves.append(stats_pd.iloc[previous_i:i+1, -cols_to_take:])
                 previous_i = i + 1
                 final_rows_for_a_config.append(i)
@@ -103,7 +104,7 @@ class MDPP_Analysis():
         # print(len(list_of_learning_curves))
         # print(len(final_rows_for_a_config))
         stats_end_of_training = stats_pd.iloc[final_rows_for_a_config]
-        stats_reshaped = stats_end_of_training.iloc[:, -3:] #hardcoded # last vals are timesteps_total, episode_reward_mean, episode_len_mean
+        stats_reshaped = stats_end_of_training.iloc[:, -num_metrics:] # hardcoded # last vals are timesteps_total, episode_reward_mean, episode_len_mean
         stats_reshaped = np.reshape(np.array(stats_reshaped), config_counts)
         # print(stats_end_of_training.head(10))
         print("train stats shape:", stats_reshaped.shape)
@@ -151,11 +152,11 @@ class MDPP_Analysis():
 #         print(np.array(stats_pd.iloc[:, -3]))
 
         # Adds timesteps_total column to the eval stats which did not have them:
-        mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -3])).T, mean_data_eval), axis=1)
+        mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -num_metrics])).T, mean_data_eval), axis=1)
 #         print(mean_data_eval.shape, len(final_rows_for_a_config))
 
 
-        final_eval_metrics_ = mean_data_eval[final_rows_for_a_config, :] # 1st column is episode reward, 2nd is episode length
+        final_eval_metrics_ = mean_data_eval[final_rows_for_a_config, :] # 1st column is episode reward, 2nd is episode length in original _eval.csv file, here it's 2nd and 3rd after prepending timesteps_total column above.
         # print(dims_values, config_counts)
         final_eval_metrics_reshaped = np.reshape(final_eval_metrics_, config_counts)
         # print(final_eval_metrics_)
@@ -169,7 +170,7 @@ class MDPP_Analysis():
         x_axis_labels = []
         x_tick_labels_ = []
         dims_varied = []
-        for i in range(len(self.config_counts) - 1): # -1 is added to ignore seeds as dimensions of difficulty
+        for i in range(len(self.config_counts) - 1): # -1 is added to ignore #seeds as dimensions of difficulty
             if self.config_counts[i]> 1:
                 x_axis_labels.append(self.config_names[i])
                 x_tick_labels_.append([str(j) for j in self.dims_values[i]])
@@ -200,7 +201,7 @@ class MDPP_Analysis():
         return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval
 
 
-    def plot_1d_dimensions(self, stats_data, save_fig=False, train=True):
+    def plot_1d_dimensions(self, stats_data, save_fig=False, train=True, metric_num=-2):
         '''Plots 1-D bar plots across a single dimension with mean and std. dev.
 
         Parameters
@@ -214,14 +215,14 @@ class MDPP_Analysis():
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
 
         '''
-        y_axis_label = 'Reward'
+        y_axis_label = 'Reward' if 'reward' in self.metric_names[metric_num] else self.metric_names[metric_num]
 
         plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
         # print(stats_data.shape)
 
-        mean_data_ = np.mean(stats_data[..., -2], axis=-1) # the slice sub-selects episode_reward_means from the last axis of diff. metrics saved and then the axis of seeds becomes axis=-1 ( before slice it was -2).
+        mean_data_ = np.mean(stats_data[..., metric_num], axis=-1) # the slice sub-selects the metric written in position metric_num from the "last axis of diff. metrics that were written" and then the axis of #seeds becomes axis=-1 ( before slice it was -2).
         to_plot_ = np.squeeze(mean_data_)
-        std_dev_ = np.std(stats_data[..., -2], axis=-1)
+        std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
         to_plot_std_ = np.squeeze(std_dev_)
 
         fig_width = len(self.tick_labels[0])
@@ -236,7 +237,7 @@ class MDPP_Analysis():
         plt.xlabel(self.axis_labels[0])
         plt.ylabel(y_axis_label)
         if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_1d.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
         plt.show()
 
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
@@ -247,10 +248,10 @@ class MDPP_Analysis():
             plt.xlabel(self.axis_labels[1])
             plt.ylabel(y_axis_label)
             if save_fig:
-                plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_1d.pdf', dpi=300, bbox_inches="tight")
+                plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
             plt.show()
 
-    def plot_2d_heatmap(self, stats_data, save_fig=False, train=True):
+    def plot_2d_heatmap(self, stats_data, save_fig=False, train=True, metric_num=-2):
         '''Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground
 
         Parameters
@@ -265,45 +266,46 @@ class MDPP_Analysis():
         '''
         plt.rcParams.update({'font.size': 18}) # default 12, 24 for paper, for poster: 30
         cmap = 'Purples' # 'Blues' #
+        label_ = 'Reward' if 'reward' in self.metric_names[metric_num] else self.metric_names[metric_num]
 
-        mean_data_ = np.mean(stats_data[..., -2], axis=-1)
+        mean_data_ = np.mean(stats_data[..., metric_num], axis=-1) #seed
         to_plot_ = np.squeeze(mean_data_)
         if len(to_plot_.shape) > 2:
             # warning.warn("Data contains variation in more than 2 dimensions (apart from seeds). May lead to plotting error!")
             raise ValueError("Data contains variation in more than 2 dimensions (apart from seeds). This is currently not supported") #TODO Add 2-D plots for all combinations of 2 varying dims?
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_))
         if len(self.tick_labels) == 2:
-            plt.gca().set_xticklabels(self.tick_labels[1]) # dims 1 and 0 are exchanged here because Y-axis has plot for 1st varying dim and X-axis has plot for 2nd varying dim
-        plt.gca().set_yticklabels(self.tick_labels[0])
+            plt.gca().set_yticklabels(self.tick_labels[1])
+        plt.gca().set_xticklabels(self.tick_labels[0])
         cbar = plt.colorbar()
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 25
-        cbar.set_label('Reward', rotation=270)
+        cbar.set_label(label_, rotation=270)
         if len(self.axis_labels) == 2:
-            plt.xlabel(self.axis_labels[1])
-        plt.ylabel(self.axis_labels[0])
+            plt.ylabel(self.axis_labels[1])
+        plt.xlabel(self.axis_labels[0])
         if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
         plt.show()
-        std_dev_ = np.std(stats_data[..., -2], axis=-1)
+        std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
         to_plot_ = np.squeeze(std_dev_)
         # print(to_plot_, to_plot_.shape)
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_)) # 60 for DQN, 100 for A3C
         if len(self.tick_labels) == 2:
-            plt.gca().set_xticklabels(self.tick_labels[1])
-        plt.gca().set_yticklabels(self.tick_labels[0])
+            plt.gca().set_yticklabels(self.tick_labels[1])
+        plt.gca().set_xticklabels(self.tick_labels[0])
         cbar = plt.colorbar()
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 30
         cbar.set_label('Reward Std Dev.', rotation=270)
         if len(self.axis_labels) == 2:
-            plt.xlabel(self.axis_labels[1])
-        plt.ylabel(self.axis_labels[0])
+            plt.ylabel(self.axis_labels[1])
+        plt.xlabel(self.axis_labels[0])
         # plt.tight_layout()
         if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
             # plt.savefig(stats_file.split('/')[-1] + '_train_heat_map.png')#, dpi=300)
         plt.show()
 
-    def plot_learning_curves(self, stats_data, save_fig=False, train=True):
+    def plot_learning_curves(self, stats_data, save_fig=False, train=True, metric_num=-2): # metric_num needs to be minus indexed because stats_pd reutrned for train stats has _all_ columns
         '''Plots learning curves: Either across 1 or 2 meta-features of MDP Playground. Different colours represent learning curves for different seeds.
 
         Parameters
@@ -337,10 +339,10 @@ class MDPP_Analysis():
             i_index = i//(nseeds_ * ncols_) # = num_seeds * shape of more frequently changing hyperparam
             j_index = (i//nseeds_) % ncols_ #
             if i == 0:
-                to_plot_ = stats_data[0:self.final_rows_for_a_config[i]+1,-2]
+                to_plot_ = stats_data[0:self.final_rows_for_a_config[i]+1, metric_num]
                 to_plot_x = stats_data[0:self.final_rows_for_a_config[i]+1,-3]
             else:
-                to_plot_ = stats_data[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -2]
+                to_plot_ = stats_data[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, metric_num]
                 to_plot_x = stats_data[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -3]
         #     if i % 10 == 0:
         #         fig = plt.figure(figsize=(12, 7))
@@ -366,4 +368,4 @@ class MDPP_Analysis():
         # plt.suptitle("Training Learning Curves")
         plt.show()
         if save_fig:
-            fig.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
+            fig.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
