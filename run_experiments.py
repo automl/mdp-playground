@@ -319,7 +319,7 @@ for current_config in cartesian_product_configs:
     elif algorithm == 'A3C': #hack
         timesteps_total = 150000
     else: #if algorithm == 'DDPG': #hack
-        timesteps_total = 40000
+        timesteps_total = 20000
 
     tune.run(
         algorithm,

@@ -14,9 +14,9 @@ var_env_configs = OrderedDict({
     'make_denser': [True],
     # 'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
     'transition_noise': [0],
-    'reward_noise': [0, 0.25, 0.5, 1, 2, 5, 10, 25],#, 1, 5, 10, 25] # Std dev. of normal dist.
+    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'target_point': [[0, 0]],
-    "target_radius": [0.5],
+    "target_radius": [0.05, 0.10, 0.25, 0.5, 1.0],
     "state_space_max": [10],
     "action_space_max": [1],
     "action_loss_weight": [0.0],#0.01,
