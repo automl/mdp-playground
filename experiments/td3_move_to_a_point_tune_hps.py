@@ -22,21 +22,13 @@ var_env_configs = OrderedDict({
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
-
-
 var_agent_configs = OrderedDict({
-    # Learning rate for the critic (Q-function) optimizer.
-    "critic_lr": [1e-2, 1e-3, 1e-4],
-    # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": [2e-2, 2e-3, 2e-4],
-    # How many steps of the model to sample before learning starts.
-    "learning_starts": [500, 1000, 2000],
-    # Postprocess the critic network model output with these hidden layers;
-    # again, if use_state_preprocessor is True, then the state will be
-    # preprocessed by the model specified with the "model" config option first.
-    "critic_hiddens": [[8, 8], [16, 16], [32, 32]], # , [64, 64], [128, 128]
+    "policy_delay": [2, 3, 4],
+    # N-step Q learning
+    "n_step": [2, 3, 4],
+    "target_noise": [0.02, 0.2, 2.0],
+    "target_noise_clip": [1.5, 2.5], # this is abs. val. for our purposes we need relative so we hack that in run_experiments.py
 })
-
 
 # var_model_configs = OrderedDict({
 # })
@@ -59,18 +51,31 @@ env_config = {
         "reward_function": 'move_to_a_point',
         # 'make_denser': True,
         # "log_level": 'INFO',
-        "log_filename": '/tmp/ddpg_mv_pt.log',
+        "log_filename": '/tmp/td3_mv_pt.log',
     },
 }
 
-algorithm = "DDPG"
+algorithm = "TD3"
 agent_config = {
+    # Learning rate for the critic (Q-function) optimizer.
+    "critic_lr": 1e-3,
     # Learning rate for the actor (policy) optimizer.
-    "actor_lr": None, #[1e-2, 1e-3, 1e-4],
+    "actor_lr": 1e-3,
+    # Update the target by \tau * policy + (1-\tau) * target_policy
+    "tau": 0.02,
+    # How many steps of the model to sample before learning starts.
+    "learning_starts": 2000,
     # Postprocess the policy network model output with these hidden layers. If
     # use_state_preprocessor is False, then these will be the *only* hidden
     # layers in the network.
-    "actor_hiddens": None, #[[64, 64], [128, 128], [256, 256]],
+    "actor_hiddens": [32, 32],
+    # Postprocess the critic network model output with these hidden layers;
+    # again, if use_state_preprocessor is True, then the state will be
+    # preprocessed by the model specified with the "model" config option first.
+    "critic_hiddens": [32, 32],
+
+    "twin_q": True,
+    "smooth_target_policy": True,
 
     # Apply a state preprocessor with spec given by the "model" config option
     # (like other RL algorithms). This is mostly useful if you have a weird
@@ -81,8 +86,6 @@ agent_config = {
     "actor_hidden_activation": "relu",
     # Hidden layers activation of the postprocessing state of the critic.
     "critic_hidden_activation": "relu",
-    # N-step Q learning
-    "n_step": 1,
     # Update the target network every `target_network_update_freq` steps.
     "target_network_update_freq": 0,
     # If True, use huber loss instead of squared loss for critic network

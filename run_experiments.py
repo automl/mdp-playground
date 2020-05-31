@@ -270,12 +270,13 @@ for current_config in cartesian_product_configs:
     if model_config["model"]["use_lstm"]:
         model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
 
-    if algorithm == 'DDPG':
-        agent_config["actor_lr"] = agent_config["critic_lr"] ###TODO Find a better way to enforce this??
+    if algorithm == 'DDPG': ###TODO Find a better way to enforce these??
+        agent_config["actor_lr"] = agent_config["critic_lr"]
         agent_config["actor_hiddens"] = agent_config["critic_hiddens"]
-    # elif algorithm == 'SAC':
+    elif algorithm == 'TD3':
+        agent_config["target_noise_clip"] = agent_config["target_noise_clip"] * agent_config["target_noise"]
 
-    # else: #if algorithm == 'TD3':
+    # else: #if algorithm == 'SAC':
 
 
     # hacks end

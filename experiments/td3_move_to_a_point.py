@@ -49,17 +49,17 @@ agent_config = {
     # Learning rate for the actor (policy) optimizer.
     "actor_lr": 1e-3,
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.002,
+    "tau": 0.02,
     # How many steps of the model to sample before learning starts.
-    "learning_starts": 1000,
+    "learning_starts": 2000,
     # Postprocess the policy network model output with these hidden layers. If
     # use_state_preprocessor is False, then these will be the *only* hidden
     # layers in the network.
-    "actor_hiddens": [400, 300],
+    "actor_hiddens": [32, 32],
     # Postprocess the critic network model output with these hidden layers;
     # again, if use_state_preprocessor is True, then the state will be
     # preprocessed by the model specified with the "model" config option first.
-    "critic_hiddens": [400, 300],
+    "critic_hiddens": [32, 32],
 
     "twin_q": True,
     "policy_delay": 2,
@@ -117,7 +117,7 @@ agent_config = {
 
 model_config = {
     "model": {
-        "fcnet_hiddens": [256, 256],
+        # "fcnet_hiddens": [256, 256],
         # "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         # "no_final_linear": False,
