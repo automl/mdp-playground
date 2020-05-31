@@ -11,7 +11,7 @@
 ##SBATCH --mem 16000M # Specify the real memory required per node, not needed as for our cluster, -c below takes priority and auto-sets the memory. For CPU, use --mem-per-cpu
 #SBATCH -a 0-69 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
 
-export EXP_NAME='ddpg_move_to_a_point_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='ddpg_move_to_a_point_time_unit' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
