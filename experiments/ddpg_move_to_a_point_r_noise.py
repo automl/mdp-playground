@@ -33,7 +33,7 @@ env_config = {
     "env": "RLToy-v0",
     "horizon": 100,
     "env_config": {
-        'seed': 0, #seed
+        'seed': 1, #seed
         'state_space_type': 'continuous',
         'action_space_type': 'continuous',
         'inertia': 1,
