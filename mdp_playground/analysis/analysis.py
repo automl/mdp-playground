@@ -11,7 +11,7 @@ class MDPP_Analysis():
     def __init__(self):
         pass
 
-    def load_data(self, dir_name, exp_name, num_metrics=3):
+    def load_data(self, dir_name, exp_name, num_metrics=3, max_total_configs=200):
         '''Loads training and evaluation data from given file
 
         Parameters
@@ -44,7 +44,8 @@ class MDPP_Analysis():
                 '''Utility to join files that were written with different experiment configs'''
                 with open(file_prefix + file_suffix, 'ab') as combined_file:
                     i = 0
-                    while True:
+                    missing_configs = []
+                    while i < max_total_configs:
                         if os.path.isfile(file_prefix + '_' + str(i) + file_suffix):
                             with open(file_prefix + '_' + str(i) + file_suffix, 'rb') as curr_file:
                                 byte_string = curr_file.read()
@@ -53,9 +54,11 @@ class MDPP_Analysis():
                                     warnings.warn('Expected 21 \\n chars in each stats file. Got only: ' + str(newline_count) + ' in file: ' + str(i))
                                 combined_file.write(byte_string)
                         else:
-                            break
+                            missing_configs.append(i)
+                            # break
                         i += 1
                     print(str(i) + " files were combined into 1 for file:" + file_prefix + '_n' + file_suffix)
+                    print("Files missing for config_nums:", missing_configs)
                     if i==0:
                         raise FileNotFoundError("No files to combine were present. Please check your location and/or filenames that they are correct.")
             join_files(stats_file,  '.csv')
@@ -270,19 +273,24 @@ class MDPP_Analysis():
 
         mean_data_ = np.mean(stats_data[..., metric_num], axis=-1) #seed
         to_plot_ = np.squeeze(mean_data_)
+        # print(to_plot_)
         if len(to_plot_.shape) > 2:
             # warning.warn("Data contains variation in more than 2 dimensions (apart from seeds). May lead to plotting error!")
             raise ValueError("Data contains variation in more than 2 dimensions (apart from seeds). This is currently not supported") #TODO Add 2-D plots for all combinations of 2 varying dims?
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_))
         if len(self.tick_labels) == 2:
-            plt.gca().set_yticklabels(self.tick_labels[1])
-        plt.gca().set_xticklabels(self.tick_labels[0])
+            plt.gca().set_xticklabels(self.tick_labels[1])
+            plt.gca().set_yticklabels(self.tick_labels[0])
+        else:
+            plt.gca().set_xticklabels(self.tick_labels[0])
         cbar = plt.colorbar()
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 25
         cbar.set_label(label_, rotation=270)
         if len(self.axis_labels) == 2:
-            plt.ylabel(self.axis_labels[1])
-        plt.xlabel(self.axis_labels[0])
+            plt.xlabel(self.axis_labels[1])
+            plt.ylabel(self.axis_labels[0])
+        else:
+            plt.xlabel(self.axis_labels[0])
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
         plt.show()
@@ -291,14 +299,18 @@ class MDPP_Analysis():
         # print(to_plot_, to_plot_.shape)
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_)) # 60 for DQN, 100 for A3C
         if len(self.tick_labels) == 2:
-            plt.gca().set_yticklabels(self.tick_labels[1])
-        plt.gca().set_xticklabels(self.tick_labels[0])
+            plt.gca().set_xticklabels(self.tick_labels[1])
+            plt.gca().set_yticklabels([str(i) for i in self.tick_labels[0]])
+        else:
+            plt.gca().set_xticklabels(self.tick_labels[0])
         cbar = plt.colorbar()
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 30
         cbar.set_label('Reward Std Dev.', rotation=270)
         if len(self.axis_labels) == 2:
-            plt.ylabel(self.axis_labels[1])
-        plt.xlabel(self.axis_labels[0])
+            plt.xlabel(self.axis_labels[1])
+            plt.ylabel(self.axis_labels[0])
+        else:
+            plt.xlabel(self.axis_labels[0])
         # plt.tight_layout()
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
@@ -320,9 +332,9 @@ class MDPP_Analysis():
         '''
         # Plot for train metrics: learning curves; with subplot
         # Comment out unneeded labels in code lines 41-44 in this cell
-        ncols_ = self.config_counts[self.dims_varied[0]]
+        ncols_ = self.config_counts[self.dims_varied[1]]
         if len(self.dims_varied) > 1:
-            nrows_ = self.config_counts[self.dims_varied[1]]
+            nrows_ = self.config_counts[self.dims_varied[0]]
         else:
             nrows_ = 1
         nseeds_ = self.config_counts[-1]
@@ -344,6 +356,7 @@ class MDPP_Analysis():
             else:
                 to_plot_ = stats_data[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, metric_num]
                 to_plot_x = stats_data[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -3]
+            # print(to_plot_[-1])
         #     if i % 10 == 0:
         #         fig = plt.figure(figsize=(12, 7))
         #     print(i//50, (i//10) % 5)
@@ -354,9 +367,9 @@ class MDPP_Analysis():
                 ax[i_index][j_index].set_xlabel("Train Timesteps")
                 ax[i_index][j_index].set_ylabel("Reward")
         #         ax[i_index][j_index].set_title('Delay ' + str(delays[i_index]) + ', Sequence Length ' + str(sequence_lengths[j_index]))
-                title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][j_index])
+                title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][i_index])
                 if len(self.dims_varied) > 1:
-                    title_2nd_dim = self.config_names[self.dims_varied[1]] + ' '  + str(self.dims_values[self.dims_varied[1]][i_index])
+                    title_2nd_dim = self.config_names[self.dims_varied[1]] + ' '  + str(self.dims_values[self.dims_varied[1]][j_index])
                 else:
                     title_2nd_dim = ''
                 ax[i_index][j_index].set_title(title_1st_dim + ', ' + title_2nd_dim)
