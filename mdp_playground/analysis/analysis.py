@@ -332,10 +332,11 @@ class MDPP_Analysis():
         '''
         # Plot for train metrics: learning curves; with subplot
         # Comment out unneeded labels in code lines 41-44 in this cell
-        ncols_ = self.config_counts[self.dims_varied[1]]
         if len(self.dims_varied) > 1:
+            ncols_ = self.config_counts[self.dims_varied[1]]
             nrows_ = self.config_counts[self.dims_varied[0]]
         else:
+            ncols_ = self.config_counts[self.dims_varied[0]]
             nrows_ = 1
         nseeds_ = self.config_counts[-1]
         # print(ax, type(ax), type(ax[0]))

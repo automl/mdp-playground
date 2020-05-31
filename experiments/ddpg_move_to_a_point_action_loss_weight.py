@@ -19,7 +19,7 @@ var_env_configs = OrderedDict({
     "target_radius": [0.5],
     "state_space_max": [10],
     "action_space_max": [1],
-    "action_loss_weight": [0.01, 0.1, 1, 10, 100],
+    "action_loss_weight": [0.01, 0.1, 1, 5, 10, 100],
     'time_unit': [1.0],
     'transition_dynamics_order': [1],
     'dummy_seed': [i for i in range(num_seeds)],

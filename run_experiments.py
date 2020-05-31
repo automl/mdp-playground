@@ -293,6 +293,7 @@ for current_config in cartesian_product_configs:
                 "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
                 'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
                 'reward_noise': tune.function(lambda a: a.normal(0, 0)),
+                'action_loss_weight': 0.0,
             }
         },
     }
