@@ -84,7 +84,7 @@ class MDPP_Analysis():
             dims_values.append(stats_pd[i].unique())
             config_counts.append(stats_pd[i].nunique())
 
-        config_counts[2] = 1
+        # config_counts[2] = 1 # hack
         # config_counts[-1] = 2 # hack for TD3 HP tuning files
         config_counts.append(num_metrics) #hardcoded number of training stats that were recorded
         config_counts = tuple(config_counts)

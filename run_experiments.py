@@ -75,7 +75,7 @@ if config.algorithm == 'DQN':
 elif config.algorithm == 'A3C': #hack
     ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9))
 else:
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True)
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, temp_dir='/tmp/ray' + str(args.config_num))
 
 
 var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
