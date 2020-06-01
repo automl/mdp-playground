@@ -71,7 +71,7 @@ from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
 if config.algorithm == 'DQN':
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True) #, memory=int(8e9), local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
 elif config.algorithm == 'A3C': #hack
     ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9))
 else:
