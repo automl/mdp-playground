@@ -51,14 +51,14 @@ class MDPP_Analysis():
                                 byte_string = curr_file.read()
                                 newline_count = byte_string.count(10)
                                 if newline_count != 21 and file_suffix == '.csv': #hack to check only train files and not eval
-                                    warnings.warn('Expected 21 \\n chars in each stats file. Got only: ' + str(newline_count) + ' in file: ' + str(i))
+                                    warnings.warn('Expected 21 \\n chars in each stats file because we usually write stats every 1k timesteps for 20k timesteps. However, this can easily differ, e.g., for TD3 and DDPG where learning starts at 2k timesteps and there is 1 less \\n. Got only: ' + str(newline_count) + ' in file: ' + str(i))
                                 combined_file.write(byte_string)
                         else:
                             missing_configs.append(i)
                             # break
                         i += 1
                     print(str(i) + " files were combined into 1 for file:" + file_prefix + '_n' + file_suffix)
-                    print("Files missing for config_nums:", missing_configs)
+                    print("Files missing for config_nums:", missing_configs, ". Did you pass the right value for max_total_configs as an argument?")
                     if i==0:
                         raise FileNotFoundError("No files to combine were present. Please check your location and/or filenames that they are correct.")
             join_files(stats_file,  '.csv')
