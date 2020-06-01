@@ -369,10 +369,11 @@ class MDPP_Analysis():
                 ax[i_index][j_index].set_xlabel("Train Timesteps")
                 ax[i_index][j_index].set_ylabel("Reward")
         #         ax[i_index][j_index].set_title('Delay ' + str(delays[i_index]) + ', Sequence Length ' + str(sequence_lengths[j_index]))
-                title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][i_index])
                 if len(self.dims_varied) > 1:
+                    title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][i_index])
                     title_2nd_dim = self.config_names[self.dims_varied[1]] + ' '  + str(self.dims_values[self.dims_varied[1]][j_index])
                 else:
+                    title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][j_index])
                     title_2nd_dim = ''
                 ax[i_index][j_index].set_title(title_1st_dim + ', ' + title_2nd_dim)
         #         ax[i_index][j_index].set_title('Sequence Length ' + str(seq_lens[j_index]))
