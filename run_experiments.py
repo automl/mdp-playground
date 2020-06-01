@@ -277,7 +277,8 @@ for current_config in cartesian_product_configs:
         agent_config["target_noise_clip"] = agent_config["target_noise_clip"] * agent_config["target_noise"]
 
     # else: #if algorithm == 'SAC':
-
+    if env_config["env_config"]["state_space_type"] == 'continuous':
+        env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
 
     # hacks end
 
