@@ -113,6 +113,16 @@ fout = open(hack_filename, 'a') #hardcoded
 fout.write('# training_iteration, algorithm, ')
 for config_type, config_dict in var_configs_deepcopy.items():
     for key in config_dict:
+        # if config_type == "agent":
+        #     if config_algorithm == 'SAC' and key == "critic_learning_rate":
+        #         real_key = "lr" #hack due to Ray's weird ConfigSpaces
+        #         fout.write(real_key + ', ')
+        #     elif config_algorithm == 'SAC' and key == "fcnet_hiddens":
+        #         #hack due to Ray's weird ConfigSpaces
+        #         fout.write('fcnet_hiddens' + ', ')
+        #     else:
+        #         fout.write(key + ', ')
+        # else:
         fout.write(key + ', ')
 fout.write('timesteps_total, episode_reward_mean, episode_len_mean\n')
 fout.close()
@@ -139,7 +149,18 @@ def on_train_result(info):
                 else:
                     fout.write(str(info["result"]["config"]["env_config"][key]).replace(' ', '') + ' ')
             elif config_type == "agent":
-                fout.write(str(info["result"]["config"][key]).replace(' ', '') + ' ')
+                if config_algorithm == 'SAC' and key == "critic_learning_rate":
+                    real_key = "lr" #hack due to Ray's weird ConfigSpaces
+                    fout.write(str(info["result"]["config"]['optimization'][key]).replace(' ', '') + ' ')
+                elif config_algorithm == 'SAC' and key == "fcnet_hiddens":
+                    #hack due to Ray's weird ConfigSpaces
+                    fout.write(str(info["result"]["config"]["Q_model"][key]).replace(' ', '') + ' ')
+                # elif config_algorithm == 'SAC' and key == "policy_model":
+                #     #hack due to Ray's weird ConfigSpaces
+                #     pass
+                    # fout.write(str(info["result"]["config"][key]['fcnet_hiddens']).replace(' ', '') + ' ')
+                else:
+                    fout.write(str(info["result"]["config"][key]).replace(' ', '') + ' ')
             elif config_type == "model":
                 # if key == 'conv_filters':
                 fout.write(str(info["result"]["config"]["model"][key]).replace(' ', '') + ' ')
@@ -260,7 +281,24 @@ for current_config in cartesian_product_configs:
 
             elif config_type == "agent":
                 num_configs_done = len(list(var_env_configs))
-                agent_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+                if algorithm == 'SAC' and key == 'critic_learning_rate': #hack
+                    value = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+                    agent_config['optimization'] = {
+                                                    key: value,
+                                                    'actor_learning_rate': value,
+                                                    'entropy_learning_rate': value,
+                                                    }
+                elif algorithm == 'SAC' and key == 'fcnet_hiddens': #hack
+                    agent_config['Q_model'] = {
+                                                key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
+                                                "fcnet_activation": "relu",
+                                                }
+                    agent_config['policy_model'] = {
+                                                key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
+                                                "fcnet_activation": "relu",
+                                                }
+                else:
+                    agent_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
             elif config_type == "model":
                 num_configs_done = len(list(var_env_configs)) + len(list(var_agent_configs))
