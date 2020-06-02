@@ -4,9 +4,9 @@ num_seeds = 10
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    'state_space_dim': [2],#, 10, 12, 14] # [2**i for i in range(1,6)]
-    'action_space_dim': [2],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0], # + [2**i for i in range(4)],
+    'state_space_dim': [2],
+    'action_space_dim': [2],
+    'delay': [0, 1, 2, 4, 8],
     # 'sequence_length': [1], #, 2, 3, 4],#i for i in range(1,4)]
     # 'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [True],
@@ -45,16 +45,16 @@ env_config = {
 algorithm = "SAC"
 agent_config = {
     # Initial value to use for the entropy weight alpha.
-    "initial_alpha": 1.0,
+    "initial_alpha": 0.1,
     "optimization": {
         "actor_learning_rate": 3e-4,
         "critic_learning_rate": 3e-4,
         "entropy_learning_rate": 3e-4,
     },
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.002,
+    "tau": 0.0002,
     # How many steps of the model to sample before learning starts.
-    "learning_starts": 1000,
+    "learning_starts": 2000,
 
     # Apply a state preprocessor with spec given by the "model" config option
     # (like other RL algorithms). This is mostly useful if you have a weird
@@ -93,11 +93,11 @@ agent_config = {
 model_config = {
     "Q_model": {
         "fcnet_activation": "relu",
-        "fcnet_hiddens": [256, 256],
+        "fcnet_hiddens": [32, 32],
     },
     "policy_model": {
         "fcnet_activation": "relu",
-        "fcnet_hiddens": [256, 256],
+        "fcnet_hiddens": [32, 32],
     },
 
     "model": {
