@@ -39,57 +39,32 @@ env_config = {
         "reward_function": 'move_to_a_point',
         # 'make_denser': True,
         # "log_level": 'INFO',
-        "log_filename": '/tmp/td3_mv_pt.log',
+        "log_filename": '/tmp/sac_mv_pt.log',
     },
 }
 
-algorithm = "TD3"
+algorithm = "SAC"
 agent_config = {
-    # Learning rate for the critic (Q-function) optimizer.
-    "critic_lr": 1e-3,
-    # Learning rate for the actor (policy) optimizer.
-    "actor_lr": 1e-3,
+    # Initial value to use for the entropy weight alpha.
+    "initial_alpha": 0.1,
+    "optimization": {
+        "actor_learning_rate": 3e-4,
+        "critic_learning_rate": 3e-4,
+        "entropy_learning_rate": 3e-4,
+    },
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.02,
+    "tau": 0.0002,
     # How many steps of the model to sample before learning starts.
     "learning_starts": 2000,
-    # Postprocess the policy network model output with these hidden layers. If
-    # use_state_preprocessor is False, then these will be the *only* hidden
-    # layers in the network.
-    "actor_hiddens": [32, 32],
-    # Postprocess the critic network model output with these hidden layers;
-    # again, if use_state_preprocessor is True, then the state will be
-    # preprocessed by the model specified with the "model" config option first.
-    "critic_hiddens": [32, 32],
-
-    "twin_q": True,
-    "policy_delay": 2,
-    "smooth_target_policy": True,
-    "target_noise": 0.02,
-    "target_noise_clip": 0.05,
 
     # Apply a state preprocessor with spec given by the "model" config option
     # (like other RL algorithms). This is mostly useful if you have a weird
     # observation shape, like an image. Disabled by default.
     "use_state_preprocessor": False,
-    # Hidden layers activation of the postprocessing stage of the policy
-    # network
-    "actor_hidden_activation": "relu",
-    # Hidden layers activation of the postprocessing state of the critic.
-    "critic_hidden_activation": "relu",
     # N-step Q learning
-    "n_step": 4,
+    "n_step": 1,
     # Update the target network every `target_network_update_freq` steps.
     "target_network_update_freq": 0,
-    # If True, use huber loss instead of squared loss for critic network
-    # Conventionally, no need to clip gradients if using a huber loss
-    "use_huber": False,
-    # Threshold of a huber loss
-    "huber_threshold": 1.0,
-    # Weights for L2 regularization
-    "l2_reg": 1e-6,
-    # If not None, clip gradients during optimization at this value
-    "grad_norm_clipping": None,
 
     "buffer_size": 50000,
     # If True prioritized replay buffer will be used.
@@ -117,8 +92,16 @@ agent_config = {
 
 
 model_config = {
+    "Q_model": {
+        "fcnet_activation": "relu",
+        "fcnet_hiddens": [32, 32],
+    },
+    "policy_model": {
+        "fcnet_activation": "relu",
+        "fcnet_hiddens": [32, 32],
+    },
+
     "model": {
-        # "fcnet_hiddens": [256, 256],
         # "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         # "no_final_linear": False,
