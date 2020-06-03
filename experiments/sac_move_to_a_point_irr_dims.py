@@ -5,7 +5,6 @@ num_seeds = 10
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_dim': [2, 3, 4, 6, 10],#, 10, 12, 14] # [2**i for i in range(1,6)]
-    'action_space_dim': [None], #hack to enforce it's set to same value as state_space_dim in run_experiments.py
     "state_space_relevant_indices": [[0, 1]],
     "action_space_relevant_indices": [[0, 1]],
     'delay': [0], # + [2**i for i in range(4)],
@@ -33,6 +32,7 @@ env_config = {
     "env": "RLToy-v0",
     "horizon": 100,
     "env_config": {
+        'action_space_dim': [None], #hack to enforce it's set to same value as state_space_dim in run_experiments.py
         'seed': 0, #seed
         'state_space_type': 'continuous',
         'action_space_type': 'continuous',
