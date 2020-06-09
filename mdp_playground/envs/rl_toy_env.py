@@ -21,7 +21,7 @@ class RLToyEnv(gym.Env):
     """
     The base environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible meta-features. The class extends OpenAI Gym's environment.
 
-    The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP the instantiated object will emulate. We recommend looking at the examples in example.py to begin using the environment since the config options are mostly self-explanatory. For more details, we list here the meta-features and config options (their names here correspond to the keys to be passed in the config dict):
+    The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated object will emulate. We recommend looking at the examples in example.py to begin using the environment since the config options are mostly self-explanatory. For more details, we list here the meta-features and config options (their names here correspond to the keys to be passed in the config dict):
         delay: Delays reward by this number of steps.
         sequence_length: Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length rewardable at init if generate_random_mdp = true.
         transition_noise: For discrete environments, a fraction = fraction of times environment, uniformly at random, transitions to a noisy state. For continuous environments, a lambda function added to next state.
@@ -33,17 +33,20 @@ class RLToyEnv(gym.Env):
         term_state_reward: Adds this to the _current_ reward if a terminal state was reached at current time step.
         state_space_relevant_indices: A list that provides the relevant "dimensions" for continuous and multi-discrete environments. The dynamics for these dimensions are independent of the dynamics for the remaining (irrelevant) dimensions.
         action_space_relevant_indices: Same description as state_space_relevant_indices. For continuous environments, it should be equal to state_space_relevant_indices.
-
-    Other important config:
         Only for discrete environments:
-            generate_random_mdp: If true, generates a random MDP.
-            repeats_in_sequences: If true, allows sequences to have repeating states in them.
-            completely_connected: If true, sets the transition function such that every state can transition to every other state, including itself.
             state_space_size: A number specifying size of state space for uni-discrete environments and a list for multi-discrete environments.
             action_space_size: Same description as state_space_size.
+            image_representations: Boolean to associate an image as the external observation with every discrete categorical state. This is handled by a ImageMultiDiscrete object. It associates the image of an n+3 sided polygon for a categorical state n.
+            Only for image_representations:
+                image_transforms: String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever it is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.
+                sh_quant: An int to quantise the shift transforms.
+                scale_range: A tuple of real numbers to specify (min_scaling, max_scaling).
+                ro_quant: An int to quantise the rotation transforms.
         Only for continuous environments:
-            state_space_dim: A number specifying dimensionality.
+            state_space_dim: A number specifying dimensionality. A Gym Box will be instantiated.
             action_space_dim: Same description as state_space_dim.
+            state_space_max: Max absolute value that a dimension of the space can take. A Gym Box will be instantiated with range [-state_space_max, state_space_max]. Sampling will be done as for Gym Box spaces.
+            action_space_max: Same description as state_space_max.
             terminal_states: The centres of hypercube subspaces which are terminal.
             term_state_edge: The edge of the hypercube subspaces which are terminal.
             transition_dynamics_order: An order of n implies that the n-th state derivative is set equal to the action/inertia.
@@ -51,9 +54,19 @@ class RLToyEnv(gym.Env):
             time_unit: time duration over which the action is applied to the system
             reward_function: A string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
             target_point: The target point in case move_to_a_point a is the reward_function. If make_denser is true, target_radius determines distance from target point at which reward is handed out.
+            action_loss_weight: A coefficient to multiply the norm of the action and subtract it from the reward to penalise action magnitude
+
+    Other important config:
+        Only for discrete environments:
+            generate_random_mdp: If true, generates a random MDP.
+            repeats_in_sequences: If true, allows sequences to have repeating states in them.
+            completely_connected: If true, sets the transition function such that every state can transition to every other state, including itself.
+        Only for continuous environments:
+            none as of now
         make_denser: If true, makes the reward denser in environments. For discrete environments, hands out a reward for completing part of a sequence. For continuous environment, for reward function move_to_a_point, it's based on the distance moved towards the target point.
         seed: Recommended to be passed as an int which generates seeds to be used for various components of the environment. It is however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for it below to see how to do that.
-        log_filename: Prefix for the name of the log file to which logs are written.
+        log_filename: The name of the log file to which logs are written.
+        log_level: Python log level for logging
 
     The accompanying paper is available at at: https://arxiv.org/abs/1909.07750.
 
@@ -283,7 +296,7 @@ class RLToyEnv(gym.Env):
             self.action_loss_weight = config["action_loss_weight"]
 
 
-        self.dtype = np.float32
+        self.dtype = np.float32 #hardcoded
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
@@ -428,9 +441,8 @@ class RLToyEnv(gym.Env):
         self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
 
         self.logger.info("self.augmented_state, len: " + str(self.augmented_state) + ", " + str(len(self.augmented_state)))
-        self.logger.info("MDP Playground toy env instantiated with config: " + str(self.config)) #hack
-        # print("MDP Playground toy env instantiated with config:" + str(self.config)) # hack
-
+        self.logger.info("MDP Playground toy env instantiated with config: " + str(self.config))
+        
 
     def init_terminal_states(self):
         """Initialises terminal state set to be the 'last' states for discrete environments. For continuous environments, terminal states will be in a hypercube centred around config['terminal_states'] with the edge of the hypercube of length config['term_state_edge'].
@@ -843,7 +855,7 @@ class RLToyEnv(gym.Env):
                         self.reached_terminal = True
 
 
-        noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random
+        noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
