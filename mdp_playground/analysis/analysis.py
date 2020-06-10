@@ -140,6 +140,8 @@ class MDPP_Analysis():
         if hack_indices[0] == 0: #hack
             hack_indices = hack_indices[1:] #hardcoded removes the 1st hack_index which is at position 0 so that hack_indices_10 below doesn't begin with a -10; apparently Ray seems to have changed logging for evaluation (using on_episode_end) from 0.7.3 to 0.9.0
             ray_0_9_0 = True
+        else:
+            ray_0_9_0 = False
         hack_indices_10 = np.array(hack_indices) - 10
         # print(hack_indices_10.shape, hack_indices_10)
         # print(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))
