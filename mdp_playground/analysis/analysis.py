@@ -11,7 +11,7 @@ class MDPP_Analysis():
     def __init__(self):
         pass
 
-    def load_data(self, dir_name, exp_name, num_metrics=3, max_total_configs=200):
+    def load_data(self, dir_name, exp_name, num_metrics=3): #, max_total_configs=200):
         '''Loads training and evaluation data from given file
 
         Parameters
@@ -46,7 +46,7 @@ class MDPP_Analysis():
                     i = 0
                     missing_configs = []
                     num_diff_lines = []
-                    while i < max_total_configs:
+                    while True: # i < max_total_configs:
                         if os.path.isfile(file_prefix + '_' + str(i) + file_suffix):
                             with open(file_prefix + '_' + str(i) + file_suffix, 'rb') as curr_file:
                                 byte_string = curr_file.read()
@@ -56,12 +56,12 @@ class MDPP_Analysis():
                                 #     warnings.warn('Expected 21 \\n chars in each stats file because we usually write stats every 1k timesteps for 20k timesteps. However, this can easily differ, e.g., for TD3 and DDPG where learning starts at 2k timesteps and there is 1 less \\n. Got only: ' + str(newline_count) + ' in file: ' + str(i))
                                 combined_file.write(byte_string)
                         else:
-                            missing_configs.append(i)
-                            # break
+                            # missing_configs.append(i)
+                            break
                         i += 1
                     print(str(i) + " files were combined into 1 for file:" + file_prefix + '_n' + file_suffix)
-                    print("Files missing for config_nums:", missing_configs, ". Did you pass the right value for max_total_configs as an argument?")
-                    print("Unique line count values:", np.unique(num_diff_lines))
+                    # print("Files missing for config_nums:", missing_configs, ". Did you pass the right value for max_total_configs as an argument?")
+                    # print("Unique line count values:", np.unique(num_diff_lines))
                     if i==0:
                         raise FileNotFoundError("No files to combine were present. Please check your location and/or filenames that they are correct.")
             join_files(stats_file,  '.csv')

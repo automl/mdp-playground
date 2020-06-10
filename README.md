@@ -39,9 +39,10 @@ pip install ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl[rllib,debug]
 ```
 
 ## Running experiments
-For reproducing experiments from the main paper, please see [below](#running-experiments-from-main-paper).
+For reproducing experiments from the main paper, please see [below](#running-experiments-from-the-main-paper).
 
 For general instructions, please continue reading.
+
 You can run experiments using:
 ```
 python run_experiments.py -c <config_file> -e <exp_name> -n <config_num>
@@ -51,14 +52,15 @@ Each of the command line arguments has defaults. Please refer to the documentati
 
 The config files for experiments from the [paper](https://arxiv.org/abs/1909.07750) are in the experiments directory.<br>
 The name of the file corresponding to an experiment is formed as: `<algorithm_name>_<meta_feature_names>.py`<br>
-The possible `algorithm_name`s are: `dqn`, `rainbow`, `a3c`, `a3c_lstm`, `ddpg`, `td3` and `sac`<br>
-The possible `meta_feature_name`s are: `seq_del` (for **delay** and **sequence length** varied together), `p_r_noises` (for **P** and **R noises** varied together), `sparsity` (for varying **reward density**) and `make_denser` (for making **rewards denser** in environments with **sequences**)<br>
+Some sample `algorithm_name`s are: `dqn`, `rainbow`, `a3c`, `a3c_lstm`, `ddpg`, `td3` and `sac`<br>
+Some sample `meta_feature_name`s are: `seq_del` (for **delay** and **sequence length** varied together), `p_r_noises` (for **P** and **R noises** varied together),
+`target_radius` (for varying **target radius**) and `time_unit` (for varying **time unit**)<br>
 For example, for algorithm **DQN** when varying meta-features **delay** and **sequence length**, the corresponding experiment file is [`dqn_seq_del.py`](experiments/dqn_seq_del.py)
 
 ## Running experiments from the main paper
 For completeness, we list here the commands for the experiments from the main paper:
 ```
-# Discrete environments:
+# Discrete environments: (Figures 1 and 2)
 # We varied delay and sequence lengths together
 conda activate py36_toy_rl_disc
 python run_experiments.py -c experiments/dqn_seq_del.py -e dqn_seq_del
@@ -66,13 +68,13 @@ python run_experiments.py -c experiments/rainbow_seq_del.py -e rainbow_seq_del
 python run_experiments.py -c experiments/a3c_seq_del.py -e a3c_seq_del
 python run_experiments.py -c experiments/a3c_lstm_seq_del.py -e a3c_lstm_seq_del
 
-# Representation learning:
+# Representation learning: (Figure 3)
 python run_experiments.py -c experiments/dqn_image_representations.py -e dqn_image_representations
 python run_experiments.py -c experiments/rainbow_image_representations.py -e rainbow_image_representations
 python run_experiments.py -c experiments/a3c_image_representations.py -e a3c_image_representations
 python run_experiments.py -c experiments/dqn_image_representations_sh_quant.py -e dqn_image_representations_sh_quant
 
-# Continuous environments:
+# Continuous environments: (Figure 4)
 conda activate py36_toy_rl_cont
 python run_experiments.py -c experiments/ddpg_move_to_a_point_target_radius.py -e ddpg_move_to_a_point_target_radius
 python run_experiments.py -c experiments/ddpg_move_to_a_point_action_max.py -e ddpg_move_to_a_point_action_max
