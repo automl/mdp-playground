@@ -1,6 +1,6 @@
-'''Script to run experiments in MDP Playground.
+'''Script to run experiments on MDP Playground.
 
-Takes a configuration file and experiment name as arguments.
+Takes a configuration file, experiment name and config number to run as optional arguments.
 '''
 from __future__ import absolute_import
 from __future__ import division
@@ -19,12 +19,11 @@ register_env("RLToy-v0", lambda config: RLToyEnv(config))
 
 import sys, os
 import argparse
-import configparser
+# import configparser
 
 parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
 parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
-                   help='Configuration file containing configuration space to run experiments. It must be a Python file so config can be given programmatically. The env_config is different from the other config dicts in there. It contains variable configs for each configuration option for the environment as a list over the possible values they should take. A Cartesian product of these lists is taken to generate various possible configurations to be run.'
-                   ' See default_config.py for an example. Config files for various experiments are present in the experiments directory.')
+                   help='Configuration file containing configuration to run experiments. It must be a Python file so config can be given programmatically. There are 2 types of configs - VARIABLE CONFIG across the experiments and STATIC CONFIG across the experiments. \nVARIABLE CONFIGS: The OrderedDicts var_env_configs, var_agent_configs and var_model_configs hold configuration options that are variable for the environment, agent and model across the current experiment. For each configuration option, the option is the key in the dict and its value is a list of values it can take for the current experiment.  A Cartesian product of these lists is taken to generate various possible configurations to be run. For example, you might want to vary "delay" for the current experiment. Then "delay" would be a key in var_env_configs dict and its value would be a list of values it can take. Because Ray does not have a common way to address this specification of configurations for its agents, there are a few hacky ways to set var_agent_configs and var_model_configs currently. Please see sample experiment config files in the experiments directory to see how to set the values for a given algorithm. \nSTATIC CONFIGS: env_config, agent_config and model_config are dicts which hold the static configuration for the current experiment as a normal Python dict.')
 parser.add_argument('-e', '--exp-name', dest='exp_name', action='store', default='mdpp_default_experiment',
                    help='The user-chosen name of the experiment. This is used as the prefix of the output files (the prefix also contains config_num if that is provided). It will save stats to 2 CSV files, with the filenames as the one given as argument'
                    ' and another file with an extra "_eval" in the filename that contains evaluation stats during the training. Appends to existing files or creates new ones if they don\'t exist.')

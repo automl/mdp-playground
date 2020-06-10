@@ -3,14 +3,15 @@ from setuptools import setup
 extras_require = [
     'ray[rllib,debug]==0.7.3',
     'tensorflow==1.13.0rc1',
+    'pillow==6.1.0',
     'pandas==0.25.0',
     'requests==2.22.0',
 ]
 
 extras_require_cont = [
-    'ray[rllib,debug]==0.9.0',
+    # 'ray[rllib,debug]==0.9.0',
     'tensorflow==2.2.0',
-    'tensorflow-probability==0.9.0'
+    'tensorflow-probability==0.9.0',
     'pandas==0.25.0',
     'requests==2.22.0',
 ]
