@@ -79,6 +79,10 @@ class RLToyEnv(gym.Env):
         the config contains all the details required to generate an environment
     seed : int or dict
         recommended to set to int, which would set seeds for the env, relevant and irrelevant and externally visible observation and action spaces automatically. If fine-grained control over the seeds is necessary, a dict, with key values as in the source code further below, can be passed
+    observation_space : Gym.Space
+        The externally visible observation space for the enviroment
+    action_space : Gym.Space
+        The externally visible action space for the enviroment        
     rewardable_sequences : list of lists of lists
         holds the rewardable sequences. Here, the 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), the 2nd index is for the diff. sequences possible for that sequence length, the 3rd index is over the sequence itself.
     possible_remaining_sequences : list of lists of lists
@@ -442,7 +446,7 @@ class RLToyEnv(gym.Env):
 
         self.logger.info("self.augmented_state, len: " + str(self.augmented_state) + ", " + str(len(self.augmented_state)))
         self.logger.info("MDP Playground toy env instantiated with config: " + str(self.config))
-        
+
 
     def init_terminal_states(self):
         """Initialises terminal state set to be the 'last' states for discrete environments. For continuous environments, terminal states will be in a hypercube centred around config['terminal_states'] with the edge of the hypercube of length config['term_state_edge'].
