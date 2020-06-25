@@ -50,7 +50,7 @@ python run_experiments.py -c <config_file> -e <exp_name> -n <config_num>
 The `exp_name` is a prefix for the filenames of CSV files where stats for the experiments are recorded. The CSV stats files will be saved to the current directory.<br>
 Each of the command line arguments has defaults. Please refer to the documentation inside [`run_experiments.py`](run_experiments.py) for further details on the command line arguments. (Or run it with the `-h` flag to bring up help.)
 
-The config files for experiments from the paper are in the experiments directory.<br>
+The config files for experiments from the [paper](https://arxiv.org/abs/1909.07750) are in the experiments directory.<br>
 The name of the file corresponding to an experiment is formed as: `<algorithm_name>_<meta_feature_names>.py`<br>
 Some sample `algorithm_name`s are: `dqn`, `rainbow`, `a3c`, `a3c_lstm`, `ddpg`, `td3` and `sac`<br>
 Some sample `meta_feature_name`s are: `seq_del` (for **delay** and **sequence length** varied together), `p_r_noises` (for **P** and **R noises** varied together),
@@ -85,3 +85,17 @@ The CSV stats files will be saved to the current directory and can be analysed i
 
 ## Plotting
 To plot results from experiments, run `jupyter-notebook` and open [`plot_experiments.ipynb`](plot_experiments.ipynb) in Jupyter. There are instructions within each of the cells on how to generate and save plots.
+
+## Citing
+If you use MDP Playground in your work, please cite the following paper:
+
+```bibtex
+@article{rajan2019mdp,
+    title={MDP Playground: Meta-Features in Reinforcement Learning},
+    author={Raghu Rajan and Frank Hutter},
+    year={2019},
+    eprint={1909.07750},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```
