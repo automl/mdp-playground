@@ -50,7 +50,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_function"] = "move_along_a_line"
 
         # Test 1: general dynamics and reward
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         self.assertEqual(type(state), np.ndarray, "Type of continuous state should be numpy.ndarray.")
         for i in range(20):
@@ -71,7 +71,7 @@ class TestRLToyEnv(unittest.TestCase):
 
 
         # Test 3: that random actions lead to bad reward and then later a sequence of optimal actions leads to good reward. Also implicitly tests sequence lengths.
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(40):
             if i < 20:
@@ -95,7 +95,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test 4: same as 3 above except with delay
         print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_DELAY\033[0m')
         config["delay"] = 1
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(40):
             if i < 20:
@@ -120,7 +120,7 @@ class TestRLToyEnv(unittest.TestCase):
         print('\033[32;1;4mTEST_CONTINUOUS_DYNAMICS_R_NOISE\033[0m')
         config["reward_noise"] = lambda a: a.normal(0, 0.5)
         config["delay"] = 0
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         expected_rewards = [-0.70707351, 0.44681, 0.150735, -0.346204, 0.80687]
         for i in range(5):
@@ -141,7 +141,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["action_space_dim"] = 7
         config["state_space_relevant_indices"] = [0, 1, 2, 6]
         config["action_space_relevant_indices"] = [0, 1, 2, 6]
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(20):
             action = env.action_space.sample()
@@ -155,7 +155,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
         # Test that random actions in relevant action space along with linear actions in irrelevant action space leads to bad reward for move_along_a_line reward function
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(20):
             action = env.action_space.sample()
@@ -172,7 +172,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test using config values: state_space_max and action_space_max
         config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
         config["action_space_max"] = 1 # Will be a Box in the range [-max, max]
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for _ in range(20):
             # action = env.action_space.sample()
@@ -190,7 +190,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test for terminal states in presence of irrelevant dimensions
         config["terminal_states"] = [[0.92834036, 2.16924632, -4.88226269, -0.12869191], [2.96422742, -2.17263562, -2.71264267, 0.07446024]] # The 1st element is taken from the relevant dimensions of the default initial state for the given seed. This is to trigger a resample in reset. The 2nd element is taken from the relevant dimensions of the state reached after 2 iterations below. This is to trigger reaching a terminal state.
         config["term_state_edge"] = 1.0
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         state_derivatives = copy.deepcopy(env.state_derivatives)
         # augmented_state = copy.deepcopy(env.augmented_state)
@@ -215,7 +215,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         # Test P noise
         config["transition_noise"] = lambda a: a.normal([0] * 7, [0.5] * 7)
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         state_derivatives = copy.deepcopy(env.state_derivatives)
         # augmented_state = copy.deepcopy(env.augmented_state)
@@ -274,7 +274,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_scale"] = 1.0
         config["reward_function"] = "move_along_a_line"
 
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() # copy is needed to have a copy of the old state, otherwise we get the np.array that has the same location in memory and is constantly updated by step()
         state_derivatives = copy.deepcopy(env.state_derivatives)
 
@@ -330,7 +330,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["make_denser"] = True
 
         # Test : dense reward
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(20):
             # action = env.action_space.sample()
@@ -349,7 +349,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["state_space_relevant_indices"] = [1, 2]
         config["action_space_relevant_indices"] = [1, 2]
         config["target_point"] = [1.71012, 0.941906]
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(20):
             # action = env.action_space.sample()
@@ -369,7 +369,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         # Test delay
         config["delay"] = 10
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(20):
             # action = env.action_space.sample()
@@ -413,7 +413,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_scale"] = 2.0
 
         # Test : sparse reward
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(20):
             # action = env.action_space.sample()
@@ -434,7 +434,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         # Test delay
         config["delay"] = 10
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(35):
             # action = env.action_space.sample()
@@ -459,7 +459,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["state_space_relevant_indices"] = [1, 2]
         config["action_space_relevant_indices"] = [1, 2]
         config["target_point"] = [1.71012, 0.941906]
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
         for i in range(35):
             # action = env.action_space.sample()
@@ -500,7 +500,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_scale"] = 1.0
 
         config["generate_random_mdp"] = True
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
         self.assertEqual(type(state), int, "Type of discrete state should be int.") #TODO Move this and the test_continuous_dynamics type checks to separate unit tests
 
@@ -559,7 +559,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True
 
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
         actions = [6, 2, 5, 4, 5, 2, 3, np.random.randint(config["action_space_size"]), 4] # 2nd last action is random just to check that last delayed reward works with any action
@@ -600,7 +600,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_scale"] = 1.0
 
         config["generate_random_mdp"] = True
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
@@ -640,7 +640,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["transition_noise"] = 0.5
 
         config["generate_random_mdp"] = True
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
         actions = [6, 6, 2, np.random.randint(config["action_space_size"])] #
@@ -680,7 +680,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_noise"] = lambda a: a.normal(0, 0.5)
 
         config["generate_random_mdp"] = True
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
         actions = [6, 6, 2, 1] #
@@ -729,7 +729,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_noise"] = lambda a: a.normal(0, 0.5)
 
         config["generate_random_mdp"] = True
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
 
@@ -778,7 +778,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True
 
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
         actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
@@ -828,7 +828,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
 
         try: # Testing for completely_connected options working properly when invalid config specified. #TODO Is this part needed?
-            env = RLToyEnv(config)
+            env = RLToyEnv(**config)
             state = env.get_augmented_state()['curr_state']
 
             actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
@@ -848,7 +848,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         # Test: Adds one irrelevant dimension
         config["state_space_size"] = [2, 2, 2, 5]
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
         actions = [[1, 4, 1, 0], [0, 3, 1, 0], [1, 4, 0, 1], [1, 0 ,0, 0], [1, 2, 0, 1], [0, 3, 1, 0], [0, 1, 1, 1], [0, 4, 0, 1], [1, 4, 0, 0]]
@@ -870,7 +870,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["state_space_relevant_indices"] = [0, 1, 2]
         config["action_space_size"] = [2, 5, 1, 1, 2, 2]
         config["action_space_relevant_indices"] = [0, 4, 5]
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
         actions = [[1, 4, 0, 0, 1, 0], [0, 3, 0, 0, 1, 0], [1, 4, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0], [1, 2, 0, 0, 0, 1], [0, 3, 0, 0, 1, 0], [0, 1, 0, 0, 1, 1], [0, 4, 0, 0, 0, 1], [1, 4, 0, 0, 0, 0]]
@@ -921,7 +921,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["image_height"] = 100
         config["image_transforms"] = 'shift,scale,rotate,flip'
         config["image_scale_range"] = (0.5,1.5)
-        env = RLToyEnv(config)
+        env = RLToyEnv(**config)
         state = env.get_augmented_state()['augmented_state'][-1]
 
 
@@ -975,7 +975,7 @@ class TestRLToyEnv(unittest.TestCase):
     #
     #     config["generate_random_mdp"] = True
     #
-    #     env = RLToyEnv(config)
+    #     env = RLToyEnv(**config)
     #     state = env.get_augmented_state()['curr_state']
     #
     #     actions = [0, 1, 17, 5, 3, 4, 3, 2]

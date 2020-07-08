@@ -15,7 +15,7 @@ from ray.rllib.utils.seed import seed as rllib_seed
 import mdp_playground
 from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
-register_env("RLToy-v0", lambda config: RLToyEnv(config))
+register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 
 import sys, os
 import argparse

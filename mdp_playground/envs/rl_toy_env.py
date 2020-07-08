@@ -82,7 +82,7 @@ class RLToyEnv(gym.Env):
     observation_space : Gym.Space
         The externally visible observation space for the enviroment
     action_space : Gym.Space
-        The externally visible action space for the enviroment        
+        The externally visible action space for the enviroment
     rewardable_sequences : list of lists of lists
         holds the rewardable sequences. Here, the 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), the 2nd index is for the diff. sequences possible for that sequence length, the 3rd index is over the sequence itself.
     possible_remaining_sequences : list of lists of lists
@@ -116,7 +116,7 @@ class RLToyEnv(gym.Env):
         Performs 1 transition of the MDP
     """
 
-    def __init__(self, config = None):
+    def __init__(self, **config): # = None):
         """Initialises the MDP to be emulated using the settings provided in config
 
         Parameters
@@ -126,8 +126,8 @@ class RLToyEnv(gym.Env):
         """
 
         # Set default settings for config to be able to use class without any config passed
-        if config is None:
-            config = {}
+        if len(config) == 0: #is None:
+            # config = {}
 
             # Discrete spaces configs:
             config["state_space_type"] = "discrete" # TODO if states are assumed categorical in discrete setting, need to have an embedding for their OHE when using NNs; do the encoding on the training end!
@@ -446,6 +446,7 @@ class RLToyEnv(gym.Env):
 
         self.logger.info("self.augmented_state, len: " + str(self.augmented_state) + ", " + str(len(self.augmented_state)))
         self.logger.info("MDP Playground toy env instantiated with config: " + str(self.config))
+        print("MDP Playground toy env instantiated with config: " + str(self.config))
 
 
     def init_terminal_states(self):
@@ -1119,7 +1120,7 @@ if __name__ == "__main__":
     # config["reward_function"] = "move_along_a_line"
 
     config["generate_random_mdp"] = True # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
-    env = RLToyEnv(config)
+    env = RLToyEnv(**config)
     state = copy.copy(env.get_augmented_state()['curr_state'])
     for _ in range(20):
         # env.render() # For GUI

@@ -34,7 +34,7 @@ def discrete_environment_example():
     config["repeats_in_sequences"] = False
 
     config["generate_random_mdp"] = True
-    env = RLToyEnv(config)
+    env = RLToyEnv(**config)
 
     # The environment maintains an augmented state. We can fetch a dict containing the augmented state and current state like this:
     augmented_state_dict = env.get_augmented_state()
@@ -69,7 +69,7 @@ def continuous_environment_example():
     config["transition_noise"] = lambda a: a.normal(0, 0.1)
     config["reward_function"] = "move_along_a_line"
 
-    env = RLToyEnv(config)
+    env = RLToyEnv(**config)
     state = env.get_augmented_state()['curr_state'].copy()
 
     print("Taking a step in the environment with a random action and printing the transition:")
