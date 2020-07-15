@@ -36,6 +36,7 @@ class RLToyEnv(gym.Env):
         Only for discrete environments:
             state_space_size: A number specifying size of state space for uni-discrete environments and a list for multi-discrete environments.
             action_space_size: Same description as state_space_size.
+            reward_every_n_steps: Boolean. Hand out rewards only at multiples of sequence_length steps. This makes chances of having overlapping rewarding sequences that one is on 0 and makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either make_denser case or continuous environments.
             image_representations: Boolean to associate an image as the external observation with every discrete categorical state. This is handled by a ImageMultiDiscrete object. It associates the image of an n+3 sided polygon for a categorical state n.
             Only for image_representations:
                 image_transforms: String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever it is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.
@@ -299,6 +300,10 @@ class RLToyEnv(gym.Env):
         else:
             self.action_loss_weight = config["action_loss_weight"]
 
+        if "reward_every_n_steps" not in config:
+            self.reward_every_n_steps = False
+        else:
+            self.reward_every_n_steps = config["reward_every_n_steps"]
 
         self.dtype = np.float32 #hardcoded
 
@@ -785,35 +790,40 @@ class RLToyEnv(gym.Env):
             assert len(state_considered) == self.augmented_state_length, "Length of list of states passed should be equal to self.augmented_state_length. It was: " + str(len(state_considered))
 
         if self.config["state_space_type"] == "discrete":
-            if not self.config["make_denser"]:
-                self.logger.debug(str(state_considered) + " with delay " + str(self.delay))
-                if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
-                    # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
-                    reward += self.reward_scale
-                else:
-                    # print(state_considered, "with delay", self.delay, "NOT rewarded.")
-                    pass
-            else: # if make_denser
-                for j in range(1, sequence_length + 1):
-            # Check if augmented_states - delay up to different lengths in the past are present in sequence lists of that particular length; if so add them to the list of length
-                    curr_seq_being_checked = state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay]
-                    # print("curr_seq_being_checked, self.possible_remaining_sequences[j - 1]:", curr_seq_being_checked, self.possible_remaining_sequences[j - 1])
-                    if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
-                        count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
-                        # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_scale * j / self.sequence_length)
-                        reward += count_ * self.reward_scale * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
+            if np.isnan(state_considered[0]):
+                pass ###IMP: This check is to get around case of augmented_state_length being > 2, i.e. non-vanilla seq_len or delay, because then rewards may be handed out for the initial state being part of a sequence which is not fair since it is handed out without having the agent take an action.
+            else:
+                if not self.config["make_denser"]:
+                    self.logger.debug("state_considered for reward:" + str(state_considered) + " with delay " + str(self.delay))
+                    if (not self.reward_every_n_steps or
+                        (self.reward_every_n_steps and self.total_transitions_episode % self.sequence_length == delay)): ##TODO also implement this for make_denser case and continuous envs.
+                        if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
+                            # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
+                            reward += self.reward_scale
+                        else:
+                            # print(state_considered, "with delay", self.delay, "NOT rewarded.")
+                            pass
+                else: # if make_denser
+                    for j in range(1, sequence_length + 1):
+                # Check if augmented_states - delay up to different lengths in the past are present in sequence lists of that particular length; if so add them to the list of length
+                        curr_seq_being_checked = state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay]
+                        # print("curr_seq_being_checked, self.possible_remaining_sequences[j - 1]:", curr_seq_being_checked, self.possible_remaining_sequences[j - 1])
+                        if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
+                            count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
+                            # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_scale * j / self.sequence_length)
+                            reward += count_ * self.reward_scale * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
 
-                self.possible_remaining_sequences = [[] for i in range(sequence_length)] #TODO for variable sequence length just maintain a list of lists of lists rewarded_sequences
-                for j in range(0, sequence_length):
-            #        if j == 0:
-                    for k in range(sequence_length):
-                        for l in range(len(self.specific_sequences[k])): # self.specific_sequences[i][j][k] where 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), 2nd index is for the diff. sequences possible for that sequence length, 3rd index is over the sequence
-                            if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]: # if curr_seq_being_checked matches a rewardable sequence up to a length j in the past, i.e., is a prefix of the rewardable sequence,
-                                self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1]) # add it + an extra next state in that sequence to list of possible sequence prefixes to be checked for rewards above
-                ###IMP: Above routine for sequence prefix checking can be coded in a more human understandable manner, but this kind of pruning out of "sequences which may not be attainable" based on the current past trajectory, done above, should be in principle more efficient?
+                    self.possible_remaining_sequences = [[] for i in range(sequence_length)] #TODO for variable sequence length just maintain a list of lists of lists rewarded_sequences
+                    for j in range(0, sequence_length):
+                #        if j == 0:
+                        for k in range(sequence_length):
+                            for l in range(len(self.specific_sequences[k])): # self.specific_sequences[i][j][k] where 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), 2nd index is for the diff. sequences possible for that sequence length, 3rd index is over the sequence
+                                if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]: # if curr_seq_being_checked matches a rewardable sequence up to a length j in the past, i.e., is a prefix of the rewardable sequence,
+                                    self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1]) # add it + an extra next state in that sequence to list of possible sequence prefixes to be checked for rewards above
+                    ###IMP: Above routine for sequence prefix checking can be coded in a more human understandable manner, but this kind of pruning out of "sequences which may not be attainable" based on the current past trajectory, done above, should be in principle more efficient?
 
-                self.logger.info("rew" + str(reward))
-                self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
+                    self.logger.info("rew" + str(reward))
+                    self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
 
         else: # if continuous space
             ###TODO Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0. Since the principal component is always taken to be the direction of travel, this would mean a larger distance covered in that direction and hence would lead to +ve reward always and would mean larger random actions give a larger reward! Should penalise actions in proportion that scale then?
@@ -886,7 +896,7 @@ class RLToyEnv(gym.Env):
         self.reward = self.R(self.curr_state, action, only_query=only_query) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
 
 
-        self.done = self.is_terminal_state(self.augmented_state[-1]) or self.reached_terminal ####TODO curr_state is external state, while we need to check relevant state for terminality!
+        self.done = self.is_terminal_state(self.augmented_state[-1]) or self.reached_terminal #### TODO curr_state is external state, while we need to check relevant state for terminality! Done - by using augmented_state now instead of curr_state!
         if self.done:
             self.reward += self.term_state_reward * self.reward_scale
         self.logger.info('sas\'r:   ' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))

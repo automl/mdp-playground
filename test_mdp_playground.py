@@ -604,7 +604,7 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()['curr_state']
 
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
-        expected_rewards = [0, 1, 1, 0, 1, 0, 0, 0]
+        expected_rewards = [0, 0, 1, 0, 1, 0, 0, 0]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -613,7 +613,6 @@ class TestRLToyEnv(unittest.TestCase):
 
         env.reset()
         env.close()
-
 
     def test_discrete_p_noise(self):
         ''''''
@@ -695,7 +694,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
-###TODO Test for make_denser, for creating multiple instances of an Env with the same config dict (can lead to issues because the dict is shared)
+###TODO Test for make_denser; also one for creating multiple instances of an Env with the same config dict (can lead to issues because the dict is shared)
 ##TODO Tests for imaginary rollouts for discrete and continuous - for different Ps and Rs
 
     def test_discrete_multiple_meta_features(self):
@@ -734,7 +733,7 @@ class TestRLToyEnv(unittest.TestCase):
 
 
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
-        expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
+        expected_rewards = [0, 0, 0, 1, 0, 1, 0, 0]
         expected_reward_noises = [-0.292808, 0.770696, -1.01743611, -0.042768, 0.78761320, -0.510087, -0.089978, 0.48654863]
         for i in range(len(expected_rewards)):
             expected_rewards[i] = expected_rewards[i] * config["reward_scale"] + config["reward_shift"] + expected_reward_noises[i]
@@ -926,7 +925,7 @@ class TestRLToyEnv(unittest.TestCase):
 
 
         actions = [6, 6, 2, 3, 4, 2, np.random.randint(config["action_space_size"]), 5] #
-        expected_rewards = [0, 0, 1, 1, 0, 1, 0, 0]
+        expected_rewards = [0, 0, 0, 1, 0, 1, 0, 0]
         expected_reward_noises = [-0.292808, 0.770696, -1.01743611, -0.042768, 0.78761320, -0.510087, -0.089978, 0.48654863]
         expected_image_sums = [122910, 212925, 111180] # [152745, 282030, 528870], [105060, 232050, 78795]
         for i in range(len(expected_rewards)):
@@ -948,6 +947,44 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
+    def test_discrete_reward_every_n_steps(self):
+        ''''''
+        print('\033[32;1;4mTEST_DISCRETE_REWARD_EVERY_N_STEPS\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = {}
+        config["seed"]["env"] = 0
+        config["seed"]["relevant_state_space"] = 8
+        config["seed"]["relevant_action_space"] = 8
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.25
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 0
+        config["sequence_length"] = 3
+        config["reward_scale"] = 1.0
+        config["reward_every_n_steps"] = True
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 6, 2, 3, 4, 2, 6, 1, 0, np.random.randint(config["action_space_size"]), 5] #
+        expected_rewards = [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when sequence length = 3.")
+            state = next_state
+
+        env.reset()
+        env.close()
 
 
     # def test_discrete_imaginary_rollouts(self):
