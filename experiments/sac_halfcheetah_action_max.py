@@ -5,6 +5,7 @@ num_seeds = 5
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     "action_space_max": [0.25, 0.5, 1.0, 2.0, 4.0],
+    'dummy_seed': [i for i in range(num_seeds)],
 })
 
 var_configs = OrderedDict({
@@ -12,7 +13,7 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "HopperWrapper-v3",
+    "env": "HalfCheetahWrapper-v3",
     "horizon": 1000,
     "env_config": {
     },

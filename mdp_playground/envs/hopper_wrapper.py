@@ -8,6 +8,7 @@ class HopperWrapperV3(HopperEnv):
         if "dummy_eval" in config:
             del config["dummy_eval"]
         del config["action_space_max"]
+        del config["dummy_seed"]
         super(HopperWrapperV3, self).__init__(**config)
         self.action_space.low *= action_space_max
         self.action_space.high *= action_space_max
