@@ -1,4 +1,4 @@
-from gym.envs.mujoco.halfcheetah_v3 import HalfCheetahEnv
+from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
 import copy
 
 class HalfCheetahWrapperV3(HalfCheetahEnv):
