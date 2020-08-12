@@ -17,8 +17,11 @@ from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 
-from mdp_playground.envs.hopper_wrapper import HopperWrapperV3
+from mdp_playground.envs.hopper_wrapper import HopperWrapperV3 #hack
 register_env("HopperWrapper-v3", lambda config: HopperWrapperV3(**config))
+
+from mdp_playground.envs.halfcheetah_wrapper import HalfCheetahWrapperV3 #hack
+register_env("HalfCheetahWrapper-v3", lambda config: HalfCheetahWrapperV3(**config))
 
 import sys, os
 import argparse
@@ -323,7 +326,7 @@ for current_config in cartesian_product_configs:
 
     # hacks end
 
-    if env_config["env"] in ["HopperWrapper-v3"]: #hack
+    if env_config["env"] in ["HopperWrapper-v3", "HalfCheetahWrapper-v3"]: #hack
         eval_config = {
             "evaluation_interval": 1, # I think this means every x training_iterations
             "evaluation_config": {
@@ -377,7 +380,7 @@ for current_config in cartesian_product_configs:
     print("tune_config:",)
     pp.pprint(tune_config)
 
-    if env_config["env"] in ["HopperWrapper-v3"]: #hack
+    if env_config["env"] in ["HopperWrapper-v3", "HalfCheetahWrapper-v3"]: #hack
         timesteps_total = 500000
     else:
         if algorithm == 'DQN':
