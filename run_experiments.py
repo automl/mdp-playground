@@ -317,28 +317,48 @@ for current_config in cartesian_product_configs:
         agent_config["target_noise_clip"] = agent_config["target_noise_clip"] * agent_config["target_noise"]
 
     # else: #if algorithm == 'SAC':
-    if env_config["env_config"]["state_space_type"] == 'continuous':
-        env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
+    if "state_space_type" in env_config:
+        if env_config["env_config"]["state_space_type"] == 'continuous':
+            env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
 
     # hacks end
 
-    eval_config = {
-        "evaluation_interval": 1, # I think this means every x training_iterations
-        "evaluation_config": {
-            "explore": False,
-            "exploration_fraction": 0,
-            "exploration_final_eps": 0,
-            "evaluation_num_episodes": 10,
-            "batch_mode": "complete_episodes",
-            'horizon': 100,
-            "env_config": {
-                "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-                'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
-                'reward_noise': tune.function(lambda a: a.normal(0, 0)),
-                'action_loss_weight': 0.0,
-            }
-        },
-    }
+    if env_config["env"] in ["HopperWrapper-v3"]: #hack
+        eval_config = {
+            "evaluation_interval": 1, # I think this means every x training_iterations
+            "evaluation_config": {
+                "explore": False,
+                "exploration_fraction": 0,
+                "exploration_final_eps": 0,
+                "evaluation_num_episodes": 10,
+                "batch_mode": "complete_episodes",
+                'horizon': 100,
+                "env_config": {
+                    "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+                    # 'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+                    # 'reward_noise': tune.function(lambda a: a.normal(0, 0)),
+                    # 'action_loss_weight': 0.0,
+                }
+            },
+        }
+    else:
+        eval_config = {
+            "evaluation_interval": 1, # I think this means every x training_iterations
+            "evaluation_config": {
+                "explore": False,
+                "exploration_fraction": 0,
+                "exploration_final_eps": 0,
+                "evaluation_num_episodes": 10,
+                "batch_mode": "complete_episodes",
+                'horizon': 100,
+                "env_config": {
+                    "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+                    'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+                    'reward_noise': tune.function(lambda a: a.normal(0, 0)),
+                    'action_loss_weight': 0.0,
+                }
+            },
+        }
 
     extra_config = {
         "callbacks": {
@@ -357,12 +377,15 @@ for current_config in cartesian_product_configs:
     print("tune_config:",)
     pp.pprint(tune_config)
 
-    if algorithm == 'DQN':
-        timesteps_total = 20000
-    elif algorithm == 'A3C': #hack
-        timesteps_total = 150000
-    else: #if algorithm == 'DDPG': #hack
-        timesteps_total = 20000
+    if env_config["env"] in ["HopperWrapper-v3"]: #hack
+        timesteps_total = 500000
+    else:
+        if algorithm == 'DQN':
+            timesteps_total = 20000
+        elif algorithm == 'A3C': #hack
+            timesteps_total = 150000
+        else: #if algorithm == 'DDPG': #hack
+            timesteps_total = 20000
 
     tune.run(
         algorithm,
