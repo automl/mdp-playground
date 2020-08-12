@@ -17,6 +17,9 @@ from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 
+from mdp_playground.envs.hopper_wrapper import HopperWrapperV3
+register_env("HopperWrapper-v3", lambda config: HopperWrapperV3(**config))
+
 import sys, os
 import argparse
 # import configparser
