@@ -380,8 +380,10 @@ for current_config in cartesian_product_configs:
     print("tune_config:",)
     pp.pprint(tune_config)
 
-    if env_config["env"] in ["HopperWrapper-v3", "HalfCheetahWrapper-v3"]: #hack
-        timesteps_total = 500000
+    if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack
+        timesteps_total = 3000000
+    elif env_config["env"] in ["HopperWrapper-v3"]: #hack
+        timesteps_total = 1000000
     else:
         if algorithm == 'DQN':
             timesteps_total = 20000

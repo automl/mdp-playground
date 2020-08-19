@@ -10,5 +10,6 @@ class HalfCheetahWrapperV3(HalfCheetahEnv):
         del config["action_space_max"]
         del config["dummy_seed"]
         super(HalfCheetahWrapperV3, self).__init__(**config)
+        self.model.opt.disableflags = 128 ##IMP disables clamping of controls to the range in the XML, i.e., [-1, 1]
         self.action_space.low *= action_space_max
         self.action_space.high *= action_space_max
