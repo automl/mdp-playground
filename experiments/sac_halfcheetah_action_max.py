@@ -67,7 +67,7 @@ agent_config = {
     "train_batch_size": 256,
     "min_iter_time_s": 0,
     "num_workers": 0,
-    "num_gpus": 1,
+    "num_gpus": 0,
     "clip_actions": False,
     "normalize_actions": True,
 #    "evaluation_interval": 1,
