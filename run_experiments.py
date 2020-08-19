@@ -326,42 +326,22 @@ for current_config in cartesian_product_configs:
 
     # hacks end
 
-    if env_config["env"] in ["HopperWrapper-v3", "HalfCheetahWrapper-v3"]: #hack
-        eval_config = {
-            "evaluation_interval": 1, # I think this means every x training_iterations
-            "evaluation_config": {
-                "explore": False,
-                "exploration_fraction": 0,
-                "exploration_final_eps": 0,
-                "evaluation_num_episodes": 10,
-                "batch_mode": "complete_episodes",
-                'horizon': 100,
-                "env_config": {
-                    "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-                    # 'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
-                    # 'reward_noise': tune.function(lambda a: a.normal(0, 0)),
-                    # 'action_loss_weight': 0.0,
-                }
-            },
-        }
-    else:
-        eval_config = {
-            "evaluation_interval": 1, # I think this means every x training_iterations
-            "evaluation_config": {
-                "explore": False,
-                "exploration_fraction": 0,
-                "exploration_final_eps": 0,
-                "evaluation_num_episodes": 10,
-                "batch_mode": "complete_episodes",
-                'horizon': 100,
-                "env_config": {
-                    "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-                    'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
-                    'reward_noise': tune.function(lambda a: a.normal(0, 0)),
-                    'action_loss_weight': 0.0,
-                }
-            },
-        }
+    eval_config = { ##TODO Move horizon from here to every Discrete env expt. and move whole eval_config to expt. config files as well?
+        "evaluation_interval": 1, # I think this means every x training_iterations
+        "evaluation_config": {
+            "explore": False,
+            "exploration_fraction": 0,
+            "exploration_final_eps": 0,
+            "evaluation_num_episodes": 10,
+            "horizon": 100,
+            "env_config": {
+                "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+                'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+                'reward_noise': tune.function(lambda a: a.normal(0, 0)),
+                'action_loss_weight': 0.0,
+            }
+        },
+    }
 
     extra_config = {
         "callbacks": {

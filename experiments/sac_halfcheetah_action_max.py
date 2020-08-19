@@ -15,6 +15,7 @@ var_configs = OrderedDict({
 env_config = {
     "env": "HalfCheetahWrapper-v3",
     "horizon": 1000,
+    "soft_horizon": False,
     "env_config": {
     },
 }
@@ -41,10 +42,10 @@ agent_config = {
     "n_step": 1,
     # Update the target network every `target_network_update_freq` steps.
     "target_network_update_freq": 1,
+    "target_entropy": "auto",
 
     "no_done_at_end": True,
 
-    "buffer_size": 50000,
     # If True prioritized replay buffer will be used.
     "prioritized_replay": True,
     # Alpha parameter for prioritized replay buffer.
