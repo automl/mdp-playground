@@ -343,6 +343,11 @@ for current_config in cartesian_product_configs:
         },
     }
 
+    if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different. In HalfCheetah, this is needed because the reward function is dependent on the time_unit because it depends on velocity achieved which depends on amount of time torque was applied.
+        if "time_unit" in env_config["env_config"]:
+            env_config["env_config"]["horizon"] /= env_config["env_config"]["time_unit"]
+            eval_config["env_config"]["horizon"] /= env_config["env_config"]["time_unit"]
+
     extra_config = {
         "callbacks": {
 #                 "on_episode_start": tune.function(on_episode_start),
