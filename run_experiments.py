@@ -310,7 +310,7 @@ for current_config in cartesian_product_configs:
                 model_config["model"][key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
     #hacks begin:
-    if model_config["model"]["use_lstm"]:
+    if "model" in model_config and model_config["model"]["use_lstm"]:
         model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
 
     if algorithm == 'DDPG': ###TODO Find a better way to enforce these??
@@ -336,7 +336,7 @@ for current_config in cartesian_product_configs:
             "horizon": 100,
             "env_config": {
                 "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-                'transition_noise': 0 if env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+                'transition_noise': 0 if "state_space_type" in env_config and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
                 'reward_noise': tune.function(lambda a: a.normal(0, 0)),
                 'action_loss_weight': 0.0,
             }
