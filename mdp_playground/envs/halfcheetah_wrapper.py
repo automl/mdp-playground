@@ -23,13 +23,14 @@ class HalfCheetahWrapperV3(HalfCheetahEnv):
 
         super(HalfCheetahWrapperV3, self).__init__(**config)
         self.model.opt.disableflags = 128 ##IMP disables clamping of controls to the range in the XML, i.e., [-1, 1]
-        self.action_space.low *= action_space_max
-        self.action_space.high *= action_space_max
+        if "action_space_max" in locals():
+            self.action_space.low *= action_space_max
+            self.action_space.high *= action_space_max
 
-        if "action_space_max" in locals() and action_space_max == 4: #hack
-            self.model.opt.timestep /= 2 # 0.005
-            self.frame_skip *= 2
-            print("Setting Mujoco timestep to", self.model.opt.timestep, "half of the usual to avoid instabilities. At the same time action repeat increased to twice its usual.")
+            if action_space_max == 4: #hack
+                self.model.opt.timestep /= 2 # 0.005
+                self.frame_skip *= 2
+                print("Setting Mujoco timestep to", self.model.opt.timestep, "half of the usual to avoid instabilities. At the same time action repeat increased to twice its usual.")
 
         if "time_unit" in locals(): #hack
             # self.model.opt.timestep /= 2 # 0.005
