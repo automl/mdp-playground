@@ -347,8 +347,16 @@ for current_config in cartesian_product_configs:
         if "time_unit" in env_config["env_config"]:
             env_config["horizon"] /= env_config["env_config"]["time_unit"]
             env_config["horizon"] = int(env_config["horizon"])
+
+            agent_config["learning_starts"] /= env_config["env_config"]["time_unit"]
+            agent_config["learning_starts"] = int(agent_config["learning_starts"])
+
+            agent_config["timesteps_per_iteration"] /= env_config["env_config"]["time_unit"]
+            agent_config["timesteps_per_iteration"] = int(agent_config["timesteps_per_iteration"])
+
             eval_config["evaluation_config"]["horizon"] /= env_config["env_config"]["time_unit"]
             eval_config["evaluation_config"]["horizon"] = int(eval_config["evaluation_config"]["horizon"])
+
 
     extra_config = {
         "callbacks": {
