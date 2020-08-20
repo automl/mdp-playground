@@ -377,6 +377,10 @@ for current_config in cartesian_product_configs:
 
     if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack
         timesteps_total = 3000000
+        if "time_unit" in env_config["env_config"]:
+            timesteps_total /= env_config["env_config"]["time_unit"]
+            timesteps_total = int(timesteps_total)
+
     elif env_config["env"] in ["HopperWrapper-v3"]: #hack
         timesteps_total = 1000000
     else:
@@ -389,7 +393,7 @@ for current_config in cartesian_product_configs:
 
     tune.run(
         algorithm,
-        name=algorithm + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
+        name=algorithm + str(args.exp_name) + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
         stop={
             "timesteps_total": timesteps_total,
               },

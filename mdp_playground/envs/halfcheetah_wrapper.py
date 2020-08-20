@@ -36,4 +36,7 @@ class HalfCheetahWrapperV3(HalfCheetahEnv):
             # self.model.opt.timestep /= 2 # 0.005
             self.frame_skip *= time_unit
             self.frame_skip = int(self.frame_skip)
-            print("Setting Mujoco frame_skip to", self.frame_skip, "corresponding to time_unit in config.")
+            self._ctrl_cost_weight *= time_unit
+            self._forward_reward_weight *= time_unit
+            print("Setting Mujoco self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight to", self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight, "corresponding to time_unit in config.")
+

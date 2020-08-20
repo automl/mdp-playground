@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
 #SBATCH -t 4-00:00 # time (D-HH:MM)
-#SBATCH -c 1 # number of CPUs/task
+#SBATCH -c 3 # number of CPUs/task
 #SBATCH -o log/%x.%A.%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%A.%a.err # STDERR  (the folder log has to exist!)  %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -J mdp-playground-job-array # sets the job name. If not specified, the file name will be used as job name
@@ -11,7 +11,7 @@
 ##SBATCH --mem 16000M # Specify the real memory required per node, not needed as for our cluster, -c below takes priority and auto-sets the memory. For CPU, use --mem-per-cpu
 #SBATCH -a 0-24 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
 
-export EXP_NAME='sac_halfcheetah_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='sac_halfcheetah_time_unit' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
