@@ -1,11 +1,11 @@
 #!/bin/bash
 #MOAB -N mdpp
 #MOAB -t 0-24 # specifies array job indices
-#MOAB -l nodes=1:ppn=2 
-#MOAB -l walltime=4:00:00:00 
-#MOAB -l pmem=18GB 
+#MOAB -l nodes=1:ppn=2
+#MOAB -l walltime=3:00:00:00
+#MOAB -l pmem=16GB
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
-##MOAB -V # export env. variables from launch env. I think 
+##MOAB -V # export env. variables from launch env. I think
 ##MOAB -o output_filename
 #MOAB
 
@@ -21,7 +21,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='sac_halfcheetah_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='sac_halfcheetah_time_unit' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
@@ -75,11 +75,10 @@ cd mdpp_${JOB_ID}
 echo ${MOAB_JOBID} ${MOAB_JOBARRAYINDEX} ${MOAB_JOBNAME}
 \time -v /home/fr/fr_fr/fr_rr1034/anaconda3/envs/py36_toy_rl/bin/python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX}
 
-#python output_argv_1.py 
+#python output_argv_1.py
 #\time -v rllib train --env=BreakoutDeterministic-v4 --run=DQN --config '{"num_workers": 0, "monitor": true}'
 #rllib train -f $HOME/atari-dqn_mod_breakout.yaml
 
 # Print some Information about the end-time to STDOUT
 echo "DONE";
 echo "Finished at $(date)";
-
