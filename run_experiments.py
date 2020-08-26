@@ -17,12 +17,6 @@ from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 
-from mdp_playground.envs.hopper_wrapper import HopperWrapperV3 #hack
-register_env("HopperWrapper-v3", lambda config: HopperWrapperV3(**config))
-
-from mdp_playground.envs.halfcheetah_wrapper import HalfCheetahWrapperV3 #hack
-register_env("HalfCheetahWrapper-v3", lambda config: HalfCheetahWrapperV3(**config))
-
 import sys, os
 import argparse
 # import configparser
@@ -378,13 +372,25 @@ for current_config in cartesian_product_configs:
 
     if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack
         timesteps_total = 3000000
+
+        from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+        from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+        HalfCheetahWrapperV3 = get_mujoco_wrapper(HalfCheetahEnv)
+        register_env("HalfCheetahWrapper-v3", lambda config: HalfCheetahWrapperV3(**config))
+
         if "time_unit" in env_config["env_config"]:
             # timesteps_total /= env_config["env_config"]["time_unit"]
             # timesteps_total = int(timesteps_total)
             pass
-            
+
     elif env_config["env"] in ["HopperWrapper-v3"]: #hack
         timesteps_total = 1000000
+
+        from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+        from gym.envs.mujoco.hopper_v3 import HopperEnv
+        HopperWrapperV3 = get_mujoco_wrapper(HopperEnv)
+        register_env("HopperWrapper-v3", lambda config: HopperWrapperV3(**config))
+
     else:
         if algorithm == 'DQN':
             timesteps_total = 20000
