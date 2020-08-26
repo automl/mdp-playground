@@ -389,6 +389,14 @@ for current_config in cartesian_product_configs:
         HopperWrapperV3 = get_mujoco_wrapper(HopperEnv)
         register_env("HopperWrapper-v3", lambda config: HopperWrapperV3(**config))
 
+    elif env_config["env"] in ["Pusher-v2"]: #hack
+        timesteps_total = 500000
+
+        from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+        from gym.envs.mujoco.pusher import PusherEnv
+        PusherWrapperV2 = get_mujoco_wrapper(PusherEnv)
+        register_env("Pusher-v2", lambda config: PusherWrapperV2(**config))
+
     else:
         if algorithm == 'DQN':
             timesteps_total = 20000
