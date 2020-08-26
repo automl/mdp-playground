@@ -37,12 +37,10 @@ def get_mujoco_wrapper(base_class):
                     print("Setting Mujoco timestep to", self.model.opt.timestep, "half of the usual to avoid instabilities. At the same time action repeat increased to twice its usual.")
 
             if "time_unit" in locals(): #hack
-                # self.model.opt.timestep /= 2 # 0.005
                 self.frame_skip *= time_unit
                 self.frame_skip = int(self.frame_skip)
-                # self._ctrl_cost_weight *= time_unit
-                # self._forward_reward_weight *= time_unit
-                # print("Setting Mujoco self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight to", self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight, "corresponding to time_unit in config.")
-                pass
+                self._ctrl_cost_weight *= time_unit
+                self._forward_reward_weight *= time_unit
+                print("Setting Mujoco self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight to", self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight, "corresponding to time_unit in config.")
 
     return MujocoEnvWrapperV3
