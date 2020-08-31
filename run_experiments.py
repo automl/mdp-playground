@@ -407,7 +407,7 @@ for current_config in cartesian_product_configs:
 
     tune.run(
         algorithm,
-        name=algorithm + str(args.exp_name) + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
+        name=algorithm + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
         stop={
             "timesteps_total": timesteps_total,
               },

@@ -2,7 +2,7 @@
 #MOAB -N mdpp
 #MOAB -t 0-24 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
-#MOAB -l walltime=0:12:00:00
+#MOAB -l walltime=0:11:00:00
 #MOAB -l pmem=8GB
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 ##MOAB -V # export env. variables from launch env. I think
@@ -21,7 +21,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='sac_pusher_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='sac_reacher_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
