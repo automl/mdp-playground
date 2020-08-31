@@ -13,7 +13,7 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "Pusher-v2",
+    "env": "Reacher-v2",
     "horizon": 100,
     "soft_horizon": False,
     "env_config": {

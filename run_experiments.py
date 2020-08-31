@@ -330,7 +330,7 @@ for current_config in cartesian_product_configs:
             "horizon": 100,
             "env_config": {
                 "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-                'transition_noise': 0 if "state_space_type" in env_config and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+                'transition_noise': 0 if "state_space_type" in env_config["env_config"] and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
                 'reward_noise': tune.function(lambda a: a.normal(0, 0)),
                 'action_loss_weight': 0.0,
             }
@@ -397,6 +397,14 @@ for current_config in cartesian_product_configs:
         PusherWrapperV2 = get_mujoco_wrapper(PusherEnv)
         register_env("Pusher-v2", lambda config: PusherWrapperV2(**config))
 
+    elif env_config["env"] in ["Reacher-v2"]: #hack
+        timesteps_total = 500000
+
+        from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+        from gym.envs.mujoco.reacher import ReacherEnv
+        ReacherWrapperV2 = get_mujoco_wrapper(ReacherEnv)
+        register_env("Reacher-v2", lambda config: ReacherWrapperV2(**config))
+
     else:
         if algorithm == 'DQN':
             timesteps_total = 20000
@@ -411,7 +419,8 @@ for current_config in cartesian_product_configs:
         stop={
             "timesteps_total": timesteps_total,
               },
-        config=tune_config
+        config=tune_config,
+        checkpoint_at_end=True,
         #return_trials=True # add trials = tune.run( above
     )
 
