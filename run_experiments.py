@@ -320,23 +320,7 @@ for current_config in cartesian_product_configs:
 
     # hacks end
 
-    eval_config = { ##TODO Move horizon from here to every Discrete env expt. and move whole eval_config to expt. config files as well?
-        "evaluation_interval": 1, # I think this means every x training_iterations
-        "evaluation_config": {
-            "explore": False,
-            "exploration_fraction": 0,
-            "exploration_final_eps": 0,
-            "evaluation_num_episodes": 10,
-            "horizon": 100,
-            "env_config": {
-                "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-                'transition_noise': 0 if "state_space_type" in env_config["env_config"] and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
-                'reward_noise': tune.function(lambda a: a.normal(0, 0)),
-                'action_loss_weight': 0.0,
-            }
-        },
-    }
-
+    eval_config = config.eval_config
     if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different. In HalfCheetah, this is needed because the reward function is dependent on the time_unit because it depends on velocity achieved which depends on amount of time torque was applied.
         if "time_unit" in env_config["env_config"]:
             env_config["horizon"] /= env_config["env_config"]["time_unit"]
@@ -389,21 +373,21 @@ for current_config in cartesian_product_configs:
         HopperWrapperV3 = get_mujoco_wrapper(HopperEnv)
         register_env("HopperWrapper-v3", lambda config: HopperWrapperV3(**config))
 
-    elif env_config["env"] in ["Pusher-v2"]: #hack
+    elif env_config["env"] in ["PusherWrapper-v2"]: #hack
         timesteps_total = 500000
 
         from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
         from gym.envs.mujoco.pusher import PusherEnv
         PusherWrapperV2 = get_mujoco_wrapper(PusherEnv)
-        register_env("Pusher-v2", lambda config: PusherWrapperV2(**config))
+        register_env("PusherWrapper-v2", lambda config: PusherWrapperV2(**config))
 
-    elif env_config["env"] in ["Reacher-v2"]: #hack
+    elif env_config["env"] in ["ReacherWrapper-v2"]: #hack
         timesteps_total = 500000
 
         from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
         from gym.envs.mujoco.reacher import ReacherEnv
         ReacherWrapperV2 = get_mujoco_wrapper(ReacherEnv)
-        register_env("Reacher-v2", lambda config: ReacherWrapperV2(**config))
+        register_env("ReacherWrapper-v2", lambda config: ReacherWrapperV2(**config))
 
     else:
         if algorithm == 'DQN':
