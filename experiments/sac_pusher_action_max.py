@@ -1,10 +1,10 @@
 '''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 5
+num_seeds = 10
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    "action_space_max": [0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0],
+    "action_space_max": [0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 4.0],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
