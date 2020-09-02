@@ -72,7 +72,6 @@ model_config = {
     },
 
 }
-from ray import tune
 
 from ray import tune
 eval_config = {

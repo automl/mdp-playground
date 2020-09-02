@@ -28,10 +28,12 @@ def get_mujoco_wrapper(base_class):
             super(MujocoEnvWrapperV3, self).__init__(**config)
             self.model.opt.disableflags = 128 ##IMP disables clamping of controls to the range in the XML, i.e., [-1, 1]
             if "action_space_max" in locals():
+                print("Setting Mujoco self.action_space.low, self.action_space.high from:", self.action_space.low, self.action_space.high)
                 self.action_space.low *= action_space_max
                 self.action_space.high *= action_space_max
+                print("to:", self.action_space.low, self.action_space.high)
 
-                if base_class == HalfCheetahEnv and action_space_max == 4: #hack
+                if base_class == HalfCheetahEnv and action_space_max >= 4: #hack
                     self.model.opt.timestep /= 2 # 0.005
                     self.frame_skip *= 2
                     print("Setting Mujoco timestep to", self.model.opt.timestep, "half of the usual to avoid instabilities. At the same time action repeat increased to twice its usual.")
