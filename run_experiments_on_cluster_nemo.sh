@@ -1,6 +1,6 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-24 # specifies array job indices
+#MOAB -t 25-34 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
 #MOAB -l walltime=0:11:00:00
 #MOAB -l pmem=8GB
