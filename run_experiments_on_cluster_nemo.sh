@@ -1,6 +1,6 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-79 # specifies array job indices
+#MOAB -t 0-69 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
 #MOAB -l walltime=0:10:00:00
 #MOAB -l pmem=8GB
@@ -21,7 +21,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='sac_reacher_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='sac_pusher_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
