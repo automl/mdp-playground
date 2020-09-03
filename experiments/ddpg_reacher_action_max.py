@@ -31,6 +31,9 @@ agent_config = {
     # How many steps of the model to sample before learning starts.
     "learning_starts": 10000,
 
+    "critic_hiddens": [256, 256],
+    "actor_hiddens": [256, 256],
+
     # N-step Q learning
     "n_step": 1,
     # Update the target network every `target_network_update_freq` steps.
@@ -57,8 +60,6 @@ agent_config = {
 
 
 model_config = {
-    "critic_hiddens": [256, 256],
-    "actor_hiddens": [256, 256],
 }
 
 from ray import tune
