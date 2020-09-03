@@ -433,9 +433,9 @@ class RLToyEnv(gym.Env):
 
         if config["action_space_type"] == "discrete":
             if not config["generate_random_mdp"]:
-                self.logger.error("User defined P and R are currently not supported.")
+                self.logger.error("User defined P and R are currently not supported.") ##TODO
                 sys.exit(1)
-                self.P = config["transition_function"] if callable(config["transition_function"]) else lambda s, a: config["transition_function"][s, a] # callable may not be optimal always since it was deprecated in Python 3.0 and 3.1
+                self.P = config["transition_function"] if callable(config["transition_function"]) else lambda s, a: config["transition_function"][s, a] ##IMP callable may not be optimal always since it was deprecated in Python 3.0 and 3.1
                 self.R = config["reward_function"] if callable(config["reward_function"]) else lambda s, a: config["reward_function"][s, a]
             # else:
         ##TODO Support imaginary rollouts for continuous envs. and user-defined P and R? Will do it depending on demand for it. In fact, for imagined rollouts, just completely separate out the stored augmented_state, curr_state, etc. so that it's easy for user to perform them instead of having to maintain their own state and action sequences.
