@@ -1,15 +1,34 @@
 '''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 10
+num_seeds = 3
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    "action_space_max": [0.025, 0.05, 0.1, 0.25, 0.5, 1.0, 2.0],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
+
+var_agent_configs = OrderedDict({
+    # Learning rate for the critic (Q-function) optimizer.
+    "critic_lr": [1e-2, 1e-3, 1e-4],
+    # Update the target by \tau * policy + (1-\tau) * target_policy
+    "tau": [2e-2, 2e-3, 2e-4],
+    # How many steps of the model to sample before learning starts.
+    "learning_starts": [1000, 5000, 10000],
+    # Postprocess the critic network model output with these hidden layers;
+    # again, if use_state_preprocessor is True, then the state will be
+    # preprocessed by the model specified with the "model" config option first.
+    "critic_hiddens": [[64, 64], [128, 128], [256, 256]]
+})
+
+
+# var_model_configs = OrderedDict({
+# })
+
 var_configs = OrderedDict({
-"env": var_env_configs
+"env": var_env_configs,
+"agent": var_agent_configs,
+# "model": var_model_configs,
 })
 
 env_config = {
@@ -23,16 +42,16 @@ env_config = {
 algorithm = "DDPG"
 agent_config = {
     # Learning rate for the critic (Q-function) optimizer.
-    "critic_lr": 1e-3,
+    # "critic_lr": 1e-3,
     # Learning rate for the actor (policy) optimizer.
-    "actor_lr": 1e-3,
+    "actor_lr": None,
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.001,
+    # "tau": 0.001,
     # How many steps of the model to sample before learning starts.
-    "learning_starts": 10000,
+    # "learning_starts": 10000,
 
-    "critic_hiddens": [64, 64],
-    "actor_hiddens": [64, 64],
+    # "critic_hiddens": [64, 64],
+    "actor_hiddens": None,
 
     # N-step Q learning
     "n_step": 1,
@@ -50,7 +69,7 @@ agent_config = {
     # setting applies per-worker if num_workers > 1.
     # "rollout_fragment_length": 1,
     "rollout_fragment_length": 1, # Renamed from sample_batch_size in some Ray version
-    "train_batch_size": 64,
+    "train_batch_size": 256,
     "min_iter_time_s": 0,
     "num_workers": 0,
     "num_gpus": 0,
