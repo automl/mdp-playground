@@ -126,7 +126,7 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         for config_type, config_dict in var_configs.items():
             for key in config_dict:
                 if config_type == "env":
-                    env_config = env.env.config
+                    env_config = env.config
                     if key == 'reward_noise':
                         fout.write(str(env_config['reward_noise_std']) + ' ') #hack
                     elif key == 'transition_noise' and env_config["state_space_type"] == "continuous":
@@ -275,12 +275,17 @@ def vision_net(scaled_images, kwargs):
     else: #default
         activ_fn = tf.nn.relu
 
-    output = scaled_images
-    for i, layer_def in enumerate(kwargs['net_arch']):
-        n_filters, kernel, padding = layer_def
-        scope = "c%d"%(i+1)
-        output = activ_fn(conv(output,scope, n_filters = n_filters, filter_size = kernel, stride = 1))
-    output = activ_fn(linear(conv_to_fc(output), 'fc1', n_hidden=512))
+    output, i = scaled_images, 0
+    for i, layer_def in enumerate(kwargs['net_arch'][:-1], start=1):
+        n_filters, kernel, stride = layer_def
+        scope = "c%d"%(i)
+        output = activ_fn(conv(output, scope, n_filters = n_filters, filter_size = kernel[0], stride = stride, pad="SAME", init_scale=np.sqrt(2)))
+    
+    #last layer has valid padding
+    n_filters, kernel, stride = kwargs['net_arch'][-1]
+    output = activ_fn(conv(output, scope = "c%d"%(i+1), n_filters = n_filters, filter_size = kernel[0], stride = stride, pad="VALID", init_scale=np.sqrt(2)))
+    output = conv_to_fc(output) #No linear layer
+    #output = activ_fn(linear(output, 'fc1', n_hidden=512, init_scale=np.sqrt(2)))
     return output
 
 def act_fnc_from_name(key):
@@ -443,11 +448,7 @@ def model_to_policy_kwargs(env, config):
             len(env.observation_space.shape) <= 2:
         feat_ext ="mlp"
     else:# Default Conv2D net.
-        feat_ext = "cnn"   
-    
-    if("use_lstm" in model_config["model"].keys()):
-        #use_lstm does not exist in baselines, here is used to define the policy
-        use_lstm =  model_config["model"].pop("use_lstm")
+        feat_ext = "cnn"
 
     #Move model config(already on baselines framework) to policy_kwargs
     policy_kwargs, cnn_config = {}, {}
@@ -465,6 +466,7 @@ def model_to_policy_kwargs(env, config):
     if(feat_ext == "cnn" and ("net_arch" in policy_kwargs)):
         cnn_config["act_fun"] = act_fnc_from_name( policy_kwargs.pop("act_fun") )
         cnn_config["net_arch"] =  policy_kwargs.pop("net_arch")
+        #Uncomment to pass through custom cnn
         policy_kwargs['cnn_extractor'] = vision_net
         policy_kwargs["kwargs"] = cnn_config
 
@@ -541,7 +543,8 @@ def main():
 
     #------------ Run every configuration  ------------------ #
     pp = pprint.PrettyPrinter(indent=4)
-    for current_config in cartesian_product_configs:
+    for i, current_config in enumerate(cartesian_product_configs):
+        print("Configuration: %d \t %d remaining"%(i, len(cartesian_product_configs) - i ))
         #------------ Dictionaries setup  ------------------ #
         agent_config, model_config, env_config = process_dictionaries(config, current_config, var_env_configs, var_agent_configs, var_model_configs) #hacks
 
