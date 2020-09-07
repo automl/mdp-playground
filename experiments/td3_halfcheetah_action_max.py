@@ -1,6 +1,6 @@
 '''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 10
+num_seeds = 5
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
@@ -13,35 +13,38 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "HopperWrapper-v3",
+    "env": "HalfCheetahWrapper-v3",
     "horizon": 1000,
-    "soft_horizon": False,
     "env_config": {
     },
 }
 
-algorithm = "SAC"
+algorithm = "TD3"
 agent_config = {
-    "optimization": {
-        "actor_learning_rate": 3e-4,
-        "critic_learning_rate": 3e-4,
-        "entropy_learning_rate": 3e-4,
-    },
+    # Learning rate for the critic (Q-function) optimizer.
+    "critic_lr": 3e-4,
+    # Learning rate for the actor (policy) optimizer.
+    "actor_lr": 3e-4,
     # Update the target by \tau * policy + (1-\tau) * target_policy
     "tau": 0.005,
     # How many steps of the model to sample before learning starts.
     "learning_starts": 10000,
 
-    # N-step Q learning
-    "n_step": 1,
-    # Update the target network every `target_network_update_freq` steps.
-    "target_network_update_freq": 1,
-    "target_entropy": "auto",
+    "twin_q": True,
+    "policy_delay": 2,
+    "smooth_target_policy": True,
+    "target_noise": 0.2,
+    "target_noise_clip": 2.5,
 
-    "no_done_at_end": True,
+    # N-step Q learning
+    # "n_step": 4,
+    # Update the target network every `target_network_update_freq` steps.
+#    "target_network_update_freq": 0,
+
+    "buffer_size": 1000000,
 
     # If True prioritized replay buffer will be used.
-    "prioritized_replay": True,
+    # "prioritized_replay": False,
 
     # "schedule_max_timesteps": 20000,
     "timesteps_per_iteration": 1000,
@@ -53,24 +56,12 @@ agent_config = {
     "min_iter_time_s": 0,
     "num_workers": 0,
     "num_gpus": 0,
-    "clip_actions": False,
-    "normalize_actions": True,
 #    "evaluation_interval": 1,
-    "metrics_smoothing_episodes": 5,
 
 }
 
 
 model_config = {
-    "Q_model": {
-        "fcnet_activation": "relu",
-        "fcnet_hiddens": [256, 256],
-    },
-    "policy_model": {
-        "fcnet_activation": "relu",
-        "fcnet_hiddens": [256, 256],
-    },
-
 }
 
 from ray import tune
@@ -78,8 +69,6 @@ eval_config = {
     "evaluation_interval": 1, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
-        "exploration_fraction": 0,
-        "exploration_final_eps": 0,
         "evaluation_num_episodes": 10,
         "horizon": 100,
         "env_config": {

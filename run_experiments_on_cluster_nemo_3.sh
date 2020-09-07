@@ -1,8 +1,8 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-24 # specifies array job indices
+#MOAB -t 25-34 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
-#MOAB -l walltime=0:50:00:00
+#MOAB -l walltime=0:22:00:00
 #MOAB -l pmem=8GB
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 ##MOAB -V # export env. variables from launch env. I think
@@ -16,6 +16,7 @@
 #cd mdpp_${MOAB_JOBID}
 
 echo -e '\033[32m'
+echo "Started at $(date)";
 # Output general info, timing info
 echo "TMPDIR: " $TMPDIR
 

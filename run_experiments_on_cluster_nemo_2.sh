@@ -1,8 +1,8 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-69 # specifies array job indices
+#MOAB -t 15-19 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
-#MOAB -l walltime=0:10:00:00
+#MOAB -l walltime=0:26:00:00
 #MOAB -l pmem=8GB
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 ##MOAB -V # export env. variables from launch env. I think
@@ -16,12 +16,13 @@
 #cd mdpp_${MOAB_JOBID}
 
 echo -e '\033[32m'
+echo "Started at $(date)";
 # Output general info, timing info
 echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='ddpg_pusher_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='td3_halfcheetah_action_max' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
