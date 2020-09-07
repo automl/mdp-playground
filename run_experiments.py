@@ -401,6 +401,8 @@ for current_config in cartesian_product_configs:
         else: #if algorithm == 'DDPG': #hack
             timesteps_total = 20000
 
+    print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
+
     tune.run(
         algorithm,
         name=algorithm + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.

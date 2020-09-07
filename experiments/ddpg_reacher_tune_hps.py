@@ -32,7 +32,7 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "PusherWrapper-v2",
+    "env": "ReacherWrapper-v2",
     "horizon": 100,
     "soft_horizon": False,
     "env_config": {
