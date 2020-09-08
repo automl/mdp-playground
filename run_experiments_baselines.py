@@ -25,6 +25,8 @@ from gym.wrappers.time_limit import TimeLimit
 import tensorflow as tf
 import stable_baselines as sb
 from stable_baselines import DQN, DDPG, SAC, A2C, TD3
+from stable_baselines.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
+from stable_baselines.common.env_checker import check_env
 from stable_baselines.common.tf_layers import conv, linear, conv_to_fc, lstm
 from stable_baselines.common.vec_env import DummyVecEnv, VecEnv, sync_envs_normalization
 from typing import Any, Dict, List, Optional, Union
@@ -134,19 +136,25 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
                     else:
                         fout.write(str(env_config[key]).replace(' ', '') + ' ')
                 elif config_type == "agent":
-                    fout.write(str(self.model[key]).replace(' ', '') + ' ')
+                    fout.write(str(getattr(self.model, key)).replace(' ', '') + ' ')
                 elif config_type == "model":
-                    fout.write(str(self.model["policy_kwargs"][key]).replace(' ', '') + ' ')
+                    if(key == "net_arch"):#this is kwargs as it is sent to visionet
+                        fout.write(str(getattr(self.model, "policy_kwargs")["kwargs"][key]).replace(' ', '') + ' ')
+                    else:
+                        fout.write(str(getattr(self.model, "policy_kwargs")[key]).replace(' ', '') + ' ')
 
         # Write train stats
         rewards = env.get_episode_rewards()
-        espisode_lengths = env.get_episode_lengths()
+        episode_lengths = env.get_episode_lengths()
         episode_times = env.get_episode_times()
         total_steps = env.get_total_steps()
-
-        #episode stats are from all steps taken in env then we need to count "iterations"
-        episode_reward_mean = np.mean(rewards)
-        episode_len_mean =  np.mean(espisode_lengths)
+        if(len(rewards) == 0):#no episodes yet
+            episode_reward_mean = np.mean( env.rewards )
+            episode_len_mean = env.total_steps
+        else:
+            #episode stats are from all steps taken in env then we need to count "iterations"
+            episode_reward_mean = np.mean(rewards)
+            episode_len_mean =  np.mean(episode_lengths)
 
         fout.write(str(timesteps_total) + ' ' + str(episode_reward_mean) +
                 ' ' + str(episode_len_mean) + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
@@ -233,39 +241,43 @@ def process_dictionaries(config, current_config, var_env_configs, var_agent_conf
 
             elif config_type == "agent":
                 num_configs_done = len(list(var_env_configs))
-                if algorithm == 'SAC' and key == 'critic_learning_rate': #hack
-                    value = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
-                    agent_config['optimization'] = {
-                                                    key: value,
-                                                    'actor_learning_rate': value,
-                                                    'entropy_learning_rate': value,
-                                                    }
-                elif algorithm == 'SAC' and key == 'fcnet_hiddens': #hack
-                    agent_config['Q_model'] = {
-                                                key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
-                                                "fcnet_activation": "relu",
-                                                }
-                    agent_config['policy_model'] = {
-                                                key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
-                                                "fcnet_activation": "relu",
-                                                }
-                else:
-                    agent_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+                # if algorithm == 'SAC' and key == 'learning_rate': #hack
+                #     pass
+                #     value = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+                #     agent_config['optimization'] = {
+                #                                     key: value,
+                #                                     'actor_learning_rate': value,
+                #                                     'entropy_learning_rate': value,
+                #                                     }
+                # elif algorithm == 'SAC' and key == 'layers': #hack
+                #     agent_config['Q_model'] = {
+                #                                 key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
+                #                                 "fcnet_activation": "relu",
+                #                                 }
+                #     agent_config['policy_model'] = {
+                #                                 key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
+                #                                 "fcnet_activation": "relu",
+                #                                 }
+                # else:
+                agent_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
             elif config_type == "model":
                 num_configs_done = len(list(var_env_configs)) + len(list(var_agent_configs))
                 model_config["model"][key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
     #hacks begin:
-    if model_config["model"]["use_lstm"]:
-        model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
+    if "use_lstm" in model_config["model"]:
+        if model_config["model"]["use_lstm"]:#if true
+            model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
 
     elif algorithm == 'TD3':
-        agent_config["target_noise_clip"] = agent_config["target_noise_clip"] * agent_config["target_noise"]
+        if("target_policy_noise" in agent_config):
+            agent_config["target_noise_clip"] = agent_config["target_noise_clip"] * agent_config["target_policy_noise"]
 
     # else: #if algorithm == 'SAC':
-    if env_config["env_config"]["state_space_type"] == 'continuous':
-        env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
+    if("state_space_type" in env_config["env_config"]):
+        if env_config["env_config"]["state_space_type"] == 'continuous':
+            env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
     
     return agent_config, model_config, env_config
 
@@ -302,8 +314,17 @@ def act_fnc_from_name(key):
 def agent_to_baselines(config):
     policy_kwargs = {}
     algorithm, agent_config, model_config = config.algorithm, config.agent_config, config.model_config
+    try:
+        var_agent_configs = config.var_agent_configs
+    except AttributeError:
+        var_agent_configs = {} #var_model_configs does not exist
+    try:
+        var_model_configs = config.var_model_configs
+    except AttributeError:
+        var_model_configs = {} #var_model_configs does not exist
     
     valid_keys = ["gamma", "buffer_size", "batch_size", "learning_starts","timesteps_per_iteration"]#common
+    agent_to_model = []#none
     #Check correct keys for each algorithm
     if algorithm == 'DQN':
         #change keys in dictionaries to something baselines understands
@@ -316,67 +337,133 @@ def agent_to_baselines(config):
                         ('lr','learning_rate'),
                         ('train_batch_size', 'batch_size')]
         #Move dueling to policy parameters
-        if('dueling' in agent_config.keys()):
-            policy_kwargs['dueling'] = agent_config['dueling']
-            agent_config.pop('dueling')
+        agent_to_model+=[("dueling","dueling")]
     elif algorithm == "DDPG":
         #memory_policy can be used to select PER
         #random_exploration, param_noise, action_noise parameters aditional
-        valid_keys += ["critic_lr", "actor_lr", "tau","critic_l2_reg","clip_norm"]
+        valid_keys += ["critic_lr", "actor_lr", "tau","critic_l2_reg",\
+                        "clip_norm", "nb_rollout_steps", "nb_train_steps"]
+        valid_keys.remove("learning_starts") #For some reason it's the only one that does not have this implemented
         exchange_keys = [
                 ("l2_reg", "critic_l2_reg"),
-                ("grad_norm_clipping", "clip_norm")
+                ("grad_norm_clipping", "clip_norm"),
                 ('train_batch_size',   'batch_size')]
+        # Because of how DDPG is implemented it will perform 100 rollout steps and then 50 train steps
+        # This needs to be changed s.t. it does one rollout step and one training step
+        agent_config["nb_rollout_steps"] = 1
+        agent_config["nb_train_steps"] = 1
+        agent_to_model+=[("actor_hiddens", "layers"),("critic_hiddens", "layers")]#cannot specify different nets
+        #SPECIAL CASE, learning rates SHOULD NOT be none :c
+        for key in ["critic_lr", "actor_lr"]:
+            key_not_none = agent_config.get(key) 
+            if (key in agent_config):
+                if(not key_not_none): #key==none
+                    agent_config.pop(key) #remove to get default value
+
+    elif algorithm == "TD3":
+        #memory_policy can be used to select PER; policy is always smoothened
+        #random_exploration, param_noise, action_noise parameters aditional
+        valid_keys += ["learning_rate", "policy_delay","tau","train_freq","gradient_steps",\
+                       "target_policy_noise","target_noise_clip","action_noise"]
+        exchange_keys = [
+                ("target_noise", "target_policy_noise"),
+                ("critic_lr", "learning_rate"),
+                ("actor_lr", "learning_rate"),
+                ('train_batch_size',   'batch_size')]
+        agent_to_model+=[("actor_hiddens", "layers"),("critic_hiddens", "layers")]
+        #SPECIAL CASE, learning rates SHOULD NOT be none :c
+        for key in ["critic_lr, actor_lr"]:
+            key_not_none = agent_config.get(key) 
+            if (key in agent_config):
+                if(not key_not_none):
+                    agent_config.pop(key) #remove to get default value
+        # Because of how TD3 is implemented it will perform 100 grad steps every 100 steps
+        # This needs to be changed s.t. it does one rollout step and one training step
+        agent_config["train_freq"] = 1
+        agent_config["gradient_steps"] = 1
+        agent_config["action_noise"] = NormalActionNoise(mean=0, sigma=0) #s.t. it clips actions between [-1,1]
     elif algorithm == "SAC":
         valid_keys += ["learning_rate", "tau", "ent_coef",
                        "target_update_interval","clip_norm","target_entropy"]
         exchange_keys = [
-                ("entropy_learning_rate","learning_rate") #same learning rate for 
+                ("entropy_learning_rate","learning_rate"), #same learning rate for 
                 ("critic_learning_rate", "learning_rate"), #entropy 
                 ("actor_learning_rate", "learning_rate"), #actor and critic
                 ("target_network_update_freq","target_update_interval"),
-                ("grad_norm_clipping", "clip_norm")
+                ("grad_norm_clipping", "clip_norm"),
                 ('train_batch_size',   'batch_size')]
-        #Move layers to policy parameters
-        if('fcnet_hiddens' in agent_config.keys()):
-            policy_kwargs['layers'] = agent_config['fcnet_hiddens']
-            agent_config.pop('fcnet_hiddens')
+        agent_to_model+=[("fcnet_hiddens", "layers")]
         #-------- Add init entropy coef ------------#
         if("initial_alpha" in agent_config.keys()):
-            agent_config["ent_coef"] = "auto_%d"%agent_config["initial_alpha"] #idk why but that's how baselines initializes this thing..
+            agent_config["ent_coef"] = "auto_%.3f"%agent_config["initial_alpha"] #idk why but that's how baselines initializes this thing..
             agent_config.pop("initial_alpha")
-        #var agent configs
+        #var agent configs initial_alpha
+        #idk why but that's how baselines initializes this thing..
         if("agent" in config.var_configs):
-            if(old_key in config.var_agent_configs):
-                config.var_agent_configs["ent_coef"] = ["auto_%d"%coef for coef in config.var_agent_configs["inital_alpha"]]#idk why but that's how baselines initializes this thing..
-                config.var_agent_configs.pop("inital_alpha")
-    
-    #change keys
+            if("initial_alpha" in var_agent_configs):
+                var_agent_configs["ent_coef"] = ["auto_%.3f"%coef for coef in var_agent_configs["initial_alpha"]]
+                var_agent_configs.pop("initial_alpha")
+        # ----------- special case ---------#
+        #should be at least one
+        if("target_network_update_freq" in config.agent_config):
+            key_val = agent_config["target_network_update_freq"]
+            agent_config["target_network_update_freq"] = 1 if key_val <= 0 else key_val 
+        #-------- Take things out of optimization  ------------#
+        #Special case: Optimization
+        if("optimization" in agent_config):
+            for k in config.agent_config["optimization"].keys():
+                key_value = config.agent_config["optimization"][k]
+                if(key_value): #not none
+                    agent_config[k] = key_value
+        #-------- Take things out of Q-model and policy_model  ------------#
+        #Can only specify one model for everything
+        for move_key in ["Q_model", "policy_model"]:
+            if(move_key in model_config):
+                if("model" not in model_config):#init
+                    model_config["model"]={}
+                for k in config.model_config[move_key].keys():
+                    model_config["model"][k] =  config.model_config[move_key][k]
+            model_config.pop(move_key)#Remove from model_config
+
+    #-------- Change keys from Agent to Model dict when needed--------#
+    for key_tuple in agent_to_model:
+        old_key, new_key = key_tuple
+        #-------- Agent config --------#
+        key_exists = agent_config.get(old_key) 
+        if key_exists:#If key exists and is not none
+            policy_kwargs[new_key] =  agent_config.pop(old_key) #Move key to model config
+        # #-------- Var agent config --------#
+        key_exists = var_agent_configs.get(old_key) 
+        if key_exists:#If key exists and is not none
+            var_model_configs[new_key] =  var_agent_configs.pop(old_key) #Move key to model config
+
+    if('fcnet_hiddens' in agent_config.keys()):
+        policy_kwargs['layers'] = agent_config['fcnet_hiddens']
+        agent_config.pop('fcnet_hiddens')
+
+    #-------- Agent config --------#
+    #change agent keys
     for key_tuple in exchange_keys:
         old_key, new_key = key_tuple
         #-------- Agent config --------#
         if(old_key in agent_config):
             agent_config[new_key] = agent_config.pop(old_key)
         #-------- Var agent config --------#
-        if("agent" in config.var_configs):
-            if(old_key in config.var_agent_configs):
-                config.var_agent_configs[new_key] =  config.var_agent_configs.pop(old_key)
+        if(old_key in var_agent_configs):
+            var_agent_configs[new_key] =  var_agent_configs.pop(old_key)
 
     #remove keys from dictionary which are not configurable by baselines
     for key in list(agent_config.keys()):
         if( key not in valid_keys ):#delete invalid keys
             agent_config.pop(key)
 
+    #-------- Var agent config --------#
     #remove keys from dictionary which are not configurable by baselines
-    try:
-        var_agent_configs = config.var_agent_configs
-    except AttributeError:
-        var_agent_configs = {} #var_agent_configs does not exist
     for key in list(var_agent_configs.keys()):
         if( key not in valid_keys ):#delete invalid keys
-            config.var_agent_configs.pop(key) 
+            var_agent_configs.pop(key) 
 
-    #----------- Model setup ----------------#
+    #----------- Model config ----------------#
     valid_keys = ["act_fun", "net_arch", "feature_extractor", "layers", "use_lstm"]
     exchange_keys = [("fcnet_activation", "act_fun"),
                      ("conv_activation", "act_fun"),
@@ -390,53 +477,33 @@ def agent_to_baselines(config):
     #change keys
     for key_tuple in exchange_keys:
         old_key, new_key = key_tuple
-        #-------- Agent config --------#
+        #-------- model config --------#
         if(old_key in model_config["model"]):
             model_config["model"][new_key] = model_config["model"].pop(old_key)
 
-        #-------- Var agent config --------#
-        if("model" in config.var_configs):
-            if(old_key in config.var_model_configs):
-                config.var_model_configs[new_key] =  config.var_model_configs.pop(old_key)
+        #-------- Var model config --------#
+        if(old_key in var_model_configs):
+            var_model_configs[new_key] = var_model_configs.pop(old_key)
     
     #remove invalid keys
     for key in list(model_config["model"].keys()):
-        if( key not in valid_keys ):#delete invalid keys
+        if( key not in valid_keys ):
             model_config["model"].pop(key)
-    
-    try:
-        var_model_configs = config.var_model_configs
-    except AttributeError:
-        var_model_configs = {} #var_model_configs does not exist
+
+    #-------- Var model config - delete invalid keys -------#
     for key in list(var_model_configs.keys()):
-        if( key not in valid_keys ):#delete invalid keys
-            config.var_model_configs.pop(key)
-
-    # for key in model_config['model'].keys(): 
-    #     if algorithm == "DQN":  
-    #         #mlp config
-    #         if(key == "fcnet_activation"):
-    #             policy_kwargs["mlp"]['act_fun'] = act_fnc_from_name( model_config['model']["fcnet_activation"])
-    #         if(key == "fcnet_hiddens"):
-    #             policy_kwargs["mlp"]['layers'] = model_config['model']["fcnet_hiddens"]
-    #         #this is to create a custom CNN since there's no implementation currently
-    #         if( key == "conv_activation"):
-    #             cnn_config["act_fun"] = act_fnc_from_name( model_config['model']["conv_activation"] )
-    #         if( key == "conv_filters"):
-    #             cnn_config["net_arch"] = model_config['model']["conv_filters"]
-    #             policy_kwargs["cnn"]["kwargs"] = cnn_config #Extra parameters for cnn
-    #     else: #DDPG
-    #         if(key == "actor_hiddens" or key == "critic_hiddens"): #cannot specify different models for actor and critic
-    #             # cnn_config["net_arch"] = model_config["model"][key]
-    #             # policy_kwargs["cnn_kwargs"] = cnn_config
-    #             policy_kwargs["layers"] = model_config["model"][key] #Post process layers are after the cnn
-    #         if(key == "actor_hidden_activation" or key == "actor_hidden_activation"):
-    #             policy_kwargs["act_fun"] = act_fnc_from_name( model_config["model"][key] )
-
+        if( key not in valid_keys ):
+            var_model_configs.pop(key)
+    
+    #-------- set model config -------#
     agent_config['policy_kwargs'] = policy_kwargs
     config.agent_config = agent_config
     config.model_config = model_config
-    return config
+    if bool(var_agent_configs): #variable configs
+        config.var_configs["agent"] = var_agent_configs
+    if bool(var_model_configs):
+        config.var_configs["model"] = var_model_configs
+    return config, var_agent_configs, var_model_configs
 
 #change config.model_config to baselines framework/ decide MLP or CNN policy
 def model_to_policy_kwargs(env, config):
@@ -500,21 +567,22 @@ def main():
     print("Stats file being written to:", stats_file_name)
 
     #------------------------- Variable configurations  ----------------------------#
-    config = agent_to_baselines(config)
+    config, var_agent_configs, var_model_configs = agent_to_baselines(config)
     var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
 
     if "env" in config.var_configs:
         var_env_configs = config.var_configs["env"] #hack
     else:
         var_env_configs = []
-    if "agent" in config.var_configs:
-        var_agent_configs = config.var_configs["agent"] #hack
-    else:
-        var_agent_configs = []
-    if "model" in config.var_configs:
-        var_model_configs = config.var_configs["model"] #hack
-    else:
-        var_model_configs = []
+    # Modified in agent_to_baselines    
+    # if "agent" in config.var_configs:
+    #     var_agent_configs = config.var_configs["agent"] #hack
+    # else:
+    #     var_agent_configs = []
+    # if "model" in config.var_configs:
+    #     var_model_configs = config.var_configs["model"] #hack
+    # else:
+    #     var_model_configs = []
     config_algorithm = config.algorithm #hack, used on on_train_result
 
     print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
@@ -550,13 +618,19 @@ def main():
 
         #------------ Env init  ------------------ #
         #env = RLToyEnv(env_config["env_config"]) #alternative
+        if( "horizon" in env_config ):
+            train_horizon = env_config["horizon"]
+        else:
+            train_horizon = None
         env = gym.make(env_config['env'],**env_config['env_config'])
+        env = TimeLimit(env, max_episode_steps = train_horizon) #horizon
         env = sb.bench.monitor.Monitor(env, None)
-
+        #check_env(env)
+        #limit max timesteps in training too... (idk why but seems like ray does this (?))
+        
         #limit max timesteps in evaluation
         eval_horizon = 100
-        eval_env = gym.make(env_config['env'],**env_config['env_config']) 
-        eval_env.spec.tags['wrapper_config.TimeLimit.max_episode_steps'] = eval_horizon
+        eval_env = gym.make(env_config['env'],**env_config['env_config'])
         eval_env = TimeLimit(eval_env, max_episode_steps = eval_horizon) #horizon
         print("Env config:",)
         pp.pprint(env_config)
@@ -579,19 +653,16 @@ def main():
             model = DQN(env = env, policy = sb.deepq.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1)
         elif config.algorithm == 'DDPG': #hack
             model = DDPG(env = env, policy = sb.ddpg.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1 )
+        elif config.algorithm == "TD3":
+            model = TD3(env = env, policy = sb.td3.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1 )
         else: #'SAC
-            model = SAC(env = env, **agent_config_baselines, verbose=1)
+            model = SAC(env = env, policy = sb.sac.policies.FeedForwardPolicy ,**agent_config_baselines, verbose=1)
 
         #------------ train/evaluation ------------------ #
         if env_config["env"] in ["HopperWrapper-v3", "HalfCheetahWrapper-v3"]:
             timesteps_total = 500000
         else:
-            if config.algorithm == 'DQN':
-                timesteps_total = 20000
-            elif config.algorithm  == 'A3C': #hack
-                timesteps_total = 150000
-            else: #if algorithm == 'DDPG': #hack
-                timesteps_total = 20000
+            timesteps_total = 20000 #DQN, DDPG, TD3, SAC
 
         # train your model for n_iter timesteps
         #Define evaluation
@@ -601,12 +672,14 @@ def main():
                         deterministic=True, file_name = stats_file_name, \
                         config_algorithm = config.algorithm, var_configs = var_configs_deepcopy)
         #Train
-        model.learn(callback= eval_callback, total_timesteps = timesteps_total)
-
-        rewards = env.get_episode_rewards()
-        espisode_lengths = env.get_episode_lengths()
-        episode_times = env.get_episode_times()
-        total_steps = env.get_total_steps()
+        learn_params = {"callback": eval_callback,
+                        "total_timesteps": timesteps_total}
+        if(config.algorithm == "DDPG"): #Log interval is handled differently for each algorithm, e.g. each log_interval episodes(DQN) or log_interval steps(DDPG).
+            learn_params["log_interval"] = timesteps_per_iteration
+        else:
+            learn_params["log_interval"] = timesteps_per_iteration//10
+        
+        model.learn(**learn_params)
 
     end = time.time()
     print("No. of seconds to run:", end - start)
