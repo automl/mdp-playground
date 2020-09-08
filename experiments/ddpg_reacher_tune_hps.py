@@ -1,47 +1,67 @@
 '''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 10
+num_seeds = 3
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    "action_space_max": [0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
+
+var_agent_configs = OrderedDict({
+    # Learning rate for the critic (Q-function) optimizer.
+    "critic_lr": [1e-2, 1e-3, 1e-4],
+    # Update the target by \tau * policy + (1-\tau) * target_policy
+    "tau": [2e-2, 2e-3, 2e-4],
+    # How many steps of the model to sample before learning starts.
+    "learning_starts": [1000, 5000, 10000],
+    # Postprocess the critic network model output with these hidden layers;
+    # again, if use_state_preprocessor is True, then the state will be
+    # preprocessed by the model specified with the "model" config option first.
+    "critic_hiddens": [[64, 64], [128, 128], [256, 256]]
+})
+
+
+# var_model_configs = OrderedDict({
+# })
+
 var_configs = OrderedDict({
-"env": var_env_configs
+"env": var_env_configs,
+"agent": var_agent_configs,
+# "model": var_model_configs,
 })
 
 env_config = {
-    "env": "HopperWrapper-v3",
-    "horizon": 1000,
+    "env": "ReacherWrapper-v2",
+    "horizon": 100,
     "soft_horizon": False,
     "env_config": {
     },
 }
 
-algorithm = "SAC"
+algorithm = "DDPG"
 agent_config = {
-    "optimization": {
-        "actor_learning_rate": 3e-4,
-        "critic_learning_rate": 3e-4,
-        "entropy_learning_rate": 3e-4,
-    },
+    # Learning rate for the critic (Q-function) optimizer.
+    # "critic_lr": 1e-3,
+    # Learning rate for the actor (policy) optimizer.
+    "actor_lr": None,
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.005,
+    # "tau": 0.001,
     # How many steps of the model to sample before learning starts.
-    "learning_starts": 10000,
+    # "learning_starts": 10000,
+
+    # "critic_hiddens": [64, 64],
+    "actor_hiddens": None,
 
     # N-step Q learning
     "n_step": 1,
     # Update the target network every `target_network_update_freq` steps.
-    "target_network_update_freq": 1,
-    "target_entropy": "auto",
+    # "target_network_update_freq": 1,
 
-    "no_done_at_end": True,
+    "buffer_size": 1000000,
 
     # If True prioritized replay buffer will be used.
-    "prioritized_replay": True,
+    "prioritized_replay": False,
 
     # "schedule_max_timesteps": 20000,
     "timesteps_per_iteration": 1000,
@@ -53,24 +73,12 @@ agent_config = {
     "min_iter_time_s": 0,
     "num_workers": 0,
     "num_gpus": 0,
-    "clip_actions": False,
-    "normalize_actions": True,
 #    "evaluation_interval": 1,
-    "metrics_smoothing_episodes": 5,
 
 }
 
 
 model_config = {
-    "Q_model": {
-        "fcnet_activation": "relu",
-        "fcnet_hiddens": [256, 256],
-    },
-    "policy_model": {
-        "fcnet_activation": "relu",
-        "fcnet_hiddens": [256, 256],
-    },
-
 }
 
 from ray import tune
@@ -78,8 +86,6 @@ eval_config = {
     "evaluation_interval": 1, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
-        "exploration_fraction": 0,
-        "exploration_final_eps": 0,
         "evaluation_num_episodes": 10,
         "horizon": 100,
         "env_config": {

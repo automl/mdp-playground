@@ -49,7 +49,7 @@ agent_config = {
     # setting applies per-worker if num_workers > 1.
     # "rollout_fragment_length": 1,
     "rollout_fragment_length": 1, # Renamed from sample_batch_size in some Ray version
-    "train_batch_size": 256,
+    "train_batch_size": 255,
     "min_iter_time_s": 0,
     "num_workers": 0,
     "num_gpus": 0,
