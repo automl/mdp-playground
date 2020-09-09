@@ -27,12 +27,12 @@ agent_config = {
     # Learning rate for the actor (policy) optimizer.
     "actor_lr": 1e-3,
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.001,
+    "tau": 0.002,
     # How many steps of the model to sample before learning starts.
     "learning_starts": 10000,
 
-    "critic_hiddens": [64, 64],
-    "actor_hiddens": [64, 64],
+    "critic_hiddens": [256, 256],
+    "actor_hiddens": [256, 256],
 
     # N-step Q learning
     "n_step": 1,
@@ -50,7 +50,7 @@ agent_config = {
     # setting applies per-worker if num_workers > 1.
     # "rollout_fragment_length": 1,
     "rollout_fragment_length": 1, # Renamed from sample_batch_size in some Ray version
-    "train_batch_size": 64,
+    "train_batch_size": 256,
     "min_iter_time_s": 0,
     "num_workers": 0,
     "num_gpus": 0,

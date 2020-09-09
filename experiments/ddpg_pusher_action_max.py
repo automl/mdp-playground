@@ -23,16 +23,16 @@ env_config = {
 algorithm = "DDPG"
 agent_config = {
     # Learning rate for the critic (Q-function) optimizer.
-    "critic_lr": 3e-4,
+    "critic_lr": 1e-4,
     # Learning rate for the actor (policy) optimizer.
-    "actor_lr": 3e-4,
+    "actor_lr": 1e-4,
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.005,
+    "tau": 0.02,
     # How many steps of the model to sample before learning starts.
-    "learning_starts": 10000,
+    "learning_starts": 5000,
 
-    "critic_hiddens": [256, 256],
-    "actor_hiddens": [256, 256],
+    "critic_hiddens": [128, 128],
+    "actor_hiddens": [128, 128],
 
     # N-step Q learning
     "n_step": 1,
