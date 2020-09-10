@@ -119,6 +119,20 @@ class MDPP_Analysis():
 #         to_plot_ = np.squeeze(stats_reshaped[:, :, :, :, 0, 0, :, 1])
 #         print('Episode reward (at end of training) for 10 seeds for vanilla env.:', to_plot_)
 
+        # Calculate AUC metrics
+        train_aucs = []
+        for i in range(len(final_rows_for_a_config)):
+            if i == 0:
+                to_avg_ = stats_pd.iloc[0:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            else:
+                to_avg_ = stats_pd.iloc[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            auc = np.mean(to_avg_, axis=0)
+            train_aucs.append(auc)
+            # print(auc)
+
+        train_aucs = np.reshape(np.array(train_aucs), config_counts)
+        print("train_aucs.shape:", train_aucs.shape)
+
 
         # Load evaluation stats
         stats_file_eval = stats_file + '_eval.csv'
@@ -175,6 +189,22 @@ class MDPP_Analysis():
 #         print("eval stats shapes (before and after reshape):", final_eval_metrics_.shape, final_eval_metrics_reshaped.shape)
         print("eval stats shape:", final_eval_metrics_reshaped.shape)
 
+
+        # Calculate AUC metrics
+        eval_aucs = []
+        for i in range(len(final_rows_for_a_config)):
+            if i == 0:
+                to_avg_ = mean_data_eval[0:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            else:
+                to_avg_ = mean_data_eval[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            auc = np.mean(to_avg_, axis=0)
+            eval_aucs.append(auc)
+            # print(auc)
+
+        eval_aucs = np.reshape(np.array(eval_aucs), config_counts)
+        print("eval_aucs.shape:", eval_aucs.shape)
+
+
         self.config_counts = config_counts[:-1] # -1 is added to ignore "no. of stats that were saved" as dimensions of difficulty
         self.dims_values = dims_values
 
@@ -210,7 +240,7 @@ class MDPP_Analysis():
         for d,v,i in zip(x_axis_labels, x_tick_labels_, dims_varied):
             print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
 
-        return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval
+        return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval, train_aucs, eval_aucs
 
 
     def plot_1d_dimensions(self, stats_data, save_fig=False, train=True, metric_num=-2):
