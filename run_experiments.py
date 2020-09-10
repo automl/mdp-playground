@@ -318,27 +318,25 @@ for current_config in cartesian_product_configs:
         if env_config["env_config"]["state_space_type"] == 'continuous':
             env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
 
-    if "time_unit" in env_config["env_config"]:
-        agent_config["train_batch_size"] *= env_config["env_config"]["time_unit"]
-        agent_config["train_batch_size"] = int(agent_config["train_batch_size"])
-
     #hacks end
 
     eval_config = config.eval_config
-    if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different. In HalfCheetah, this is needed because the reward function is dependent on the time_unit because it depends on velocity achieved which depends on amount of time torque was applied.
-        if "time_unit" in env_config["env_config"]:
-            env_config["horizon"] /= env_config["env_config"]["time_unit"]
-            env_config["horizon"] = int(env_config["horizon"])
 
-            agent_config["learning_starts"] /= env_config["env_config"]["time_unit"]
-            agent_config["learning_starts"] = int(agent_config["learning_starts"])
+    if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
+        env_config["horizon"] /= env_config["env_config"]["time_unit"]
+        env_config["horizon"] = int(env_config["horizon"])
 
-            agent_config["timesteps_per_iteration"] /= env_config["env_config"]["time_unit"]
-            agent_config["timesteps_per_iteration"] = int(agent_config["timesteps_per_iteration"])
+        agent_config["learning_starts"] /= env_config["env_config"]["time_unit"]
+        agent_config["learning_starts"] = int(agent_config["learning_starts"])
 
-            eval_config["evaluation_config"]["horizon"] /= env_config["env_config"]["time_unit"]
-            eval_config["evaluation_config"]["horizon"] = int(eval_config["evaluation_config"]["horizon"])
+        agent_config["timesteps_per_iteration"] /= env_config["env_config"]["time_unit"]
+        agent_config["timesteps_per_iteration"] = int(agent_config["timesteps_per_iteration"])
 
+        eval_config["evaluation_config"]["horizon"] /= env_config["env_config"]["time_unit"]
+        eval_config["evaluation_config"]["horizon"] = int(eval_config["evaluation_config"]["horizon"])
+
+        agent_config["train_batch_size"] *= env_config["env_config"]["time_unit"] # this is needed because Ray (until version 0.8.6 I think) fixes the ratio of number of samples trained/number of steps sampled in environment
+        agent_config["train_batch_size"] = int(agent_config["train_batch_size"])
 
     extra_config = {
         "callbacks": {
@@ -364,10 +362,6 @@ for current_config in cartesian_product_configs:
         from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
         HalfCheetahWrapperV3 = get_mujoco_wrapper(HalfCheetahEnv)
         register_env("HalfCheetahWrapper-v3", lambda config: HalfCheetahWrapperV3(**config))
-
-        if "time_unit" in env_config["env_config"]:
-            timesteps_total /= env_config["env_config"]["time_unit"]
-            timesteps_total = int(timesteps_total)
 
     elif env_config["env"] in ["HopperWrapper-v3"]: #hack
         timesteps_total = 1000000
@@ -400,6 +394,11 @@ for current_config in cartesian_product_configs:
             timesteps_total = 150000
         else: #if algorithm == 'DDPG': #hack
             timesteps_total = 20000
+
+    if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
+        timesteps_total /= env_config["env_config"]["time_unit"]
+        timesteps_total = int(timesteps_total)
+
 
     print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
 

@@ -20,7 +20,7 @@ var_env_configs = OrderedDict({
     "state_space_max": [10],
     "action_space_max": [1],
     "action_loss_weight": [0.0],#0.01,
-    'time_unit': [0.1, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0],
+    'time_unit': [0.1, 0.2, 0.5, 1.0, 2.0, 4.0, 8.0],
     'transition_dynamics_order': [1],
     'dummy_seed': [i for i in range(num_seeds)],
 })
@@ -107,7 +107,7 @@ agent_config = {
     # setting applies per-worker if num_workers > 1.
     # "rollout_fragment_length": 1,
     "rollout_fragment_length": 1, # Renamed from sample_batch_size in some Ray version
-    "train_batch_size": 32,
+    "train_batch_size": 30,
     "min_iter_time_s": 0,
 }
 

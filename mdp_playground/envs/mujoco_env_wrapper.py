@@ -38,7 +38,7 @@ def get_mujoco_wrapper(base_class):
                     self.frame_skip *= 2
                     print("Setting Mujoco timestep to", self.model.opt.timestep, "half of the usual to avoid instabilities. At the same time action repeat increased to twice its usual.")
 
-            if "time_unit" in locals(): #hack
+            if "time_unit" in locals(): #hack In HalfCheetah, this is needed because the reward function is dependent on the time_unit because it depends on velocity achieved which depends on amount of time torque was applied. In Pusher, Reacher, it is also needed because the reward is similar to the distance from current position to goal at _each_ step, which means if we calculate the reward multiple times in the same amount of "real" time, we'd need to average out the reward the more times we calculate the reward in the same amount of "real" time (i.e., when we have shorter acting timesteps). This is not the case with the toy enviroments because there the reward is amount of distance moved from current position to goal in the current timestep, so it's dependent on "real" time and not on acting timesteps.
                 self.frame_skip *= time_unit
                 self.frame_skip = int(self.frame_skip)
                 self._ctrl_cost_weight *= time_unit
