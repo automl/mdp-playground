@@ -4,7 +4,7 @@ num_seeds = 10
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    'time_unit': [0.2, 0.4, 1.0, 2.0, 4.0], # set values such that frame_skip in Gym HalfCheetah-v3 is integral
+    'time_unit': [0.5, 1.0, 2.5, 5.0, 10.0], # set values such that frame_skip in Gym HalfCheetah-v3 is integral
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
