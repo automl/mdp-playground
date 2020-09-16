@@ -17,6 +17,16 @@ from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 
+def create_gym_env_wrapper(config):
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    ae = AtariEnv(**config["AtariEnv"])
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
+register_env("GymEnvWrapper-v0", lambda config: create_gym_env_wrapper(config))
+
+
 import sys, os
 import argparse
 # import configparser
@@ -386,6 +396,10 @@ for current_config in cartesian_product_configs:
         from gym.envs.mujoco.reacher import ReacherEnv
         ReacherWrapperV2 = get_mujoco_wrapper(ReacherEnv)
         register_env("ReacherWrapper-v2", lambda config: ReacherWrapperV2(**config))
+
+    elif env_config["env"] in ["GymEnvWrapper-v0"]: #hack
+        if "AtariEnv" in env_config["env_config"]:
+            timesteps_total = 1000000
 
     else:
         if algorithm == 'DQN':

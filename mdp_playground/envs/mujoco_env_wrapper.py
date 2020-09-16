@@ -5,7 +5,8 @@ from gym.envs.mujoco.reacher import ReacherEnv
 import copy
 
 def get_mujoco_wrapper(base_class):
-    '''Wraps a mujoco-py environment to be able to modify its XML attributes'''
+    '''Wraps a mujoco-py environment to be able to modify its XML attributes.'''
+    #TODO This is a subclass and not a wrapper. Change name. Or make it a wrapper by using composition? Some frameworks might need an instance of this class to also be an instance of the base class?
 
     class MujocoEnvWrapperV3(base_class):
         def __init__(self, **config):
@@ -61,3 +62,13 @@ def get_mujoco_wrapper(base_class):
 
 
     return MujocoEnvWrapperV3
+
+# from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+#
+# from gym.envs.mujoco.reacher import ReacherEnv
+# ReacherWrapperV2 = get_mujoco_wrapper(ReacherEnv)
+# config = {"time_unit": 0.2}
+# rw2 = ReacherWrapperV2(**config)
+# o = rw2.reset()
+# rw2.seed(0)
+# rw2.step(1)
