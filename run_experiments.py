@@ -322,6 +322,7 @@ for current_config in cartesian_product_configs:
         agent_config["actor_hiddens"] = agent_config["critic_hiddens"]
     elif algorithm == 'TD3':
         agent_config["target_noise_clip"] = agent_config["target_noise_clip_relative"] * agent_config["target_noise"]
+        del agent_config["target_noise_clip_relative"] #hack have to delete it otherwise Ray will crash for unknown config param.
 
     # else: #if algorithm == 'SAC':
     if "state_space_type" in env_config:
