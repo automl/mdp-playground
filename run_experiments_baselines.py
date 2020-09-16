@@ -62,12 +62,12 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         self.eval_freq = eval_freq
         self.deterministic = deterministic
         self.file_name = file_name
-        self.training_iteration = 0
+        self.training_iteration = 1
         self.timesteps_per_iteration = 0
         self.last_iter_ts = 0
         self.config_algorithm = config_algorithm
         self.var_configs = var_configs
-
+        self.last_episode_count = 0
         # Convert to VecEnv for consistency
         if not isinstance(eval_env, VecEnv):
             eval_env = DummyVecEnv([lambda: eval_env])
@@ -122,6 +122,10 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
     def write_train_result(self):
         env, training_iteration, timesteps_total = self.training_env, self.training_iteration, self.timesteps_per_iteration
         file_name, config_algorithm, var_configs = self.file_name, self.config_algorithm, self.var_configs
+
+        #A2C can handle multiple envs..
+        if(self.config_algorithm == "A2C" or self.config_algorithm =="A3C"):
+            env = env.envs[0]#take first env
         # Writes every iteration, would slow things down. #hack
         fout = open(self.file_name + '.csv', 'a') #hardcoded
         fout.write(str(training_iteration) + ' ' + config_algorithm + ' ')
@@ -152,9 +156,13 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
             episode_reward_mean = np.mean( env.rewards )
             episode_len_mean = env.total_steps
         else:
-            #episode stats are from all steps taken in env then we need to count "iterations"
+            #episode stats are from all steps taken in env then we need to count "iterations" mean per iteration
+            # n_episodes = len(episode_lengths)
+            # episode_reward_mean = np.mean(rewards[self.last_episode_count: n_episodes])
+            # episode_len_mean =  np.mean(episode_lengths[self.last_episode_count: n_episodes])
+            # self.last_episode_count =  n_episodes
             episode_reward_mean = np.mean(rewards)
-            episode_len_mean =  np.mean(episode_lengths)
+            episode_len_mean = np.mean(episode_lengths)
 
         fout.write(str(timesteps_total) + ' ' + str(episode_reward_mean) +
                 ' ' + str(episode_len_mean) + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
@@ -266,15 +274,13 @@ def process_dictionaries(config, current_config, var_env_configs, var_agent_conf
                 model_config["model"][key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
     #hacks begin:
-    if "use_lstm" in model_config["model"]:
-        if model_config["model"]["use_lstm"]:#if true
-            model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
+    # if "use_lstm" in model_config["model"]:
+    #     if model_config["model"]["use_lstm"]:#if true
+    #         model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
 
-    elif algorithm == 'TD3':
+    if algorithm == 'TD3':
         if("target_policy_noise" in agent_config):
             agent_config["target_noise_clip"] = agent_config["target_noise_clip"] * agent_config["target_policy_noise"]
-
-    # else: #if algorithm == 'SAC':
     if("state_space_type" in env_config["env_config"]):
         if env_config["env_config"]["state_space_type"] == 'continuous':
             env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
@@ -424,6 +430,14 @@ def agent_to_baselines(config):
                 for k in config.model_config[move_key].keys():
                     model_config["model"][k] =  config.model_config[move_key][k]
             model_config.pop(move_key)#Remove from model_config
+    else: #A2C
+        config.algorithm = "A2C"
+        valid_keys += ["learning_rate","vf_coef", "ent_coef","max_grad_norm"] #"lr_schedule" cannot be none
+        exchange_keys = [
+                ("vf_loss_coeff","vf_coef"),
+                ("entropy_coeff","ent_coef"),
+                ("lr", "learning_rate"),
+                ("grad_clip", "max_grad_norm")]
 
     #-------- Change keys from Agent to Model dict when needed--------#
     for key_tuple in agent_to_model:
@@ -464,7 +478,7 @@ def agent_to_baselines(config):
             var_agent_configs.pop(key) 
 
     #----------- Model config ----------------#
-    valid_keys = ["act_fun", "net_arch", "feature_extractor", "layers", "use_lstm"]
+    valid_keys = ["act_fun", "net_arch", "feature_extractor", "layers", "use_lstm","n_lstm"]
     exchange_keys = [("fcnet_activation", "act_fun"),
                      ("conv_activation", "act_fun"),
                      ("actor_hidden_activation", "act_fun"),
@@ -472,7 +486,8 @@ def agent_to_baselines(config):
                      ("fcnet_hiddens", "layers"),
                      ("actor_hiddens", "layers"),
                      ("critic_hiddens","layers"),
-                     ("conv_filters", "net_arch")]
+                     ("conv_filters", "net_arch"),
+                     ("lstm_cell_size","n_lstm")]
 
     #change keys
     for key_tuple in exchange_keys:
@@ -528,6 +543,9 @@ def model_to_policy_kwargs(env, config):
     if("use_lstm" in policy_kwargs.keys()):
         #use_lstm does not exist in baselines, here is used to define the policy
         use_lstm =  policy_kwargs.pop("use_lstm")
+    
+    if("n_lstm" in policy_kwargs.keys() and not use_lstm):
+        policy_kwargs.pop("n_lstm")#not valid if not lstm policy
 
     #Custom Feature extractor
     if(feat_ext == "cnn" and ("net_arch" in policy_kwargs)):
@@ -542,7 +560,7 @@ def model_to_policy_kwargs(env, config):
     # if('lr_schedule'in agent_config.keys()): #schedule is part of model instead of agent in baselines
     #     agent_config['policy_kwargs']['lr_schedule'] = agent_config['lr_schedule']
     
-    return policy_kwargs
+    return policy_kwargs, use_lstm
 
 def main():   
     #-------------------------  init configuration ----------------------------#
@@ -574,15 +592,6 @@ def main():
         var_env_configs = config.var_configs["env"] #hack
     else:
         var_env_configs = []
-    # Modified in agent_to_baselines    
-    # if "agent" in config.var_configs:
-    #     var_agent_configs = config.var_configs["agent"] #hack
-    # else:
-    #     var_agent_configs = []
-    # if "model" in config.var_configs:
-    #     var_model_configs = config.var_configs["model"] #hack
-    # else:
-    #     var_model_configs = []
     config_algorithm = config.algorithm #hack, used on on_train_result
 
     print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
@@ -617,14 +626,14 @@ def main():
         agent_config, model_config, env_config = process_dictionaries(config, current_config, var_env_configs, var_agent_configs, var_model_configs) #hacks
 
         #------------ Env init  ------------------ #
+        #if time limit, wrap it
+        env = gym.make(env_config['env'],**env_config['env_config'])
+        env = sb.bench.monitor.Monitor(env, None)
         #env = RLToyEnv(env_config["env_config"]) #alternative
         if( "horizon" in env_config ):
             train_horizon = env_config["horizon"]
-        else:
-            train_horizon = None
-        env = gym.make(env_config['env'],**env_config['env_config'])
-        env = TimeLimit(env, max_episode_steps = train_horizon) #horizon
-        env = sb.bench.monitor.Monitor(env, None)
+            env = TimeLimit(env, max_episode_steps = train_horizon) #horizon
+        
         #check_env(env)
         #limit max timesteps in training too... (idk why but seems like ray does this (?))
         
@@ -645,7 +654,7 @@ def main():
             timesteps_per_iteration = 1000#default
 
         #Set model parameters
-        policy_kwargs = model_to_policy_kwargs(env, config) #return policy_kwargs
+        policy_kwargs, use_lstm = model_to_policy_kwargs(env, config) #return policy_kwargs
         agent_config_baselines["policy_kwargs"] = policy_kwargs
         
         #Use feed forward policies and specify cnn feature extractor in configuration
@@ -655,6 +664,9 @@ def main():
             model = DDPG(env = env, policy = sb.ddpg.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1 )
         elif config.algorithm == "TD3":
             model = TD3(env = env, policy = sb.td3.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1 )
+        elif config.algorithm == "A3C" or config.algorithm == "A2C":
+            policy = sb.common.policies.LstmPolicy if use_lstm else sb.common.policies.FeedForwardPolicy
+            model = A2C(env = env, policy = policy ,**agent_config_baselines, verbose=1)
         else: #'SAC
             model = SAC(env = env, policy = sb.sac.policies.FeedForwardPolicy ,**agent_config_baselines, verbose=1)
 
