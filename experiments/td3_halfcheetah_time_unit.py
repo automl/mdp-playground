@@ -19,7 +19,7 @@ env_config = {
     },
 }
 
-algorithm = "DDPG"
+algorithm = "TD3"
 agent_config = {
     # Learning rate for the critic (Q-function) optimizer.
     "critic_lr": 3e-4,
@@ -30,18 +30,21 @@ agent_config = {
     # How many steps of the model to sample before learning starts.
     "learning_starts": 10000,
 
-    "critic_hiddens": [256, 256],
-    "actor_hiddens": [256, 256],
+    "twin_q": True,
+    "policy_delay": 2,
+    "smooth_target_policy": True,
+    "target_noise": 0.2,
+    "target_noise_clip": 2.5,
 
     # N-step Q learning
-    "n_step": 1,
+    # "n_step": 4,
     # Update the target network every `target_network_update_freq` steps.
-    # "target_network_update_freq": 1,
+#    "target_network_update_freq": 0,
 
     "buffer_size": 1000000,
 
     # If True prioritized replay buffer will be used.
-    "prioritized_replay": False,
+    # "prioritized_replay": False,
 
     # "schedule_max_timesteps": 20000,
     "timesteps_per_iteration": 1000,

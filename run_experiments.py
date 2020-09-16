@@ -17,6 +17,16 @@ from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 
+def create_gym_env_wrapper(config):
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    ae = AtariEnv(**config["AtariEnv"])
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
+register_env("GymEnvWrapper-v0", lambda config: create_gym_env_wrapper(config))
+
+
 import sys, os
 import argparse
 # import configparser
@@ -307,38 +317,37 @@ for current_config in cartesian_product_configs:
     if "model" in model_config and model_config["model"]["use_lstm"]:
         model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
 
-    if algorithm == 'DDPG': ###TODO Find a better way to enforce these??
+    if algorithm == 'DDPG': ###TODO Find a better way to enforce these?? Especially problematic for TD3 because then more values for target_noise_clip are witten to CSVs than actually used during HPO but for normal (non-HPO) runs this needs to be not done.
         agent_config["actor_lr"] = agent_config["critic_lr"]
         agent_config["actor_hiddens"] = agent_config["critic_hiddens"]
     elif algorithm == 'TD3':
-        agent_config["target_noise_clip"] = agent_config["target_noise_clip"] * agent_config["target_noise"]
+        agent_config["target_noise_clip"] = agent_config["target_noise_clip_relative"] * agent_config["target_noise"]
+        del agent_config["target_noise_clip_relative"] #hack have to delete it otherwise Ray will crash for unknown config param.
 
     # else: #if algorithm == 'SAC':
     if "state_space_type" in env_config:
         if env_config["env_config"]["state_space_type"] == 'continuous':
             env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
 
-    if "time_unit" in env_config["env_config"]:
-        agent_config["train_batch_size"] *= env_config["env_config"]["time_unit"]
-        agent_config["train_batch_size"] = int(agent_config["train_batch_size"])
-
     #hacks end
 
     eval_config = config.eval_config
-    if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different. In HalfCheetah, this is needed because the reward function is dependent on the time_unit because it depends on velocity achieved which depends on amount of time torque was applied.
-        if "time_unit" in env_config["env_config"]:
-            env_config["horizon"] /= env_config["env_config"]["time_unit"]
-            env_config["horizon"] = int(env_config["horizon"])
 
-            agent_config["learning_starts"] /= env_config["env_config"]["time_unit"]
-            agent_config["learning_starts"] = int(agent_config["learning_starts"])
+    if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
+        env_config["horizon"] /= env_config["env_config"]["time_unit"]
+        env_config["horizon"] = int(env_config["horizon"])
 
-            agent_config["timesteps_per_iteration"] /= env_config["env_config"]["time_unit"]
-            agent_config["timesteps_per_iteration"] = int(agent_config["timesteps_per_iteration"])
+        agent_config["learning_starts"] /= env_config["env_config"]["time_unit"]
+        agent_config["learning_starts"] = int(agent_config["learning_starts"])
 
-            eval_config["evaluation_config"]["horizon"] /= env_config["env_config"]["time_unit"]
-            eval_config["evaluation_config"]["horizon"] = int(eval_config["evaluation_config"]["horizon"])
+        agent_config["timesteps_per_iteration"] /= env_config["env_config"]["time_unit"]
+        agent_config["timesteps_per_iteration"] = int(agent_config["timesteps_per_iteration"])
 
+        eval_config["evaluation_config"]["horizon"] /= env_config["env_config"]["time_unit"]
+        eval_config["evaluation_config"]["horizon"] = int(eval_config["evaluation_config"]["horizon"])
+
+        agent_config["train_batch_size"] *= env_config["env_config"]["time_unit"] # this is needed because Ray (until version 0.8.6 I think) fixes the ratio of number of samples trained/number of steps sampled in environment
+        agent_config["train_batch_size"] = int(agent_config["train_batch_size"])
 
     extra_config = {
         "callbacks": {
@@ -365,10 +374,6 @@ for current_config in cartesian_product_configs:
         HalfCheetahWrapperV3 = get_mujoco_wrapper(HalfCheetahEnv)
         register_env("HalfCheetahWrapper-v3", lambda config: HalfCheetahWrapperV3(**config))
 
-        if "time_unit" in env_config["env_config"]:
-            timesteps_total /= env_config["env_config"]["time_unit"]
-            timesteps_total = int(timesteps_total)
-
     elif env_config["env"] in ["HopperWrapper-v3"]: #hack
         timesteps_total = 1000000
 
@@ -393,6 +398,10 @@ for current_config in cartesian_product_configs:
         ReacherWrapperV2 = get_mujoco_wrapper(ReacherEnv)
         register_env("ReacherWrapper-v2", lambda config: ReacherWrapperV2(**config))
 
+    elif env_config["env"] in ["GymEnvWrapper-v0"]: #hack
+        if "AtariEnv" in env_config["env_config"]:
+            timesteps_total = 1000000
+
     else:
         if algorithm == 'DQN':
             timesteps_total = 20000
@@ -400,6 +409,11 @@ for current_config in cartesian_product_configs:
             timesteps_total = 150000
         else: #if algorithm == 'DDPG': #hack
             timesteps_total = 20000
+
+    if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
+        timesteps_total /= env_config["env_config"]["time_unit"]
+        timesteps_total = int(timesteps_total)
+
 
     print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
 

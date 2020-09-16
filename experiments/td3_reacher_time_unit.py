@@ -1,10 +1,10 @@
 '''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 5
+num_seeds = 10
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    'time_unit': [0.2, 0.4, 1.0, 2.0, 4.0], # set values such that frame_skip in Gym HalfCheetah-v3 is integral
+    'time_unit': [0.5, 1.0, 2.5, 5.0, 10.0], # set values such that frame_skip in Gym HalfCheetah-v3 is integral
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -13,30 +13,36 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "HalfCheetahWrapper-v3",
-    "horizon": 1000,
+    "env": "ReacherWrapper-v2",
+    "horizon": 100,
     "env_config": {
     },
 }
 
-algorithm = "DDPG"
+algorithm = "TD3"
 agent_config = {
     # Learning rate for the critic (Q-function) optimizer.
-    "critic_lr": 3e-4,
+    "critic_lr": 1e-3,
     # Learning rate for the actor (policy) optimizer.
-    "actor_lr": 3e-4,
+    "actor_lr": 1e-3,
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.005,
+    "tau": 0.002,
     # How many steps of the model to sample before learning starts.
     "learning_starts": 10000,
 
     "critic_hiddens": [256, 256],
     "actor_hiddens": [256, 256],
 
+    "twin_q": True,
+    "policy_delay": 2,
+    "smooth_target_policy": True,
+    "target_noise": 0.02,
+    "target_noise_clip_relative": 2.5,
+
     # N-step Q learning
-    "n_step": 1,
+    "n_step": 4,
     # Update the target network every `target_network_update_freq` steps.
-    # "target_network_update_freq": 1,
+#    "target_network_update_freq": 0,
 
     "buffer_size": 1000000,
 
@@ -49,7 +55,7 @@ agent_config = {
     # setting applies per-worker if num_workers > 1.
     # "rollout_fragment_length": 1,
     "rollout_fragment_length": 1, # Renamed from sample_batch_size in some Ray version
-    "train_batch_size": 255,
+    "train_batch_size": 256,
     "min_iter_time_s": 0,
     "num_workers": 0,
     "num_gpus": 0,

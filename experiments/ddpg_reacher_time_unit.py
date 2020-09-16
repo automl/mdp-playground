@@ -1,10 +1,10 @@
 '''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 5
+num_seeds = 10
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    'time_unit': [0.2, 0.4, 1.0, 2.0, 4.0], # set values such that frame_skip in Gym HalfCheetah-v3 is integral
+    'time_unit': [0.5, 1.0, 2.5, 5.0, 10.0], # set values such that frame_skip in Gym HalfCheetah-v3 is integral
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -13,8 +13,8 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "HalfCheetahWrapper-v3",
-    "horizon": 1000,
+    "env": "ReacherWrapper-v2",
+    "horizon": 100,
     "env_config": {
     },
 }
@@ -22,11 +22,11 @@ env_config = {
 algorithm = "DDPG"
 agent_config = {
     # Learning rate for the critic (Q-function) optimizer.
-    "critic_lr": 3e-4,
+    "critic_lr": 1e-3,
     # Learning rate for the actor (policy) optimizer.
-    "actor_lr": 3e-4,
+    "actor_lr": 1e-3,
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.005,
+    "tau": 0.002,
     # How many steps of the model to sample before learning starts.
     "learning_starts": 10000,
 
