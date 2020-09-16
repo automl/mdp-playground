@@ -307,11 +307,11 @@ for current_config in cartesian_product_configs:
     if "model" in model_config and model_config["model"]["use_lstm"]:
         model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
 
-    if algorithm == 'DDPG': ###TODO Find a better way to enforce these??
+    if algorithm == 'DDPG': ###TODO Find a better way to enforce these?? Especially problematic for TD3 because then more values for target_noise_clip are witten to CSVs than actually used during HPO but for normal (non-HPO) runs this needs to be not done.
         agent_config["actor_lr"] = agent_config["critic_lr"]
         agent_config["actor_hiddens"] = agent_config["critic_hiddens"]
     elif algorithm == 'TD3':
-        agent_config["target_noise_clip"] = agent_config["target_noise_clip"] * agent_config["target_noise"]
+        agent_config["target_noise_clip"] = agent_config["target_noise_clip_relative"] * agent_config["target_noise"]
 
     # else: #if algorithm == 'SAC':
     if "state_space_type" in env_config:

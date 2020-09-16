@@ -22,29 +22,32 @@ env_config = {
 algorithm = "TD3"
 agent_config = {
     # Learning rate for the critic (Q-function) optimizer.
-    "critic_lr": 3e-4,
+    "critic_lr": 1e-4,
     # Learning rate for the actor (policy) optimizer.
-    "actor_lr": 3e-4,
+    "actor_lr": 1e-4,
     # Update the target by \tau * policy + (1-\tau) * target_policy
-    "tau": 0.005,
+    "tau": 0.02,
     # How many steps of the model to sample before learning starts.
-    "learning_starts": 10000,
+    "learning_starts": 5000,
+
+    "critic_hiddens": [128, 128],
+    "actor_hiddens": [128, 128],
 
     "twin_q": True,
     "policy_delay": 2,
     "smooth_target_policy": True,
-    "target_noise": 0.2,
-    "target_noise_clip": 2.5,
+    "target_noise": 0.02,
+    "target_noise_clip_relative": 1.5,
 
     # N-step Q learning
-    # "n_step": 4,
+    "n_step": 4,
     # Update the target network every `target_network_update_freq` steps.
 #    "target_network_update_freq": 0,
 
     "buffer_size": 1000000,
 
     # If True prioritized replay buffer will be used.
-    # "prioritized_replay": False,
+    "prioritized_replay": False,
 
     # "schedule_max_timesteps": 20000,
     "timesteps_per_iteration": 1000,
