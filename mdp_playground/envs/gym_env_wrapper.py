@@ -1,5 +1,7 @@
 import gym
 import copy
+import numpy as np
+import sys
 from gym.wrappers import AtariPreprocessing
 
 # def get_gym_wrapper(base_class):
@@ -14,18 +16,37 @@ class GymEnvWrapper(gym.Env):
         # self.env = config["env"]
         self.env = env
 
+        seed_int = None
+        if "seed" in config:
+            seed_int = config["seed"]
+
+        self.seed(seed_int)
+        self.env.seed(seed_int) ###IMP Apparently Atari also has a seed. :/ Without this about 1 in 5 times I got reward of 88.0 and 44.0 the remaining times with the same action sequence!! With setting this seed, I got the same reward of 44.0 when I ran about 20 times.
+        obs_space_seed = self.np_random.randint(sys.maxsize) #random
+        act_space_seed = self.np_random.randint(sys.maxsize) #random
+        self.env.observation_space.seed(obs_space_seed)
+        self.env.action_space.seed(act_space_seed)
+
         # if "dummy_eval" in config: #hack
         #     del config["dummy_eval"]
         if "delay" in config:
             assert config["delay"] >= 0
-            self.reward_buffer = [0] * (config["delay"])
+            self.reward_buffer = [0.0] * (config["delay"])
 
         if "transition_noise" in config:
             self.transition_noise = config["transition_noise"]
+            if config["state_space_type"] == "continuous":
+                assert callable(self.transition_noise), "transition_noise must be a function when env is continuous, it was of type:" + str(type(self.transition_noise))
+            else:
+                assert self.transition_noise <= 1.0 and self.transition_noise >= 0.0, "transition_noise must be a value in [0.0, 1.0] when env is discrete, it was:" + str(self.transition_noise)
+        else:
+            self.transition_noise = 0.0
             #next set seeds, assert for correct type of P, R noises
 
         if "reward_noise" in config:
-            self.reward_noise =  config["reward_noise"]
+            self.reward_noise = config["reward_noise"]
+        else:
+            self.reward_noise = lambda a: 0.0
 
         if config["atari_preprocessing"]:
             self.frame_skip = 4 # default for AtariPreprocessing
@@ -33,8 +54,11 @@ class GymEnvWrapper(gym.Env):
                 self.frame_skip = config["frame_skip"]
             if "grayscale_obs" in config:
                 self.grayscale_obs = config["grayscale_obs"]
-            self.env = AtariPreprocessing(self.env, frame_skip=self.frame_skip, grayscale_obs=self.grayscale_obs)
+            else:
+                self.grayscale_obs = False
             # Use AtariPreprocessing with frame_skip
+            self.env = AtariPreprocessing(self.env, frame_skip=self.frame_skip, grayscale_obs=self.grayscale_obs, noop_max=1)
+            print("self.env.noop_max set to: ", self.env.noop_max)
 
         if "irrelevant_dims" in config:
             self.irrelevant_dims =  config["irrelevant_dims"]
@@ -42,6 +66,8 @@ class GymEnvWrapper(gym.Env):
             self.action_space = self.env.action_space
             self.observation_space = self.env.observation_space
 
+
+        self.total_episodes = 0
 
         # if "action_loss_weight" in config: #hack
         #     del config["action_loss_weight"]
@@ -75,15 +101,70 @@ class GymEnvWrapper(gym.Env):
 
     def step(self, action):
         # next_state, reward, done, info = super(GymEnvWrapper, self).step(action)
+        self.total_transitions_episode += 1
+        if self.config["state_space_type"] == "discrete" and self.transition_noise > 0.0:
+            probs = np.ones(shape=(self.action_space.n,)) * self.transition_noise / (self.action_space.n - 1)
+            probs[action] = 1 - self.transition_noise
+            old_action = action
+            action = int(self.np_random.choice(self.action_space.n, size=1, p=probs)) #random
+            if old_action != action:
+                # print("NOISE inserted", old_action, action)
+                self.total_noisy_transitions_episode += 1
+        else: # cont. envs
+            pass ###TODO
+            # self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
+
+
         next_state, reward, done, info = self.env.step(action)
         self.reward_buffer.append(reward)
-        delayed_reward = self.reward_buffer[0]
+        old_reward = reward
+        reward = self.reward_buffer[0]
+        # print("rewards:", self.reward_buffer, old_reward, reward)
         del self.reward_buffer[0]
+
+        noise_in_reward = self.reward_noise(self.np_random) #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
+        self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
+        self.total_reward_episode += reward
+        reward += noise_in_reward
+
         return next_state, reward, done, info
 
     def reset(self):
+        # on episode "end" stuff (to not be invoked when reset() called when self.total_episodes = 0; end is in quotes because it may not be a true episode end reached by reaching a terminal state, but reset() may have been called in the middle of an episode):
+        if not self.total_episodes == 0:
+            print("Noise stats for previous episode num.: " + str(self.total_episodes) + " (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): " + str(self.total_abs_noise_in_reward_episode) + " " + str(self.total_abs_noise_in_transition_episode) + " " + str(self.total_reward_episode) + " " + str(self.total_noisy_transitions_episode) + " " + str(self.total_transitions_episode))
+
+        # on episode start stuff:
+        self.total_episodes += 1
+
+        self.total_abs_noise_in_reward_episode = 0
+        self.total_abs_noise_in_transition_episode = 0 # only present in continuous spaces
+        self.total_noisy_transitions_episode = 0 # only present in discrete spaces
+        self.total_reward_episode = 0
+        self.total_transitions_episode = 0
+
         return self.env.reset()
         # return super(GymEnvWrapper, self).reset()
+
+    def seed(self, seed=None):
+        """Initialises the Numpy RNG for the environment by calling a utility for this in Gym.
+
+        Parameters
+        ----------
+        seed : int
+            seed to initialise the np_random instance held by the environment. Cannot use numpy.int64 or similar because Gym doesn't accept it.
+
+        Returns
+        -------
+        int
+            The seed returned by Gym
+        """
+        # If seed is None, you get a randomly generated seed from gym.utils...
+        self.np_random, self.seed_ = gym.utils.seeding.np_random(seed) #random
+        print("Env SEED set to: " + str(seed) + ". Returned seed from Gym: " + str(self.seed_))
+        return self.seed_
+
+
 
     # return GymEnvWrapper
 
@@ -98,14 +179,24 @@ class GymEnvWrapper(gym.Env):
 # aew = AtariEnvWrapper(**{'game': 'breakout', 'obs_type': 'image', 'frameskip': 4})
 # ob = aew.reset()
 
-# from gym.envs.atari import AtariEnv
 # from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-# ae = AtariEnv(**{'game': 'breakout', 'obs_type': 'image', 'frameskip': 1})
-# aew = GymEnvWrapper(ae, **{'reward_noise': 0.1, 'transition_noise': 0.1, 'delay': 1, 'frame_skip': 4, "atari_preprocessing": True})
+# from gym.envs.atari import AtariEnv
+# ae = AtariEnv(**{'game': 'beam_rider', 'obs_type': 'image', 'frameskip': 1})
+# aew = GymEnvWrapper(ae, **{'reward_noise': lambda a: a.normal(0, 0.1), 'transition_noise': 0.1, 'delay': 1, 'frame_skip': 4, "atari_preprocessing": True, "state_space_type": "discrete", 'seed': 0})
 # ob = aew.reset()
 # print(ob.shape)
 # print(ob)
-# next_state, reward, done, info = aew.step(2)
+# total_reward = 0.0
+# for i in range(200):
+#     act = aew.action_space.sample()
+#     next_state, reward, done, info = aew.step(act)
+#     print(reward, done, act)
+#     # if reward > 10:
+#     #     print("reward in step:", i, reward)
+#     total_reward += reward
+# print("total_reward:", total_reward)
+# aew.reset()
+
 # # AtariPreprocessing()
 # # from ray.tune.registry import register_env
 # # register_env("AtariEnvWrapper", lambda config: AtariEnvWrapper(**config))

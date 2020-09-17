@@ -21,6 +21,9 @@ env_config = {
         "atari_preprocessing": True,
         'frame_skip': 4,
         'grayscale_obs': False,
+        'state_space_type': 'discrete',
+        'action_space_type': 'discrete',
+        'seed': 0,
         # },
         # 'seed': 0, #seed
     },
