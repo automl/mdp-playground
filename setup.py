@@ -18,7 +18,7 @@ extras_require_cont = [
 
 setup(name='mdp_playground',
       version='0.0.1',
-      install_requires=['gym_extensions_for_mdp_playground'],
+      install_requires=['gym'],
       extras_require={
           'extras_disc': extras_require,
           'extras_cont': extras_require_cont,
