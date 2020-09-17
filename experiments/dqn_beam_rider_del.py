@@ -51,21 +51,21 @@ agent_config = { # Taken from Ray tuned_examples
     'train_batch_size': 32,
     "tf_session_args": {
         # note: overriden by `local_tf_session_args`
-        "intra_op_parallelism_threads": 1,
-        "inter_op_parallelism_threads": 1,
+        "intra_op_parallelism_threads": 4,
+        "inter_op_parallelism_threads": 4,
         # "gpu_options": {
         #     "allow_growth": True,
         # },
         # "log_device_placement": False,
         "device_count": {
-            "CPU": 1
+            "CPU": 4
         },
         # "allow_soft_placement": True,  # required by PPO multi-gpu
     },
     # Override the following tf session args on the local worker
     "local_tf_session_args": {
-        "intra_op_parallelism_threads": 1,
-        "inter_op_parallelism_threads": 1,
+        "intra_op_parallelism_threads": 4,
+        "inter_op_parallelism_threads": 4,
     },
 
 }
