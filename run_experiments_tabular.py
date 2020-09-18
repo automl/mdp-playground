@@ -8,10 +8,10 @@ from __future__ import print_function
 
 import numpy as np
 import copy
+from tabular_rl.agents.Q_learning import q_learning
 
 import mdp_playground
 from mdp_playground.envs import RLToyEnv
-
 
 import sys, os
 import argparse
@@ -216,9 +216,8 @@ print("Total number of configs. to run:", len(cartesian_product_configs))
 if args.config_num is None:
     pass
 else:
+    print("Current config to run:", cartesian_product_configs[args.config_num])
     cartesian_product_configs = [cartesian_product_configs[args.config_num]]
-
-
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
@@ -231,47 +230,71 @@ for current_config in cartesian_product_configs:
     env_config = config.env_config
     # sys.exit(0)
 
+    for config_type, config_dict in config.var_configs.items():
+        for key in config_dict:
+        # if config_type == "env_config": # There is a dummy seed in the env_config because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
+            if config_type == "env":
+                if key == 'reward_noise':
+                    reward_noise_ = current_config[list(var_env_configs).index(key)] # this works because env_configs are 1st in the OrderedDict
+                    env_config["env_config"][key] = lambda a: a.normal(0, reward_noise_)
+                    env_config["env_config"]['reward_noise_std'] = reward_noise_ #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above ###TODO Could remove the hack by creating a class for the noises and changing its repr()
+                elif key == 'transition_noise' and env_config["env_config"]["state_space_type"] == "continuous":
+                    transition_noise_ = current_config[list(var_env_configs).index(key)]
+                    env_config["env_config"][key] = lambda a: a.normal(0, transition_noise_)
+                    env_config["env_config"]['transition_noise_std'] = transition_noise_ #hack
+                else:
+                    env_config["env_config"][key] = current_config[list(var_env_configs).index(key)]
+
+            elif config_type == "agent":
+                num_configs_done = len(list(var_env_configs))
+                if algorithm == 'SAC' and key == 'critic_learning_rate': #hack
+                    value = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+                    agent_config['optimization'] = {
+                                                    key: value,
+                                                    'actor_learning_rate': value,
+                                                    'entropy_learning_rate': value,
+                                                    }
+                elif algorithm == 'SAC' and key == 'fcnet_hiddens': #hack
+                    agent_config['Q_model'] = {
+                                                key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
+                                                "fcnet_activation": "relu",
+                                                }
+                    agent_config['policy_model'] = {
+                                                key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
+                                                "fcnet_activation": "relu",
+                                                }
+                else:
+                    agent_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
+
+            elif config_type == "model":
+                num_configs_done = len(list(var_env_configs)) + len(list(var_agent_configs))
+                model_config["model"][key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
 
     if "state_space_type" in env_config:
         if env_config["env_config"]["state_space_type"] == 'continuous':
             env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
 
-
     eval_config = config.eval_config
 
-    extra_config = {
-        "callbacks": {
-#                 "on_episode_start": tune.function(on_episode_start),
-            # "on_episode_step": tune.function(on_episode_step),
-            "on_episode_end": tune.function(on_episode_end),
-#                 "on_sample_end": tune.function(on_sample_end),
-            "on_train_result": tune.function(on_train_result),
-#                 "on_postprocess_traj": tune.function(on_postprocess_traj),
-                },
-        # "log_level": 'WARN',
-    }
+    # all_configs = {**agent_config, **model_config, **env_config, **eval_config} # This works because the dictionaries involved have mutually exclusive sets of keys, otherwise we would need to use a deepmerge!
+    # print("total config:",)
+    # pp.pprint(all_configs)
 
-    # tune_config = reduce(deepmerge, [agent_config, env_config, model_config, eval_config, extra_config])
-    tune_config = {**agent_config, **model_config, **env_config, **eval_config, **extra_config} # This works because the dictionaries involved have mutually exclusive sets of keys, otherwise we would need to use a deepmerge!
-    print("tune_config:",)
-    pp.pprint(tune_config)
+    agent_config["timesteps_total"] = 20000
 
+    eval_horizon = 100
+    env = RLToyEnv(**env_config["env_config"])
 
-    timesteps_total = 20000
-
+    print("Env config:", )
+    pp.pprint(env_config)
 
     print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
 
-    tune.run(
-        algorithm,
-        name=algorithm + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
-        stop={
-            "timesteps_total": timesteps_total,
-              },
-        config=tune_config,
-        checkpoint_at_end=True,
-        #return_trials=True # add trials = tune.run( above
-    )
+    train_data, test_data, num_steps = q_learning(env, **agent_config)
+
+    # todo: return dict
+    # todo: write to csv
+    # todo: space sep., first column: training_iteration, 2nd column: algorithm, ..., n-3: dummy_seed, n-2: timesteps_total, n-1: episode_reward_mean, n:episode_len_mean
 
 end = time.time()
 print("No. of seconds to run:", end - start)

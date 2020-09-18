@@ -14,8 +14,18 @@ var_env_configs = OrderedDict({
 })
 
 
+var_agent_configs = OrderedDict({
+    # learning rate used in TD updates
+    "alpha": [.5, 1e-1, 1e-2],
+    # Epsilon value. Used as start value when decay linear or log. Otherwise constant value.
+    "agent_eps": [1e-1, 2e-2, 2e-3],
+    # Epsilon decay schedule, in (linear, log, const)
+    "agent_eps_decay": ["linear", "log", "const"],
+})
+
 var_configs = OrderedDict({
-"env": var_env_configs
+"env": var_env_configs,
+"agent": var_agent_configs
 })
 
 env_config = {
@@ -52,9 +62,6 @@ episodes = agent_config["episodes"]
 env_max_steps = agent_config["env_max_steps"]
 agent_eps_decay = agent_config["agent_eps_decay"]
 agent_eps = agent_config["agent_eps"]
-timesteps_per_iteration = agent_config["timesteps_per_iteration"]
-agent_config = eval_eps
-
 
 agent_config = {
     #"env_max_steps": env_max_steps,
