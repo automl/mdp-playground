@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import numpy as np
 import copy
+import pandas as pd
 from tabular_rl.agents.Q_learning import q_learning
 
 import mdp_playground
@@ -179,12 +180,19 @@ for current_config in cartesian_product_configs:
     print("Env config:", )
     pp.pprint(env_config)
 
+    columns = ["algorithm", "state_space_dim", "action_space_dim", "delay", "make_denser", "transition_noise", "reward_noise",
+               "target_point", "target_radius", "state_space_max", "action_space_max", "action_loss_weight", "time_unit", "transition_dynamics_order",
+               "dummy_seed", "timesteps_total", "episode_reward_mean", "episode_len_mean"]
+
+    log_df = pd.DataFrame(columns=columns)
+
     print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
 
-    train_data, test_data, num_steps = q_learning(env, **agent_config)
+    train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
 
-    # todo: return dict
-    # todo: write to csv
+    print(timesteps_per_iteration_statistics)
+
+    # construct dataframe from csv_statistics
     # todo: space sep., first column: training_iteration, 2nd column: algorithm, ..., n-3: dummy_seed, n-2: timesteps_total, n-1: episode_reward_mean, n:episode_len_mean
 
 end = time.time()

@@ -52,7 +52,7 @@ episodes = agent_config["episodes"]
 env_max_steps = agent_config["env_max_steps"]
 agent_eps_decay = agent_config["agent_eps_decay"]
 agent_eps = agent_config["agent_eps"]
-timesteps_per_iteration = agent_config["timesteps_per_iteration"]
+#timesteps_per_iteration = agent_config["timesteps_per_iteration"]
 agent_config = eval_eps
 
 
