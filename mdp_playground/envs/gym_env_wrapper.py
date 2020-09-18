@@ -191,8 +191,8 @@ class GymEnvWrapper(gym.Env):
 #     act = aew.action_space.sample()
 #     next_state, reward, done, info = aew.step(act)
 #     print(reward, done, act)
-#     # if reward > 10:
-#     #     print("reward in step:", i, reward)
+#     if reward > 10:
+#         print("reward in step:", i, reward)
 #     total_reward += reward
 # print("total_reward:", total_reward)
 # aew.reset()

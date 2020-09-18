@@ -1,4 +1,4 @@
-num_seeds = 1
+num_seeds = 5
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'delay': [0] + [2**i for i in range(4)],
@@ -61,7 +61,7 @@ agent_config = { # Taken from Ray tuned_examples
         # },
         # "log_device_placement": False,
         "device_count": {
-            "CPU": 4
+            "CPU": 2
         },
         # "allow_soft_placement": True,  # required by PPO multi-gpu
     },
