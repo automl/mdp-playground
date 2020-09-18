@@ -425,6 +425,7 @@ for current_config in cartesian_product_configs:
               },
         config=tune_config,
         checkpoint_at_end=True,
+        local_dir=os.path.abspath(''),
         #return_trials=True # add trials = tune.run( above
     )
 

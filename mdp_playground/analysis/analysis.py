@@ -11,7 +11,7 @@ class MDPP_Analysis():
     def __init__(self):
         pass
 
-    def load_data(self, dir_name, exp_name, num_metrics=3): #, max_total_configs=200):
+    def load_data(self, dir_name, exp_name, num_metrics=3, load_eval=True): #, max_total_configs=200):
         '''Loads training and evaluation data from given file
 
         Parameters
@@ -134,75 +134,78 @@ class MDPP_Analysis():
         print("train_aucs.shape:", train_aucs.shape)
 
 
+        final_eval_metrics_reshaped, mean_data_eval, eval_aucs = None, None, None
         # Load evaluation stats
-        stats_file_eval = stats_file + '_eval.csv'
-        eval_stats = np.loadtxt(stats_file_eval, dtype=float)
-        # print(eval_stats, eval_stats.shape)
+        # load_eval = False #hack ####TODO rectify
+        if load_eval:
+            stats_file_eval = stats_file + '_eval.csv'
+            eval_stats = np.loadtxt(stats_file_eval, dtype=float)
+            # print(eval_stats, eval_stats.shape)
 
-        i = 0
-        hack_indices = []
-        for line in open(stats_file_eval):
+            i = 0
+            hack_indices = []
+            for line in open(stats_file_eval):
 
-            line=line.strip()
-        #    print(line)
-            if line.startswith("#HACK"):
-        #         print(line, i)
-                hack_indices.append(i - len(hack_indices)) # appends index of last eval in this training_iteration
-            i += 1
+                line=line.strip()
+            #    print(line)
+                if line.startswith("#HACK"):
+            #         print(line, i)
+                    hack_indices.append(i - len(hack_indices)) # appends index of last eval in this training_iteration
+                i += 1
 
-        # print(len(hack_indices), hack_indices)
-        if hack_indices[0] == 0: #hack
-            hack_indices = hack_indices[1:] #hardcoded removes the 1st hack_index which is at position 0 so that hack_indices_10 below doesn't begin with a -10; apparently Ray seems to have changed logging for evaluation (using on_episode_end) from 0.7.3 to 0.9.0
-            ray_0_9_0 = True
-        else:
-            ray_0_9_0 = False
-        hack_indices_10 = np.array(hack_indices) - 10
-        # print(hack_indices_10.shape, hack_indices_10)
-        # print(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))
-        # print("Min:", min(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))) # Some problem with Ray? Sometimes no. of eval episodes is less than 10.
-        final_10_evals = []
-        for i in range(len(hack_indices)):
-            final_10_evals.append(eval_stats[hack_indices_10[i]:hack_indices[i]])
-        #     print(final_10_evals[-1])
-        if ray_0_9_0: #hack
-            final_10_evals.append(eval_stats[hack_indices[i]:]) # appends the very last eval which begins at last hack_index for Ray 0.9.0
-
-        final_10_evals = np.array(final_10_evals) # has 2 columns: episode reward and episode length
-        # print(final_10_evals.shape, final_10_evals)
-
-
-        # final_vals = fin[final_rows_for_a_config]
-        # print('final_rows_for_a_config', final_rows_for_a_config)
-        # print("len(final_10_evals)", final_10_evals.shape, type(final_10_evals))
-        mean_data_eval = np.mean(final_10_evals, axis=1) # this is mean over last 10 eval episodes
-#         print(np.array(stats_pd.iloc[:, -3]))
-
-        # Adds timesteps_total column to the eval stats which did not have them:
-        mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -num_metrics])).T, mean_data_eval), axis=1)
-#         print(mean_data_eval.shape, len(final_rows_for_a_config))
-
-
-        final_eval_metrics_ = mean_data_eval[final_rows_for_a_config, :] # 1st column is episode reward, 2nd is episode length in original _eval.csv file, here it's 2nd and 3rd after prepending timesteps_total column above.
-        # print(dims_values, config_counts)
-        final_eval_metrics_reshaped = np.reshape(final_eval_metrics_, config_counts)
-        # print(final_eval_metrics_)
-#         print("eval stats shapes (before and after reshape):", final_eval_metrics_.shape, final_eval_metrics_reshaped.shape)
-        print("eval stats shape:", final_eval_metrics_reshaped.shape)
-
-
-        # Calculate AUC metrics
-        eval_aucs = []
-        for i in range(len(final_rows_for_a_config)):
-            if i == 0:
-                to_avg_ = mean_data_eval[0:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            # print(len(hack_indices), hack_indices)
+            if hack_indices[0] == 0: #hack
+                hack_indices = hack_indices[1:] #hardcoded removes the 1st hack_index which is at position 0 so that hack_indices_10 below doesn't begin with a -10; apparently Ray seems to have changed logging for evaluation (using on_episode_end) from 0.7.3 to 0.9.0
+                ray_0_9_0 = True
             else:
-                to_avg_ = mean_data_eval[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -num_metrics:]
-            auc = np.mean(to_avg_, axis=0)
-            eval_aucs.append(auc)
-            # print(auc)
+                ray_0_9_0 = False
+            hack_indices_10 = np.array(hack_indices) - 10
+            # print(hack_indices_10.shape, hack_indices_10)
+            # print(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))
+            # print("Min:", min(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))) # Some problem with Ray? Sometimes no. of eval episodes is less than 10.
+            final_10_evals = []
+            for i in range(len(hack_indices)):
+                final_10_evals.append(eval_stats[hack_indices_10[i]:hack_indices[i]])
+            #     print(final_10_evals[-1])
+            if ray_0_9_0: #hack
+                final_10_evals.append(eval_stats[hack_indices[i]:]) # appends the very last eval which begins at last hack_index for Ray 0.9.0
 
-        eval_aucs = np.reshape(np.array(eval_aucs), config_counts)
-        print("eval_aucs.shape:", eval_aucs.shape)
+            final_10_evals = np.array(final_10_evals) # has 2 columns: episode reward and episode length
+            # print(final_10_evals.shape, final_10_evals)
+
+
+            # final_vals = fin[final_rows_for_a_config]
+            # print('final_rows_for_a_config', final_rows_for_a_config)
+            # print("len(final_10_evals)", final_10_evals.shape, type(final_10_evals))
+            mean_data_eval = np.mean(final_10_evals, axis=1) # this is mean over last 10 eval episodes
+    #         print(np.array(stats_pd.iloc[:, -3]))
+
+            # Adds timesteps_total column to the eval stats which did not have them:
+            mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -num_metrics])).T, mean_data_eval), axis=1)
+    #         print(mean_data_eval.shape, len(final_rows_for_a_config))
+
+
+            final_eval_metrics_ = mean_data_eval[final_rows_for_a_config, :] # 1st column is episode reward, 2nd is episode length in original _eval.csv file, here it's 2nd and 3rd after prepending timesteps_total column above.
+            # print(dims_values, config_counts)
+            final_eval_metrics_reshaped = np.reshape(final_eval_metrics_, config_counts)
+            # print(final_eval_metrics_)
+    #         print("eval stats shapes (before and after reshape):", final_eval_metrics_.shape, final_eval_metrics_reshaped.shape)
+            print("eval stats shape:", final_eval_metrics_reshaped.shape)
+
+
+            # Calculate AUC metrics
+            eval_aucs = []
+            for i in range(len(final_rows_for_a_config)):
+                if i == 0:
+                    to_avg_ = mean_data_eval[0:self.final_rows_for_a_config[i]+1, -num_metrics:]
+                else:
+                    to_avg_ = mean_data_eval[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -num_metrics:]
+                auc = np.mean(to_avg_, axis=0)
+                eval_aucs.append(auc)
+                # print(auc)
+
+            eval_aucs = np.reshape(np.array(eval_aucs), config_counts)
+            print("eval_aucs.shape:", eval_aucs.shape)
 
 
         self.config_counts = config_counts[:-1] # -1 is added to ignore "no. of stats that were saved" as dimensions of difficulty
