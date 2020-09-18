@@ -1,4 +1,4 @@
-num_seeds = 1
+num_seeds = 5
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'delay': [0] + [2**i for i in range(4)],
@@ -54,8 +54,8 @@ agent_config = { # Taken from Ray tuned_examples
     'train_batch_size': 32,
     "tf_session_args": {
         # note: overriden by `local_tf_session_args`
-        "intra_op_parallelism_threads": 4,
-        "inter_op_parallelism_threads": 4,
+        "intra_op_parallelism_threads": 8,
+        "inter_op_parallelism_threads": 8,
         # "gpu_options": {
         #     "allow_growth": True,
         # },
@@ -67,8 +67,8 @@ agent_config = { # Taken from Ray tuned_examples
     },
     # Override the following tf session args on the local worker
     "local_tf_session_args": {
-        "intra_op_parallelism_threads": 4,
-        "inter_op_parallelism_threads": 4,
+        "intra_op_parallelism_threads": 8,
+        "inter_op_parallelism_threads": 8,
     },
 
 }
