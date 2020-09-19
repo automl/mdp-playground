@@ -16,6 +16,7 @@ from mdp_playground.envs import RLToyEnv
 
 import sys, os
 import argparse
+from collections import OrderedDict
 # import configparser
 
 parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
@@ -180,20 +181,35 @@ for current_config in cartesian_product_configs:
     print("Env config:", )
     pp.pprint(env_config)
 
-    columns = ["algorithm", "state_space_dim", "action_space_dim", "delay", "make_denser", "transition_noise", "reward_noise",
-               "target_point", "target_radius", "state_space_max", "action_space_max", "action_loss_weight", "time_unit", "transition_dynamics_order",
-               "dummy_seed", "timesteps_total", "episode_reward_mean", "episode_len_mean"]
-
-    log_df = pd.DataFrame(columns=columns)
-
     print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
 
     train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
 
-    print(timesteps_per_iteration_statistics)
+    keys_to_exclude = ["reward_noise", "timesteps_total"] # reward noise = lambda function, timesteps_total = already in last_keys
 
-    # construct dataframe from csv_statistics
-    # todo: space sep., first column: training_iteration, 2nd column: algorithm, ..., n-3: dummy_seed, n-2: timesteps_total, n-1: episode_reward_mean, n:episode_len_mean
+    # keys missing from exmaple:
+    # "target_radius", "state_space_max", "action_space_max", "action_loss_weight", "time_unit", "transition_dynamics_order", "target_point"
+
+    first_key = {"training_iteration": [], "algorithm": []}
+    env_config_dct = {key: [value]*len(timesteps_per_iteration_statistics) for key, value in {**env_config["env_config"], **agent_config}.items() if key not in keys_to_exclude}
+    last_keys = {"timesteps_total": [], "episode_reward_mean": [], "episode_len_mean": []}
+
+    middle_keys = {}
+
+    for i, stat in enumerate(timesteps_per_iteration_statistics, 1):
+        first_key["training_iteration"].append(i)
+        first_key["algorithm"].append(algorithm)
+
+        last_keys["timesteps_total"].append(stat[0])
+        last_keys["episode_reward_mean"].append(stat[1])
+        last_keys["episode_len_mean"].append(stat[2])
+
+
+    data = OrderedDict(**first_key, **env_config_dct, **last_keys)
+
+    log_df = pd.DataFrame(data)
+
+    log_df.to_csv(algorithm+".csv", mode="a", sep=" ", index=False)
 
 end = time.time()
 print("No. of seconds to run:", end - start)

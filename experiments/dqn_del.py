@@ -68,7 +68,7 @@ agent_config = {
     #"timesteps_per_iteration": timesteps_per_iteration, #todo: perhaps pass this later as an argument to the agent
 }
 
-algorithm = "Tabular Q-Learning"
+algorithm = "q_learn_tabular"
 # agent_config = {
 #     "adam_epsilon": 1e-4,
 #     "beta_annealing_fraction": 1.0,
