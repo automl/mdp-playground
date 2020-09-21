@@ -50,6 +50,7 @@ agent_config = { # Taken from Ray tuned_examples
     'noisy': True,
     'num_atoms': 51,
     'num_gpus': 0,
+    # "num_cpus_for_driver": 2,
     # 'gpu': False, #deprecated
     'prioritized_replay': True,
     'prioritized_replay_alpha': 0.5,
@@ -59,25 +60,26 @@ agent_config = { # Taken from Ray tuned_examples
     'target_network_update_freq': 8000,
     # 'target_network_update_freq': 500,
     'train_batch_size': 32,
-    "tf_session_args": {
-    # note: overriden by `local_tf_session_args`
-    "intra_op_parallelism_threads": 4,
-    "inter_op_parallelism_threads": 4,
-    # "gpu_options": {
-    #     "allow_growth": True,
+    # "tf_session_args": {
+    #     # note: overriden by `local_tf_session_args`
+    #     "intra_op_parallelism_threads": 4,
+    #     "inter_op_parallelism_threads": 4,
+    #     # "gpu_options": {
+    #     #     "allow_growth": True,
+    #     # },
+    #     # "log_device_placement": False,
+    #     "device_count": {
+    #         "CPU": 2,
+    #         # "GPU": 0,
+    #     },
+    #     # "allow_soft_placement": True,  # required by PPO multi-gpu
     # },
-    # "log_device_placement": False,
-    "device_count": {
-        "CPU": 2,
-        # "GPU": 0,
-    },
-    # "allow_soft_placement": True,  # required by PPO multi-gpu
-    },
-# Override the following tf session args on the local worker
-"local_tf_session_args": {
-    "intra_op_parallelism_threads": 4,
-    "inter_op_parallelism_threads": 4,
-    },
+    # # Override the following tf session args on the local worker
+    # "local_tf_session_args": {
+    #     "intra_op_parallelism_threads": 4,
+    #     "inter_op_parallelism_threads": 4,
+    # },
+
 }
 
 
@@ -94,7 +96,7 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": 5, # I think this means every x training_iterations
+    "evaluation_interval": None, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
