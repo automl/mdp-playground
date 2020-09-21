@@ -185,25 +185,25 @@ for current_config in cartesian_product_configs:
 
     train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
 
-    keys_to_exclude = ["reward_noise", "timesteps_total"] # reward noise = lambda function, timesteps_total = already in last_keys
+    keys_to_exclude = ["reward_noise", "dummy_seed", "timesteps_total"]  # reward noise = lambda function, timesteps_total = already in last_keys
 
     # keys missing from exmaple:
     # "target_radius", "state_space_max", "action_space_max", "action_loss_weight", "time_unit", "transition_dynamics_order", "target_point"
 
-    first_key = {"training_iteration": [], "algorithm": []}
-    env_config_dct = {key: [value]*len(timesteps_per_iteration_statistics) for key, value in {**env_config["env_config"], **agent_config}.items() if key not in keys_to_exclude}
-    last_keys = {"timesteps_total": [], "episode_reward_mean": [], "episode_len_mean": []}
+    first_key = {"#training_iteration,": [], "algorithm,": []}
+    env_config_dct = {key + ",": [value]*len(timesteps_per_iteration_statistics) for key, value in {**env_config["env_config"], **agent_config}.items() if key not in keys_to_exclude}
+    last_keys = {"dummy_seed,": [], "timesteps_total,": [], "episode_reward_mean,": [], "episode_len_mean": []}
 
     middle_keys = {}
 
     for i, stat in enumerate(timesteps_per_iteration_statistics, 1):
-        first_key["training_iteration"].append(i)
-        first_key["algorithm"].append(algorithm)
+        first_key["#training_iteration,"].append(i)
+        first_key["algorithm,"].append(algorithm)
 
-        last_keys["timesteps_total"].append(stat[0])
-        last_keys["episode_reward_mean"].append(stat[1])
+        last_keys["dummy_seed,"].append(env_config["env_config"]["dummy_seed"])
+        last_keys["timesteps_total,"].append(stat[0])
+        last_keys["episode_reward_mean,"].append(stat[1])
         last_keys["episode_len_mean"].append(stat[2])
-
 
     data = OrderedDict(**first_key, **env_config_dct, **last_keys)
 
