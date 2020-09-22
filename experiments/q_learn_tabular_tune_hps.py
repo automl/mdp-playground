@@ -16,11 +16,11 @@ var_env_configs = OrderedDict({
 
 var_agent_configs = OrderedDict({
     # learning rate used in TD updates
-    "alpha": [.1, .3, .5],
+    "alpha": [.1],#, .3, .5],
     # agent epsilon value. Used as start value when decay linear or log. Otherwise constant value.
-    "epsilon": [1e-1, 2e-2, 2e-3],
+    "epsilon": [1e-1],#, 2e-2, 2e-3],
     # agent epsilon decay schedule, in (linear, log, const)
-    "epsilon_decay": ["linear", "log", "const"],
+    "epsilon_decay": ["linear"]#, "log", "const"],
 })
 
 var_configs = OrderedDict({
@@ -75,7 +75,7 @@ agent_config = {
     #"timesteps_per_iteration": timesteps_per_iteration, #todo: perhaps pass this later as an argument to the agent
 }
 
-algorithm = "q_learn_tabular_del"
+algorithm = "q_learn_tabular_tune_hps"
 # agent_config = {
 #     "adam_epsilon": 1e-4,
 #     "beta_annealing_fraction": 1.0,
