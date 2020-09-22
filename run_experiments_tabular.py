@@ -16,6 +16,9 @@ from mdp_playground.envs import RLToyEnv
 
 import sys, os
 import argparse
+from pathlib import Path
+from datetime import datetime
+
 from collections import OrderedDict
 # import configparser
 
@@ -115,6 +118,13 @@ else:
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
+time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+dir_name = time + "_" + "q_learn_tabular" + "_" + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num)
+
+path = Path("experiments") / dir_name
+if not os.path.exists(path):
+    os.makedirs(path)
+
 for current_config in cartesian_product_configs:
     algorithm = config.algorithm
 
@@ -174,8 +184,7 @@ for current_config in cartesian_product_configs:
     # pp.pprint(all_configs)
 
     agent_config["timesteps_total"] = 20000
-
-    eval_horizon = 100
+    agent_config["horizon"] = 100
     env = RLToyEnv(**env_config["env_config"])
 
     print("Env config:", )
@@ -187,14 +196,12 @@ for current_config in cartesian_product_configs:
 
     keys_to_exclude = ["reward_noise", "dummy_seed", "timesteps_total"]  # reward noise = lambda function, timesteps_total = already in last_keys
 
-    # keys missing from exmaple:
+    # keys missing from example:
     # "target_radius", "state_space_max", "action_space_max", "action_loss_weight", "time_unit", "transition_dynamics_order", "target_point"
 
     first_key = {"#training_iteration,": [], "algorithm,": []}
     env_config_dct = {key + ",": [value]*len(timesteps_per_iteration_statistics) for key, value in {**env_config["env_config"], **agent_config}.items() if key not in keys_to_exclude}
     last_keys = {"dummy_seed,": [], "timesteps_total,": [], "episode_reward_mean,": [], "episode_len_mean": []}
-
-    middle_keys = {}
 
     for i, stat in enumerate(timesteps_per_iteration_statistics, 1):
         first_key["#training_iteration,"].append(i)
@@ -208,8 +215,7 @@ for current_config in cartesian_product_configs:
     data = OrderedDict(**first_key, **env_config_dct, **last_keys)
 
     log_df = pd.DataFrame(data)
-
-    log_df.to_csv(algorithm+".csv", mode="a", sep=" ", index=False)
+    log_df.to_csv((path / algorithm).with_suffix(".csv"), mode="a", sep=" ", index=False)
 
 end = time.time()
 print("No. of seconds to run:", end - start)
