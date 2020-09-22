@@ -178,7 +178,7 @@ for current_config in cartesian_product_configs:
         if env_config["env_config"]["state_space_type"] == 'continuous':
             env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
 
-    eval_config = config.eval_config
+    #eval_config = config.eval_config
 
     # all_configs = {**agent_config, **model_config, **env_config, **eval_config} # This works because the dictionaries involved have mutually exclusive sets of keys, otherwise we would need to use a deepmerge!
     # print("total config:",)
@@ -195,24 +195,30 @@ for current_config in cartesian_product_configs:
 
     train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
 
-    keys_to_exclude = ["reward_noise", "dummy_seed", "timesteps_total"]  # reward noise = lambda function, timesteps_total = already in last_keys
-
-    # keys missing from example:
-    # "target_radius", "state_space_max", "action_space_max", "action_loss_weight", "time_unit", "transition_dynamics_order", "target_point"
+    keys_to_exclude_from_middle_dict = ["reward_noise"]
 
     first_key = {"#training_iteration,": [], "algorithm,": []}
-    env_config_dct = {key + ",": [value]*len(timesteps_per_iteration_statistics) for key, value in {**env_config["env_config"], **agent_config}.items() if key not in keys_to_exclude}
-    last_keys = {"dummy_seed,": [], "timesteps_total,": [], "episode_reward_mean,": [], "episode_len_mean": []}
+
+    env_config_dct = {}
+    for key, value in {**config.var_configs["env"], **config.var_configs["agent"]}.items():
+        if key not in keys_to_exclude_from_middle_dict:
+            if key == "dummy_seed" and isinstance(value, list):
+                env_config_dct[key + ","] = env_config["env_config"]["dummy_seed"] * len(timesteps_per_iteration_statistics)
+            else:
+                env_config_dct[key + ","] = value * len(timesteps_per_iteration_statistics)
+
+    last_keys = {"timesteps_total,": [], "episode_reward_mean,": [], "episode_len_mean": []}
 
     for i, stat in enumerate(timesteps_per_iteration_statistics, 1):
         first_key["#training_iteration,"].append(i)
         first_key["algorithm,"].append(algorithm)
 
-        last_keys["dummy_seed,"].append(env_config["env_config"]["dummy_seed"])
         last_keys["timesteps_total,"].append(stat[0])
         last_keys["episode_reward_mean,"].append(stat[1])
         last_keys["episode_len_mean"].append(stat[2])
 
+
+# transition_noise, dummy_seed, alpha, epsilon, epsilon_decay, timesteps_total,
     data = OrderedDict(**first_key, **env_config_dct, **last_keys)
 
     log_df = pd.DataFrame(data)
