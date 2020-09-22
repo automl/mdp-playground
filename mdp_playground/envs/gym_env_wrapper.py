@@ -116,11 +116,14 @@ class GymEnvWrapper(gym.Env):
 
 
         next_state, reward, done, info = self.env.step(action)
-        self.reward_buffer.append(reward)
-        old_reward = reward
-        reward = self.reward_buffer[0]
-        # print("rewards:", self.reward_buffer, old_reward, reward)
-        del self.reward_buffer[0]
+        if done:
+            reward = np.sum(self.reward_buffer) # if episode is finished return the rewards that were delayed and not handed out before ##TODO add test case for this
+        else:
+            self.reward_buffer.append(reward)
+            old_reward = reward
+            reward = self.reward_buffer[0]
+            # print("rewards:", self.reward_buffer, old_reward, reward)
+            del self.reward_buffer[0]
 
         noise_in_reward = self.reward_noise(self.np_random) #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
@@ -135,6 +138,8 @@ class GymEnvWrapper(gym.Env):
             print("Noise stats for previous episode num.: " + str(self.total_episodes) + " (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): " + str(self.total_abs_noise_in_reward_episode) + " " + str(self.total_abs_noise_in_transition_episode) + " " + str(self.total_reward_episode) + " " + str(self.total_noisy_transitions_episode) + " " + str(self.total_transitions_episode))
 
         # on episode start stuff:
+        self.reward_buffer = [0.0] * (self.config["delay"])
+
         self.total_episodes += 1
 
         self.total_abs_noise_in_reward_episode = 0
