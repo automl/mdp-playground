@@ -30,8 +30,11 @@ class GymEnvWrapper(gym.Env):
         # if "dummy_eval" in config: #hack
         #     del config["dummy_eval"]
         if "delay" in config:
+            self.delay = config["delay"]
             assert config["delay"] >= 0
-            self.reward_buffer = [0.0] * (config["delay"])
+            self.reward_buffer = [0.0] * (self.delay)
+        else:
+            self.delay = 0
 
         if "transition_noise" in config:
             self.transition_noise = config["transition_noise"]
@@ -138,7 +141,7 @@ class GymEnvWrapper(gym.Env):
             print("Noise stats for previous episode num.: " + str(self.total_episodes) + " (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): " + str(self.total_abs_noise_in_reward_episode) + " " + str(self.total_abs_noise_in_transition_episode) + " " + str(self.total_reward_episode) + " " + str(self.total_noisy_transitions_episode) + " " + str(self.total_transitions_episode))
 
         # on episode start stuff:
-        self.reward_buffer = [0.0] * (self.config["delay"])
+        self.reward_buffer = [0.0] * (self.delay)
 
         self.total_episodes += 1
 
