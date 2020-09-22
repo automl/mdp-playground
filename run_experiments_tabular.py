@@ -118,12 +118,13 @@ else:
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-dir_name = time + "_" + "q_learn_tabular" + "_" + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num)
-
-path = Path("experiments") / dir_name
-if not os.path.exists(path):
-    os.makedirs(path)
+# time = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+#dir_name = time + "_" + "q_learn_tabular_del" + "_" + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num)
+# dir_name =
+#
+# path = Path("experiments") / dir_name
+# if not os.path.exists(path):
+#     os.makedirs(path)
 
 for current_config in cartesian_product_configs:
     algorithm = config.algorithm
@@ -215,7 +216,7 @@ for current_config in cartesian_product_configs:
     data = OrderedDict(**first_key, **env_config_dct, **last_keys)
 
     log_df = pd.DataFrame(data)
-    log_df.to_csv((path / algorithm).with_suffix(".csv"), mode="a", sep=" ", index=False)
+    log_df.to_csv(algorithm + ".csv", mode="a", sep=" ", index=False)
 
 end = time.time()
 print("No. of seconds to run:", end - start)
