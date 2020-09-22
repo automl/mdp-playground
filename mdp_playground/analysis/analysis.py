@@ -350,12 +350,12 @@ class MDPP_Analysis():
             stats_data[group_key][sub_group_key]['axis_labels'] = exp_data[groupby]
             stats_data[group_key][sub_group_key]['metric_names'] = exp_data['metric_names']
             stats_data[group_key][sub_group_key]['stats_file'] = exp_data['stats_file']
-
+        
         #plot
-        color = ['blue', 'orange', 'green', 'purple', 'cyan', 'olive', 'brown', 'grey', 'red', 'pink']
         for group_key in stats_data.keys():
-            rows = math.ceil((len(stats_data[group_key].keys())/2))
-            cols = min(2, len(stats_data[group_key].keys())//2 +1)
+            cols_per_row = 4
+            rows = math.ceil((len(stats_data[group_key].keys())/cols_per_row))
+            cols = cols_per_row#min(cols_per_row, len(stats_data[group_key].keys())//cols_per_row + cols_per_row - 1)
             
             plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
             plt.rcParams['figure.figsize'] = [7 * cols, 5 * rows]
@@ -367,28 +367,36 @@ class MDPP_Analysis():
             for sub_group_key in stats_data[group_key].keys():
                 if cols == 1 and rows == 1:
                     #single row, single column plot
-                    self.plot_bar(axes, stats_data[group_key][sub_group_key], save_fig, metric_num, color[color_idx])
+                    self.plot_bar(axes, stats_data[group_key][sub_group_key], save_fig, metric_num, color_idx)
                 elif rows ==1 :
                     #single row, multiple column plot
-                    self.plot_bar(axes[j], stats_data[group_key][sub_group_key], save_fig, metric_num, color[color_idx])
+                    self.plot_bar(axes[j], stats_data[group_key][sub_group_key], save_fig, metric_num, color_idx)
                     j +=1
                 else :
                     #multiple row, multiple column plot
-                    self.plot_bar(axes[i, j], stats_data[group_key][sub_group_key], save_fig, metric_num, color[color_idx])
-                    if j == 1:
-                        #swith to next row 1st column
+                    self.plot_bar(axes[i, j], stats_data[group_key][sub_group_key], save_fig, metric_num, color_idx)
+                    if j == cols-1:
+                        #switch to next row 1st column
                         j = 0
                         i += 1
                     else:
-                        #swith to same row 2nd column
-                        j = 1
+                        #switch to same row next column
+                        j += 1
                 color_idx += 1
-            if rows > 1 and j == 1:
-                # hide the blank plot
-                axes[i, j].set_visible(False)
+            
+            # hide the blank plot (if any)
+            if j > 0 and j <= cols-1:
+                while j <= cols-1:
+                    if i == 0:
+                        #axes[j].set_visible(False)
+                        axes[j].axis('off')
+                    else:
+                        #axes[i, j].set_visible(False)
+                        axes[i, j].axis('off')
+                    j += 1              
             
             figure.tight_layout(pad=3.0)
-            figure.suptitle(group_key, fontsize=18, fontweight='bold')
+            figure.suptitle(group_key, x=0.2, y=1, fontsize=24, fontweight='bold')
             
             # save figure
             if save_fig:
@@ -400,7 +408,7 @@ class MDPP_Analysis():
             
             plt.show()
         
-    def plot_bar(self, ax, stats_data, save_fig=False, metric_num=-2, bar_color='b'):
+    def plot_bar(self, ax, stats_data, save_fig=False, metric_num=-2, color_idx=1):
         '''Plots 1-D bar plots across a single dimension with mean and std. dev.
 
         Parameters
@@ -413,7 +421,7 @@ class MDPP_Analysis():
         metric_num :
             allowed values-> '-1' to plot episode mean lengths
                              '-2' to plot episode reward
-        bar_color : string used to define the bar color in plots
+        color_idx : index used to define the bar color in plots
         '''
 
         y_axis_label = 'Reward' if 'reward' in stats_data['metric_names'][metric_num] else stats_data['metric_names'][metric_num]
@@ -425,9 +433,10 @@ class MDPP_Analysis():
         axis_labels =  stats_data['axis_labels']
         stats_file = stats_data['stats_file']
 
-        width = 0.5
         x = np.arange(len(tick_labels))
-
+        width = width=(x[1]-x[0])*0.8 # bar width
+        color = ['blue', 'orange', 'green', 'purple', 'cyan', 'olive', 'brown', 'grey', 'red', 'pink']
+        bar_color = color[color_idx]
 #<TODO>        
 #         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
 #             plt.bar(self.tick_labels[0], to_plot_[:, 0], yerr=to_plot_std_[:, 0])
@@ -463,7 +472,11 @@ class MDPP_Analysis():
         train : bool, optional
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
         '''
-        exp_data = list_exp_data[0] # <TODO> make changes to handle multiple experiements plot
+        # HACK
+        if len(list_exp_data) > 0:
+            exp_data = list_exp_data[0] # <TODO> make changes to handle multiple experiements plot
+        else:
+            return
         
         
         plt.rcParams.update({'font.size': 18}) # default 12, 24 for paper, for poster: 30
@@ -537,7 +550,11 @@ class MDPP_Analysis():
         train : bool, optional
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
         '''
-        exp_data = list_exp_data[0] # <TODO> make changes to handle multiple experiements plot
+        # HACK
+        if len(list_exp_data) > 0:
+            exp_data = list_exp_data[0] # <TODO> make changes to handle multiple experiements plot
+        else:
+            return
         
         
         stats_file = exp_data['stats_file']
