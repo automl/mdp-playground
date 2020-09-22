@@ -353,9 +353,8 @@ class MDPP_Analysis():
         
         #plot
         for group_key in stats_data.keys():
-            cols_per_row = 4
-            rows = math.ceil((len(stats_data[group_key].keys())/cols_per_row))
-            cols = cols_per_row#min(cols_per_row, len(stats_data[group_key].keys())//cols_per_row + cols_per_row - 1)
+            cols = 4 # hard-coded value
+            rows = math.ceil((len(stats_data[group_key].keys())/cols)) # dynamically compute
             
             plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
             plt.rcParams['figure.figsize'] = [7 * cols, 5 * rows]
