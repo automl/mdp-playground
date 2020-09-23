@@ -45,6 +45,7 @@ agent_config = { # Taken from Ray tuned_examples
     'noisy': False,
     'num_atoms': 1,
     'num_gpus': 0,
+    # 'num_workers': 1,
     'prioritized_replay': False,
     'prioritized_replay_alpha': 0.5,
     'prioritized_replay_beta_annealing_timesteps': 2000000,
