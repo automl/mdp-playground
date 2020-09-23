@@ -1,7 +1,7 @@
-num_seeds = 5
+num_seeds = 10
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    'delay': [0] + [2**i for i in range(4)],
+    'transition_noise': [0, 0.01, 0.02, 0.10, 0.25],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -13,7 +13,7 @@ env_config = {
     "env": "GymEnvWrapper-v0",
     "env_config": {
         "AtariEnv": {
-            "game": 'beam_rider', #"breakout",
+            "game": 'qbert',
             'obs_type': 'image',
             'frameskip': 1,
         },
@@ -87,13 +87,13 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": None, # I think this means every x training_iterations
+    "evaluation_interval": 10, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
         "exploration_final_eps": 0,
         "evaluation_num_episodes": 10,
-        "horizon": 100,
+        # "horizon": 100,
         "env_config": {
             "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
             'transition_noise': 0 if "state_space_type" in env_config["env_config"] and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),

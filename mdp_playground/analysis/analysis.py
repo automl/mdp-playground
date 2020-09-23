@@ -20,6 +20,10 @@ class MDPP_Analysis():
             The location where the training and evaluation CSV files were written
         exp_name : str
             The name of the experiment: the training and evaluation CSV filenames are formed using this string
+        num_metrics : int
+            The number of metrics that were written to CSV stats files. Default is 3 (timesteps_total, episode_reward_mean, episode_len_mean).
+        load_eval : bool
+            Whether to load evaluation stats CSV or not.
 
         Returns
         -------
@@ -37,9 +41,9 @@ class MDPP_Analysis():
         self.stats_file = stats_file
 
         if os.path.isfile(stats_file + '.csv'):
-            print("Loading data from a sequential run/already combined runs of experiment configurations.")
+            print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations.\033[0;0m")
         else:
-            print("Loading data from a distributed run of experiment configurations. Creating a combined CSV stats file.")
+            print("\033[1;31mLoading data from a distributed run of experiment configurations. Creating a combined CSV stats file.\033[0;0m")
             def join_files(file_prefix, file_suffix):
                 '''Utility to join files that were written with different experiment configs'''
                 with open(file_prefix + file_suffix, 'ab') as combined_file:
@@ -153,14 +157,14 @@ class MDPP_Analysis():
                     hack_indices.append(i - len(hack_indices)) # appends index of last eval in this training_iteration
                 i += 1
 
-            # print(len(hack_indices), hack_indices)
+            # print("len(hack_indices), hack_indices[:5] and [:-5]:", len(hack_indices), hack_indices[:5], hack_indices[-5:])
             if hack_indices[0] == 0: #hack
                 hack_indices = hack_indices[1:] #hardcoded removes the 1st hack_index which is at position 0 so that hack_indices_10 below doesn't begin with a -10; apparently Ray seems to have changed logging for evaluation (using on_episode_end) from 0.7.3 to 0.9.0
                 ray_0_9_0 = True
             else:
                 ray_0_9_0 = False
             hack_indices_10 = np.array(hack_indices) - 10
-            # print(hack_indices_10.shape, hack_indices_10)
+            # print(hack_indices_10.shape, hack_indices_10[:5], hack_indices_10[-5:])
             # print(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))
             # print("Min:", min(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))) # Some problem with Ray? Sometimes no. of eval episodes is less than 10.
             final_10_evals = []
@@ -236,6 +240,10 @@ class MDPP_Analysis():
                             # abridged_str[j] = abridged_str[j][:2]
                         x_tick_labels_[-1][j] = ''.join(abridged_str)
                 dims_varied.append(i)
+
+        if x_tick_labels_ == []:
+            warnings.warn("No varying dims were found!")
+            x_tick_labels_.append('single_config')
 
         self.axis_labels = x_axis_labels
         self.tick_labels = x_tick_labels_

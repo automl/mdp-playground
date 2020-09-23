@@ -87,7 +87,7 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": 5, # I think this means every x training_iterations
+    "evaluation_interval": None, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
