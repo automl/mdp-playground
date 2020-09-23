@@ -1,6 +1,6 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-49 # specifies array job indices
+#MOAB -t 0-16 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
 #MOAB -l walltime=0:96:00:00
 #MOAB -l pmem=32GB # Seems like it is memory per CPU core
