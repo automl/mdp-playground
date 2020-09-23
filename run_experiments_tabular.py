@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import numpy as np
 import copy
+import random
 import pandas as pd
 from tabular_rl.agents.Q_learning import q_learning
 
@@ -193,25 +194,40 @@ for current_config in cartesian_product_configs:
 
     print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
 
+    if isinstance(var_agent_configs, OrderedDict):
+        all_variable_configs_dct = OrderedDict({**var_env_configs, **var_agent_configs})
+    else:
+        all_variable_configs_dct = OrderedDict(var_env_configs)
+
+    # order of variable configs and value_tuples need to match here
+    location_dummy_seed = list(all_variable_configs_dct.keys()).index("dummy_seed")
+    if location_dummy_seed is None:
+        raise ValueError("dummy seed needs to be set")
+
+    print("setting the seed to {}".format(current_config[location_dummy_seed]))
+    np.random.seed(current_config[location_dummy_seed])
+    random.seed(current_config[location_dummy_seed])
+
     train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
 
-    keys_to_exclude_from_middle_dict = ["reward_noise"]
+    first_keys = {"#training_iteration,": [], "algorithm,": []}
 
-    first_key = {"#training_iteration,": [], "algorithm,": []}
-
-    env_config_dct = {}
-    for key, value in {**config.var_configs["env"], **config.var_configs["agent"]}.items():
-        if key not in keys_to_exclude_from_middle_dict:
-            if key == "dummy_seed" and isinstance(value, list):
-                env_config_dct[key + ","] = env_config["env_config"]["dummy_seed"] * len(timesteps_per_iteration_statistics)
-            else:
-                env_config_dct[key + ","] = value * len(timesteps_per_iteration_statistics)
+    #keys_to_exclude_from_middle_dict = ["reward_noise"]
+    middle_keys = {}
+    # order of variable configs and value_tuples need to match here also
+    assert len(all_variable_configs_dct) == len(current_config)
+    for i, kv in enumerate(all_variable_configs_dct.items()):
+        key, value = kv
+        if len(value) > 1:
+            middle_keys[key + ","] = [current_config[i]] * len(timesteps_per_iteration_statistics)
+        else:
+            middle_keys[key + ","] = value * len(timesteps_per_iteration_statistics)
 
     last_keys = {"timesteps_total,": [], "episode_reward_mean,": [], "episode_len_mean": []}
 
     for i, stat in enumerate(timesteps_per_iteration_statistics, 1):
-        first_key["#training_iteration,"].append(i)
-        first_key["algorithm,"].append(algorithm)
+        first_keys["#training_iteration,"].append(i)
+        first_keys["algorithm,"].append(algorithm)
 
         last_keys["timesteps_total,"].append(stat[0])
         last_keys["episode_reward_mean,"].append(stat[1])
@@ -219,7 +235,7 @@ for current_config in cartesian_product_configs:
 
 
 # transition_noise, dummy_seed, alpha, epsilon, epsilon_decay, timesteps_total,
-    data = OrderedDict(**first_key, **env_config_dct, **last_keys)
+    data = OrderedDict(**first_keys, **middle_keys, **last_keys)
 
     log_df = pd.DataFrame(data)
     log_df.to_csv(algorithm + ".csv", mode="a", sep=" ", index=False)
