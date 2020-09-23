@@ -93,7 +93,7 @@ eval_config = {
         "exploration_fraction": 0,
         "exploration_final_eps": 0,
         "evaluation_num_episodes": 10,
-        "horizon": 100,
+        # "horizon": 100,
         "env_config": {
             "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
             'transition_noise': 0 if "state_space_type" in env_config["env_config"] and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
