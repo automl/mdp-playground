@@ -401,7 +401,7 @@ for current_config in cartesian_product_configs:
 
     elif env_config["env"] in ["GymEnvWrapper-v0"]: #hack
         if "AtariEnv" in env_config["env_config"]:
-            timesteps_total = 1_000_000
+            timesteps_total = 3_000_000
 
     else:
         if algorithm == 'DQN':
