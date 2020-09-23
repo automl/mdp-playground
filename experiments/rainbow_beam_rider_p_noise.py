@@ -1,4 +1,4 @@
-num_seeds = 5
+num_seeds = 10
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'transition_noise': [0, 0.01, 0.02, 0.10, 0.25],
