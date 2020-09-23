@@ -13,7 +13,7 @@ env_config = {
     "env": "GymEnvWrapper-v0",
     "env_config": {
         "AtariEnv": {
-            "game": 'beam_rider', #"breakout",
+            "game": "breakout",
             'obs_type': 'image',
             'frameskip': 1,
         },
