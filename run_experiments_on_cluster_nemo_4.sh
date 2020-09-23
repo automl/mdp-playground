@@ -1,6 +1,6 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-16 # specifies array job indices
+#MOAB -t 0-49 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
 #MOAB -l walltime=0:96:00:00
 #MOAB -l pmem=32GB # Seems like it is memory per CPU core
@@ -22,7 +22,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='dqn_space_invaders_p_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='rainbow_space_invaders_p_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT

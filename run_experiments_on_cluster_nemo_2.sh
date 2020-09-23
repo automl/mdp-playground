@@ -22,7 +22,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='dqn_breakout_p_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='rainbow_breakout_p_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT

@@ -1,8 +1,8 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 10 # specifies array job indices
+#MOAB -t 0-49 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
-#MOAB -l walltime=0:02:00:00
+#MOAB -l walltime=0:96:00:00
 #MOAB -l pmem=32GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 ##MOAB -V # export env. variables from launch env. I think
