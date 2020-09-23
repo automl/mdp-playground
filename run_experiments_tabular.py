@@ -11,6 +11,7 @@ import copy
 import random
 import pandas as pd
 from tabular_rl.agents.Q_learning import q_learning
+from tabular_rl.agents.Sarsa import sarsa
 
 import mdp_playground
 from mdp_playground.envs import RLToyEnv
@@ -208,7 +209,9 @@ for current_config in cartesian_product_configs:
     np.random.seed(current_config[location_dummy_seed])
     random.seed(current_config[location_dummy_seed])
 
-    train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
+
+    #train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
+    train_data, test_data, num_steps, timesteps_per_iteration_statistics = sarsa(env, **agent_config)
 
     first_keys = {"#training_iteration,": [], "algorithm,": []}
 
