@@ -1,9 +1,9 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-2 # specifies array job indices
+#MOAB -t 0-24 # specifies array job indices
 #MOAB -l nodes=1:ppn=4
-#MOAB -l walltime=0:13:00:00
-#MOAB -l pmem=16GB # Seems like it is memory per CPU core
+#MOAB -l walltime=0:08:00:00
+#MOAB -l pmem=1GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 ##MOAB -V # export env. variables from launch env. I think
 ##MOAB -o output_filename
@@ -22,7 +22,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='rainbow_beam_rider_del_ablate_double' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='a3c_beam_rider_p_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
@@ -74,7 +74,7 @@ mkdir -p mdpp_${JOB_ID}
 cd mdpp_${JOB_ID}
 # cd /home/rajanr/mdpp
 echo ${MOAB_JOBID} ${MOAB_JOBARRAYINDEX} ${MOAB_JOBNAME}
-\time -v /home/fr/fr_fr/fr_rr1034/anaconda3/envs/py36_toy_rl/bin/python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX}
+\time -v /home/fr/fr_fr/fr_rr1034/anaconda3/envs/py36_toy_rl/bin/python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments_temp.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX}
 
 #python output_argv_1.py
 #\time -v rllib train --env=BreakoutDeterministic-v4 --run=DQN --config '{"num_workers": 0, "monitor": true}'
