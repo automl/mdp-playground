@@ -4,11 +4,11 @@ var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
     'delay': [0], # + [2**i for i in range(4)],
-    'sequence_length': [i for i in range(1, 5)],
+    'sequence_length': [1],#[i for i in range(1,4)],
     'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
-    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
+    'transition_noise': [0, 0.01, 0.02, 0.10, 0.25],
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
@@ -68,7 +68,7 @@ agent_config = {
     #"timesteps_per_iteration": timesteps_per_iteration, #todo: perhaps pass this later as an argument to the agent
 }
 
-algorithm = "sarsa_tabular_seq_5"
+algorithm = "double_q_learn_tabular_p_noise"
 # agent_config = {
 #     "adam_epsilon": 1e-4,
 #     "beta_annealing_fraction": 1.0,
