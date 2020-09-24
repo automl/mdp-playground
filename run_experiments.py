@@ -80,12 +80,12 @@ from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
 if config.algorithm == 'DQN':
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9))
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), include_webui=False)
     # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
 elif config.algorithm == 'A3C': #hack
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9))
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), include_webui=False)
 else:
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, temp_dir='/tmp/ray' + str(args.config_num))
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, temp_dir='/tmp/ray' + str(args.config_num), include_webui=False)
 
 
 var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.

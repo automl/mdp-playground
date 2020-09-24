@@ -75,6 +75,7 @@ cd mdpp_${JOB_ID}
 # cd /home/rajanr/mdpp
 echo ${MOAB_JOBID} ${MOAB_JOBARRAYINDEX} ${MOAB_JOBNAME}
 \time -v /home/fr/fr_fr/fr_rr1034/anaconda3/envs/py36_toy_rl/bin/python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments_temp.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX}
+####TODO Remove run_experiments_temp.py
 
 #python output_argv_1.py
 #\time -v rllib train --env=BreakoutDeterministic-v4 --run=DQN --config '{"num_workers": 0, "monitor": true}'
