@@ -4,28 +4,18 @@ var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
     'delay': [0], # + [2**i for i in range(4)],
-    'sequence_length': [1],#i for i in range(1,4)]
+    'sequence_length': [1],#[i for i in range(1,4)],
     'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
-    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
-    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
+    'transition_noise': [0], #0.01, 0.02, 0.10, 0.25],
+    'reward_noise': [0, 1, 5, 10, 25], # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
 
-var_agent_configs = OrderedDict({
-    # learning rate used in TD updates
-    "alpha": [.1, .3, .5],
-    # agent epsilon value. Used as start value when decay linear or log. Otherwise constant value.
-    "epsilon": [1e-1, 1e-2, 1e-3],
-    # agent epsilon decay schedule, in (linear, log, const)
-    "epsilon_decay": ["linear", "log", "const"],
-})
-
 var_configs = OrderedDict({
-"env": var_env_configs,
-"agent": var_agent_configs
+"env": var_env_configs
 })
 
 env_config = {
@@ -62,6 +52,9 @@ episodes = agent_config["episodes"]
 env_max_steps = agent_config["env_max_steps"]
 agent_eps_decay = agent_config["agent_eps_decay"]
 agent_eps = agent_config["agent_eps"]
+#timesteps_per_iteration = agent_config["timesteps_per_iteration"]
+agent_config = eval_eps
+
 
 agent_config = {
     #"env_max_steps": env_max_steps,
@@ -75,7 +68,7 @@ agent_config = {
     #"timesteps_per_iteration": timesteps_per_iteration, #todo: perhaps pass this later as an argument to the agent
 }
 
-algorithm = "q_learn_tabular_tune_hps"
+algorithm = "sarsa_tabular_r_noise"
 # agent_config = {
 #     "adam_epsilon": 1e-4,
 #     "beta_annealing_fraction": 1.0,
