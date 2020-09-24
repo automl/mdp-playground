@@ -244,6 +244,8 @@ class MDPP_Analysis():
         if x_tick_labels_ == []:
             warnings.warn("No varying dims were found!")
             x_tick_labels_.append('single_config')
+            x_axis_labels.append('single_config')
+            dims_varied.append(0)
 
         self.axis_labels = x_axis_labels
         self.tick_labels = x_tick_labels_

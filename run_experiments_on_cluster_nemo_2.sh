@@ -2,7 +2,7 @@
 #MOAB -N mdpp
 #MOAB -t 0-2 # specifies array job indices
 #MOAB -l nodes=1:ppn=4
-#MOAB -l walltime=0:12:00:00
+#MOAB -l walltime=0:13:00:00
 #MOAB -l pmem=16GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 ##MOAB -V # export env. variables from launch env. I think
@@ -22,7 +22,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='dist_dqn_beam_rider_del' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='rainbow_beam_rider_del_ablate_dueling' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
