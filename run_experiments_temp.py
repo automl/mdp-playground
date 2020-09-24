@@ -411,6 +411,9 @@ for current_config in cartesian_product_configs:
         else: #if algorithm == 'DDPG': #hack
             timesteps_total = 20000
 
+    if 'timesteps_total' in dir(config):
+        timesteps_total = config.timesteps_total
+
     if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
         timesteps_total /= env_config["env_config"]["time_unit"]
         timesteps_total = int(timesteps_total)
