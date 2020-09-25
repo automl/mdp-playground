@@ -1,5 +1,5 @@
 num_seeds = 5
-timesteps_total = 1_100_000
+timesteps_total = 10_000_000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'delay': [0] + [2**i for i in range(4)],
@@ -33,7 +33,7 @@ env_config = {
 algorithm = "DQN"
 agent_config = { # Taken from Ray tuned_examples
     'adam_epsilon': 0.00015,
-    'buffer_size': 1000000,
+    'buffer_size': 500000,
     'double_q': True,
     'dueling': True,
     'exploration_config': {   'epsilon_timesteps': 200000,
@@ -50,7 +50,7 @@ agent_config = { # Taken from Ray tuned_examples
     'noisy': False,
     'num_atoms': 51,
     'num_gpus': 0,
-    "num_workers": 7,
+    "num_workers": 3,
     # "num_cpus_for_driver": 2,
     # 'gpu': False, #deprecated
     'prioritized_replay': True,
