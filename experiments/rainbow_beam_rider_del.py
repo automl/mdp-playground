@@ -33,7 +33,7 @@ env_config = {
 algorithm = "DQN"
 agent_config = { # Taken from Ray tuned_examples
     'adam_epsilon': 0.00015,
-    'buffer_size': 1000000,
+    'buffer_size': 500000,
     'double_q': True,
     'dueling': True,
     'exploration_config': {   'epsilon_timesteps': 200000,
@@ -96,7 +96,7 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": 10, # I think this means every x training_iterations
+    "evaluation_interval": None, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
