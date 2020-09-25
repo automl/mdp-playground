@@ -1,4 +1,5 @@
 num_seeds = 5
+timesteps_total = 10_000_000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'transition_noise': [0, 0.01, 0.02, 0.10, 0.25],
@@ -32,8 +33,11 @@ env_config = {
 algorithm = "A3C"
 agent_config = { # Taken from Ray tuned_examples
     'clip_rewards': True,
-    'lr_schedule': [   [0, 0.0007],
-                      [20000000, 1e-12]],
+    'lr': 1e-4,
+    # Value Function Loss coefficient
+    "vf_loss_coeff": 2.5,
+    # Entropy coefficient
+    "entropy_coeff": 0.01,
     "min_iter_time_s": 0,
     'num_envs_per_worker': 5,
     'num_gpus': 0,
@@ -75,7 +79,7 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": 10, # I think this means every x training_iterations
+    "evaluation_interval": None, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
