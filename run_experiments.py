@@ -401,7 +401,7 @@ for current_config in cartesian_product_configs:
 
     elif env_config["env"] in ["GymEnvWrapper-v0"]: #hack
         if "AtariEnv" in env_config["env_config"]:
-            timesteps_total = 3_000_000
+            timesteps_total = 10_000_000
 
     else:
         if algorithm == 'DQN':
@@ -420,6 +420,7 @@ for current_config in cartesian_product_configs:
 
 
     print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
+    print("\n\033[1;32m======== for " + str(timesteps_total) + " steps =========\033[0;0m\n")
 
     tune.run(
         algorithm,
