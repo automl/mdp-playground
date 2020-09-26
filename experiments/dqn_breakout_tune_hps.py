@@ -1,12 +1,24 @@
-num_seeds = 5
+num_seeds = 3
+timesteps_total = 3_000_000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    'delay': [0] + [2**i for i in range(4)],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
+var_agent_configs = OrderedDict({
+    # Learning rate
+    # "lr": [1e-3, 1e-4], #
+    'exploration_config': [{   'epsilon_timesteps': 200000,
+                           'final_epsilon': 0.01}, {   'epsilon_timesteps': 200000,
+                                                  'final_epsilon': 0.05}],
+    # 'learning_starts': [10000, 20000],
+    # 'hiddens': [[512]],
+    'target_network_update_freq': [2000, 4000, 8000, 16000],
+})
+
 var_configs = OrderedDict({
-"env": var_env_configs
+"env": var_env_configs,
+"agent": var_agent_configs,
 })
 
 env_config = {
@@ -35,8 +47,8 @@ agent_config = { # Taken from Ray tuned_examples
     'buffer_size': 500000,
     'double_q': False,
     'dueling': False,
-    'exploration_config': {   'epsilon_timesteps': 200000,
-                           'final_epsilon': 0.01},
+    # 'exploration_config': {   'epsilon_timesteps': 200000,
+                           # 'final_epsilon': 0.01},
     'final_prioritized_replay_beta': 1.0,
     'hiddens': [512],
     'learning_starts': 20000,
@@ -45,11 +57,12 @@ agent_config = { # Taken from Ray tuned_examples
     'noisy': False,
     'num_atoms': 1,
     'num_gpus': 0,
+    'num_workers': 3,
     'prioritized_replay': False,
     'prioritized_replay_alpha': 0.5,
     'prioritized_replay_beta_annealing_timesteps': 2000000,
     'rollout_fragment_length': 4,
-    'target_network_update_freq': 8000,
+    # 'target_network_update_freq': 8000,
     'timesteps_per_iteration': 10000,
     'train_batch_size': 32,
     "tf_session_args": {
