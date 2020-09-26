@@ -14,6 +14,7 @@ extras_require_cont = [
     'tensorflow-probability==0.9.0',
     'pandas==0.25.0',
     'requests==2.22.0',
+    'mujoco-py==2.0.2.13', # with mujoco 2.0
 ]
 
 setup(name='mdp_playground',
