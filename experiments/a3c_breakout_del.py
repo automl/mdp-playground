@@ -1,4 +1,5 @@
 num_seeds = 5
+timesteps_total = 10_000_000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'delay': [0] + [2**i for i in range(4)],
@@ -13,7 +14,7 @@ env_config = {
     "env": "GymEnvWrapper-v0",
     "env_config": {
         "AtariEnv": {
-            "game": "breakout",
+            "game": 'breakout',
             'obs_type': 'image',
             'frameskip': 1,
         },
@@ -32,8 +33,11 @@ env_config = {
 algorithm = "A3C"
 agent_config = { # Taken from Ray tuned_examples
     'clip_rewards': True,
-    'lr_schedule': [   [0, 0.0007],
-                      [20000000, 1e-12]],
+    'lr': 1e-4,
+    # Value Function Loss coefficient
+    "vf_loss_coeff": 2.5,
+    # Entropy coefficient
+    "entropy_coeff": 0.01,
     "min_iter_time_s": 0,
     'num_envs_per_worker': 5,
     'num_gpus': 0,
