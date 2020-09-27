@@ -1,4 +1,5 @@
 num_seeds = 5
+timesteps_total = 10_000_000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'delay': [0] + [2**i for i in range(4)],
@@ -45,11 +46,12 @@ agent_config = { # Taken from Ray tuned_examples
     'noisy': False,
     'num_atoms': 1,
     'num_gpus': 0,
+    "num_workers": 3,
     'prioritized_replay': False,
     'prioritized_replay_alpha': 0.5,
     'prioritized_replay_beta_annealing_timesteps': 2000000,
     'rollout_fragment_length': 4,
-    'target_network_update_freq': 8000,
+    'target_network_update_freq': 2000,
     'timesteps_per_iteration': 10000,
     'train_batch_size': 32,
     "tf_session_args": {
