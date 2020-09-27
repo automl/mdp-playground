@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
 #SBATCH -a 0-24%25 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
-#SBATCH -t 0-24:00 # time (D-HH:MM)
+#SBATCH -t 0-20:00 # time (D-HH:MM)
 #SBATCH -c 8 # number of CPUs/task
 #SBATCH -o log/%x.%A.%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%A.%a.err # STDERR  (the folder log has to exist!)  %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
@@ -18,10 +18,10 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='a3c_beam_rider_del' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
-export EXP_NAME2='a3c_breakout_del'
-export EXP_NAME3='a3c_qbert_del'
-export EXP_NAME4='a3c_space_invaders_del'
+export EXP_NAME='a3c_beam_rider_r_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME2='a3c_breakout_r_noise'
+export EXP_NAME3='a3c_qbert_r_noise'
+export EXP_NAME4='a3c_space_invaders_r_noise'
 
 # echo -e '\033[32m'
 # Print some information about the job to STDOUT
