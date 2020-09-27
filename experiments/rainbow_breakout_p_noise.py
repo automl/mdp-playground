@@ -1,4 +1,5 @@
-num_seeds = 10
+num_seeds = 5
+timesteps_total = 10_000_000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'transition_noise': [0, 0.01, 0.02, 0.10, 0.25],
@@ -32,13 +33,12 @@ env_config = {
 algorithm = "DQN"
 agent_config = { # Taken from Ray tuned_examples
     'adam_epsilon': 0.00015,
-    'buffer_size': 1000000,
+    'buffer_size': 500000,
     'double_q': True,
     'dueling': True,
     'exploration_config': {   'epsilon_timesteps': 200000,
                            'final_epsilon': 0.01},
     'final_prioritized_replay_beta': 1.0,
-    'gamma': 0.99,
     'hiddens': [512],
     'learning_starts': 20000,
     'lr': 6.25e-05,
@@ -47,17 +47,18 @@ agent_config = { # Taken from Ray tuned_examples
     #              'grayscale': True,
     #              'zero_mean': False},
     'n_step': 4,
-    'noisy': True,
+    'noisy': False,
     'num_atoms': 51,
     'num_gpus': 0,
+    "num_workers": 3,
     # "num_cpus_for_driver": 2,
     # 'gpu': False, #deprecated
     'prioritized_replay': True,
     'prioritized_replay_alpha': 0.5,
-    'prioritized_replay_beta_annealing_timesteps': 400000,
+    'prioritized_replay_beta_annealing_timesteps': 2000000,
     'rollout_fragment_length': 4,
     'timesteps_per_iteration': 10000,
-    'target_network_update_freq': 8000,
+    'target_network_update_freq': 2000,
     # 'target_network_update_freq': 500,
     'train_batch_size': 32,
     "tf_session_args": {
@@ -95,7 +96,7 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": 10, # I think this means every x training_iterations
+    "evaluation_interval": None, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
