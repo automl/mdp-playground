@@ -58,7 +58,7 @@ agent_config = { # Taken from Ray tuned_examples
     'prioritized_replay_beta_annealing_timesteps': 2000000,
     'rollout_fragment_length': 4,
     'timesteps_per_iteration': 10000,
-    'target_network_update_freq': 8000,
+    'target_network_update_freq': 2000,
     # 'target_network_update_freq': 500,
     'train_batch_size': 32,
     "tf_session_args": {
