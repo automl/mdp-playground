@@ -37,7 +37,7 @@ agent_config = { # Taken from Ray tuned_examples
     'double_q': True,
     'dueling': True,
     'exploration_config': {   'epsilon_timesteps': 200000,
-                           'final_epsilon': 0.05},
+                           'final_epsilon': 0.10},
     'final_prioritized_replay_beta': 1.0,
     'hiddens': [512],
     'learning_starts': 20000,

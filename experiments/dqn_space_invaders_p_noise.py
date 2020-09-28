@@ -1,4 +1,5 @@
-num_seeds = 10
+num_seeds = 5
+timesteps_total = 10_000_000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'transition_noise': [0, 0.01, 0.02, 0.10, 0.25],
@@ -32,11 +33,11 @@ env_config = {
 algorithm = "DQN"
 agent_config = { # Taken from Ray tuned_examples
     'adam_epsilon': 0.00015,
-    'buffer_size': 1000000,
+    'buffer_size': 500000,
     'double_q': False,
     'dueling': False,
     'exploration_config': {   'epsilon_timesteps': 200000,
-                           'final_epsilon': 0.01},
+                           'final_epsilon': 0.05},
     'final_prioritized_replay_beta': 1.0,
     'hiddens': [512],
     'learning_starts': 20000,
@@ -45,6 +46,7 @@ agent_config = { # Taken from Ray tuned_examples
     'noisy': False,
     'num_atoms': 1,
     'num_gpus': 0,
+    "num_workers": 3,
     'prioritized_replay': False,
     'prioritized_replay_alpha': 0.5,
     'prioritized_replay_beta_annealing_timesteps': 2000000,
@@ -87,7 +89,7 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": 10, # I think this means every x training_iterations
+    "evaluation_interval": None, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
