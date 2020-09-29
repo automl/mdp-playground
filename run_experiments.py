@@ -27,6 +27,19 @@ def create_gym_env_wrapper(config):
 register_env("GymEnvWrapper-v0", lambda config: create_gym_env_wrapper(config))
 
 
+def create_gym_env_wrapper_frame_stack(config): #hack ###TODO remove?
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    import gym
+    game = config["AtariEnv"]["game"]
+    game = ''.join([g.capitalize() for g in game.split('_')])
+    ae = gym.make('{}NoFrameskip-v4'.format(game))
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
+register_env("GymEnvWrapperFrameStack-v0", lambda config: create_gym_env_wrapper_frame_stack(config))
+
+
 import sys, os
 import argparse
 # import configparser

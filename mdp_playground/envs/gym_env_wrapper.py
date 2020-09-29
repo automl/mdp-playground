@@ -3,6 +3,7 @@ import copy
 import numpy as np
 import sys
 from gym.wrappers import AtariPreprocessing
+from ray.rllib.env.atari_wrappers import wrap_deepmind, is_atari
 
 # def get_gym_wrapper(base_class):
     # '''Wraps an OpenAI Gym environment to be able to modify its meta-features corresponding to MDP Playground'''
@@ -51,7 +52,9 @@ class GymEnvWrapper(gym.Env):
         else:
             self.reward_noise = lambda a: 0.0
 
-        if config["atari_preprocessing"]:
+        if "wrap_deepmind_ray" in config and config["wrap_deepmind_ray"]: #hack ##TODO remove?
+            self.env = wrap_deepmind(self.env, dim=42, framestack=True)
+        elif config["atari_preprocessing"]:
             self.frame_skip = 4 # default for AtariPreprocessing
             if "frame_skip" in config:
                 self.frame_skip = config["frame_skip"]
