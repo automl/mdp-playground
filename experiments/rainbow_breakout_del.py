@@ -11,7 +11,7 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "GymEnvWrapper-v0",
+    "env": "GymEnvWrapperFrameStack-v0",
     "env_config": {
         "AtariEnv": {
             "game": "breakout",
@@ -19,8 +19,9 @@ env_config = {
             'frameskip': 1,
         },
         # "GymEnvWrapper": {
+        "wrap_deepmind_ray": True,
         "atari_preprocessing": True,
-        'frame_skip': 4,
+        'frame_skip': 1,
         'grayscale_obs': False,
         'state_space_type': 'discrete',
         'action_space_type': 'discrete',
@@ -33,7 +34,7 @@ env_config = {
 algorithm = "DQN"
 agent_config = { # Taken from Ray tuned_examples
     'adam_epsilon': 0.00015,
-    'buffer_size': 500000,
+    'buffer_size': 50000,
     'double_q': True,
     'dueling': True,
     'exploration_config': {   'epsilon_timesteps': 200000,
@@ -42,10 +43,9 @@ agent_config = { # Taken from Ray tuned_examples
     'hiddens': [512],
     'learning_starts': 20000,
     'lr': 6.25e-05,
-    # 'lr': 0.0001,
-    # 'model': {   'dim': 42,
-    #              'grayscale': True,
-    #              'zero_mean': False},
+    'model': {   'dim': 42,
+                 'grayscale': True,
+                 'zero_mean': False},
     'n_step': 4,
     'noisy': False,
     'num_atoms': 51,

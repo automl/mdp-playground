@@ -37,8 +37,8 @@ agent_config = { # Taken from Ray tuned_examples
     'adam_epsilon': 0.00015,
     'buffer_size': 50000,
     'clip_rewards': True,
-    'double_q': False,
-    'dueling': False,
+    'double_q': True,
+    'dueling': True,
     'exploration_config': {   'epsilon_timesteps': 200000,
                            'final_epsilon': 0.01},
     'final_prioritized_replay_beta': 1.0,
@@ -48,17 +48,19 @@ agent_config = { # Taken from Ray tuned_examples
     'model': {   'dim': 42,
                  'grayscale': True,
                  'zero_mean': False},
-    'n_step': 1,
+    'n_step': 4,
     'noisy': False,
-    'num_atoms': 1,
+    'num_atoms': 51,
     'num_gpus': 0,
-    'num_workers': 3,
-    'prioritized_replay': False,
+    "num_workers": 3,
+    # "num_cpus_for_driver": 2,
+    # 'gpu': False, #deprecated
+    'prioritized_replay': True,
     'prioritized_replay_alpha': 0.5,
     'prioritized_replay_beta_annealing_timesteps': 2000000,
     'rollout_fragment_length': 4,
-    'target_network_update_freq': 2000,
     'timesteps_per_iteration': 10000,
+    'target_network_update_freq': 2000,
     'train_batch_size': 32,
     "tf_session_args": {
         # note: overriden by `local_tf_session_args`
@@ -69,7 +71,8 @@ agent_config = { # Taken from Ray tuned_examples
         # },
         # "log_device_placement": False,
         "device_count": {
-            "CPU": 2
+            "CPU": 2,
+            # "GPU": 0,
         },
         # "allow_soft_placement": True,  # required by PPO multi-gpu
     },
@@ -78,7 +81,6 @@ agent_config = { # Taken from Ray tuned_examples
         "intra_op_parallelism_threads": 4,
         "inter_op_parallelism_threads": 4,
     },
-
 }
 
 
