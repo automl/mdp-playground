@@ -1,7 +1,9 @@
 num_seeds = 5
+timesteps_total = 10_000_000
 from collections import OrderedDict
+import numpy as np
 var_env_configs = OrderedDict({
-    'reward_noise': [0, 1, 5, 10, 25], # Std dev. of normal dist.
+    'reward_noise': list(np.array([0, 1, 5, 10, 25])/100), # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -32,7 +34,8 @@ env_config = {
 algorithm = "DQN"
 agent_config = { # Taken from Ray tuned_examples
     'adam_epsilon': 0.00015,
-    'buffer_size': 1000000,
+    'buffer_size': 500000,
+    'clip_rewards': True,
     'double_q': False,
     'dueling': False,
     'exploration_config': {   'epsilon_timesteps': 200000,
@@ -45,7 +48,7 @@ agent_config = { # Taken from Ray tuned_examples
     'noisy': False,
     'num_atoms': 1,
     'num_gpus': 0,
-    # 'num_workers': 2,
+    'num_workers': 3,
     'prioritized_replay': False,
     'prioritized_replay_alpha': 0.5,
     'prioritized_replay_beta_annealing_timesteps': 2000000,
@@ -88,7 +91,7 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": 10, # I think this means every x training_iterations
+    "evaluation_interval": None, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
