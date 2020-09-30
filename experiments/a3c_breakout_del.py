@@ -11,7 +11,7 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "GymEnvWrapper-v0",
+    "env": "GymEnvWrapperFrameStack-v0",
     "env_config": {
         "AtariEnv": {
             "game": 'breakout',
@@ -19,8 +19,9 @@ env_config = {
             'frameskip': 1,
         },
         # "GymEnvWrapper": {
+        "wrap_deepmind_ray": True,
         "atari_preprocessing": True,
-        'frame_skip': 4,
+        'frame_skip': 1,
         'grayscale_obs': False,
         'state_space_type': 'discrete',
         'action_space_type': 'discrete',
@@ -44,6 +45,9 @@ agent_config = { # Taken from Ray tuned_examples
     'num_workers': 3,
     'rollout_fragment_length': 10,
     'timesteps_per_iteration': 10000,
+    'model': {   'dim': 42,
+                 'grayscale': True,
+                 'zero_mean': False},
     # "tf_session_args": {
     #     # note: overriden by `local_tf_session_args`
     #     "intra_op_parallelism_threads": 4,
