@@ -13,7 +13,7 @@ import numpy as np
 import scipy
 from scipy import stats
 import gym
-from gym.spaces import BoxExtended, DiscreteExtended, MultiDiscreteExtended, ImageMultiDiscrete
+from mdp_playground.spaces import BoxExtended, DiscreteExtended, MultiDiscreteExtended, ImageMultiDiscrete
 # from gym.utils import seeding
 
 
