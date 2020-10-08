@@ -27,7 +27,7 @@ var_agent_configs = OrderedDict({
     # N-step Q learning
     "n_step": [2, 3, 4],
     "target_noise": [0.02, 0.2, 2.0],
-    "target_noise_clip": [1.5, 2.5], # this is abs. val. for our purposes we need relative so we hack that in run_experiments.py
+    "target_noise_clip_relative": [1.5, 2.5], # this is abs. val. for our purposes we need relative so we hack that in run_experiments.py
 })
 
 # var_model_configs = OrderedDict({

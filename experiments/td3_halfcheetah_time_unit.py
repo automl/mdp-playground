@@ -34,7 +34,7 @@ agent_config = {
     "policy_delay": 2,
     "smooth_target_policy": True,
     "target_noise": 0.2,
-    "target_noise_clip": 2.5,
+    "target_noise_clip_relative": 2.5,
 
     # N-step Q learning
     # "n_step": 4,

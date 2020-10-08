@@ -67,7 +67,7 @@ agent_config = {
     "policy_delay": 2,
     "smooth_target_policy": True,
     "target_noise": 0.02,
-    "target_noise_clip": 0.05,
+    "target_noise_clip_relative": 0.05,
 
     # Apply a state preprocessor with spec given by the "model" config option
     # (like other RL algorithms). This is mostly useful if you have a weird
