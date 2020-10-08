@@ -12,15 +12,12 @@ There are 3 parts to the package:
 ## Installation
 **IMPORTANT**
 
-We recommend using `conda` environments to manage virtual `Python` environments to run the experiments. Unfortunately, you will have to maintain 2 environments - 1 for **discrete** experiments and 1 for **continuous** experiments from the paper. As mentioned in Appendix H in the paper, this is because of issues with Ray, the library that we used for our baseline agents. Another reason to use a separate virtual environment is that our package `gym-extensions-for-mdp-playground` is currently a fork of `OpenAI Gym` and uses the same package name to avoid issues with other libraries such as `Ray`. We are waiting on a pull request for some of the clashes between our fork and `Gym` to resolve the problems.
+We recommend using `conda` environments to manage virtual `Python` environments to run the experiments. Unfortunately, you will have to maintain 2 environments - 1 for **discrete** experiments and 1 for **continuous** experiments from the paper. As mentioned in Appendix H in the paper, this is because of issues with Ray, the library that we used for our baseline agents.
 
 Please follow the following commands to install for the discrete experiments:
 ```
 conda create -n py36_toy_rl_disc python=3.6
 conda activate py36_toy_rl_disc
-cd gym-extensions-for-mdp-playground
-pip install -e .
-cd ..
 cd mdp-playground
 pip install -e .[extras_disc]
 ```
@@ -29,9 +26,6 @@ Please follow the following commands to install for the continuous experiments:
 ```
 conda create -n py36_toy_rl_cont python=3.6
 conda activate py36_toy_rl_cont
-cd gym-extensions-for-mdp-playground
-pip install -e .
-cd ..
 cd mdp-playground
 pip install -e .[extras_cont]
 wget 'https://ray-wheels.s3-us-west-2.amazonaws.com/master/8d0c1b5e068853bf748f72b1e60ec99d240932c6/ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl'
