@@ -6,7 +6,7 @@ import copy
 
 def get_mujoco_wrapper(base_class):
     '''Wraps a mujoco-py environment to be able to modify its XML attributes.'''
-    #TODO This is a subclass and not a wrapper. Change name. Or make it a wrapper by using composition? Some frameworks might need an instance of this class to also be an instance of the base class?
+    #TODO This makes a subclass and not a wrapper. Change name. Or make it a wrapper by using composition? Some frameworks might need an instance of this class to also be an instance of base_class?
 
     class MujocoEnvWrapperV3(base_class):
         def __init__(self, **config):

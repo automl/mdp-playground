@@ -24,7 +24,7 @@ def create_gym_env_wrapper(config):
     gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
     return gew
 
-register_env("GymEnvWrapper-v0", lambda config: create_gym_env_wrapper(config))
+register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper(config))
 
 
 def create_gym_env_wrapper_frame_stack(config): #hack ###TODO remove?
@@ -37,7 +37,7 @@ def create_gym_env_wrapper_frame_stack(config): #hack ###TODO remove?
     gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
     return gew
 
-register_env("GymEnvWrapperFrameStack-v0", lambda config: create_gym_env_wrapper_frame_stack(config))
+register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack(config))
 
 
 import sys, os
@@ -381,6 +381,7 @@ for current_config in cartesian_product_configs:
     print("tune_config:",)
     pp.pprint(tune_config)
 
+    #default settings for #timesteps_total
     if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack
         timesteps_total = 3000000
 
@@ -413,7 +414,7 @@ for current_config in cartesian_product_configs:
         ReacherWrapperV2 = get_mujoco_wrapper(ReacherEnv)
         register_env("ReacherWrapper-v2", lambda config: ReacherWrapperV2(**config))
 
-    elif env_config["env"] in ["GymEnvWrapper-v0"]: #hack
+    elif env_config["env"] in ["GymEnvWrapper-Atari"]: #hack
         if "AtariEnv" in env_config["env_config"]:
             timesteps_total = 10_000_000
 
