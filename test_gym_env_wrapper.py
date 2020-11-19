@@ -53,8 +53,55 @@ class TestGymEnvWrapper(unittest.TestCase):
         for i in range(200):
             act = aew.action_space.sample()
             next_state, reward, done, info = aew.step(act)
-            print(reward, done, act)
+            print("step, reward, done, act:", i, reward, done, act)
             if i == 154 or i == 159:
+                assert reward == 44.0, "1-step delayed reward in step: " + str(i) + " should have been 44.0."
+            total_reward += reward
+        print("total_reward:", total_reward)
+        aew.reset()
+
+    def test_r_delay_ray_frame_stack(self):
+        '''
+        Uses wrap_deepmind_ray to frame stack Atari
+        '''
+        print('\033[32;1;4mTEST_REWARD_DELAY_RAY_FRAME_STACK\033[0m')
+        config = {
+                "AtariEnv": {
+                    "game": 'beam_rider', #"breakout",
+                    'obs_type': 'image',
+                    'frameskip': 1,
+                },
+                'delay': 1,
+                # "GymEnvWrapper": {
+                "wrap_deepmind_ray": True,
+                "frame_skip": 1,
+                "atari_preprocessing": True,
+                'frame_skip': 4,
+                'grayscale_obs': False,
+                'state_space_type': 'discrete',
+                'action_space_type': 'discrete',
+                'seed': 0,
+                # },
+                # 'seed': 0, #seed
+            }
+
+        # config["log_filename"] = log_filename
+
+        from gym.envs.atari import AtariEnv
+        import gym
+        game = 'beam_rider'
+        game = ''.join([g.capitalize() for g in game.split('_')])
+        ae = gym.make('{}NoFrameskip-v4'.format(game))
+        aew = GymEnvWrapper(ae, **config)
+        ob = aew.reset()
+        print("observation_space.shape:", ob.shape)
+        # print(ob)
+        total_reward = 0.0
+        for i in range(200):
+            act = aew.action_space.sample()
+            next_state, reward, done, info = aew.step(act)
+            print("step, reward, done, act:", i, reward, done, act)
+            if i == 142 or i == 159:
                 assert reward == 44.0, "1-step delayed reward in step: " + str(i) + " should have been 44.0."
             total_reward += reward
         print("total_reward:", total_reward)
@@ -98,7 +145,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         for i in range(200):
             act = aew.action_space.sample()
             next_state, reward, done, info = aew.step(act)
-            print(reward, done, act)
+            print("step, reward, done, act:", i, reward, done, act)
             # Testing hardcoded values at these timesteps implicitly tests that there were 21 noisy transitions in total and noise inserted in rewards.
             if i == 154:
                 np.testing.assert_allclose(reward, 44.12183457980473, rtol=1e-05, err_msg="1-step delayed reward in step: " + str(i) + " should have been 44.0.")
@@ -154,7 +201,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         for i in range(200):
             act = aew.action_space.sample()
             next_state, reward, done, info = aew.step(act)
-            print(reward, done, act, next_state[1])
+            print("step, reward, done, act, next_state[1]:", i, reward, done, act, next_state[1])
             if i == 154 or i == 159:
                 assert reward == 44.0, "1-step delayed reward in step: " + str(i) + " should have been 44.0."
             total_reward += reward
@@ -219,7 +266,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         for i in range(200):
             act = hc3w.action_space.sample()
             next_state, reward, done, info = hc3w.step(act)
-            print(reward, done, act, next_state)
+            print("step, reward, done, act, next_state:", i, reward, done, act, next_state)
             if i == 0:
                 np.testing.assert_allclose(next_state[hc3w.env.observation_space.shape[0]:], [-4.51594779e-01, -1.00795288e+00], rtol=1e-05, err_msg="Mismatch for irr. toy envs' state in step " + str(i) + ".")
             elif i == 2:

@@ -92,7 +92,7 @@ class GymEnvWrapper(gym.Env):
             if config["state_space_type"] == "discrete":
                 self.action_space = Tuple((self.env.action_space, self.irr_toy_env.action_space))
                 self.observation_space = Tuple((self.env.observation_space, self.irr_toy_env.observation_space)) ###TODO for image observations, concatenate to 1 obs. space here and in step() and reset()?
-            else:
+            else: ####TODO Check the test case added for cont. irr features case and code for it in run_experiments.py.
                 env_obs_low = self.env.observation_space.low
                 env_obs_high = self.env.observation_space.high
                 env_obs_dtype = env_obs_low.dtype

@@ -17,17 +17,21 @@ from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 
-def create_gym_env_wrapper(config):
+def create_gym_env_wrapper_atari(config):
     from gym.envs.atari import AtariEnv
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
     ae = AtariEnv(**config["AtariEnv"])
     gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
     return gew
 
-register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper(config))
+register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
 
 
-def create_gym_env_wrapper_frame_stack(config): #hack ###TODO remove?
+def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
+    '''When using frameStack GymEnvWrapper should wrap AtariEnv using wrap_deepmind_ray and therefore this function sets "wrap_deepmind_ray": True and 'frame_skip': 1 inside config so as to keep config same as for create_gym_env_wrapper_atari above and reduce manual errors when switching between the 2.
+    '''
+    config["wrap_deepmind_ray"] = True #hack
+    config["frame_skip"] = 1 #hack
     from gym.envs.atari import AtariEnv
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
     import gym
@@ -37,7 +41,7 @@ def create_gym_env_wrapper_frame_stack(config): #hack ###TODO remove?
     gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
     return gew
 
-register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack(config))
+register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack_atari(config))
 
 
 import sys, os
@@ -381,38 +385,49 @@ for current_config in cartesian_product_configs:
     print("tune_config:",)
     pp.pprint(tune_config)
 
+    #hack Common #mujoco wrapper to allow Mujoco envs to be wrapped by MujocoEnvWrapper (which fiddles with lower-level Mujoco stuff) and then by GymEnvWrapper which is more general and basically adds dimensions from MDPP which are common to discrete and continuous environments
+    if env_config["env"] in ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]:
+        def create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env):
+            '''Creates a GymEnvWrapper around a MujocoEnvWrapper
+            '''
+            from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+            me = wrapped_mujoco_env(**config)
+            gew = GymEnvWrapper(me, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+            return gew
+
+
     #default settings for #timesteps_total
     if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack
         timesteps_total = 3000000
 
         from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
         from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
-        HalfCheetahWrapperV3 = get_mujoco_wrapper(HalfCheetahEnv)
-        register_env("HalfCheetahWrapper-v3", lambda config: HalfCheetahWrapperV3(**config))
+        wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
+        register_env("HalfCheetahWrapper-v3", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
 
     elif env_config["env"] in ["HopperWrapper-v3"]: #hack
         timesteps_total = 1000000
 
         from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
         from gym.envs.mujoco.hopper_v3 import HopperEnv
-        HopperWrapperV3 = get_mujoco_wrapper(HopperEnv)
-        register_env("HopperWrapper-v3", lambda config: HopperWrapperV3(**config))
+        wrapped_mujoco_env = get_mujoco_wrapper(HopperEnv)
+        register_env("HopperWrapper-v3", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
 
     elif env_config["env"] in ["PusherWrapper-v2"]: #hack
         timesteps_total = 500000
 
         from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
         from gym.envs.mujoco.pusher import PusherEnv
-        PusherWrapperV2 = get_mujoco_wrapper(PusherEnv)
-        register_env("PusherWrapper-v2", lambda config: PusherWrapperV2(**config))
+        wrapped_mujoco_env = get_mujoco_wrapper(PusherEnv)
+        register_env("PusherWrapper-v2", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
 
     elif env_config["env"] in ["ReacherWrapper-v2"]: #hack
         timesteps_total = 500000
 
         from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
         from gym.envs.mujoco.reacher import ReacherEnv
-        ReacherWrapperV2 = get_mujoco_wrapper(ReacherEnv)
-        register_env("ReacherWrapper-v2", lambda config: ReacherWrapperV2(**config))
+        wrapped_mujoco_env = get_mujoco_wrapper(ReacherEnv)
+        register_env("ReacherWrapper-v2", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
 
     elif env_config["env"] in ["GymEnvWrapper-Atari"]: #hack
         if "AtariEnv" in env_config["env_config"]:
