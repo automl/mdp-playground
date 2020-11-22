@@ -220,7 +220,7 @@ class RLToyEnv(gym.Env):
         else:
             raise TypeError("Unsupported data type for seed: ", type(config["seed"]))
 
-        #seed
+        #seed #TODO move to seed() so that obs., act. space, etc. have their seeds reset too when env seed is reset?
         if need_to_gen_seeds:
             self.seed_dict = {}
             self.seed_dict["env"] = self.seed_int
@@ -256,6 +256,16 @@ class RLToyEnv(gym.Env):
             self.sequence_length = 1
         else:
             self.sequence_length = config["sequence_length"]
+
+        if "reward_density" not in config:
+            self.reward_density = 0.25
+        else:
+            self.reward_density = config["reward_density"]
+
+        if "make_denser" not in config:
+            self.make_denser = False
+        else:
+            self.make_denser = config["make_denser"]
 
         if "reward_scale" not in config:
             self.reward_scale = 1.0
@@ -305,7 +315,7 @@ class RLToyEnv(gym.Env):
         else:
             self.reward_every_n_steps = config["reward_every_n_steps"]
 
-        self.dtype = np.float32 #hardcoded
+        self.dtype = np.float32 if "dtype" not in config else config["dtype"]
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
@@ -388,8 +398,22 @@ class RLToyEnv(gym.Env):
             pass
         else: # cont. spaces
             self.dynamics_order = self.config["transition_dynamics_order"]
-            self.inertia = self.config["inertia"]
-            self.time_unit = self.config["time_unit"]
+
+            #defaults
+            if 'inertia' not in config:
+                self.inertia = 1.0
+            else:
+                self.inertia = self.config["inertia"]
+
+            if 'time_unit' not in config:
+                self.time_unit = 1.0
+            else:
+                self.time_unit = self.config["time_unit"]
+
+            if 'target_radius' not in config:
+                self.target_radius = 0.05
+            else:
+                self.target_radius = self.config["target_radius"]
 
         self.total_episodes = 0
 
@@ -559,7 +583,7 @@ class RLToyEnv(gym.Env):
             non_term_relevant_state_space_size = self.config["relevant_state_space_size"] - self.num_terminal_states
             if self.config["repeats_in_sequences"]:
                 num_possible_sequences = (self.relevant_observation_space.n - self.num_terminal_states) ** self.sequence_length #TODO if sequence cannot have replacement, use permutations; use state + action sequences? Subtracting the no. of terminal states from state_space size here to get "usable" states for sequences, having a terminal state even at end of reward sequence doesn't matter because to get reward we need to transition to next state which isn't possible for a terminal state.
-                num_specific_sequences = int(self.config["reward_density"] * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
+                num_specific_sequences = int(self.reward_density * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
                 self.specific_sequences = [[] for i in range(self.sequence_length)]
                 sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
                 for i in range(num_specific_sequences):
@@ -578,7 +602,7 @@ class RLToyEnv(gym.Env):
                 permutations = list(range(non_term_relevant_state_space_size + 1 - len_, non_term_relevant_state_space_size + 1))
                 self.logger.info("No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), no. of possible perms" + str(permutations) + str(np.prod(permutations)))
                 num_possible_permutations = np.prod(permutations)
-                num_specific_sequences = int(self.config["reward_density"] * num_possible_permutations)
+                num_specific_sequences = int(self.reward_density * num_possible_permutations)
                 if num_specific_sequences > 1000:
                     warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(num_specific_sequences)) #TODO Maybe even exit the program if too much memory is (expected to be) taken.; Took about 80s for 40k iterations of the for loop below on my laptop
 
@@ -793,7 +817,7 @@ class RLToyEnv(gym.Env):
             if np.isnan(state_considered[0]):
                 pass ###IMP: This check is to get around case of augmented_state_length being > 2, i.e. non-vanilla seq_len or delay, because then rewards may be handed out for the initial state being part of a sequence which is not fair since it is handed out without having the agent take an action.
             else:
-                if not self.config["make_denser"]:
+                if not self.make_denser:
                     self.logger.debug("state_considered for reward:" + str(state_considered) + " with delay " + str(self.delay))
                     if (not self.reward_every_n_steps or
                         (self.reward_every_n_steps and self.total_transitions_episode % self.sequence_length == delay)): ##TODO also implement this for make_denser case and continuous envs.
@@ -850,7 +874,7 @@ class RLToyEnv(gym.Env):
 
                 elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
                     assert self.sequence_length == 1
-                    if self.config["make_denser"] == True:
+                    if self.make_denser == True:
                         old_relevant_state = np.array(state_considered, dtype=self.dtype)[-2 - delay, self.config["state_space_relevant_indices"]]
                         new_relevant_state = np.array(state_considered, dtype=self.dtype)[-1 - delay, self.config["state_space_relevant_indices"]]
                         reward = -np.linalg.norm(new_relevant_state - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
@@ -862,11 +886,11 @@ class RLToyEnv(gym.Env):
                         # TODO also make_denser, sparse rewards only at target
                     else:
                         new_relevant_state = np.array(state_considered, dtype=self.dtype)[-1 - delay, self.config["state_space_relevant_indices"]]
-                        if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.config["target_radius"]:
+                        if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.target_radius:
                             reward = self.reward_scale # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
                     reward -= self.action_loss_weight * np.linalg.norm(np.array(action, dtype=self.dtype))
-                    if np.linalg.norm(np.array(state, dtype=self.dtype)[self.config["state_space_relevant_indices"]] - self.config["target_point"]) < self.config["target_radius"]:
+                    if np.linalg.norm(np.array(state, dtype=self.dtype)[self.config["state_space_relevant_indices"]] - self.config["target_point"]) < self.target_radius:
                         self.reached_terminal = True
 
 
@@ -1016,7 +1040,7 @@ class RLToyEnv(gym.Env):
 
 
         # This part initializes self.possible_remaining_sequences to hold 1st state in all rewardable sequences, which will be checked for after 1st step of the episode to give rewards.
-        if self.config["state_space_type"] == "discrete" and self.config["make_denser"] == True:
+        if self.config["state_space_type"] == "discrete" and self.make_denser == True:
             delay = self.delay
             sequence_length = self.sequence_length
             self.possible_remaining_sequences = [[] for i in range(sequence_length)]

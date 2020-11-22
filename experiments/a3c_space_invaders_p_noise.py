@@ -11,7 +11,7 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "GymEnvWrapper-v0",
+    "env": "GymEnvWrapper-Atari",
     "env_config": {
         "AtariEnv": {
             "game": "space_invaders",

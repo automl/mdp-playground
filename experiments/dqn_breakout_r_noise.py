@@ -12,7 +12,7 @@ var_configs = OrderedDict({
 })
 
 env_config = {
-    "env": "GymEnvWrapperFrameStack-v0",
+    "env": "GymEnvWrapper-Atari",
     "env_config": {
         "AtariEnv": {
             "game": "breakout",
@@ -20,9 +20,9 @@ env_config = {
             'frameskip': 1,
         },
         # "GymEnvWrapper": {
-        "wrap_deepmind_ray": True,
+
         "atari_preprocessing": True,
-        'frame_skip': 1,
+
         'grayscale_obs': False,
         'state_space_type': 'discrete',
         'action_space_type': 'discrete',

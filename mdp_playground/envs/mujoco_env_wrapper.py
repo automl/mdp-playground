@@ -6,9 +6,9 @@ import copy
 
 def get_mujoco_wrapper(base_class):
     '''Wraps a mujoco-py environment to be able to modify its XML attributes.'''
-    #TODO This is a subclass and not a wrapper. Change name. Or make it a wrapper by using composition? Some frameworks might need an instance of this class to also be an instance of the base class?
+    #TODO This makes a subclass and not a wrapper. Change name. Or make it a wrapper by using composition? Some frameworks might need an instance of this class to also be an instance of base_class?
 
-    class MujocoEnvWrapperV3(base_class):
+    class MujocoEnvWrapper(base_class):
         def __init__(self, **config):
             self.config = copy.deepcopy(config)
             self.base_class = base_class
@@ -29,7 +29,7 @@ def get_mujoco_wrapper(base_class):
             if "dummy_seed" in config: #hack
                 del config["dummy_seed"]
 
-            super(MujocoEnvWrapperV3, self).__init__(**config)
+            super(MujocoEnvWrapper, self).__init__(**config["MujocoEnv"]) #hack ###IMP This helps by sending only Mujoco specific config to Mujoco, if anything else is sent by using **config, program crashes because each 'MujocoEnv', e.g. HalfCheetahV3, has a static call signature for __init__ ##TODO Thanks to this, now the above del statements can be removed I think.
             self.model.opt.disableflags = 128 ##IMP disables clamping of controls to the range in the XML, i.e., [-1, 1]
             if "action_space_max" in locals():
                 print("Setting Mujoco self.action_space.low, self.action_space.high from:", self.action_space.low, self.action_space.high)
@@ -55,13 +55,13 @@ def get_mujoco_wrapper(base_class):
                     print("Setting Mujoco self._ctrl_cost_weight, self._forward_reward_weight to", self._ctrl_cost_weight, self._forward_reward_weight, "corresponding to time_unit in config.")
 
         def step(self, action): #hack
-            obs, reward, done, info = super(MujocoEnvWrapperV3, self).step(action)
+            obs, reward, done, info = super(MujocoEnvWrapper, self).step(action)
             if self.base_class in [PusherEnv, ReacherEnv] and "time_unit" in self.config:
                 reward *= self.time_unit
             return obs, reward, done, info
 
 
-    return MujocoEnvWrapperV3
+    return MujocoEnvWrapper
 
 # from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
 #
