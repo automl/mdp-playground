@@ -15,13 +15,13 @@ var_env_configs = OrderedDict({
 
 var_agent_configs = OrderedDict({
     # normalise obs./reward, atari preprocessing
-    #'learning_starts' = [200, 500, 1000, 10000]
-    #'target_network_update_freq': [4, 8, 16, 32, 64, 128]
-    'train_batch_size': [4, 8, 16, 32, 64, 128],
+    'learning_starts' : [200, 500, 1000, 5000, 10000]
+    #'target_network_update_freq': [200, 400, 800, 1600, 3200]
+    #'train_batch_size': [4, 8, 16, 32, 64, 128],
 })
 
 var_configs = OrderedDict({
-    "env": var_env_configs
+    "env": var_env_configs,
     "agent": var_agent_configs
 })
 
@@ -57,7 +57,8 @@ agent_config = {
     "num_atoms": 1,
     "prioritized_replay": False,
     "prioritized_replay_alpha": 0.5,
-    "sample_batch_size": 4,
+    #"sample_batch_size": 4,
+    "rollout_fragment_length":4,
     "schedule_max_timesteps": 20000,
     "target_network_update_freq": 800,
     "timesteps_per_iteration": 1000,
@@ -68,7 +69,13 @@ agent_config = {
 model_config = {
     "model": {
         "fcnet_hiddens": [256, 256],
+        "custom_preprocessor": "ohe",
+        "custom_options": {},  # extra options to pass to your preprocessor
         "fcnet_activation": "tanh",
+        "use_lstm": False,
+        "max_seq_len": 20,
+        "lstm_cell_size": 256,
+        "lstm_use_prev_action_reward": False,
     },
 }
 

@@ -71,31 +71,37 @@ class MDPP_Analysis():
             join_files(stats_file,  '.csv')
             join_files(stats_file, '_eval.csv')
 
-        stats_pd = pd.read_csv(stats_file + '.csv', skip_blank_lines=True, header=None, comment='#', sep=' ')
-        # print(stats_pd)
-        # print(stats_pd[11].dtypes)
-        # print(stats_pd.dtypes)
-        print("Training stats read (rows, columns):", stats_pd.shape)
-
         # Read column names
         with open(stats_file + '.csv') as file_:
-            config_names = file_.readline().strip().split(', ')
-            config_names[0] = config_names[0][2:] # to remove '# ' that was written
-            # config_names[-1] = config_names[-1][:-1] # to remove ',' that was written
-        # print("config_names:", config_names)
-        self.config_names = config_names[1:] # ; begins at 1 to ignore training iteration num. ['Delay', 'Sequence Length', 'Reward Density', 'Terminal State Density', 'P Noise', 'R Noise', 'dummy_seed']
+            col_names = file_.readline().strip().split(', ')
+            col_names[0] = col_names[0][2:] # to remove '# ' that was written
+        # print("config_names:", col_names)
+        
+        stats_pd = pd.read_csv(stats_file + '.csv', skip_blank_lines=True,\
+                                header=None, names = col_names, comment='#', sep=' ')
+        print("Training stats read (rows, columns):", stats_pd.shape)
+
         config_counts = []
         dims_values = []
-        # For the following seeds should always be last column read! 1st column should be >=1 (it should not be 0 because that is the training_iteration that was recorded and is not used here)
-        for i in range(1, len(config_names) - num_metrics): # hardcoded 3 for no. of stats written
-            dims_values.append(stats_pd[i].unique())
-            config_counts.append(stats_pd[i].nunique())
+        #Keep only config_names that we wan't to measure
+        #traning iteration is always first, metrics are always last.
+        full_config_names = col_names[1:] # ; begins at 1 to ignore training iteration num
+        
+        # mean_vals = [ np.mean(stats_pd.loc[stats_pd['target_network_update_freq'] == val]["episode_reward_mean"]) 
+        #                 for val in stats_pd["target_network_update_freq"].unique() ]
 
-        # config_counts[2] = 1 # hack
-        # config_counts[-1] = 2 # hack for TD3 HP tuning files
+        #config counts includes seed
+        seed_idx = -1
+        for i, c in enumerate(full_config_names[:-num_metrics]): # hardcoded 3 for no. of stats written
+            dims_values.append(stats_pd[c].unique())
+            config_counts.append(stats_pd[c].nunique())
+            if("seed" in c):
+                seed_idx = i
+        
         config_counts.append(num_metrics) #hardcoded number of training stats that were recorded
         config_counts = tuple(config_counts)
-        self.metric_names = config_names[-num_metrics:]
+        self.metric_names = full_config_names[-num_metrics:]
+        self.config_names = full_config_names[:-num_metrics]
 
         # Slice into training stats and get end of training stats for individual training runs in the experiment
         final_rows_for_a_config = []
@@ -104,24 +110,19 @@ class MDPP_Analysis():
         # cols_to_take = 8
 
         for i in range(stats_pd.shape[0] - 1):
-            if stats_pd.iloc[i, -num_metrics] > stats_pd.iloc[i + 1, -num_metrics]: # hardcoded: -num_metrics column always HAS to be no. of timesteps for the current run
+            if stats_pd["timesteps_total"].iloc[i] > stats_pd["timesteps_total"].iloc[ i + 1]:
+            #if stats_pd.iloc[i, -num_metrics] > stats_pd.iloc[i + 1, -num_metrics]:
                 # list_of_learning_curves.append(stats_pd.iloc[previous_i:i+1, -cols_to_take:])
                 previous_i = i + 1
                 final_rows_for_a_config.append(i)
-        # print("i, previous_i:", i, previous_i)
+        
         final_rows_for_a_config.append(i + 1) # Always append the last row!
-        # list_of_learning_curves.append(stats_pd.iloc[previous_i:i + 2, -cols_to_take:])
         self.final_rows_for_a_config = final_rows_for_a_config
-
-        # print(len(list_of_learning_curves))
-        # print(len(final_rows_for_a_config))
         stats_end_of_training = stats_pd.iloc[final_rows_for_a_config]
         stats_reshaped = stats_end_of_training.iloc[:, -num_metrics:] # hardcoded # last vals are timesteps_total, episode_reward_mean, episode_len_mean
         stats_reshaped = np.reshape(np.array(stats_reshaped), config_counts)
-        # print(stats_end_of_training.head(10))
+
         print("train stats shape:", stats_reshaped.shape)
-#         to_plot_ = np.squeeze(stats_reshaped[:, :, :, :, 0, 0, :, 1])
-#         print('Episode reward (at end of training) for 10 seeds for vanilla env.:', to_plot_)
 
         # Calculate AUC metrics
         train_aucs = []
@@ -136,7 +137,6 @@ class MDPP_Analysis():
 
         train_aucs = np.reshape(np.array(train_aucs), config_counts)
         print("train_aucs.shape:", train_aucs.shape)
-
 
         final_eval_metrics_reshaped, mean_data_eval, eval_aucs = None, None, None
         # Load evaluation stats
@@ -182,18 +182,16 @@ class MDPP_Analysis():
             # print('final_rows_for_a_config', final_rows_for_a_config)
             # print("len(final_10_evals)", final_10_evals.shape, type(final_10_evals))
             mean_data_eval = np.mean(final_10_evals, axis=1) # this is mean over last 10 eval episodes
-    #         print(np.array(stats_pd.iloc[:, -3]))
 
             # Adds timesteps_total column to the eval stats which did not have them:
             mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -num_metrics])).T, mean_data_eval), axis=1)
-    #         print(mean_data_eval.shape, len(final_rows_for_a_config))
 
 
             final_eval_metrics_ = mean_data_eval[final_rows_for_a_config, :] # 1st column is episode reward, 2nd is episode length in original _eval.csv file, here it's 2nd and 3rd after prepending timesteps_total column above.
             # print(dims_values, config_counts)
             final_eval_metrics_reshaped = np.reshape(final_eval_metrics_, config_counts)
             # print(final_eval_metrics_)
-    #         print("eval stats shapes (before and after reshape):", final_eval_metrics_.shape, final_eval_metrics_reshaped.shape)
+
             print("eval stats shape:", final_eval_metrics_reshaped.shape)
 
 
@@ -211,15 +209,17 @@ class MDPP_Analysis():
             eval_aucs = np.reshape(np.array(eval_aucs), config_counts)
             print("eval_aucs.shape:", eval_aucs.shape)
 
-
-        self.config_counts = config_counts[:-1] # -1 is added to ignore "no. of stats that were saved" as dimensions of difficulty
+        # -1 is added to ignore "no. of stats that were saved" as dimensions of difficulty
+        self.config_counts = config_counts[:-1] 
         self.dims_values = dims_values
 
         # Catpure the dimensions that were varied, i.e. ones which had more than 1 value across experiments
         x_axis_labels = []
         x_tick_labels_ = []
         dims_varied = []
-        for i in range(len(self.config_counts) - 1): # -1 is added to ignore #seeds as dimensions of difficulty
+        for i in range(len(self.config_counts)): 
+            if("seed" in self.config_names[i]): # ignore #seeds as dimensions of difficulty
+                continue
             if self.config_counts[i]> 1:
                 x_axis_labels.append(self.config_names[i])
                 x_tick_labels_.append([str(j) for j in self.dims_values[i]])
@@ -253,8 +253,25 @@ class MDPP_Analysis():
         for d,v,i in zip(x_axis_labels, x_tick_labels_, dims_varied):
             print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
 
+        if(seed_idx>-1):
+            stats_dims = list(np.arange(len(stats_reshaped.shape)))
+            stats_dims.insert(-1, stats_dims.pop(seed_idx))
+            stats_reshaped = np.transpose(stats_reshaped, stats_dims)
+            train_aucs = np.transpose(train_aucs, stats_dims)
+            print("after transpose")
+            print("train stats shape:", stats_reshaped.shape)
+            print("train_aucs.shape:", train_aucs.shape)
+            self.config_counts = list(self.config_counts)
+            self.config_counts.append(self.config_counts.pop(seed_idx))
+            self.config_counts = tuple(self.config_counts)
+            col_names.insert(-num_metrics, col_names.pop(seed_idx))
+            stats_pd = stats_pd[col_names]
+            if(load_eval):
+                final_eval_metrics_reshaped = np.transpose(final_eval_metrics_reshaped, stats_dims)
+                eval_aucs = np.transpose(eval_aucs, stats_dims)
+                print("eval stats shape:", final_eval_metrics_reshaped.shape)
+                print("eval_aucs.shape:", eval_aucs.shape)
         return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval, train_aucs, eval_aucs
-
 
     def plot_1d_dimensions(self, stats_data, save_fig=False, train=True, metric_num=-2):
         '''Plots 1-D bar plots across a single dimension with mean and std. dev.
@@ -392,7 +409,7 @@ class MDPP_Analysis():
             nrows_ = 1
         nseeds_ = self.config_counts[-1]
         # print(ax, type(ax), type(ax[0]))
-#         color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    #color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
         # print("color_cycle", color_cycle)
         plt.rcParams.update({'font.size': 25}) # 25 for 36x21 fig, 16 for 24x14 fig.
         # 36x21 for better resolution but about 900kb file size, 24x14 for okay resolution and 550kb file size
@@ -436,3 +453,13 @@ class MDPP_Analysis():
         plt.show()
         if save_fig:
             fig.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
+
+if __name__ == "__main__":
+    dir_name = '../../../mdp_files'
+    exp_name = 'dqn_vanilla_targetnet_hps'
+    #exp_name = 'dqn_vanilla_trainbs_hps'
+    mdpp_analysis = MDPP_Analysis()
+    train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=False)
+    #mdpp_analysis.plot_1d_dimensions(train_stats, False)
+    #mdpp_analysis.plot_1d_dimensions(train_aucs, False)
+    mdpp_analysis.plot_learning_curves(train_curves)
