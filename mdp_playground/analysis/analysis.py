@@ -454,12 +454,12 @@ class MDPP_Analysis():
         if save_fig:
             fig.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
 
-if __name__ == "__main__":
-    dir_name = '../../../mdp_files'
-    exp_name = 'dqn_vanilla_targetnet_hps'
-    #exp_name = 'dqn_vanilla_trainbs_hps'
-    mdpp_analysis = MDPP_Analysis()
-    train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=False)
-    #mdpp_analysis.plot_1d_dimensions(train_stats, False)
-    #mdpp_analysis.plot_1d_dimensions(train_aucs, False)
-    mdpp_analysis.plot_learning_curves(train_curves)
+# if __name__ == "__main__":
+#     dir_name = '../../../mdp_files'
+#     exp_name = 'dqn_vanilla_targetnet_hps'
+#     #exp_name = 'dqn_vanilla_trainbs_hps'
+#     mdpp_analysis = MDPP_Analysis()
+#     train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=False)
+#     #mdpp_analysis.plot_1d_dimensions(train_stats, False)
+#     #mdpp_analysis.plot_1d_dimensions(train_aucs, False)
+#     mdpp_analysis.plot_learning_curves(train_curves)

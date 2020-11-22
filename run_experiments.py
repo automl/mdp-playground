@@ -1,5 +1,6 @@
 import sys, os
 import argparse
+import importlib
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
@@ -42,8 +43,8 @@ def main():
         import run_experiments_baselines
         run_experiments_baselines.main(args)
     else: #ray
-        import run_experiments#_ray
-        run_experiments.main(args)#_ray.main(args)
+        import run_experiments_ray
+        run_experiments_ray.main(args)#_ray.main(args)
 
 
 if __name__ == '__main__':
