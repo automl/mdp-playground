@@ -254,8 +254,8 @@ class MDPP_Analysis():
 
         # related to plots
         exp_data['metric_names'] = self.metric_names
-        exp_data['tick_labels'] = self.tick_labels[0]
-        exp_data['axis_labels'] = self.axis_labels[0]
+        exp_data['tick_labels'] = self.tick_labels
+        exp_data['axis_labels'] = self.axis_labels
         exp_data['stats_file'] = self.stats_file
         exp_data['algorithm'] = self.dims_values[0][0]
         exp_data['dims_varied'] = self.dims_varied
@@ -304,36 +304,55 @@ class MDPP_Analysis():
             }
         """
         for exp_data in list_exp_data:
-            group_key = exp_data[groupby]
-            sub_group_key = exp_data[sub_groupby]
-
-            if group_key not in stats_data:
-                # if group_key is not alreay present initialize
-                stats_data[group_key] = dict()
-
-            if sub_group_key not in stats_data[group_key]:
-                # if sub_group_key is not alreay present initialize
-                stats_data[group_key][sub_group_key] = dict()
-
             if train:
                 stats = exp_data['train_stats']
             else:
                 stats = exp_data['eval_stats']
 
+            group_keys = exp_data[groupby]
+            if isinstance(group_keys, str):
+                group_keys = [group_keys]
 
-            # gather data related to plot
-            mean_data_ = np.mean(stats[..., metric_num], axis=-1) # the slice sub-selects the metric written in position metric_num from the "last axis of diff. metrics that were written" and then the axis of #seeds becomes axis=-1 ( before slice it was -2).
-            to_plot_ = np.squeeze(mean_data_)
-            stats_data[group_key][sub_group_key]['to_plot_'] = to_plot_
-            std_dev_ = np.std(stats[..., metric_num], axis=-1) #seed
-            to_plot_std_ = np.squeeze(std_dev_)
-            stats_data[group_key][sub_group_key]['to_plot_std_'] = to_plot_std_
+            for group_key in group_keys:
+                if group_key not in stats_data:
+                    # if group_key is not alreay present initialize
+                    stats_data[group_key] = dict()
 
-            stats_data[group_key][sub_group_key]['labels'] = sub_group_key
-            stats_data[group_key][sub_group_key]['tick_labels'] = exp_data['tick_labels']
-            stats_data[group_key][sub_group_key]['axis_labels'] = exp_data[groupby]
-            stats_data[group_key][sub_group_key]['metric_names'] = exp_data['metric_names']
-            stats_data[group_key][sub_group_key]['stats_file'] = exp_data['stats_file']
+                sub_group_keys = exp_data[sub_groupby]
+                if isinstance(sub_group_keys, str):
+                    sub_group_keys = [sub_group_keys]
+
+                for idx in range(len(sub_group_keys)):
+                    sub_group_key = sub_group_keys[idx]
+                    if sub_group_key not in stats_data[group_key]:
+                        # if sub_group_key is not alreay present initialize
+                        stats_data[group_key][sub_group_key] = dict()
+
+
+                    # gather data related to plot
+                    mean_data_ = np.mean(stats[..., metric_num], axis=-1) # the slice sub-selects the metric written in position metric_num from the "last axis of diff. metrics that were written" and then the axis of #seeds becomes axis=-1 ( before slice it was -2).
+                    to_plot_ = np.squeeze(mean_data_)
+
+                    #HACK traspose the array and choose first column elements always
+                    if len(to_plot_.shape) > 1:
+                        axes = np.arange(len(to_plot_.shape))
+                        new_axes = [axes[(i - idx) % len(axes)] for i, x in enumerate(axes)]
+                        to_plot_ = np.transpose(to_plot_, tuple(new_axes))[:, 0]
+                    stats_data[group_key][sub_group_key]['to_plot_'] = to_plot_
+
+                    std_dev_ = np.std(stats[..., metric_num], axis=-1) #seed
+                    to_plot_std_ = np.squeeze(std_dev_)
+
+                    #HACK traspose the array and choose first column elements always
+                    if len(to_plot_std_.shape) > 1:
+                        to_plot_std_ = np.transpose(to_plot_std_, tuple(new_axes))[:, 0]
+                    stats_data[group_key][sub_group_key]['to_plot_std_'] = to_plot_std_
+
+                    stats_data[group_key][sub_group_key]['labels'] = sub_group_key
+                    stats_data[group_key][sub_group_key]['tick_labels'] = exp_data['tick_labels'][idx]
+                    stats_data[group_key][sub_group_key]['axis_labels'] = exp_data[groupby]
+                    stats_data[group_key][sub_group_key]['metric_names'] = exp_data['metric_names']
+                    stats_data[group_key][sub_group_key]['stats_file'] = exp_data['stats_file']
 
         return stats_data
 
@@ -431,14 +450,8 @@ class MDPP_Analysis():
 
         y_axis_label = 'Reward' if 'reward' in stats_data['metric_names'][metric_num] else stats_data['metric_names'][metric_num]
 
-        #HACK
-        if len(stats_data['to_plot_'].shape) > 1:
-            # choose first meta-feature exp data only
-            to_plot_ = stats_data['to_plot_'][:, 0]
-            to_plot_std_ = stats_data['to_plot_std_'][:, 0]
-        else:
-            to_plot_ = stats_data['to_plot_']
-            to_plot_std_ = stats_data['to_plot_std_']
+        to_plot_ = stats_data['to_plot_']
+        to_plot_std_ = stats_data['to_plot_std_']
         labels = stats_data['labels']
         tick_labels =  stats_data['tick_labels']
         axis_labels =  stats_data['axis_labels']
