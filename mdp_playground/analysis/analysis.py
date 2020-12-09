@@ -43,7 +43,7 @@ class MDPP_Analysis():
             list_exp_data.append(exp_data)
         return list_exp_data
 
-    def get_exp_data(self, dir_name, exp_name, num_metrics=3): #, max_total_configs=200):
+    def get_exp_data(self, dir_name, exp_name, num_metrics=3, threshold=0.05, sample_freq=1): #, max_total_configs=200):
         '''get training and evaluation data from given experiement file
 
         Parameters
@@ -52,6 +52,10 @@ class MDPP_Analysis():
             The location where the training and evaluation CSV files were written
         exp_name : str
             The name of the experiment: the training and evaluation CSV filenames are formed using this string
+        threshold : float
+            The fault tolerance threshold while loading data
+        sample_freq : int
+            The subsample frequency (step)
 
         Returns
         -------
@@ -70,6 +74,10 @@ class MDPP_Analysis():
         stats_file = dir_name + '/' + exp_name #Name of file to which benchmark stats were written
         self.stats_file = stats_file
 
+        #hack might need to be dynamic instead hardcoded value
+        train_cnt = 20
+        eval_cnt = 210
+
         if os.path.isfile(stats_file + '.csv'):
             print("Loading data from a sequential run/already combined runs of experiment configurations.")
         else:
@@ -86,8 +94,12 @@ class MDPP_Analysis():
                                 byte_string = curr_file.read()
                                 newline_count = byte_string.count(10)
                                 num_diff_lines.append(newline_count)
-                                # if newline_count != 21 and file_suffix == '.csv': #hack to check only train files and not eval
-                                #     warnings.warn('Expected 21 \\n chars in each stats file because we usually write stats every 1k timesteps for 20k timesteps. However, this can easily differ, e.g., for TD3 and DDPG where learning starts at 2k timesteps and there is 1 less \\n. Got only: ' + str(newline_count) + ' in file: ' + str(i))
+
+                                # fault tolerance check
+                                show_warning = (newline_count < train_cnt*threshold) if (file_suffix == '.csv') else (newline_count < eval_cnt*threshold)
+                                if show_warning:
+                                    warnings.warn('Expected {0} chars in each stats file. Got only: {1}  in file: {2}'.format(train_cnt if file_suffix == '.csv' else eval_cnt, newline_count, i))
+
                                 combined_file.write(byte_string)
                         else:
                             # missing_configs.append(i)
@@ -105,6 +117,11 @@ class MDPP_Analysis():
         # print(stats_pd)
         # print(stats_pd[11].dtypes)
         # print(stats_pd.dtypes)
+
+        # subsampling code
+        stats_pd_indices = np.arange(0, stats_pd.shape[0], step=sample_freq)
+        stats_pd = stats_pd.loc[stats_pd_indices]
+
         print("Training stats read (rows, columns):", stats_pd.shape)
 
         # Read column names
@@ -196,6 +213,10 @@ class MDPP_Analysis():
         # print("len(final_10_evals)", final_10_evals.shape, type(final_10_evals))
         mean_data_eval = np.mean(final_10_evals, axis=1) # this is mean over last 10 eval episodes
 #         print(np.array(stats_pd.iloc[:, -3]))
+
+        # subsampling code
+        eval_stats_indices = np.arange(0, mean_data_eval.shape[0], step=sample_freq)
+        mean_data_eval = mean_data_eval[eval_stats_indices]
 
         # Adds timesteps_total column to the eval stats which did not have them:
         mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -num_metrics])).T, mean_data_eval), axis=1)
