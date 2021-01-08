@@ -87,3 +87,9 @@ if __name__ == "__main__":
     discrete_environment_example()
     print("\nRunning continuous environment")
     continuous_environment_example()
+
+    # Using gym.make()
+    import mdp_playground
+    import gym
+    gym.make('RLToy-v0')
+    gym.make('RLToy-v0', **{'state_space_size':8, 'action_space_size':8, 'state_space_type':'discrete', 'action_space_type':'discrete', 'terminal_state_density':0.25, 'completely_connected': True})
