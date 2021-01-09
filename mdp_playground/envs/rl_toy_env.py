@@ -101,21 +101,21 @@ class RLToyEnv(gym.Env):
         Initialises transition function, P
     init_reward_function()
         Initialises reward function, R
-    transition_function(state, action, only_query=False)
+    transition_function(state, action)
         the transition function of the MDP, P
     P(state, action)
-        defined as a lambda function in the call to init_transition_function() and is equivalent to calling transition_function() with only_query = False
-    reward_function(state, action, only_query=False)
+        defined as a lambda function in the call to init_transition_function() and is equivalent to calling transition_function()
+    reward_function(state, action)
         the reward function of the MDP, R
     R(state, action)
-        defined as a lambda function in the call to init_reward_function() and is equivalent to calling reward_function() with only_query = False
+        defined as a lambda function in the call to init_reward_function() and is equivalent to calling reward_function()
     get_augmented_state()
         gets underlying Markovian state of the MDP
     reset()
         Resets environment state
     seed()
         Sets the seed for the numpy RNG used by the environment (state and action spaces have their own seeds as well)
-    step(action, only_query=False)
+    step(action, imaginary_rollout=False)
         Performs 1 transition of the MDP
     """
 
@@ -609,7 +609,7 @@ class RLToyEnv(gym.Env):
             pass
 
 
-        self.P = lambda s, a, only_query=False: self.transition_function(s, a, only_query)
+        self.P = lambda s, a: self.transition_function(s, a)
 
     def init_reward_function(self):
         """Initialises reward function, R by selecting random sequences to be rewardable for discrete environments. For continuous environments, we have fixed available options for the reward function.
@@ -683,10 +683,10 @@ class RLToyEnv(gym.Env):
             # self.logger.debug("# TODO for cont. spaces?: init_reward_function") # reward functions are fixed for cont. right now with a few available choices.
             pass
 
-        self.R = lambda s, a, only_query=False: self.reward_function(s, a, only_query)
+        self.R = lambda s, a: self.reward_function(s, a)
 
 
-    def transition_function(self, state, action, only_query=False):
+    def transition_function(self, state, action):
         """The transition function, P.
 
         Performs a transition according to the initialised P for discrete environments (with dynamics independent for relevant vs irrelevant dimension sub-spaces). For continuous environments, we have a fixed available option for the dynamics (which is the same for relevant or irrelevant dimensions):
@@ -698,29 +698,12 @@ class RLToyEnv(gym.Env):
             The state that the environment will use to perform a transition.
         action : list
             The action that the environment will use to perform a transition.
-        only_query: boolean
-            Option for the user to perform "imaginary" transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide the state to this function to be able to perform a rollout. For continuous environments, this is NOT currently supported. ##TODO
 
         Returns
         -------
         int or np.array
             The state at the end of the current transition
         """
-
-        # Transform multi-discrete to discrete for discrete state spaces with irrelevant dimensions; needed only for imaginary rollouts, otherwise, internal augmented state is used.
-        # if only_query:
-
-        if self.image_representations:
-            state = self.augmented_state[-1] ###TODO this would cause a crash if multi-discrete is used with image_representations!
-        else:
-            if self.config["state_space_type"] == "discrete":
-                if isinstance(self.config["state_space_size"], list):
-                    if self.config["irrelevant_state_space_size"] > 0:
-                        state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(state, action, irrelevant_parts=True)
-                    else:
-                        state, action, _, _ = self.multi_discrete_to_discrete(state, action)
-
-
 
         if self.config["state_space_type"] == "discrete":
             next_state = self.config["transition_function"](state, action)
@@ -736,20 +719,6 @@ class RLToyEnv(gym.Env):
                 # print("new probs:", probs, self.relevant_observation_space.sample(prob=probs))
                 next_state = new_next_state
                 # assert np.sum(probs) == 1, str(np.sum(probs)) + " is not equal to " + str(1)
-
-            #irrelevant dimensions part
-            if self.config["irrelevant_state_space_size"] > 0:
-                if self.config["irrelevant_action_space_size"] > 0: # only if there's an irrelevant action does a transition take place (even a noisy one)
-                    next_state_irrelevant = self.config["transition_function_irrelevant"][state_irrelevant, action_irrelevant]
-                    if "transition_noise" in self.config:
-                        probs = np.ones(shape=(self.config["irrelevant_state_space_size"],)) * self.config["transition_noise"] / (self.config["irrelevant_state_space_size"] - 1)
-                        probs[next_state_irrelevant] = 1 - self.config["transition_noise"]
-                        new_next_state_irrelevant = self.irrelevant_observation_space.sample(prob=probs) #random
-                        # if next_state_irrelevant != new_next_state_irrelevant:
-                        #     print("NOISE inserted! old next_state_irrelevant, new_next_state_irrelevant", next_state_irrelevant, new_next_state_irrelevant)
-                        #     self.total_noisy_transitions_irrelevant_episode += 1
-                        next_state_irrelevant = new_next_state_irrelevant
-
 
         else: # if continuous space
             ###TODO implement imagined transitions also for cont. spaces
@@ -790,31 +759,13 @@ class RLToyEnv(gym.Env):
                 self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
                 self.state_derivatives[0] = next_state
 
-
-        if only_query:
-            pass
-            # print("Only query") # Since transition_function currently depends only on current state and action, we don't need to do anything here!
-        else:
-            del self.augmented_state[0]
-            self.augmented_state.append(next_state.copy() if isinstance(next_state, np.ndarray) else next_state)
-            self.total_transitions_episode += 1
-
-
-        # Transform discrete back to multi-discrete if needed
-        if self.config["state_space_type"] == "discrete":
-            if isinstance(self.config["state_space_size"], list):
-                if self.config["irrelevant_state_space_size"] > 0:
-                    next_state = self.discrete_to_multi_discrete(next_state, next_state_irrelevant)
-                else:
-                    next_state = self.discrete_to_multi_discrete(next_state)
-
-        # If the externally visible observation space is images, then convert to underlying (multi-)discrete state
-        if self.image_representations:
-            next_state = self.observation_space.get_concatenated_image(next_state)
+            if self.config["reward_function"] == "move_to_a_point":
+                if np.linalg.norm(np.array(state, dtype=self.dtype)[self.config["state_space_relevant_indices"]] - self.config["target_point"]) < self.target_radius:
+                    self.reached_terminal = True
 
         return next_state
 
-    def reward_function(self, state, action, only_query=False):
+    def reward_function(self, state, action):
         """The reward function, R.
 
         Rewards the sequences selected to be rewardable at initialisation for discrete environments. For continuous environments, we have fixed available options for the reward function:
@@ -824,42 +775,40 @@ class RLToyEnv(gym.Env):
         Parameters
         ----------
         state : list
-            The augmented state that the environment uses to calculate its reward. Normally, just the sequence of past states of length delay + sequence_length + 1.
-        action : list
-            It's currently NOT used to calculate the reward. Since the underlying MDP dynamics are deterministic a state and action map 1-to-1 with the next state and just a sequence of states should be enough to calculate the reward. But it might be useful in the future, e.g., to penalise action magnitudes
-        only_query: boolean
-            Option for the user to perform "imaginary" transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide a list of states to this function to be able to perform a rollout.
+            The underlying MDP state (also called augmented state in this code) that the environment uses to calculate its reward. Normally, just the sequence of past states of length delay + sequence_length + 1.
+        action : single action dependent on action space
+            Action magnitudes are penalised immediately in the case of continuous spaces and, in effect, play no role for discrete spaces as the reward in that case only depends on sequences of states. We say "in effect" because it _is_ used in case of a custom R to calculate R(s, a) but that is equivalent to using the "next" state s' as the reward determining criterion in case of deterministic transitions. _Sequences_ of _actions_ are currently NOT used to calculate the reward. Since the underlying MDP dynamics are deterministic, a state and action map 1-to-1 with the next state and so, just a sequence of _states_ should be enough to calculate the reward.
 
         Returns
         -------
         double
             The reward at the end of the current transition
 
-        #TODO Make reward depend on the action sequence too instead of just state sequence, as it is currently? Maybe only use the action sequence for penalising action magnitude?
+        #TODO Make reward depend on the action sequence too instead of just state sequence, as it is currently?
         """
 
-        # Transform multi-discrete to discrete if needed. This is only needed for only_query = True to be able to transform multi-discrete state and action passed by user into underlying discrete state and action! When only_query = False, we don't need to convert passed state and action because internal uni-discrete representation is used to calculate reward.
-        if only_query: #test
-            if self.config["state_space_type"] == "discrete":
-                if isinstance(self.config["state_space_size"], list):
-                    # The following part is commented out because irrelevant parts are not needed in the reward_function.
-                    # if self.config["irrelevant_state_space_size"] > 0:
-                    #     state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(state, action, irrelevant_parts=True)
-                    # else:
-                    for i in range(len(state)):
-                        state[i], action, _, _ = self.multi_discrete_to_discrete(state[i], action)
+        # Transform multi-discrete to discrete if needed. This is only needed for imaginary_rollout = True to be able to transform multi-discrete state and action passed by user into underlying discrete state and action! When imaginary_rollout = False, we don't need to convert passed state and action because internal uni-discrete representation is used to calculate reward.
+        # if imaginary_rollout: #test
+        #     if self.config["state_space_type"] == "discrete":
+        #         if isinstance(self.config["state_space_size"], list):
+        #             # The following part is commented out because irrelevant parts are not needed in the reward_function.
+        #             # if self.config["irrelevant_state_space_size"] > 0:
+        #             #     state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(state, action, irrelevant_parts=True)
+        #             # else:
+        #             for i in range(len(state)):
+        #                 state[i], action, _, _ = self.multi_discrete_to_discrete(state[i], action)
 
         delay = self.delay
         sequence_length = self.sequence_length
         reward = 0.0
         # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
-        state_considered = state if only_query else self.augmented_state # When we imagine a rollout, the user has to provide full augmented state as the argument!!
+        state_considered = state # if imaginary_rollout else self.augmented_state # When we imagine a rollout, the user has to provide full augmented state as the argument!!
         # if not isinstance(state_considered, list):
         #     state_considered = [state_considered] # to get around case when sequence is an int; it should always be a list except if a user passes in a state; would rather force them to pass a list: assert for it!!
-        # TODO These asserts are only needed if only_query is True, as users then pass in a state sequence
-        if only_query:
-            assert isinstance(state_considered, list), "state passed in should be a list of states containing at the very least the state at beginning of the transition, s, and the one after it, s'. type was: " + str(type(state_considered))
-            assert len(state_considered) == self.augmented_state_length, "Length of list of states passed should be equal to self.augmented_state_length. It was: " + str(len(state_considered))
+        # TODO These asserts are only needed if imaginary_rollout is True, as users then pass in a state sequence
+        # if imaginary_rollout:
+        #     assert isinstance(state_considered, list), "state passed in should be a list of states containing at the very least the state at beginning of the transition, s, and the one after it, s'. type was: " + str(type(state_considered))
+        #     assert len(state_considered) == self.augmented_state_length, "Length of list of states passed should be equal to self.augmented_state_length. It was: " + str(len(state_considered))
 
         if self.use_custom_mdp:
             reward = self.config["reward_function"](state_considered, action)
@@ -944,9 +893,6 @@ class RLToyEnv(gym.Env):
                             reward = 1.0 # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
                     reward -= self.action_loss_weight * np.linalg.norm(np.array(action, dtype=self.dtype))
-                    if np.linalg.norm(np.array(state, dtype=self.dtype)[self.config["state_space_relevant_indices"]] - self.config["target_point"]) < self.target_radius:
-                        self.reached_terminal = True
-
 
         reward *= self.reward_scale
         noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
@@ -956,14 +902,14 @@ class RLToyEnv(gym.Env):
         reward += self.reward_shift
         return reward
 
-    def step(self, action, only_query=False):
+    def step(self, action, imaginary_rollout=False):
         """The step function for the environment.
 
         Parameters
         ----------
         action : int or np.array
             The action that the environment will use to perform a transition.
-        only_query: boolean
+        imaginary_rollout: boolean
             Option for the user to perform "imaginary" transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide a list of states to this function to be able to perform a rollout.
 
         Returns
@@ -971,8 +917,71 @@ class RLToyEnv(gym.Env):
         int or np.array, double, boolean, dict
             The next state, reward, whether the episode terminated and additional info dict at the end of the current transition
         """
-        self.curr_state = self.P(self.curr_state, action, only_query=only_query)
-        self.reward = self.R(self.curr_state, action, only_query=only_query) ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
+
+        # For imaginary transitions, discussion:
+        # 1) Use external observation_space as argument to P() and R(). But then it's not possible for P and R to know underlying MDP state unless we pass it as another argument. This is not desirable as we want P and R to simply be functions of external state/observation and action. 2) The other possibility is how it's currently done: P and R _know_ the underlying state. But in this case, we need an extra imaginary_rollout argument to P and R and we can't perform imaginary rollouts longer than one step without asking the user to maintain a sequence of underlying states and actions to be passed as arguments to P and R.
+        # P and R knowing the underlying state seems a poor design choice to me because it makes the code structure more brittle, so I propose that step() handles the underlying state vs external observation conversion and user can use P and R with underlying state. And step should handle the case of imaginary rollouts by building a tree of transitions and allowing rollback to states along the tree.
+
+
+        # Transform multi-discrete to discrete for discrete state spaces with irrelevant dimensions; needed only for imaginary rollouts, otherwise, internal augmented state is used.
+
+        if imaginary_rollout:
+            print("Imaginary rollouts are currently not supported.")
+            sys.exit(1)
+
+        state = self.augmented_state[-1]
+        if self.image_representations:
+            state = self.augmented_state[-1] ###TODO this would cause a crash if multi-discrete is used with image_representations!
+        else:
+            if self.config["state_space_type"] == "discrete":
+                if isinstance(self.config["state_space_size"], list):
+                    if self.config["irrelevant_state_space_size"] > 0:
+                        state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(self.curr_state, action, irrelevant_parts=True)
+                    else:
+                        state, action, _, _ = self.multi_discrete_to_discrete(self.curr_state, action)
+
+
+        ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
+
+        next_state = self.P(state, action)
+
+        # if imaginary_rollout:
+        #     pass
+        #     # print("imaginary_rollout") # Since transition_function currently depends only on current state and action, we don't need to do anything here!
+        # else:
+        del self.augmented_state[0]
+        self.augmented_state.append(next_state.copy() if isinstance(next_state, np.ndarray) else next_state)
+        self.total_transitions_episode += 1
+
+        self.reward = self.R(self.augmented_state, action)
+
+        #irrelevant dimensions part
+        if self.config["state_space_type"] == "discrete":
+            if self.config["irrelevant_state_space_size"] > 0:
+                if self.config["irrelevant_action_space_size"] > 0: # only if there's an irrelevant action does a transition take place (even a noisy one)
+                    next_state_irrelevant = self.config["transition_function_irrelevant"][state_irrelevant, action_irrelevant]
+                    if "transition_noise" in self.config:
+                        probs = np.ones(shape=(self.config["irrelevant_state_space_size"],)) * self.config["transition_noise"] / (self.config["irrelevant_state_space_size"] - 1)
+                        probs[next_state_irrelevant] = 1 - self.config["transition_noise"]
+                        new_next_state_irrelevant = self.irrelevant_observation_space.sample(prob=probs) #random
+                        # if next_state_irrelevant != new_next_state_irrelevant:
+                        #     print("NOISE inserted! old next_state_irrelevant, new_next_state_irrelevant", next_state_irrelevant, new_next_state_irrelevant)
+                        #     self.total_noisy_transitions_irrelevant_episode += 1
+                        next_state_irrelevant = new_next_state_irrelevant
+
+        # Transform discrete back to multi-discrete if needed
+        if self.config["state_space_type"] == "discrete":
+            if isinstance(self.config["state_space_size"], list):
+                if self.config["irrelevant_state_space_size"] > 0:
+                    next_state = self.discrete_to_multi_discrete(next_state, next_state_irrelevant)
+                else:
+                    next_state = self.discrete_to_multi_discrete(next_state)
+
+        # If the externally visible observation space is images, then convert to underlying (multi-)discrete state
+        if self.image_representations:
+            next_state = self.observation_space.get_concatenated_image(next_state)
+
+        self.curr_state = next_state
 
 
         self.done = self.is_terminal_state(self.augmented_state[-1]) or self.reached_terminal #### TODO curr_state is external state, while we need to check relevant state for terminality! Done - by using augmented_state now instead of curr_state!
