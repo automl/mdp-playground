@@ -24,8 +24,8 @@ class RLToyEnv(gym.Env):
     The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated object will emulate. We recommend looking at the examples in example.py to begin using the environment since the config options are mostly self-explanatory. For more details, we list here the meta-features and config options (their names here correspond to the keys to be passed in the config dict):
         delay: Delays reward by this number of steps.
         sequence_length: Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length rewardable at init if use_custom_mdp = false and generate_random_mdp = true.
-        transition_noise: For discrete environments, a fraction = fraction of times environment, uniformly at random, transitions to a noisy state. For continuous environments, a lambda function added to next state.
-        reward_noise: A lambda function added to the reward given at every time step.
+        transition_noise: For discrete environments, a fraction = fraction of times environment, uniformly at random, transitions to a noisy state. For continuous environments, a Python function added to next state.
+        reward_noise: A Python function added to the reward given at every time step.
         reward_density: The fraction of possible sequences of a given length that will be selected to be rewardable at init.
         reward_scale: Scales default reward function by this value.
         reward_shift: Shifts default reward function by this value.
@@ -40,6 +40,7 @@ class RLToyEnv(gym.Env):
             state_space_size: A number specifying size of state space for uni-discrete environments and a list for multi-discrete environments.
             action_space_size: Same description as state_space_size.
             reward_every_n_steps: Boolean. Hand out rewards only at multiples of sequence_length steps. This makes chances of having overlapping rewarding sequences that one is on 0 and makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either make_denser case or continuous environments.
+            reward_dist: A Python function to sample rewards that will be handed out for randomly generated sequences when generate_random_mdp = True.
             image_representations: Boolean to associate an image as the external observation with every discrete categorical state. This is handled by a ImageMultiDiscrete object. It associates the image of an n+3 sided polygon for a categorical state n.
             Only for image_representations:
                 image_transforms: String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever it is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.
@@ -238,6 +239,7 @@ class RLToyEnv(gym.Env):
         self.logger.warning('Seeds set to:' + str(self.seed_dict))
         # print(f'Seeds set to {self.seed_dict=}') # Available from Python 3.8
 
+        #defaults
         if "use_custom_mdp" not in config:
             self.use_custom_mdp = False
         else:
@@ -311,6 +313,35 @@ class RLToyEnv(gym.Env):
                 self.image_scale_range = None # (0.5, 1.5)
             else:
                 self.image_scale_range = config["image_scale_range"]
+
+        if config["state_space_type"] == "discrete":
+            if "reward_dist" not in config:
+                self.reward_dist = 1.0
+            else:
+                self.reward_dist = config["reward_dist"]
+
+        else: # cont. spaces
+            # if not self.use_custom_mdp:
+            if "transition_dynamics_order" not in config:
+                self.dynamics_order = 1
+            else:
+                self.dynamics_order = config["transition_dynamics_order"]
+
+            if 'inertia' not in config:
+                self.inertia = 1.0
+            else:
+                self.inertia = config["inertia"]
+
+            if 'time_unit' not in config:
+                self.time_unit = 1.0
+            else:
+                self.time_unit = config["time_unit"]
+
+            if 'target_radius' not in config:
+                self.target_radius = 0.05
+            else:
+                self.target_radius = config["target_radius"]
+
 
         if "action_loss_weight" not in config:
             self.action_loss_weight = 0.0
@@ -407,30 +438,6 @@ class RLToyEnv(gym.Env):
 
         self.config = config
         self.augmented_state_length = self.sequence_length + self.delay + 1
-        if self.config["state_space_type"] == "discrete":
-            pass
-        else: # cont. spaces
-            # if not self.use_custom_mdp:
-            if "transition_dynamics_order" not in config:
-                self.dynamics_order = 1
-            else:
-                self.dynamics_order = self.config["transition_dynamics_order"]
-
-            #defaults
-            if 'inertia' not in config:
-                self.inertia = 1.0
-            else:
-                self.inertia = self.config["inertia"]
-
-            if 'time_unit' not in config:
-                self.time_unit = 1.0
-            else:
-                self.time_unit = self.config["time_unit"]
-
-            if 'target_radius' not in config:
-                self.target_radius = 0.05
-            else:
-                self.target_radius = self.config["target_radius"]
 
         self.total_episodes = 0
 
@@ -640,16 +647,18 @@ class RLToyEnv(gym.Env):
                             curr_sequence_num = curr_sequence_num // (non_term_relevant_state_space_size)
                         #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
                         # specific_sequence = self.relevant_observation_space.sample(size=self.sequence_length, replace=True) # Be careful that sequence_length is less than state space size
-                        if not self.make_denser:
-                            specific_sequence = tuple(specific_sequence) # tuples are immutable and can be used as keys for a dict
-                            self.rewardable_sequences[specific_sequence] = 1.0 #hack
-                            self.logger.warning("specific_sequence that will be rewarded" + str(specific_sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+                        specific_sequence = tuple(specific_sequence) # tuples are immutable and can be used as keys for a dict
+                        if callable(self.reward_dist):
+                            self.rewardable_sequences[specific_sequence] = self.reward_dist(self.np_random)
                         else:
-                            for ss_len in range(1, len(specific_sequence) + 1):
+                            self.rewardable_sequences[specific_sequence] = 1.0
+                        self.logger.warning("specific_sequence that will be rewarded" + str(specific_sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+                        if self.make_denser:
+                            for ss_len in range(1, len(specific_sequence)):
                                 sub_sequence = tuple(specific_sequence[:ss_len])
                                 if sub_sequence not in self.rewardable_sequences:
                                     self.rewardable_sequences[sub_sequence] = 0.0
-                                self.rewardable_sequences[sub_sequence] += 1.0 * ss_len / len(specific_sequence)
+                                self.rewardable_sequences[sub_sequence] += self.rewardable_sequences[specific_sequence] * ss_len / len(specific_sequence)
 
                     self.logger.info("Total no. of rewarded sequences:" + str(len(self.rewardable_sequences)) + str("Out of", num_possible_sequences))
                 else: # if no repeats_in_sequences
@@ -679,22 +688,24 @@ class RLToyEnv(gym.Env):
                             curr_permutation = curr_permutation // j
                     #         print(rem_, curr_permutation, j, seq_)
                     #     print("T/F:", seq_ in self.rewardable_sequences)
-                        if not self.make_denser:
-                            seq_ = tuple(seq_) # tuples are immutable and can be used as keys for a dict
-                            if seq_ in self.rewardable_sequences: #hack
-                                total_clashes += 1 #TODO remove these extra checks and assert below
-                            self.rewardable_sequences[seq_] = 1.0 #hack
-                            self.logger.warning("specific_sequence that will be rewarded" + str(seq_)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
-                        else: #test
-                            for ss_len in range(1, len(seq_) + 1):
+                        seq_ = tuple(seq_) # tuples are immutable and can be used as keys for a dict
+                        if seq_ in self.rewardable_sequences: #hack
+                            total_clashes += 1 #TODO remove these extra checks and assert below
+                        if callable(self.reward_dist):
+                            self.rewardable_sequences[seq_] = self.reward_dist(self.np_random)
+                        else:
+                            self.rewardable_sequences[seq_] = 1.0
+                        self.logger.warning("specific_sequence that will be rewarded" + str(seq_)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+                        if self.make_denser: #test
+                            for ss_len in range(1, len(seq_)):
                                 sub_seq_ = tuple(seq_[:ss_len])
                                 if sub_seq_ not in self.rewardable_sequences:
                                     self.rewardable_sequences[sub_seq_] = 0.0
-                                self.rewardable_sequences[sub_seq_] += 1.0 * ss_len / len(seq_)
-                        print("specific_sequence that will be rewarded " + str(seq_)) #debug print
+                                self.rewardable_sequences[sub_seq_] += self.rewardable_sequences[seq_] * ss_len / len(seq_)
                     #print(len(set(self.rewardable_sequences))) #error
                     # print(self.rewardable_sequences[self.sequence_length - 1])
 
+                    print("rewardable_sequences: " + str(self.rewardable_sequences)) #debug print
                     self.logger.debug("Number of generated sequences that did not clash with an existing one when it was generated:" + str(total_clashes))
                     assert total_clashes == 0, 'None of the generated sequences should have clashed with an existing rewardable sequence when it was generated. No. of times a clash was detected:' + str(total_clashes)
                     self.logger.info("Total no. of rewarded sequences:" + str(len(self.rewardable_sequences)) + "Out of" + str(num_possible_permutations))

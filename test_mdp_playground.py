@@ -1124,6 +1124,46 @@ class TestRLToyEnv(unittest.TestCase):
     #     env.close()
 
 
+    def test_discrete_r_dist(self):
+        ''''''
+        print('\033[32;1;4mTEST_DISCRETE_R_DIST\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["log_level"] = logging.NOTSET
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.5
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 0
+        config["sequence_length"] = 1
+        config["reward_scale"] = 1.0
+        config["reward_shift"] = 1.0
+        config["reward_dist"] = lambda a: a.normal(0, 0.5)
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 6, 2, 6] #
+        expected_rewards = [1.131635, 1, 0.316987, 1.424395] # 1st, 3rd and 4th states produce 'true' rewards, every reward has been shifted by 1
+        for i in range(len(actions)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg='Expected reward mismatch in time step: ' + str(i + 1) + ' when R dist = 0.5.')
+
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
     #Unit tests
 
 
