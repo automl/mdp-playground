@@ -86,10 +86,8 @@ class RLToyEnv(gym.Env):
         The externally visible observation space for the enviroment
     action_space : Gym.Space
         The externally visible action space for the enviroment
-    rewardable_sequences : list of lists of lists
-        holds the rewardable sequences. Here, the 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), the 2nd index is for the diff. sequences possible for that sequence length, the 3rd index is over the sequence itself.
-    possible_remaining_sequences : list of lists of lists
-        holds, at the current time step, the sequences which might be rewarded at the next time step. Intended to prune out from all the possible rewardable sequences, only the ones we may currently be on. Indices correspond to the ones for rewardable_sequences.
+    rewardable_sequences : dict
+        holds the rewardable sequences. The keys are tuples of rewardable sequences and values are the rewards handed out. When make_denser is True, this dict also holds the rewardable sub-sequences.
 
     Methods
     -------
@@ -628,10 +626,13 @@ class RLToyEnv(gym.Env):
                 non_term_relevant_state_space_size = self.config["relevant_state_space_size"] - self.num_terminal_states
                 if self.repeats_in_sequences:
                     num_possible_sequences = (self.relevant_observation_space.n - self.num_terminal_states) ** self.sequence_length #TODO if sequence cannot have replacement, use permutations; use state + action sequences? Subtracting the no. of terminal states from state_space size here to get "usable" states for sequences, having a terminal state even at end of reward sequence doesn't matter because to get reward we need to transition to next state which isn't possible for a terminal state.
-                    num_specific_sequences = int(self.reward_density * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
-                    self.specific_sequences = [[] for i in range(self.sequence_length)]
-                    sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_specific_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
-                    for i in range(num_specific_sequences):
+                    num_rewardable_sequences = int(self.reward_density * num_possible_sequences) #FIX Could be a memory problem if too large state space and too dense reward sequences
+                    if num_rewardable_sequences > 1000:
+                        warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(num_rewardable_sequences)) #TODO Maybe even exit the program if too much memory is (expected to be) taken.;
+
+                    self.rewardable_sequences = {}
+                    sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_rewardable_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence;
+                    for i in range(num_rewardable_sequences):
                         curr_sequence_num = sel_sequence_nums[i]
                         specific_sequence = []
                         while len(specific_sequence) != self.sequence_length:
@@ -639,25 +640,34 @@ class RLToyEnv(gym.Env):
                             curr_sequence_num = curr_sequence_num // (non_term_relevant_state_space_size)
                         #bottleneck When we sample sequences here, it could get very slow if reward_density is high; alternative would be to assign numbers to sequences and then sample these numbers without replacement and take those sequences
                         # specific_sequence = self.relevant_observation_space.sample(size=self.sequence_length, replace=True) # Be careful that sequence_length is less than state space size
-                        self.specific_sequences[self.sequence_length - 1].append(specific_sequence) #hack
-                        self.logger.warning("specific_sequence that will be rewarded" + str(specific_sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
-                    self.logger.info("Total no. of rewarded sequences:" + str(len(self.specific_sequences[self.sequence_length - 1])) + str("Out of", num_possible_sequences))
+                        if not self.make_denser:
+                            specific_sequence = tuple(specific_sequence) # tuples are immutable and can be used as keys for a dict
+                            self.rewardable_sequences[specific_sequence] = 1.0 #hack
+                            self.logger.warning("specific_sequence that will be rewarded" + str(specific_sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+                        else:
+                            for ss_len in range(1, len(specific_sequence) + 1):
+                                sub_sequence = tuple(specific_sequence[:ss_len])
+                                if sub_sequence not in self.rewardable_sequences:
+                                    self.rewardable_sequences[sub_sequence] = 0.0
+                                self.rewardable_sequences[sub_sequence] += 1.0 * ss_len / len(specific_sequence)
+
+                    self.logger.info("Total no. of rewarded sequences:" + str(len(self.rewardable_sequences)) + str("Out of", num_possible_sequences))
                 else: # if no repeats_in_sequences
                     len_ = self.sequence_length
                     permutations = list(range(non_term_relevant_state_space_size + 1 - len_, non_term_relevant_state_space_size + 1))
                     self.logger.info("No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), no. of possible perms" + str(permutations) + str(np.prod(permutations)))
                     num_possible_permutations = np.prod(permutations)
-                    num_specific_sequences = int(self.reward_density * num_possible_permutations)
-                    if num_specific_sequences > 1000:
-                        warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(num_specific_sequences)) #TODO Maybe even exit the program if too much memory is (expected to be) taken.; Took about 80s for 40k iterations of the for loop below on my laptop
+                    num_rewardable_sequences = int(self.reward_density * num_possible_permutations)
+                    if num_rewardable_sequences > 1000:
+                        warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(num_rewardable_sequences)) #TODO Maybe even exit the program if too much memory is (expected to be) taken.; Took about 80s for 40k iterations of the for loop below on my laptop
 
-                    self.specific_sequences = [[] for i in range(self.sequence_length)]
+                    self.rewardable_sequences = {}
                     # print("Mersenne3:", self.np_random.get_state()[2])
-                    sel_sequence_nums = self.np_random.choice(num_possible_permutations, size=num_specific_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; # TODO this code could be replaced with self.np_random.permutation(non_term_relevant_state_space_size)[self.sequence_length]? Replacement becomes a problem then! We have to keep smpling until we have all unique rewardable sequences.
+                    sel_sequence_nums = self.np_random.choice(num_possible_permutations, size=num_rewardable_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; # TODO this code could be replaced with self.np_random.permutation(non_term_relevant_state_space_size)[self.sequence_length]? Replacement becomes a problem then! We have to keep smpling until we have all unique rewardable sequences.
                     # print("Mersenne4:", self.np_random.get_state()[2])
 
                     total_clashes = 0
-                    for i in range(num_specific_sequences):
+                    for i in range(num_rewardable_sequences):
                         curr_permutation = sel_sequence_nums[i]
                         seq_ = []
                         curr_rem_digits = list(range(non_term_relevant_state_space_size)) # has to contain every number up to n so that any one of them can be picked as part of the sequence below
@@ -668,17 +678,26 @@ class RLToyEnv(gym.Env):
                     #         print("curr_rem_digits", curr_rem_digits)
                             curr_permutation = curr_permutation // j
                     #         print(rem_, curr_permutation, j, seq_)
-                    #     print("T/F:", seq_ in self.specific_sequences)
-                        if seq_ in self.specific_sequences[self.sequence_length - 1]: #hack
-                            total_clashes += 1 #TODO remove these extra checks and assert below
-                        self.specific_sequences[self.sequence_length - 1].append(seq_)
-                        print("specific_sequence that will be rewarded " + str(seq_))
-                    #print(len(set(self.specific_sequences))) #error
-                    # print(self.specific_sequences[self.sequence_length - 1])
+                    #     print("T/F:", seq_ in self.rewardable_sequences)
+                        if not self.make_denser:
+                            seq_ = tuple(seq_) # tuples are immutable and can be used as keys for a dict
+                            if seq_ in self.rewardable_sequences: #hack
+                                total_clashes += 1 #TODO remove these extra checks and assert below
+                            self.rewardable_sequences[seq_] = 1.0 #hack
+                            self.logger.warning("specific_sequence that will be rewarded" + str(seq_)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds
+                        else: #test
+                            for ss_len in range(1, len(seq_) + 1):
+                                sub_seq_ = tuple(seq_[:ss_len])
+                                if sub_seq_ not in self.rewardable_sequences:
+                                    self.rewardable_sequences[sub_seq_] = 0.0
+                                self.rewardable_sequences[sub_seq_] += 1.0 * ss_len / len(seq_)
+                        print("specific_sequence that will be rewarded " + str(seq_)) #debug print
+                    #print(len(set(self.rewardable_sequences))) #error
+                    # print(self.rewardable_sequences[self.sequence_length - 1])
 
                     self.logger.debug("Number of generated sequences that did not clash with an existing one when it was generated:" + str(total_clashes))
                     assert total_clashes == 0, 'None of the generated sequences should have clashed with an existing rewardable sequence when it was generated. No. of times a clash was detected:' + str(total_clashes)
-                    self.logger.info("Total no. of rewarded sequences:" + str(len(self.specific_sequences[self.sequence_length - 1])) + "Out of" + str(num_possible_permutations))
+                    self.logger.info("Total no. of rewarded sequences:" + str(len(self.rewardable_sequences)) + "Out of" + str(num_possible_permutations))
         else: # if continuous space
             # self.logger.debug("# TODO for cont. spaces?: init_reward_function") # reward functions are fixed for cont. right now with a few available choices.
             pass
@@ -801,7 +820,7 @@ class RLToyEnv(gym.Env):
         delay = self.delay
         sequence_length = self.sequence_length
         reward = 0.0
-        # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.specific_sequences, type(state), type(self.specific_sequences))
+        # print("TEST", self.augmented_state[0 : self.augmented_state_length - delay], state, action, self.rewardable_sequences, type(state), type(self.rewardable_sequences))
         state_considered = state # if imaginary_rollout else self.augmented_state # When we imagine a rollout, the user has to provide full augmented state as the argument!!
         # if not isinstance(state_considered, list):
         #     state_considered = [state_considered] # to get around case when sequence is an int; it should always be a list except if a user passes in a state; would rather force them to pass a list: assert for it!!
@@ -821,37 +840,18 @@ class RLToyEnv(gym.Env):
             if np.isnan(state_considered[0]):
                 pass ###IMP: This check is to get around case of augmented_state_length being > 2, i.e. non-vanilla seq_len or delay, because then rewards may be handed out for the initial state being part of a sequence which is not fair since it is handed out without having the agent take an action.
             else:
-                if not self.make_denser:
-                    self.logger.debug("state_considered for reward:" + str(state_considered) + " with delay " + str(self.delay))
-                    if (not self.reward_every_n_steps or
-                        (self.reward_every_n_steps and self.total_transitions_episode % self.sequence_length == delay)): ###TODO also implement this for make_denser case and continuous envs.
-                        if state_considered[1 : self.augmented_state_length - delay] in self.specific_sequences[self.sequence_length - 1]:
-                            # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
-                            reward += 1.0
-                        else:
-                            # print(state_considered, "with delay", self.delay, "NOT rewarded.")
-                            pass
-                else: # if make_denser
-                    for j in range(1, sequence_length + 1):
-                # Check if augmented_states - delay up to different lengths in the past are present in sequence lists of that particular length; if so add them to the list of length
-                        curr_seq_being_checked = state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay]
-                        # print("curr_seq_being_checked, self.possible_remaining_sequences[j - 1]:", curr_seq_being_checked, self.possible_remaining_sequences[j - 1])
-                        if curr_seq_being_checked in self.possible_remaining_sequences[j - 1]:
-                            count_ = self.possible_remaining_sequences[j - 1].count(curr_seq_being_checked)
-                            # print("curr_seq_being_checked, count in possible_remaining_sequences, reward", curr_seq_being_checked, count_, count_ * self.reward_scale * j / self.sequence_length)
-                            reward += count_ * j / self.sequence_length #TODO Maybe make it possible to choose not to multiply by count_ as a config option
-
-                    self.possible_remaining_sequences = [[] for i in range(sequence_length)] #TODO for variable sequence length just maintain a list of lists of lists rewarded_sequences
-                    for j in range(0, sequence_length):
-                #        if j == 0:
-                        for k in range(sequence_length):
-                            for l in range(len(self.specific_sequences[k])): # self.specific_sequences[i][j][k] where 1st index is over different variable sequence lengths (to be able to support variable sequence lengths in the future), 2nd index is for the diff. sequences possible for that sequence length, 3rd index is over the sequence
-                                if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]: # if curr_seq_being_checked matches a rewardable sequence up to a length j in the past, i.e., is a prefix of the rewardable sequence,
-                                    self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1]) # add it + an extra next state in that sequence to list of possible sequence prefixes to be checked for rewards above
-                    ###IMP: Above routine for sequence prefix checking can be coded in a more human understandable manner, but this kind of pruning out of "sequences which may not be attainable" based on the current past trajectory, done above, should be in principle more efficient?
+                self.logger.debug("state_considered for reward:" + str(state_considered) + " with delay " + str(self.delay))
+                if (not self.reward_every_n_steps or
+                    (self.reward_every_n_steps and self.total_transitions_episode % self.sequence_length == delay)): ###TODO also implement this for make_denser case and continuous envs.
+                    sub_seq = tuple(state_considered[1 : self.augmented_state_length - delay])
+                    if sub_seq in self.rewardable_sequences:
+                        # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
+                        reward += self.rewardable_sequences[sub_seq]
+                    else:
+                        # print(state_considered, "with delay", self.delay, "NOT rewarded.")
+                        pass
 
                     self.logger.info("rew" + str(reward))
-                    self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
 
         else: # if continuous space
             ###TODO Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0. Since the principal component is always taken to be the direction of travel, this would mean a larger distance covered in that direction and hence would lead to +ve reward always and would mean larger random actions give a larger reward! Should penalise actions in proportion that scale then?
@@ -1105,21 +1105,7 @@ class RLToyEnv(gym.Env):
         self.total_reward_episode = 0
         self.total_transitions_episode = 0
 
-
-        # This part initializes self.possible_remaining_sequences to hold 1st state in all rewardable sequences, which will be checked for after 1st step of the episode to give rewards.
-        if self.config["state_space_type"] == "discrete" and self.make_denser == True:
-            delay = self.delay
-            sequence_length = self.sequence_length
-            self.possible_remaining_sequences = [[] for i in range(sequence_length)]
-            for j in range(1):
-            #        if j == 0:
-                for k in range(sequence_length):
-                    for l in range(len(self.specific_sequences[k])):
-    #                    if state_considered[self.augmented_state_length - j - delay : self.augmented_state_length - delay] == self.specific_sequences[k][l][:j]:
-                            self.possible_remaining_sequences[j].append(self.specific_sequences[k][l][:j + 1])
-
-            self.logger.debug("self.possible_remaining_sequences" + str(self.possible_remaining_sequences))
-            self.logger.info(" self.delay, self.sequence_length:" + str(self.delay) + str(self.sequence_length))
+        self.logger.info(" self.delay, self.sequence_length:" + str(self.delay) + str(self.sequence_length))
 
         return self.curr_state
 

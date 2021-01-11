@@ -694,7 +694,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
-###TODO Test for make_denser; also one for creating multiple instances of an Env with the same config dict (can lead to issues because the dict is shared)
+###TODO Test for make_denser; also one for creating multiple instances of an Env with the same config dict (can lead to issues because the dict is shared as I found with Ray's A3C imple.)
 ##TODO Tests for imaginary rollouts for discrete and continuous - for different Ps and Rs
 
     def test_discrete_multiple_meta_features(self):
