@@ -16,12 +16,12 @@ class ImageMultiDiscrete(Box):
         Gets an image representation for a given multi_discrete_state
     '''
 
-    def __init__(self, state_space, width=100, height=100, circle_radius=20, transforms='rotate,flip,scale,shift', sh_quant=1, scale_range=(0.5,1.5), ro_quant=1, seed=None, use_custom_images=None, cust_path=None): # , polygon_sides=4
+    def __init__(self, state_space_sizes, width=100, height=100, circle_radius=20, transforms='rotate,flip,scale,shift', sh_quant=1, scale_range=(0.5,1.5), ro_quant=1, seed=None, use_custom_images=None, cust_path=None): # , polygon_sides=4
         '''
         Parameters
         ----------
-        state_space : Discrete or MultiDiscrete
-            The state space to which this class associates images as external observations
+        state_space_sizes : list
+            The underlying (multi-)discrete state space sizes to which this class associates images as external observations
         width : int
             The width of the image
         height : int
@@ -39,7 +39,7 @@ class ImageMultiDiscrete(Box):
         seed : int
             seed for randomly applied transformations and NOT for the underlying state space
         use_custom_images : str or None
-            If None, then default setting of no custom textures or images. If this value is "textures" or "images", then all images in the cust_path directories are loaded in alphabetical order and correspond 1-to-1 with discrete states which are in numeric order. If this value is "textures", the textures are applied to the polygons from the default setting of no custom textures or images.
+            If None, then default setting of no custom textures or images. If this value is "textures" or "images", then all images in the cust_path directories are loaded in alphabetical order and correspond 1-to-1 with discrete states which are in numeric order. If this value is "textures", the textures are applied to the polygons that would have been generated for the default setting (of no custom textures or images).
         cust_path : str or None
             The directory containing the custom images to be loaded
         '''
@@ -52,15 +52,15 @@ class ImageMultiDiscrete(Box):
         self.ro_quant = ro_quant
         self.scale_range = scale_range
 
-        self.state_space = state_space
+        # self.state_space = state_space
         self.use_custom_images = use_custom_images
 
-        if isinstance(state_space, Discrete):
-            state_space_sizes = [state_space.n] # can be an int to map images to discrete spaces or it can be a list to map images (each image = multiple images, one for each discrete dimension, concatenated along the X-axis) to multi-discrete spaces
-        elif isinstance(state_space, MultiDiscrete):
-            state_space_sizes = list(state_space.nvec)
-        else:
-            raise TypeError('ImageMultiDiscrete can only hold a Discrete or MultiDiscrete object from Gym. Provided object was of type: ' + str(type(state_space)))
+        # if isinstance(state_space, Discrete):
+        #     state_space_sizes = [state_space.n] # can be an int to map images to discrete spaces or it can be a list to map images (each image = multiple images, one for each discrete dimension, concatenated along the X-axis) to multi-discrete spaces
+        # elif isinstance(state_space, MultiDiscrete):
+        #     state_space_sizes = list(state_space.nvec)
+        # else:
+        #     raise TypeError('ImageMultiDiscrete can only hold a Discrete or MultiDiscrete object from Gym. Provided object was of type: ' + str(type(state_space)))
 
         self.state_space_sizes = state_space_sizes
 
@@ -103,10 +103,10 @@ class ImageMultiDiscrete(Box):
         ro_quant = self.ro_quant
         scale_range = self.scale_range
 
-        if self.use_custom_images is not None:
-            image_ = Image.new("RGB", (self.width, self.height)) # Use RGB for textures
+        if self.use_custom_images is not None: # textures / custom images
+            image_ = Image.new("RGB", (self.width, self.height)) # Use RGB for textures / custom images
         else:
-            image_ = Image.new("L", (self.width, self.height)) # Use L for black and white 8-bit pixels instead of RGB
+            image_ = Image.new("L", (self.width, self.height)) # Use L for black and white 8-bit pixels instead of RGB in case not using custom images
         draw = ImageDraw.Draw(image_)
 
         R = self.circle_radius
@@ -219,9 +219,11 @@ class ImageMultiDiscrete(Box):
     # def get_multi_discrete_state(self,
 
     def sample(self):
-        sampled = self.state_space.sample()
-        if type(sampled) == int:
-            sampled = [sampled]
+        sss = np.array(self.state_space_sizes)
+        sampled = (self.np_random.random_sample(sss.shape) * sss).astype(np.int64) # Based on Gym's MultiDiscrete sampling
+        # if type(sampled) == int:
+        #     sampled = [sampled]
+        sampled = list(sampled)
 
         return self.get_concatenated_image(sampled)
 
