@@ -470,7 +470,7 @@ class RLToyEnv(gym.Env):
         # print("Mersenne1, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
         self.init_reward_function()
 
-        self.curr_state = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
+        self.curr_obs = self.reset() #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
 
         self.logger.info("self.augmented_state, len: " + str(self.augmented_state) + ", " + str(len(self.augmented_state)))
         self.logger.info("MDP Playground toy env instantiated with config: " + str(self.config))
@@ -768,7 +768,7 @@ class RLToyEnv(gym.Env):
                 self.state_derivatives[0] = next_state
 
             if self.config["reward_function"] == "move_to_a_point":
-                if np.linalg.norm(np.array(state, dtype=self.dtype)[self.config["relevant_indices"]] - self.config["target_point"]) < self.target_radius:
+                if np.linalg.norm(np.array(next_state, dtype=self.dtype)[self.config["relevant_indices"]] - self.config["target_point"]) < self.target_radius:
                     self.reached_terminal = True
 
         return next_state
@@ -919,17 +919,13 @@ class RLToyEnv(gym.Env):
             sys.exit(1)
 
 
-        state = self.augmented_state[-1]
-        if self.image_representations:
-            state = self.augmented_state[-1] ###TODO this would cause a crash if multi-discrete is used with image_representations!
-        else:
-            if self.config["state_space_type"] == "discrete":
-                if self.irrelevant_features:
-                    state, action, state_irrelevant, action_irrelevant = self.curr_state[0], action[0], self.curr_state[1], action[1],
-                else:
-                    state, action = self.curr_state, action
+        if self.config["state_space_type"] == "discrete":
+            if self.irrelevant_features:
+                state, action, state_irrelevant, action_irrelevant = self.curr_state[0], action[0], self.curr_state[1], action[1],
             else:
-                pass
+                state, action = self.curr_state, action
+        else:
+            state, action = self.curr_state, action
 
 
         ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
@@ -959,25 +955,28 @@ class RLToyEnv(gym.Env):
                     #     self.total_noisy_transitions_irrelevant_episode += 1
                     next_state_irrelevant = new_next_state_irrelevant
 
+
         # Transform discrete back to multi-discrete if needed
         if self.config["state_space_type"] == "discrete":
             if self.irrelevant_features:
-                next_state = (next_state, next_state_irrelevant)
+                next_obs = next_state = (next_state, next_state_irrelevant)
             else:
-                pass
+                next_obs = next_state
+        else: # cont. space
+            next_obs = next_state
 
-        # If the externally visible observation space is images, then convert to underlying (multi-)discrete state
         if self.image_representations:
-            next_state = self.observation_space.get_concatenated_image(next_state)
+            next_obs = self.observation_space.get_concatenated_image(next_state)
 
         self.curr_state = next_state
+        self.curr_obs = next_obs
 
 
         self.done = self.is_terminal_state(self.augmented_state[-1]) or self.reached_terminal #### TODO curr_state is external state, while we need to check relevant state for terminality! Done - by using augmented_state now instead of curr_state!
         if self.done:
             self.reward += self.term_state_reward * self.reward_scale # Scale before or after?
         self.logger.info('sas\'r:   ' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
-        return self.curr_state, self.reward, self.done, self.get_augmented_state()
+        return self.curr_obs, self.reward, self.done, self.get_augmented_state()
 
     def get_augmented_state(self):
         '''Intended to return the full augmented state which would be Markovian. (However, it's not Markovian wrt the noise in P and R because we're not returning the underlying RNG.) Currently, returns the augmented state which is the sequence of length "delay + sequence_length + 1" of past states for both discrete and continuous environments. Additonally, the current state derivatives are also returned for continuous environments.
@@ -990,9 +989,9 @@ class RLToyEnv(gym.Env):
         #TODO For noisy processes, this would need the noise distribution and random seed too. Also add the irrelevant state parts, etc.? We don't need the irrelevant parts for the state to be Markovian.
         '''
         if self.config["state_space_type"] == "discrete":
-            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state}
+            augmented_state_dict = {"curr_state": self.curr_state, "curr_obs": self.curr_obs, "augmented_state": self.augmented_state}
         else:
-            augmented_state_dict = {"curr_state": self.curr_state, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
+            augmented_state_dict = {"curr_state": self.curr_state, "curr_obs": self.curr_obs, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
         return augmented_state_dict
 
     def discrete_to_multi_discrete(self, relevant_part, irrelevant_part=None):
@@ -1058,7 +1057,9 @@ class RLToyEnv(gym.Env):
             self.augmented_state.append(self.curr_state_relevant)
             # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays which is not possible with np.array!
             if self.image_representations:
-                self.curr_state = self.observation_space.get_concatenated_image(self.curr_state)
+                self.curr_obs = self.observation_space.get_concatenated_image(self.curr_state)
+            else:
+                self.curr_obs = self.curr_state
         else: # if continuous space
             self.logger.debug("#TODO for cont. spaces: reset")
             while True: # Be careful about infinite loops
@@ -1077,6 +1078,7 @@ class RLToyEnv(gym.Env):
             zero_state = np.array([0.0] * (self.config['state_space_dim']), dtype=self.dtype)
             self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
+            self.curr_obs = self.curr_state
 
             self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state.copy())
@@ -1092,7 +1094,7 @@ class RLToyEnv(gym.Env):
 
         self.logger.info(" self.delay, self.sequence_length:" + str(self.delay) + str(self.sequence_length))
 
-        return self.curr_state
+        return self.curr_obs
 
     def seed(self, seed=None):
         """Initialises the Numpy RNG for the environment by calling a utility for this in Gym.
