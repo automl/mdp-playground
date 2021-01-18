@@ -57,9 +57,11 @@ class MDPP_Analysis():
         load_eval : bool
             Whether to load evaluation stats CSV or not.
         threshold : float
-            The fault tolerance threshold while loading data
+            The fault tolerance threshold while loading data. Show warning for files whose data rows are less than threshold value.
+            eg. threshold=0.6 and mean_row_cnt=20, warning is displayed if file row_count < 20 * (1 - 0.6)
         sample_freq : int
-            The subsample frequency (step)
+            The subsample frequency value. Sample data lines based on this value
+            eg. sample_freq=5 means choose every consecutive 5th data row
 
         Returns
         -------
@@ -78,14 +80,13 @@ class MDPP_Analysis():
         stats_file = dir_name + '/' + exp_name #Name of file to which benchmark stats were written
         self.stats_file = stats_file
 
-        #hack might need to be dynamic instead hardcoded value
-        train_cnt = 20
-        eval_cnt = 210
-
         if os.path.isfile(stats_file + '.csv'):
             print("Loading data from a sequential run/already combined runs of experiment configurations.")
         else:
             print("Loading data from a distributed run of experiment configurations. Creating a combined CSV stats file.")
+            train_data = dict()
+            eval_data = dict()
+
             def join_files(file_prefix, file_suffix):
                 '''Utility to join files that were written with different experiment configs'''
                 with open(file_prefix + file_suffix, 'ab') as combined_file:
@@ -98,13 +99,14 @@ class MDPP_Analysis():
                                 byte_string = curr_file.read()
                                 newline_count = byte_string.count(10)
                                 num_diff_lines.append(newline_count)
-
-                                # fault tolerance check
-                                show_warning = (newline_count < train_cnt*threshold) if (file_suffix == '.csv') else (newline_count < eval_cnt*threshold)
-                                if show_warning:
-                                    warnings.warn('Expected {0} chars in each stats file. Got only: {1}  in file: {2}'.format(train_cnt if file_suffix == '.csv' else eval_cnt, newline_count, i))
-
                                 combined_file.write(byte_string)
+
+                                if file_suffix == '.csv':
+                                    # train data
+                                    train_data[os.path.basename(curr_file.name)] = newline_count
+                                else:
+                                    # eval data
+                                    eval_data[os.path.basename(curr_file.name)] = newline_count
                         else:
                             # missing_configs.append(i)
                             break
@@ -117,6 +119,17 @@ class MDPP_Analysis():
             join_files(stats_file,  '.csv')
             join_files(stats_file, '_eval.csv')
 
+            train_mean_cnt = np.mean(list(train_data.values()))
+            eval_mean_cnt = np.mean(list(eval_data.values()))
+
+            # fault tolerance check
+            for file_name, line_count in train_data.items():
+                if line_count < train_mean_cnt*(1-threshold):
+                    warnings.warn('Expected minimum {0} chars in each stats file. Got only: {1}  in file: {2}'.format(train_mean_cnt*(1-threshold), line_count, file_name))
+            for file_name, line_count in eval_data.items():
+                if line_count < eval_mean_cnt*(1-threshold):
+                    warnings.warn('Expected minimum {0} chars in each stats file. Got only: {1}  in file: {2}'.format(eval_mean_cnt*(1-threshold), line_count, file_name))
+
         # Read column names
         with open(stats_file + '.csv') as file_:
             col_names = file_.readline().strip().split(', ')
@@ -125,6 +138,10 @@ class MDPP_Analysis():
 
         stats_pd = pd.read_csv(stats_file + '.csv', skip_blank_lines=True,\
                                 header=None, names = col_names, comment='#', sep=' ')
+        # subsampling code
+        stats_pd_indices = np.arange(0, stats_pd.shape[0], step=sample_freq)
+        stats_pd = stats_pd.loc[stats_pd_indices]
+
         self.stats_pd = stats_pd
         print("Training stats read (rows, columns):", stats_pd.shape)
 
@@ -345,11 +362,11 @@ class MDPP_Analysis():
     def gather_stats(self, list_exp_data, train, metric_num, plot_type, use_aucs):
         stats_data = dict()
 
-        if plot_type is "agent":
+        if plot_type == "agent":
             #groupby agent
             groupby = 'algorithm'
             sub_groupby = 'axis_labels'
-        elif plot_type is "metric":
+        elif plot_type == "metric":
             #groupby metric
             groupby = 'axis_labels'
             sub_groupby = 'algorithm'
