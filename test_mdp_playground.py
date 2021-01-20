@@ -1169,7 +1169,7 @@ class TestRLToyEnv(unittest.TestCase):
         print('\033[32;1;4mTEST_DISCRETE_R_DIST\033[0m')
         config = {}
         config["log_filename"] = log_filename
-        config["log_level"] = logging.NOTSET
+        # config["log_level"] = logging.NOTSET
         config["seed"] = 0
 
         config["state_space_type"] = "discrete"
@@ -1202,6 +1202,93 @@ class TestRLToyEnv(unittest.TestCase):
 
         env.reset()
         env.close()
+
+    def test_discrete_diameter(self):
+        ''''''
+        print('\033[32;1;4mTEST_DISCRETE_DIAMETER\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["log_level"] = logging.NOTSET
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 24
+        config["action_space_size"] = 24
+        config["reward_density"] = 0.05
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 0
+        config["diameter"] = 3
+        config["sequence_length"] = 3
+        config["reward_scale"] = 1.0
+        config["reward_shift"] = 0.0
+        # config["reward_dist"] = lambda a: a.normal(0, 0.5)
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(**config)
+
+        for seq_num, sequence in enumerate(env.rewardable_sequences):
+            for i, state in enumerate(sequence):
+                assert state not in [6, 7, 14, 15, 22, 23], "A terminal state was encountered in a rewardable sequence. This is unexpected."
+                rem_ = (state % env.action_space_size[0])
+                assert rem_ < env.action_space_size[0] - env.num_terminal_states, "The effective state number within an independent set was expected to be in range (0, 6). However, it was: " + str(rem_)
+
+        assert len(env.rewardable_sequences) == int(0.05 * np.prod([6, 6, 6])) * 3, "Number of rewardable_sequences: " + str(len(env.rewardable_sequences)) + ". Expected: " + str(int(0.05 * np.prod([6, 6, 6])) * 3)
+        np.testing.assert_allclose(np.sum(env.config['relevant_init_state_dist']), 1.0, rtol=1e-05, err_msg='Expected sum of probabilities in init_state_dist was 1.0. However, actual sum was: ' + str(np.sum(env.config['relevant_init_state_dist']))) #TODO Similar test case for irrelevant_features
+
+        state = env.get_augmented_state()['curr_state']
+        actions = [6, 6, 7, 7, 0, 7, 1] #
+        expected_rewards = [0, 0, 1, 0, 0, 0, 1] # 1st, 3rd and 4th states produce 'true' rewards, every reward has been shifted by 1
+        for i in range(len(actions)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg='Expected reward mismatch in time step: ' + str(i + 1) + ' when diam = ' + str(config["diameter"]))
+
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+        # Sub-test 2 Have sequence length greater than the diameter and check selected rewardable sequences
+        config["sequence_length"] = 5
+        config["reward_density"] = 0.01 # reduce density to have fewer rewardable sequences
+
+        env = RLToyEnv(**config)
+
+        for seq_num, sequence in enumerate(env.rewardable_sequences):
+            for j in range(config["diameter"]):
+                if j / config["diameter"] < seq_num / len(env.rewardable_sequences) and seq_num / len(env.rewardable_sequences) < (j + 1) / config["diameter"]:
+                    for i, state in enumerate(sequence):
+                        min_state = ((i + j) * env.action_space_size[0]) % env.state_space_size[0]
+                        max_state = ((i + j + 1) * env.action_space_size[0]) % env.state_space_size[0]
+                        if max_state < min_state: # edge case
+                            max_state += env.state_space_size[0]
+                        assert sequence[i] >= min_state and sequence[i] < max_state, "" + str(min_state) + " " + str(sequence[i]) + " " + str(max_state)
+
+            for i, state in enumerate(sequence):
+                rem_ = (state % env.action_space_size[0])
+                assert rem_ < env.action_space_size[0] - env.num_terminal_states, "The effective state number within an independent set was expected to be in range (0, 6). However, it was: " + str(rem_)
+
+        assert len(env.rewardable_sequences) == int(0.01 * np.prod([6, 6, 6, 5, 5])) * 3, "Number of rewardable_sequences: " + str(len(env.rewardable_sequences)) + ". Expected: " + str(int(0.05 * np.prod([6, 6, 6, 5, 5])) * 3)
+        np.testing.assert_allclose(np.sum(env.config['relevant_init_state_dist']), 1.0, rtol=1e-05, err_msg='Expected sum of probabilities in init_state_dist was 1.0. However, actual sum was: ' + str(np.sum(env.config['relevant_init_state_dist']))) #TODO Similar test case for irrelevant_features
+
+        state = env.get_augmented_state()['curr_state']
+        actions = [1, 7, 2, 4, 0, 7, 1] # Leads to rewardable sequence 20, 1, 12, 21, 5
+        expected_rewards = [0, 0, 0, 0, 1, 0, 0] # 1st, 3rd and 4th states produce 'true' rewards, every reward has been shifted by 1
+        for i in range(len(actions)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg='Expected reward mismatch in time step: ' + str(i + 1) + ' when diam = ' + str(config["diameter"]))
+
+            state = next_state
+
+        env.reset()
+        env.close()
+
 
 
     #Unit tests
