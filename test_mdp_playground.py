@@ -1185,7 +1185,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["sequence_length"] = 1
         config["reward_scale"] = 1.0
         config["reward_shift"] = 1.0
-        config["reward_dist"] = lambda a: a.normal(0, 0.5)
+        config["reward_dist"] = lambda rng, r_dict: rng.normal(0, 0.5)
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)
@@ -1225,7 +1225,6 @@ class TestRLToyEnv(unittest.TestCase):
         config["sequence_length"] = 3
         config["reward_scale"] = 1.0
         config["reward_shift"] = 0.0
-        # config["reward_dist"] = lambda a: a.normal(0, 0.5)
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)

@@ -246,20 +246,21 @@ def on_episode_step(info):
 
 
 
-value_tuples = []
-for config_type, config_dict in config.var_configs.items():
-    for key in config_dict:
-        assert type(config.var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
-        value_tuples.append(config.var_configs[config_type][key])
-
-import itertools
-cartesian_product_configs = list(itertools.product(*value_tuples))
-print("Total number of configs. to run:", len(cartesian_product_configs))
+# value_tuples = []
+# for config_type, config_dict in config.var_configs.items():
+#     for key in config_dict:
+#         assert type(config.var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
+#         value_tuples.append(config.var_configs[config_type][key])
+#
+# import itertools
+# cartesian_product_configs = list(itertools.product(*value_tuples))
+# print("Total number of configs. to run:", len(cartesian_product_configs))
 
 if args.config_num is None:
-    pass
+    cartesian_product_configs = config.cartesian_product_configs
+    # pass
 else:
-    cartesian_product_configs = [cartesian_product_configs[args.config_num]]
+    cartesian_product_configs = [config.cartesian_product_configs[args.config_num]]
 
 
 from functools import reduce
@@ -295,7 +296,7 @@ for current_config in cartesian_product_configs:
     for config_type, config_dict in config.var_configs.items():
         for key in config_dict:
         # if config_type == "env_config": # There is a dummy seed in the env_config because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
-            if config_type == "env":
+            if config_type == "env": #hack All these are hacks to get around different limitations
                 if key == 'reward_noise':
                     reward_noise_ = current_config[list(var_env_configs).index(key)] # this works because env_configs are 1st in the OrderedDict
                     env_config["env_config"][key] = tune.function(lambda a: a.normal(0, reward_noise_))
@@ -304,6 +305,19 @@ for current_config in cartesian_product_configs:
                     transition_noise_ = current_config[list(var_env_configs).index(key)]
                     env_config["env_config"][key] = tune.function(lambda a: a.normal(0, transition_noise_))
                     env_config["env_config"]['transition_noise_std'] = transition_noise_ #hack
+                elif key == 'reward_dist_end_pts':
+                    reward_dist_ = current_config[list(var_env_configs).index(key)] # this works because env_configs are 1st in the OrderedDict
+                    num_rews = current_config[list(var_env_configs).index("action_space_size")] * (1 - current_config[list(var_env_configs).index("terminal_state_density")]) * current_config[list(var_env_configs).index("reward_density")]
+                    print("num_rewardable_sequences set to:", num_rews)
+                    assert current_config[list(var_env_configs).index("sequence_length")] == 1
+                    rews = np.linspace(reward_dist_[0], reward_dist_[1], num=num_rews)
+                    np.random.shuffle(rews)
+
+                    def get_rews(rng, r_dict):
+                        return rews[len(r_dict)]
+
+                    env_config["env_config"]['reward_dist'] = tune.function(get_rews)
+                    env_config["env_config"]['reward_dist_end_pts'] = reward_dist_
                 else:
                     env_config["env_config"][key] = current_config[list(var_env_configs).index(key)]
 

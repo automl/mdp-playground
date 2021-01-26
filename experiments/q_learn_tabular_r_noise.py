@@ -107,3 +107,12 @@ model_config = {
         "lstm_use_prev_action_reward": False,
     },
 }
+value_tuples = []
+for config_type, config_dict in var_configs.items():
+    for key in config_dict:
+        assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
+        value_tuples.append(var_configs[config_type][key])
+
+import itertools
+cartesian_product_configs = list(itertools.product(*value_tuples))
+print("Total number of configs. to run:", len(cartesian_product_configs))

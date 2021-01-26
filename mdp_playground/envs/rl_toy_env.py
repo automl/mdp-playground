@@ -22,56 +22,103 @@ class RLToyEnv(gym.Env):
     The base environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible meta-features. The class extends OpenAI Gym's environment.
 
     The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated object will emulate. We recommend looking at the examples in example.py to begin using the environment since the config options are mostly self-explanatory. For more details, we list here the meta-features and config options (their names here correspond to the keys to be passed in the config dict):
-        delay: Delays reward by this number of steps.
-        sequence_length: Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length rewardable at init if use_custom_mdp = false and generate_random_mdp = true.
-        transition_noise: For discrete environments, a fraction = fraction of times environment, uniformly at random, transitions to a noisy state. For continuous environments, a Python function added to next state.
-        reward_noise: A Python function added to the reward given at every time step.
-        reward_density: The fraction of possible sequences of a given length that will be selected to be rewardable at init.
-        reward_scale: Scales default reward function by this value.
-        reward_shift: Shifts default reward function by this value.
-        diameter: For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will be = (number of states) / (d). When injecting irrelevant features, this can be a list to have independent diameters per sub-environment.
-        terminal_state_density: For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states, w.l.o.g. because discrete states are categorical. For continuous, see terminal_states and term_state_edge for how to control terminal states.
-        term_state_reward: Adds this to the _current_ reward if a terminal state was reached at current time step.
-        irrelevant_features: If True, additional irrelevant sub-space is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space. For discrete envs, additionally, state_space_size must be specified as a list and for continuous envs, relevant_indices must be specified.
-        use_custom_mdp: If true, users specify their own custom transition and reward functions using config options.
-        transition_function: A Python function emulating P(s, a). For discrete envs it's also possible to specify an |S|x|A| transition matrix.
-        reward_function:  A Python function emulating R(state_sequence, action_sequence). The state_sequence is recorded by the environment and transition_function is called before reward_function, so the "current" state (when step() was called) and next state are the last 2 states in the sequence. For discrete envs it's also possible to specify an |S|x|A| transition matrix where reward is assumed to be a function over "current" state and action. If use_custom_mdp = false and env. is continuous, a string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
+        delay : int >= 0
+            Delays reward by this number of steps.
+        sequence_length : int >= 1
+            Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length rewardable at init if use_custom_mdp = false and generate_random_mdp = true.
+        transition_noise :
+            For discrete environments, a fraction = fraction of times environment, uniformly at random, transitions to a noisy state. For continuous environments, a Python function added to next state. This function receives the random number generator of the environment as an argument.
+        reward_noise :
+            A Python function added to the reward given at every time step. This function receives the random number generator of the environment as an argument.
+        reward_density :
+            The fraction of possible sequences of a given length that will be selected to be rewardable at init.
+        reward_scale :
+            Scales default reward function by this value.
+        reward_shift :
+            Shifts default reward function by this value.
+        diameter : int > 0
+            For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will, thus, be = (number of states) / (d).
+        terminal_state_density :
+            For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states, w.l.o.g. because discrete states are categorical. For continuous, see terminal_states and term_state_edge for how to control terminal states.
+        term_state_reward :
+            Adds this to the _current_ reward if a terminal state was reached at current time step.
+        irrelevant_features :
+            If True, additional irrelevant sub-space (irrelevant to achieving rewards) is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space. For discrete envs, additionally, state_space_size must be specified as a list and for continuous envs, relevant_indices must be specified.
+        use_custom_mdp :
+            If true, users specify their own custom transition and reward functions using config options.
+        transition_function :
+            A Python function emulating P(s, a). For discrete envs it's also possible to specify an |S|x|A| transition matrix.
+        reward_function :
+            A Python function emulating R(state_sequence, action_sequence). The state_sequence is recorded by the environment and transition_function is called before reward_function, so the "current" state (when step() was called) and next state are the last 2 states in the sequence. For discrete envs it's also possible to specify an |S|x|A| transition matrix where reward is assumed to be a function over "current" state and action. If use_custom_mdp = false and env. is continuous, a string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
+
         Only for discrete environments:
-            state_space_size: A number specifying size of state space for uni-discrete environments and a list of len = 2 when irrelevant_features is True (The list contains sizes of relevant and irrelevant sub-spaces where the 1st sub-space is assumed relevant and the 2nd sub-space is assumed irrelevant).
-            action_space_size: Similar description as state_space_size. When generating MDPs, however, its value depends on the state_space_size and the diameter.
-            reward_every_n_steps: Boolean. Hand out rewards only at multiples of sequence_length steps. This makes chances of having overlapping rewarding sequences that one is on 0 and makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either make_denser case or continuous environments.
-            reward_dist: A Python function to sample rewards that will be handed out for randomly generated sequences when generate_random_mdp = True.
-            image_representations: Boolean to associate an image as the external observation with every discrete categorical state. This is handled by a ImageMultiDiscrete object. It associates the image of an n+3 sided polygon for a categorical state n.
+            state_space_size : int > 0
+                A number specifying size of state space for uni-discrete environments and a list of len = 2 when irrelevant_features is True (The list contains sizes of relevant and irrelevant sub-spaces where the 1st sub-space is assumed relevant and the 2nd sub-space is assumed irrelevant).
+            action_space_size : int > 0
+                Similar description as state_space_size. When generating MDPs, however, its value depends on the state_space_size and the diameter.
+            reward_dist :
+                A Python function to sample rewards that will be handed out for randomly generated sequences when generate_random_mdp = True. This function receives the random number generator and rewardable_sequences dict of the environment as arguments.
+            image_representations : boolean
+                Boolean to associate an image as the external observation with every discrete categorical state. This is handled by a ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n.
+
             Only for image_representations:
-                image_transforms: String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever it is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.
-                sh_quant: An int to quantise the shift transforms.
-                scale_range: A tuple of real numbers to specify (min_scaling, max_scaling).
-                ro_quant: An int to quantise the rotation transforms.
+                image_transforms :
+                    String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever it is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.
+                sh_quant :
+                    An int to quantise the shift transforms.
+                scale_range :
+                    A tuple of real numbers to specify (min_scaling, max_scaling).
+                ro_quant :
+                    An int to quantise the rotation transforms.
+
         Only for continuous environments:
-            state_space_dim: A number specifying dimensionality. A Gym Box will be instantiated.
-            action_space_dim: Same description as state_space_dim.
-            relevant_indices: A list that provides the relevant "dimensions" for continuous environments. The dynamics for these dimensions are independent of the dynamics for the remaining (irrelevant) dimensions.
-            state_space_max: Max absolute value that a dimension of the space can take. A Gym Box will be instantiated with range [-state_space_max, state_space_max]. Sampling will be done as for Gym Box spaces.
-            action_space_max: Same description as state_space_max.
-            terminal_states: The centres of hypercube subspaces which are terminal.
-            term_state_edge: The edge of the hypercube subspaces which are terminal.
-            transition_dynamics_order: An order of n implies that the n-th state derivative is set equal to the action/inertia.
-            inertia: inertia of the rigid body or point object simulated
-            time_unit: time duration over which the action is applied to the system
-            target_point: The target point in case move_to_a_point a is the reward_function. If make_denser is true, target_radius determines distance from target point at which reward is handed out.
-            action_loss_weight: A coefficient to multiply the norm of the action and subtract it from the reward to penalise action magnitude
+            state_space_dim :
+                A number specifying dimensionality. A Gym Box will be instantiated.
+            action_space_dim :
+                Same description as state_space_dim.
+            relevant_indices :
+                A list that provides the relevant "dimensions" for continuous environments. The dynamics for these dimensions are independent of the dynamics for the remaining (irrelevant) dimensions.
+            state_space_max :
+                Max absolute value that a dimension of the space can take. A Gym Box will be instantiated with range [-state_space_max, state_space_max]. Sampling will be done as for Gym Box spaces.
+            action_space_max :
+                Same description as state_space_max.
+            terminal_states :
+                The centres of hypercube subspaces which are terminal.
+            term_state_edge :
+                The edge of the hypercube subspaces which are terminal.
+            transition_dynamics_order :
+                An order of n implies that the n-th state derivative is set equal to the action/inertia.
+            inertia :
+                inertia of the rigid body or point object that is being simulated
+            time_unit :
+                time duration over which the action is applied to the system
+            target_point :
+                The target point in case move_to_a_point a is the reward_function. If make_denser is true, target_radius determines distance from target point at which reward is handed out.
+            action_loss_weight :
+                A coefficient to multiply the norm of the action and subtract it from the reward to penalise action magnitude
 
     Other important config:
         Only for discrete environments:
-            generate_random_mdp: If true, random MDPs are generated
-            repeats_in_sequences: If true, allows sequences to have repeating states in them.
-            completely_connected: If true, sets the transition function such that every state can transition to every other state, including itself.
+            generate_random_mdp : boolean
+                If true, random MDPs are generated
+            repeats_in_sequences : boolean
+                If true, allows sequences to have repeating states in them.
+            completely_connected : boolean
+                If true, sets the transition function such that every state can transition to every other state, including itself.
+            reward_every_n_steps : boolean
+                Hand out rewards only at multiples of sequence_length steps. This makes chances of having overlapping rewarding sequences that one is on 0 and makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either make_denser case or continuous environments.
+
         Only for continuous environments:
             none as of now
-        make_denser: If true, makes the reward denser in environments. For discrete environments, hands out a reward for completing part of a sequence. For continuous environment, for reward function move_to_a_point, it's based on the distance moved towards the target point.
-        seed: Recommended to be passed as an int which generates seeds to be used for various components of the environment. It is however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for it below to see how to do that.
-        log_filename: The name of the log file to which logs are written.
-        log_level: Python log level for logging
+
+        make_denser :
+            If true, makes the reward denser in environments. For discrete environments, hands out a reward for completing part of a sequence. For continuous environment, for reward function move_to_a_point, it's based on the distance moved towards the target point.
+        seed :
+            Recommended to be passed as an int which generates seeds to be used for various components of the environment. It is however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for it below to see how to do that.
+        log_filename :
+            The name of the log file to which logs are written.
+        log_level :
+            Python log level for logging
 
     The accompanying paper is available at: https://arxiv.org/abs/1909.07750.
 
@@ -569,7 +616,7 @@ class RLToyEnv(gym.Env):
                             ind_1 = ((i_s + 1) * self.action_space_size[0]) % self.state_space_size[0]
                             ind_2 = ((i_s + 2) * self.action_space_size[0]) % self.state_space_size[0]
                             # print(ind_1, ind_2)
-                            if ind_2 < ind_1: # edge case
+                            if ind_2 <= ind_1: # edge case
                                 ind_2 += self.state_space_size[0]
                             prob[ind_1 : ind_2] = prob_next_states
                             self.config["transition_function"][s] = self.observation_spaces[0].sample(prob=prob, size=self.action_space_size[0], replace=False) #random #TODO Preferably use the seed of the Env for this? #hardcoded
@@ -588,7 +635,7 @@ class RLToyEnv(gym.Env):
                         ind_1 = ((i_s + 1) * self.action_space_size[0]) % self.state_space_size[0]
                         ind_2 = ((i_s + 2) * self.action_space_size[0]) % self.state_space_size[0]
                         # print(ind_1, ind_2)
-                        if ind_2 < ind_1: # edge case
+                        if ind_2 <= ind_1: # edge case
                             ind_2 += self.state_space_size[0]
                         prob[ind_1 : ind_2] = prob_next_states
 
@@ -616,8 +663,8 @@ class RLToyEnv(gym.Env):
                             prob_next_states = np.ones(shape=(self.action_space_size[1],)) / self.action_space_size[1]
                             ind_1 = ((i_s + 1) * self.action_space_size[1]) % self.state_space_size[1]
                             ind_2 = ((i_s + 2) * self.action_space_size[1]) % self.state_space_size[1]
-                            # print(ind_1, ind_2)
-                            if ind_2 < ind_1: # edge case
+                            print(ind_1, ind_2)
+                            if ind_2 <= ind_1: # edge case
                                 ind_2 += self.state_space_size[1]
                             prob[ind_1 : ind_2] = prob_next_states
 
@@ -635,7 +682,7 @@ class RLToyEnv(gym.Env):
                             ind_1 = ((i_s + 1) * self.action_space_size[1]) % self.state_space_size[1]
                             ind_2 = ((i_s + 2) * self.action_space_size[1]) % self.state_space_size[1]
                             # print(ind_1, ind_2)
-                            if ind_2 < ind_1: # edge case
+                            if ind_2 <= ind_1: # edge case
                                 ind_2 += self.state_space_size[1]
                             prob[ind_1 : ind_2] = prob_next_states
 
@@ -752,7 +799,7 @@ class RLToyEnv(gym.Env):
                     '''
                     sequence = tuple(sequence) # tuples are immutable and can be used as keys for a dict
                     if callable(self.reward_dist):
-                        self.rewardable_sequences[sequence] = self.reward_dist(self.np_random)
+                        self.rewardable_sequences[sequence] = self.reward_dist(self.np_random, self.rewardable_sequences)
                     else:
                         self.rewardable_sequences[sequence] = 1.0 # this is the default reward value, reward scaling will be handled later
                     self.logger.warning("specific_sequence that will be rewarded" + str(sequence)) #TODO impose a different distribution for these: independently sample state for each step of specific sequence; or conditionally dependent samples if we want something like DMPs/manifolds

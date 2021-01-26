@@ -1,15 +1,19 @@
 num_seeds = 10
+timesteps_total = 20_000
+
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    'state_space_size': [50],#, 10, 12, 14] # [2**i for i in range(1,6)]
-    'action_space_size': [50],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0],
-    'sequence_length': [1],#i for i in range(1,4)]
-    'reward_density': [0.25, 0.5, 0.75], # np.linspace(0.0, 1.0, num=5)
+    'state_space_size': [24],#, 10, 12, 14] # [2**i for i in range(1,6)]
+    'action_space_size': [24],#2, 4, 8, 16] # [2**i for i in range(1,6)]
+    # 'diameter': [1], # + [2**i for i in range(4)],
+    'delay': [0], # + [2**i for i in range(4)],
+    'sequence_length': [1], #, 2, 3, 4],#i for i in range(1,4)]
+    'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
+    'reward_dist_end_pts': [(0.01, 1)],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -34,26 +38,29 @@ env_config = {
 algorithm = "DQN"
 agent_config = {
     "adam_epsilon": 1e-4,
-    "beta_annealing_fraction": 1.0,
     "buffer_size": 1000000,
-    "double_q": False,
-    "dueling": False,
+    "double_q": True,
+    "dueling": True,
+    "lr": 1e-3,
     "exploration_final_eps": 0.01,
     "exploration_fraction": 0.1,
-    "final_prioritized_replay_beta": 1.0,
-    "hiddens": None,
-    "learning_starts": 1000,
-    "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
-    "n_step": 1,
-    "noisy": False,
-    "num_atoms": 1,
-    "prioritized_replay": False,
-    "prioritized_replay_alpha": 0.5,
-    "sample_batch_size": 4,
     "schedule_max_timesteps": 20000,
-    "target_network_update_freq": 800,
+    # "hiddens": None,
+    "learning_starts": 500,
+    "target_network_update_freq": 80,
+    "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
+    "noisy": True,
+    "num_atoms": 10, # [5, 10, 20]
+    "prioritized_replay": True,
+    "prioritized_replay_alpha": 0.75, #
+    "prioritized_replay_beta": 0.4,
+    "final_prioritized_replay_beta": 1.0, #
+    "beta_annealing_fraction": 1.0, #
+
+    "sample_batch_size": 4,
     "timesteps_per_iteration": 1000,
     "train_batch_size": 32,
+    "min_iter_time_s": 0,
 }
 
 model_config = {

@@ -39,7 +39,7 @@ class ImageMultiDiscrete(Box):
         seed : int
             seed for randomly applied transformations and NOT for the underlying state space
         use_custom_images : str or None
-            If None, then default setting of no custom textures or images. If this value is "textures" or "images", then all images in the cust_path directories are loaded in alphabetical order and correspond 1-to-1 with discrete states which are in numeric order. If this value is "textures", the textures are applied to the polygons that would have been generated for the default setting (of no custom textures or images).
+            If None, then default setting of no custom textures or images. If this value is "textures" or "images", then all images in the cust_path directories are loaded in alphabetical order and correspond 1-to-1 with discrete states which are in numeric order. If this value is "textures", the textures are applied to the polygons that would have been generated for the default setting (of no custom textures or images). If this value is "images", then the custom images are drawn in a square (with side length = circle_radius * sqrt(2)) in the centre of the polygon when no transforms are applied. When the underlying state space sizes are multi-discrete, the 1-to-1 state number to image mapping is the same for all discrete sub-spaces.
         cust_path : str or None
             The directory containing the custom images to be loaded
         '''
