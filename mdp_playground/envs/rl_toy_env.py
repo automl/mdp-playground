@@ -450,8 +450,9 @@ class RLToyEnv(gym.Env):
 
         assert config["action_space_type"] == config["state_space_type"], 'config["state_space_type"] != config["action_space_type"]. Currently mixed space types are not supported.'
         assert self.sequence_length > 0, "config[\"sequence_length\"] <= 0. Set to: " + str(self.sequence_length) # also should be int
-        if "completely_connected" in config and config["completely_connected"]: ####TODO remove
-            assert config["state_space_size"] == config["action_space_size"], "config[\"state_space_size\"] != config[\"action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values. Vals: " + str(config["state_space_size"]) + " " + str(config["action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
+        if "completely_connected" in config and config["completely_connected"]: #### TODO remove
+            pass
+            # assert config["state_space_size"] == config["action_space_size"], "config[\"state_space_size\"] != config[\"action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values. Vals: " + str(config["state_space_size"]) + " " + str(config["action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
             # assert config["irrelevant_state_space_size"] == config["irrelevant_action_space_size"], "config[\"irrelevant_state_space_size\"] != config[\"irrelevant_action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values! Vals: " + str(config["irrelevant_state_space_size"]) + " " + str(config["irrelevant_action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!" #TODO Currently, irrelevant dimensions have a P similar to that of relevant dimensions. Should this be decoupled?
 
         if config["state_space_type"] == 'continuous':
@@ -483,6 +484,10 @@ class RLToyEnv(gym.Env):
             if self.image_representations:
                 # underlying_obs_space = MultiDiscreteExtended(self.state_space_size, seed=self.seed_dict["state_space"]) #seed
                 self.observation_space = ImageMultiDiscrete(self.state_space_size, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=20, seed=self.seed_dict["image_representations"]) #seed
+                if self.irrelevant_features:
+                    self.action_space = TupleExtended(self.action_spaces, seed=self.seed_dict["action_space"]) #seed
+                else:
+                    self.action_space = self.action_spaces[0]
             else:
                 if self.irrelevant_features:
                     self.observation_space = TupleExtended(self.observation_spaces, seed=self.seed_dict["state_space"]) #seed # hack #TODO Gym (and so Ray) apparently needs observation_space as a member of an env.
@@ -741,6 +746,9 @@ class RLToyEnv(gym.Env):
                     if repeats:
                         num_possible_sequences = (maximum) ** length
                         num_sel_sequences = int(fraction * num_possible_sequences)
+                        if num_sel_sequences == 0:
+                            num_sel_sequences = 1
+                            warnings.warn('0 rewardable sequences per independent set for given reward_density, sequence_length, diameter and terminal_state_density. Setting it to 1.')
                         sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_sel_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; This line also makes it not possible to have this function be portable as part of a library because it use the np_random member variable of this class
                         for i_s in range(diameter): # Allow sequences to begin in any of the independent sets and therefore this loop is over the no. of independent sets(= diameter)
                             for i in range(num_rewardable_sequences):
@@ -764,6 +772,9 @@ class RLToyEnv(gym.Env):
                         for i_s in range(diameter): # Allow sequences to begin in any of the independent sets and therefore this loop is over the no. of independent sets(= diameter). Could maybe sample independent set no. as "part" of sel_sequence_nums below and avoid this loop?
                             num_possible_permutations = np.prod(permutations) # Number of possible permutations/sequences for, say, a diameter of 3 and 24 total states and terminal_state_density = 0.25, i.e., 6 non-terminal states (out of 8 states) per independent set, for sequence length of 5 is np.prod([6, 6, 6, 5, 5]) * 3; the * diameter at the end is needed because the sequence can begin in any of the independent sets; However, for simplicity, we omit * diameter here and just perform the same procedure per independent set. This can lead to slightly fewer rewardable sequences than should be the case for a given reward_density - this is due int() in the next step
                             num_sel_sequences = int(fraction * num_possible_permutations)
+                            if num_sel_sequences == 0: ##TODO Remove this test here and above?
+                                num_sel_sequences = 1
+                                warnings.warn('0 rewardable sequences per independent set for given reward_density, sequence_length, diameter and terminal_state_density. Setting it to 1.')
                             # print("Mersenne3:", self.np_random.get_state()[2])
                             sel_sequence_nums = self.np_random.choice(num_possible_permutations, size=num_sel_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; # TODO this code could be replaced with self.np_random.permutation(non_term_state_space_size)[self.sequence_length]? Replacement becomes a problem then! We have to keep sampling until we have all unique rewardable sequences.
                             # print("Mersenne4:", self.np_random.get_state()[2])

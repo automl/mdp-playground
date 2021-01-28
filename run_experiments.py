@@ -50,7 +50,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
 parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
-                   help='Configuration file containing configuration to run experiments. It must be a Python file so config can be given programmatically. There are 2 types of configs - VARIABLE CONFIG across the experiments and STATIC CONFIG across the experiments. \nVARIABLE CONFIGS: The OrderedDicts var_env_configs, var_agent_configs and var_model_configs hold configuration options that are variable for the environment, agent and model across the current experiment. For each configuration option, the option is the key in the dict and its value is a list of values it can take for the current experiment.  A Cartesian product of these lists is taken to generate various possible configurations to be run. For example, you might want to vary "delay" for the current experiment. Then "delay" would be a key in var_env_configs dict and its value would be a list of values it can take. Because Ray does not have a common way to address this specification of configurations for its agents, there are a few hacky ways to set var_agent_configs and var_model_configs currently. Please see sample experiment config files in the experiments directory to see how to set the values for a given algorithm. \nSTATIC CONFIGS: env_config, agent_config and model_config are dicts which hold the static configuration for the current experiment as a normal Python dict.')
+                   help='Configuration file containing configuration to run experiments. It must be a Python file so config can be given programmatically. There are 2 types of configs - VARIABLE CONFIG across the experiments and STATIC CONFIG across the experiments. \nVARIABLE CONFIGS: The OrderedDicts var_env_configs, var_agent_configs and var_model_configs hold configuration options that are variable for the environment, agent and model across the current experiment. For each configuration option, the option is the key in the dict and its value is a list of values it can take for the current experiment. A Cartesian product of these lists is taken to generate various possible configurations to be run. For example, you might want to vary "delay" for the current experiment. Then "delay" would be a key in var_env_configs dict and its value would be a list of values it can take. Because Ray does not have a common way to address this specification of configurations for its agents, there are a few hacky ways to set var_agent_configs and var_model_configs currently. Please see sample experiment config files in the experiments directory to see how to set the values for a given algorithm. \nSTATIC CONFIGS: env_config, agent_config and model_config are dicts which hold the static configuration for the current experiment as a normal Python dict.') ####TODO Update docs regarding how to get configs to run: i.e., Cartesian product, or random, etc.
 parser.add_argument('-e', '--exp-name', dest='exp_name', action='store', default='mdpp_default_experiment',
                    help='The user-chosen name of the experiment. This is used as the prefix of the output files (the prefix also contains config_num if that is provided). It will save stats to 2 CSV files, with the filenames as the one given as argument'
                    ' and another file with an extra "_eval" in the filename that contains evaluation stats during the training. Appends to existing files or creates new ones if they don\'t exist.')
@@ -58,6 +58,8 @@ parser.add_argument('-n', '--config-num', dest='config_num', action='store', def
                    help='Used for running the configurations of experiments in parallel. This is appended to the prefix of the output files (after exp_name).'
                    ' A Cartesian product of different configuration values for the experiment will be taken and ordered as a list and this number corresponds to the configuration number in this list.'
                    ' Please look in to the code for details.')
+parser.add_argument('-a', '--agent-config-num', dest='agent_config_num', action='store', default=None, type=int,
+                   help='Used for running the configurations of experiments in parallel. This is appended to the prefix of the output files (after exp_name).') ###TODO Remove? #hack to run 1000 x 1000 env configs x agent configs. Storing all million of them in memory may be too inefficient?
 # parser.add_argument('-t', '--tune-hps', dest='tune_hps', action='store', default=False, type=bool,
 #                    help='Used for tuning the hyperparameters that can be used for experiments later.'
 #                    ' A Cartesian product of different configuration values for the experiment will be taken and ordered as a list and this number corresponds to the configuration number in this list.'
@@ -76,7 +78,7 @@ sys.path.insert(1, config_file_path) #hack
 import importlib
 config = importlib.import_module(args.config_file.split('/')[-1], package=None)
 print("Number of seeds for environment:", config.num_seeds)
-print("Configuration numbers that will be run:", "all" if args.config_num is None else args.config_num)
+print("Configuration number(s) that will be run:", "all" if args.config_num is None else args.config_num)
 
 
 # import default_config
@@ -84,10 +86,13 @@ print("Configuration numbers that will be run:", "all" if args.config_num is Non
 # print(os.path.abspath(args.config_file)) # 'experiments/dqn_seq_del.py'
 
 args.exp_name = os.path.abspath(args.exp_name)
-if args.config_num is None:
-    stats_file_name = args.exp_name
-else:
-    stats_file_name = args.exp_name + '_' + str(args.config_num)
+stats_file_name = args.exp_name
+
+if args.config_num is not None:
+    stats_file_name += '_' + str(args.config_num)
+if args.agent_config_num is not None:
+    stats_file_name += '_' + str(args.agent_config_num)
+
 print("Stats file being written to:", stats_file_name)
 
 
@@ -171,24 +176,40 @@ def on_train_result(info):
         for key in config_dict:
             if config_type == "env":
                 if key == 'reward_noise':
-                    fout.write(str(info["result"]["config"]["env_config"]['reward_noise_std']) + ' ') #hack
+                    fout.write('%.2e' % info["result"]["config"]["env_config"]['reward_noise_std'] + ' ') #hack
                 elif key == 'transition_noise' and info["result"]["config"]["env_config"]["state_space_type"] == "continuous":
-                    fout.write(str(info["result"]["config"]["env_config"]['transition_noise_std']) + ' ') #hack
+                    fout.write('%.2e' % info["result"]["config"]["env_config"]['transition_noise_std'] + ' ') #hack
                 else:
-                    fout.write(str(info["result"]["config"]["env_config"][key]).replace(' ', '') + ' ')
+                    field_val = info["result"]["config"]["env_config"][key]
+                    if type(field_val) == float:
+                        str_to_write = '%.2e' % field_val
+                    elif type(field_val) == list:
+                        str_to_write = "["
+                        for elem in field_val:
+                            str_to_write += '%.2e' % elem if type(elem) == float else elem
+                            str_to_write += ","
+                        str_to_write += "]"
+                    else:
+                        str_to_write = str(field_val).replace(' ', '')
+                    str_to_write += ' '
+                    fout.write(str_to_write)
             elif config_type == "agent":
                 if config_algorithm == 'SAC' and key == "critic_learning_rate":
                     real_key = "lr" #hack due to Ray's weird ConfigSpaces
-                    fout.write(str(info["result"]["config"]['optimization'][key]).replace(' ', '') + ' ')
+                    fout.write('%.2e' % info["result"]["config"]['optimization'][key].replace(' ', '') + ' ')
                 elif config_algorithm == 'SAC' and key == "fcnet_hiddens":
                     #hack due to Ray's weird ConfigSpaces
-                    fout.write(str(info["result"]["config"]["Q_model"][key]).replace(' ', '') + ' ')
+                    str_to_write = str(info["result"]["config"]["Q_model"][key]).replace(' ', '') + ' '
+                    fout.write(str_to_write)
                 # elif config_algorithm == 'SAC' and key == "policy_model":
                 #     #hack due to Ray's weird ConfigSpaces
                 #     pass
                     # fout.write(str(info["result"]["config"][key]['fcnet_hiddens']).replace(' ', '') + ' ')
                 else:
-                    fout.write(str(info["result"]["config"][key]).replace(' ', '') + ' ')
+                    field_val = info["result"]["config"][key]
+                    str_to_write = '%.2e' % field_val if type(field_val) == float else str(field_val).replace(' ', '')
+                    str_to_write += ' '
+                    fout.write(str_to_write)
             elif config_type == "model":
                 # if key == 'conv_filters':
                 fout.write(str(info["result"]["config"]["model"][key]).replace(' ', '') + ' ')
@@ -199,8 +220,8 @@ def on_train_result(info):
     # print("Custom_metrics: ", info["result"]["step_reward_mean"], info["result"]["step_reward_max"], info["result"]["step_reward_min"])
     episode_len_mean = info["result"]["episode_len_mean"]
 
-    fout.write(str(timesteps_total) + ' ' + str(episode_reward_mean) +
-               ' ' + str(episode_len_mean) + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
+    fout.write(str(timesteps_total) + ' ' + '%.2e' % episode_reward_mean +
+               ' ' + '%.2e' % episode_len_mean + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
     fout.close()
 
     # print("##### hack_filename: ", hack_filename)
@@ -224,7 +245,7 @@ def on_episode_end(info):
         length_this_episode = info["episode"].length
         hack_filename_eval = stats_file_name + '_eval.csv'
         fout = open(hack_filename_eval, 'a') #hardcoded
-        fout.write(str(reward_this_episode) + ' ' + str(length_this_episode) + "\n")
+        fout.write('%.2e' % reward_this_episode + ' ' + str(length_this_episode) + "\n")
         fout.close()
 
 def on_episode_step(info):
@@ -262,6 +283,12 @@ if args.config_num is None:
 else:
     cartesian_product_configs = [config.cartesian_product_configs[args.config_num]]
 
+#hack ###TODO remove?
+if 'random_configs' in dir(config):
+    random_config = config.random_configs[args.agent_config_num]
+    print("random_config of agent to be run:", random_config)
+
+
 
 from functools import reduce
 def deepmerge(a, b, path=None):
@@ -286,6 +313,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 for current_config in cartesian_product_configs:
+    current_config += random_config ###TODO Remove #hack because this ignores model_config that may be at end of current_config!
     algorithm = config.algorithm
 
     agent_config = config.agent_config
@@ -307,10 +335,30 @@ for current_config in cartesian_product_configs:
                     env_config["env_config"]['transition_noise_std'] = transition_noise_ #hack
                 elif key == 'reward_dist_end_pts':
                     reward_dist_ = current_config[list(var_env_configs).index(key)] # this works because env_configs are 1st in the OrderedDict
-                    num_rews = current_config[list(var_env_configs).index("action_space_size")] * (1 - current_config[list(var_env_configs).index("terminal_state_density")]) * current_config[list(var_env_configs).index("reward_density")]
+
+                    permutations = []
+                    length = current_config[list(var_env_configs).index("sequence_length")]
+                    diameter = current_config[list(var_env_configs).index("diameter")]
+                    state_space_size = current_config[list(var_env_configs).index("state_space_size")]
+                    terminal_state_density = current_config[list(var_env_configs).index("terminal_state_density")]
+                    maximum = state_space_size  * (1 - terminal_state_density)/diameter
+                    fraction = current_config[list(var_env_configs).index("reward_density")]
+
+                    for i in range(length):
+                        permutations.append(maximum - i // diameter)
+                    num_possible_permutations = np.prod(permutations)
+                    num_sel_sequences = int(fraction * num_possible_permutations)
+                    if num_sel_sequences == 0:
+                        num_sel_sequences = 1
+                        warnings.warn('0 rewardable sequences per independent set for given reward_density, sequence_length, diameter and terminal_state_density. Setting it to 1.')
+
+                    num_rews = diameter * num_sel_sequences
                     print("num_rewardable_sequences set to:", num_rews)
-                    assert current_config[list(var_env_configs).index("sequence_length")] == 1
-                    rews = np.linspace(reward_dist_[0], reward_dist_[1], num=num_rews)
+                    if num_rews == 1:
+                        rews = [1.0]
+                    else:
+                        rews = np.linspace(reward_dist_[0], reward_dist_[1], num=num_rews)
+                    assert rews[-1] == 1.0
                     np.random.shuffle(rews)
 
                     def get_rews(rng, r_dict):
