@@ -340,7 +340,8 @@ for current_config in cartesian_product_configs:
                     permutations = []
                     length = current_config[list(var_env_configs).index("sequence_length")]
                     diameter = current_config[list(var_env_configs).index("diameter")]
-                    state_space_size = current_config[list(var_env_configs).index("state_space_size")]
+                    action_space_size = current_config[list(var_env_configs).index("action_space_size")]
+                    state_space_size = action_space_size * diameter
                     terminal_state_density = current_config[list(var_env_configs).index("terminal_state_density")]
                     maximum = state_space_size  * (1 - terminal_state_density)/diameter
                     fraction = current_config[list(var_env_configs).index("reward_density")]
@@ -367,6 +368,7 @@ for current_config in cartesian_product_configs:
 
                     env_config["env_config"]['reward_dist'] = tune.function(get_rews)
                     env_config["env_config"]['reward_dist_end_pts'] = reward_dist_
+                    env_config["env_config"]['state_space_size'] = action_space_size * diameter
                 else:
                     env_config["env_config"][key] = current_config[list(var_env_configs).index(key)]
 

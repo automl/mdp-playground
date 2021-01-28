@@ -5,7 +5,7 @@ import numpy as np
 from collections import OrderedDict
 
 var_env_configs = OrderedDict({
-    'state_space_size': (64,),#, 10, 12, 14] # [2**i for i in range(1,6)]
+    'action_space_size': (8,),#, 10, 12, 14] # [2**i for i in range(1,6)]
     # 'action_space_size': (64),#2, 4, 8, 16] # [2**i for i in range(1,6)]
     'delay': "cat, " + str([i for i in range(11)]), # + [2**i for i in range(4)],
     'sequence_length': "cat, " + str([i for i in range(1, 4)]), #, 2, 3, 4],#i for i in range(1,4)]
@@ -190,6 +190,26 @@ agent_config = {
     "timesteps_per_iteration": 1000,
     # "train_batch_size": 32,
     "min_iter_time_s": 0,
+
+    "tf_session_args": {
+        # note: overriden by `local_tf_session_args`
+        "intra_op_parallelism_threads": 4,
+        "inter_op_parallelism_threads": 4,
+        # "gpu_options": {
+        #     "allow_growth": True,
+        # },
+        # "log_device_placement": False,
+        "device_count": {
+            "CPU": 2
+        },
+        # "allow_soft_placement": True,  # required by PPO multi-gpu
+    },
+    # Override the following tf session args on the local worker
+    "local_tf_session_args": {
+        "intra_op_parallelism_threads": 4,
+        "inter_op_parallelism_threads": 4,
+    },
+
 }
 
 model_config = {
