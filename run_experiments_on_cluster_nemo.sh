@@ -7,7 +7,7 @@
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 ##MOAB -V # export env. variables from launch env. I think
 ##MOAB -o output_filename
-#MOAB
+##MOAB
 
 
 # This is a workaround for a know bug.

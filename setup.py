@@ -6,6 +6,8 @@ extras_require = [
     'pillow==6.1.0',
     'pandas==0.25.0',
     'requests==2.22.0',
+    'configspace==0.4.10',
+    'scipy==1.3.0',
 ]
 
 extras_require_cont = [
@@ -15,6 +17,8 @@ extras_require_cont = [
     'pandas==0.25.0',
     'requests==2.22.0',
     'mujoco-py==2.0.2.13', # with mujoco 2.0
+    'configspace==0.4.10',
+    'scipy==1.3.0',
 ]
 
 setup(name='mdp_playground',
