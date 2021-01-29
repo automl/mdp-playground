@@ -113,6 +113,8 @@ else:
 
 
 var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
+if "timesteps_total" in dir(config):
+    hacky_timesteps_total = config.timesteps_total #hack
 
 if "env" in config.var_configs:
     var_env_configs = config.var_configs["env"] #hack
@@ -209,7 +211,7 @@ def on_train_result(info):
                     # fout.write(str(info["result"]["config"][key]['fcnet_hiddens']).replace(' ', '') + ' ')
                 else:
                     if key == "exploration_fraction" and "exploration_fraction" not in info["result"]["config"]: #hack ray 0.7.3 will have exploration_fraction but not versions later than ~0.9
-                        field_val = info["result"]["config"]["exploration_config"]["epsilon_timesteps"]
+                        field_val = info["result"]["config"]["exploration_config"]["epsilon_timesteps"] / hacky_timesteps_total # convert to fraction to be similar to old exploration_fraction
                     else:
                         field_val = info["result"]["config"][key]
                     str_to_write = '%.2e' % field_val if isinstance(field_val, float) else str(field_val).replace(' ', '')
@@ -296,6 +298,8 @@ else:
 if 'random_configs' in dir(config):
     random_config = config.random_configs[args.agent_config_num]
     print("random_config of agent to be run:", random_config)
+else:
+    random_config = ()
 
 
 

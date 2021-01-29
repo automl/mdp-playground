@@ -1,5 +1,7 @@
 num_seeds = 1
 timesteps_total = 20_000
+num_agent_configs = 1000
+num_prob_inst = 1000
 
 import numpy as np
 from collections import OrderedDict
@@ -25,7 +27,6 @@ def sobol_configs_from_config_dict(config_dict):
     '''
     '''
 
-    num_prob_inst = 10
     num_dims = 0
     for key in config_dict:
         val = config_dict[key]
@@ -89,7 +90,7 @@ sobol_configs_from_config_dict(var_env_configs)
 # pp = pprint.PrettyPrinter(indent=4)
 
 for i, conf in enumerate(cartesian_product_configs):
-    cartesian_product_configs[i] = list(conf.values()) #hack
+    cartesian_product_configs[i] = tuple(conf.values()) #hack
     # print(conf)
     # pp.pprint(cartesian_product_configs[i])
 
@@ -138,10 +139,9 @@ def create_config_space_from_config_dict(config_dict):
 cs = create_config_space_from_config_dict(var_agent_configs)
 print("Agent variable ConfigSpace:")
 print(cs)
-num_agent_configs = 10
 random_configs = cs.sample_configuration(size=num_agent_configs)
 for i in range(len(random_configs)):
-    random_configs[i] = list(random_configs[i].get_dictionary().values()) #hack ####TODO Change run_experiments.py and here to directly pass whole config dict to run_experiments.py. Would need to replace in every config.py file.
+    random_configs[i] = tuple(random_configs[i].get_dictionary().values()) #hack ####TODO Change run_experiments.py and here to directly pass whole config dict to run_experiments.py. Would need to replace in every config.py file.
 # print(random_configs)
 
 var_configs = OrderedDict({
@@ -177,7 +177,7 @@ agent_config = {
     # "learning_starts": 500,
     # "target_network_update_freq": 800,
     # "n_step": 4,
-    "noisy": True,
+    "noisy": False,
     "num_atoms": 10, # [5, 10, 20]
     "prioritized_replay": True,
     "prioritized_replay_alpha": 0.75, #

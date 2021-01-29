@@ -1,10 +1,11 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-9 # specifies array job indices
+#MOAB -t 0-999 # specifies array job indices
 #MOAB -l nodes=1:ppn=2
-#MOAB -l walltime=0:01:00:00
-#MOAB -l pmem=2GB # Seems like it is memory per CPU core
+#MOAB -l walltime=0:70:00:00
+#MOAB -l pmem=1GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
+
 ##MOAB -V # export env. variables from launch env. I think
 ##MOAB -o output_filename
 ##MOAB
@@ -75,7 +76,7 @@ cd mdpp_${JOB_ID}
 # cd /home/rajanr/mdpp
 echo ${MOAB_JOBID} ${MOAB_JOBARRAYINDEX} ${MOAB_JOBNAME}
 
-for i in {0..9}
+for i in {0..999}
 do
     echo -e "Running agent config $i:\n"
     \time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --agent-config-num ${MOAB_JOBARRAYINDEX} --config-num $i
