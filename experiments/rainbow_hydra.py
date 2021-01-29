@@ -25,7 +25,7 @@ def sobol_configs_from_config_dict(config_dict):
     '''
     '''
 
-    num_prob_inst = 10
+    num_prob_inst = 1000
     num_dims = 0
     for key in config_dict:
         val = config_dict[key]
@@ -138,7 +138,7 @@ def create_config_space_from_config_dict(config_dict):
 cs = create_config_space_from_config_dict(var_agent_configs)
 print("Agent variable ConfigSpace:")
 print(cs)
-num_agent_configs = 10
+num_agent_configs = 1000
 random_configs = cs.sample_configuration(size=num_agent_configs)
 for i in range(len(random_configs)):
     random_configs[i] = list(random_configs[i].get_dictionary().values()) #hack ####TODO Change run_experiments.py and here to directly pass whole config dict to run_experiments.py. Would need to replace in every config.py file.
@@ -190,6 +190,10 @@ agent_config = {
     "timesteps_per_iteration": 1000,
     # "train_batch_size": 32,
     "min_iter_time_s": 0,
+
+    'num_gpus': 0,
+    "num_workers": 1, # extra workers I think
+    # "num_cpus_for_driver": 2,
 
     "tf_session_args": {
         # note: overriden by `local_tf_session_args`
