@@ -103,8 +103,8 @@ from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
 if config.algorithm == 'DQN':
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), include_webui=False) #webui_host='0.0.0.0')
-    # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
+    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), include_webui=False, local_mode=True) #webui_host='0.0.0.0')
+    # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # local_mode (bool): If true, the code will be executed serially. This is useful for debugging. # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
 elif config.algorithm == 'A3C': #hack
     ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), include_webui=False)
     # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
@@ -182,12 +182,13 @@ def on_train_result(info):
                     fout.write('%.2e' % info["result"]["config"]["env_config"]['transition_noise_std'] + ' ') #hack
                 else:
                     field_val = info["result"]["config"]["env_config"][key]
-                    if type(field_val) == float:
+                    if isinstance(field_val, float):
                         str_to_write = '%.2e' % field_val
                     elif type(field_val) == list:
                         str_to_write = "["
                         for elem in field_val:
-                            str_to_write += '%.2e' % elem if type(elem) == float else elem
+                            # print(key)
+                            str_to_write += '%.2e' % elem if isinstance(elem, float) else elem
                             str_to_write += ","
                         str_to_write += "]"
                     else:
@@ -207,8 +208,11 @@ def on_train_result(info):
                 #     pass
                     # fout.write(str(info["result"]["config"][key]['fcnet_hiddens']).replace(' ', '') + ' ')
                 else:
-                    field_val = info["result"]["config"][key]
-                    str_to_write = '%.2e' % field_val if type(field_val) == float else str(field_val).replace(' ', '')
+                    if key == "exploration_fraction" and "exploration_fraction" not in info["result"]["config"]: #hack ray 0.7.3 will have exploration_fraction but not versions later than ~0.9
+                        field_val = info["result"]["config"]["exploration_config"]["epsilon_timesteps"]
+                    else:
+                        field_val = info["result"]["config"][key]
+                    str_to_write = '%.2e' % field_val if isinstance(field_val, float) else str(field_val).replace(' ', '')
                     str_to_write += ' '
                     fout.write(str_to_write)
             elif config_type == "model":
@@ -231,7 +235,11 @@ def on_train_result(info):
     # We did not manage to find an easy way to log evaluation stats for Ray without the following hack which demarcates the end of a training iteration in the evaluation stats file
     hack_filename_eval = stats_file_name + '_eval.csv'
     fout = open(hack_filename_eval, 'a') #hardcoded
-    fout.write('#HACK STRING EVAL' + "\n")
+
+    import os, psutil
+    mem_used_mb = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
+
+    fout.write('#HACK STRING EVAL, mem_used_mb: ' + str(mem_used_mb) + "\n")
     fout.close()
 
     info["result"]["callback_ok"] = True
