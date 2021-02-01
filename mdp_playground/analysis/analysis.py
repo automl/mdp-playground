@@ -182,18 +182,12 @@ class MDPP_Analysis():
 
         # print("i, previous_i:", i, previous_i)
         final_rows_for_a_config.append(i + 1) # Always append the last row!
-        # list_of_learning_curves.append(stats_pd.iloc[previous_i:i + 2, -cols_to_take:])
         self.final_rows_for_a_config = final_rows_for_a_config
-
-        # print(len(list_of_learning_curves))
-        # print(len(final_rows_for_a_config))
         stats_end_of_training = stats_pd.iloc[final_rows_for_a_config]
         stats_reshaped = stats_end_of_training.iloc[:, -num_metrics:] # last vals are timesteps_total, episode_reward_mean, episode_len_mean
         stats_reshaped = np.reshape(np.array(stats_reshaped), config_counts)
-        # print(stats_end_of_training.head(10))
+
         print("train stats shape:", stats_reshaped.shape)
-#         to_plot_ = np.squeeze(stats_reshaped[:, :, :, :, 0, 0, :, 1])
-#         print('Episode reward (at end of training) for 10 seeds for vanilla env.:', to_plot_)
 
         # Calculate AUC metrics
         train_aucs = []
@@ -268,7 +262,6 @@ class MDPP_Analysis():
             # print('final_rows_for_a_config', final_rows_for_a_config)
             # print("len(final_10_evals)", final_10_evals.shape, type(final_10_evals))
             mean_data_eval = np.mean(final_10_evals, axis=1) # this is mean over last 10 eval episodes
-    #         print(np.array(stats_pd.iloc[:, -3]))
 
             # subsampling code
             eval_stats_indices = np.arange(0, mean_data_eval.shape[0], step=sample_freq)
@@ -276,14 +269,13 @@ class MDPP_Analysis():
 
             # Adds timesteps_total column to the eval stats which did not have them:
             mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -num_metrics])).T, mean_data_eval), axis=1)
-    #         print(mean_data_eval.shape, len(final_rows_for_a_config))
 
 
             final_eval_metrics_ = mean_data_eval[final_rows_for_a_config, :] # 1st column is episode reward, 2nd is episode length in original _eval.csv file, here it's 2nd and 3rd after prepending timesteps_total column above.
             # print(dims_values, config_counts)
             final_eval_metrics_reshaped = np.reshape(final_eval_metrics_, config_counts)
             # print(final_eval_metrics_)
-    #         print("eval stats shapes (before and after reshape):", final_eval_metrics_.shape, final_eval_metrics_reshaped.shape)
+
             print("eval stats shape:", final_eval_metrics_reshaped.shape)
 
 
@@ -701,7 +693,7 @@ class MDPP_Analysis():
             nrows_ = 1
         nseeds_ = config_counts[exp_data['seed_idx']]#self.config_counts[-1]
         # print(ax, type(ax), type(ax[0]))
-#         color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
+    #color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
         # print("color_cycle", color_cycle)
         plt.rcParams.update({'font.size': 25}) # 25 for 36x21 fig, 16 for 24x14 fig.
         # 36x21 for better resolution but about 900kb file size, 24x14 for okay resolution and 550kb file size
