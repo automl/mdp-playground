@@ -1,7 +1,8 @@
 #!/bin/bash
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
-#SBATCH -t 4-00:00 # time (D-HH:MM)
-#SBATCH -c 3 # number of CPUs/task
+#SBATCH -a 0-24%25 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
+#SBATCH -t 0-05:00 # time (D-HH:MM)
+#SBATCH -c 8 # number of CPUs/task
 #SBATCH -o log/%x.%A.%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%A.%a.err # STDERR  (the folder log has to exist!)  %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -J mdp-playground-job-array # sets the job name. If not specified, the file name will be used as job name
@@ -9,11 +10,20 @@
 ##SBATCH --mail-type=END,FAIL # (receive mails about end and timeouts/crashes of your job)
 ##SBATCH --gres=gpu:1  # reserves one GPU
 ##SBATCH --mem 16000M # Specify the real memory required per node, not needed as for our cluster, -c below takes priority and auto-sets the memory. For CPU, use --mem-per-cpu
-#SBATCH -a 0-24 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
-
-export EXP_NAME='sac_halfcheetah_time_unit' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
+echo "Started at $(date)";
+# Output general info, timing info
+echo "TMPDIR: " $TMPDIR
+
+printenv
+
+export EXP_NAME='a3c_beam_rider_r_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME2='a3c_breakout_del'
+export EXP_NAME3='a3c_qbert_r_noise'
+export EXP_NAME4='a3c_space_invaders_r_noise'
+
+# echo -e '\033[32m'
 # Print some information about the job to STDOUT
 echo "Workingdir: $PWD";
 echo "Started at $(date)";
@@ -38,6 +48,7 @@ echo Shell used is $SHELL
 # source activate /home/rajanr/anaconda3/envs/py36_toy_rl
 . /home/rajanr/anaconda3/etc/profile.d/conda.sh # for anaconda3
 conda activate /home/rajanr/anaconda3/envs/py36_toy_rl # should be conda activate and not source when using anaconda3?
+echo $?
 #/home/rajanr/anaconda3/bin/conda activate /home/rajanr/anaconda2/envs/py36
 which python
 python -V
@@ -58,7 +69,13 @@ echo "Line common to all tasks with SLURM_JOB_ID: ${SLURM_JOB_ID}, SLURM_ARRAY_J
 mkdir -p mdpp_${SLURM_ARRAY_JOB_ID}
 cd mdpp_${SLURM_ARRAY_JOB_ID}
 # cd /home/rajanr/mdpp
-\time -v python3 /home/rajanr/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/rajanr/mdp-playground/experiments/${EXP_NAME} --config-num ${SLURM_ARRAY_TASK_ID}
+# \time -v python3 /home/rajanr/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/rajanr/mdp-playground/experiments/${EXP_NAME} --config-num ${SLURM_ARRAY_TASK_ID}
+
+\time -v python3 /home/rajanr/mdp-playground/run_experiments.py --exp-name ${EXP_NAME2} --config-file /home/rajanr/mdp-playground/experiments/${EXP_NAME2} --config-num ${SLURM_ARRAY_TASK_ID}
+
+# \time -v python3 /home/rajanr/mdp-playground/run_experiments.py --exp-name ${EXP_NAME3} --config-file /home/rajanr/mdp-playground/experiments/${EXP_NAME3} --config-num ${SLURM_ARRAY_TASK_ID}
+
+# \time -v python3 /home/rajanr/mdp-playground/run_experiments.py --exp-name ${EXP_NAME4} --config-file /home/rajanr/mdp-playground/experiments/${EXP_NAME4} --config-num ${SLURM_ARRAY_TASK_ID}
 
 # Print some Information about the end-time to STDOUT
 echo "DONE";

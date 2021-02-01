@@ -49,7 +49,7 @@ def discrete_environment_example():
     env.close()
 
 
-def continuous_environment_example():
+def continuous_environment_example_move_along_a_line():
 
     config = {}
     config["seed"] = 0
@@ -82,8 +82,49 @@ def continuous_environment_example():
     env.close()
 
 
+def continuous_environment_example_move_to_a_point():
+    config = {}
+    config["seed"] = 0
+
+    config["state_space_type"] = "continuous"
+    config["action_space_type"] = "continuous"
+    config["state_space_dim"] = 2
+    config["action_space_dim"] = 2
+    config["transition_dynamics_order"] = 1
+    config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
+    config["time_unit"] = 1 # Discretization of time domain and the time duration over which action is applied
+
+    config['make_denser'] = True
+    config['target_point'] = [0, 0]
+    config['target_radius'] = 0.05
+    config["state_space_max"] = 10
+    config["action_space_max"] = 1
+    config["action_loss_weight"] = 0.0
+    
+    config["reward_function"] = "move_to_a_point"
+
+    env = RLToyEnv(**config)
+    state = env.reset()
+
+    print("Taking a step in the environment with a random action and printing the transition:")
+    action = env.action_space.sample()
+    next_state, reward, done, info = env.step(action)
+    print("sars', done =", state, action, reward, next_state, done)
+    state = next_state.copy()
+
+    env.reset()
+    env.close()
+
 if __name__ == "__main__":
     print("Running discrete environment")
     discrete_environment_example()
-    print("\nRunning continuous environment")
-    continuous_environment_example()
+    print("\nRunning continuous environment: move_along_a_line")
+    continuous_environment_example_move_along_a_line()
+    print("\nRunning continuous environment: move_to_a_point")
+    continuous_environment_example_move_to_a_point()
+
+    # Using gym.make()
+    import mdp_playground
+    import gym
+    gym.make('RLToy-v0')
+    gym.make('RLToy-v0', **{'state_space_size':8, 'action_space_size':8, 'state_space_type':'discrete', 'action_space_type':'discrete', 'terminal_state_density':0.25, 'completely_connected': True})

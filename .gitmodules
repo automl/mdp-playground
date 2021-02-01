@@ -1,0 +1,3 @@
+[submodule "tabular_rl"]
+	path = tabular_rl
+	url = https://github.com/ferreirafabio/tabular_rl

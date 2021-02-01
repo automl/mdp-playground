@@ -139,7 +139,7 @@ class TestRLToyEnv(unittest.TestCase):
         del config["reward_noise"]
         config["state_space_dim"] = 7
         config["action_space_dim"] = 7
-        config["state_space_relevant_indices"] = [0, 1, 2, 6]
+        config["relevant_indices"] = [0, 1, 2, 6]
         config["action_space_relevant_indices"] = [0, 1, 2, 6]
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
@@ -150,7 +150,7 @@ class TestRLToyEnv(unittest.TestCase):
             print("sars', done =", state, action, reward, next_state, done)
             np.testing.assert_allclose(0.0, reward, atol=1e-5, err_msg='Step: ' + str(i))
             state = next_state.copy()
-        np.testing.assert_allclose(state[config["state_space_relevant_indices"]], np.array([21.59339006, 20.68189965, 21.49608203, 19.835966]))
+        np.testing.assert_allclose(state[config["relevant_indices"]], np.array([21.59339006, 20.68189965, 21.49608203, 19.835966]))
         env.reset()
         env.close()
 
@@ -346,7 +346,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test irrelevant dimensions
         config["state_space_dim"] = 5
         config["action_space_dim"] = 5
-        config["state_space_relevant_indices"] = [1, 2]
+        config["relevant_indices"] = [1, 2]
         config["action_space_relevant_indices"] = [1, 2]
         config["target_point"] = [1.71012, 0.941906]
         env = RLToyEnv(**config)
@@ -456,7 +456,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test irrelevant dimensions
         config["state_space_dim"] = 5
         config["action_space_dim"] = 5
-        config["state_space_relevant_indices"] = [1, 2]
+        config["relevant_indices"] = [1, 2]
         config["action_space_relevant_indices"] = [1, 2]
         config["target_point"] = [1.71012, 0.941906]
         env = RLToyEnv(**config)
@@ -616,7 +616,7 @@ class TestRLToyEnv(unittest.TestCase):
 
     def test_discrete_p_noise(self):
         ''''''
-        print('TEST_DISCRETE_P_NOISE')
+        print('\033[32;1;4mTEST_DISCRETE_P_NOISE\033[0m')
         config = {}
         config["log_filename"] = log_filename
         config["seed"] = {}
@@ -656,7 +656,7 @@ class TestRLToyEnv(unittest.TestCase):
 
     def test_discrete_r_noise(self):
         ''''''
-        print('TEST_DISCRETE_R_NOISE')
+        print('\033[32;1;4mTEST_DISCRETE_R_NOISE\033[0m')
         config = {}
         config["log_filename"] = log_filename
         config["seed"] = {}
@@ -694,7 +694,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
-###TODO Test for make_denser; also one for creating multiple instances of an Env with the same config dict (can lead to issues because the dict is shared)
+###TODO Test for make_denser; also one for creating multiple instances of an Env with the same config dict (can lead to issues because the dict is shared as I found with Ray's A3C imple.)
 ##TODO Tests for imaginary rollouts for discrete and continuous - for different Ps and Rs
 
     def test_discrete_multiple_meta_features(self):
@@ -702,7 +702,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         #TODO Currently tests for seq, del and r noise, r scale, r shift together. Include others? Gets complicated with P noise: trying to avoid terminal states while still following a rewardable sequence. Maybe try low P noise to test this? Or low terminal state density?
         '''
-        print('TEST_DISCRETE_MULTIPLE_META_FEATURES')
+        print('\033[32;1;4mTEST_DISCRETE_MULTIPLE_META_FEATURES\033[0m')
 
         config = {}
         config["log_filename"] = log_filename
@@ -747,144 +747,184 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 
-    def test_discrete_multi_discrete(self):
-        '''
-        Same as the test_discrete_reward_delay test above except with state_space_size and action_space_size specified as vectors and the actions slightly different near the end.
-        '''
-        print('TEST_DISCRETE_MULTI_DISCRETE')
+    # Commented out the following 2 tests after changing implementation of irrelevant_features to not use MultiDiscrete and be much simpler
 
-        config = {}
-        config["log_filename"] = log_filename
-        config["seed"] = {}
-        config["seed"]["env"] = 0
-        config["seed"]["relevant_state_space"] = 8
-        config["seed"]["relevant_action_space"] = 8
-
-        config["state_space_type"] = "discrete"
-        config["action_space_type"] = "discrete"
-        config["state_space_size"] = [2, 2, 2]
-        config["state_space_relevant_indices"] = [0, 1, 2]
-        config["action_space_size"] = [2, 2, 2]
-        config["action_space_relevant_indices"] = [0, 1, 2]
-        config["reward_density"] = 0.25
-        config["make_denser"] = True
-        config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
-        config["repeats_in_sequences"] = False
-        config["delay"] = 3
-        config["sequence_length"] = 1
-        config["reward_scale"] = 1.0
-
-        config["generate_random_mdp"] = True
-
-        env = RLToyEnv(**config)
-        state = env.get_augmented_state()['curr_state']
-
-        actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
-        expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
-        for i in range(len(expected_rewards)):
-            next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done)
-            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
-            state = next_state
-
-        env.reset()
-        env.close()
-
-
-    def test_discrete_multi_discrete_irrelevant_dimensions(self):
-        '''
-        Same as the test_discrete_multi_discrete test above except with state_space_size and action_space_size having extra irrelevant dimensions
-        '''
-        print('\033[32;1;4mTEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS\033[0m')
-
-        config = {}
-        config["log_filename"] = log_filename
-        config["seed"] = {}
-        config["seed"]["env"] = 0
-        config["seed"]["relevant_state_space"] = 8
-        config["seed"]["relevant_action_space"] = 8
-        config["seed"]["irrelevant_state_space"] = 52
-        config["seed"]["irrelevant_action_space"] = 65
-        config["seed"]["state_space"] = 87
-        config["seed"]["action_space"] = 89
-
-        config["state_space_type"] = "discrete"
-        config["action_space_type"] = "discrete"
-        config["state_space_size"] = [2, 2, 2, 3]
-        config["state_space_relevant_indices"] = [0, 1, 2]
-        config["action_space_size"] = [2, 5, 2, 2]
-        config["action_space_relevant_indices"] = [0, 2, 3]
-        config["reward_density"] = 0.25
-        config["make_denser"] = True
-        config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
-        config["repeats_in_sequences"] = False
-        config["delay"] = 3
-        config["sequence_length"] = 1
-        config["reward_scale"] = 1.0
-
-        config["generate_random_mdp"] = True
-
-        try: # Testing for completely_connected options working properly when invalid config specified. #TODO Is this part needed?
-            env = RLToyEnv(**config)
-            state = env.get_augmented_state()['curr_state']
-
-            actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
-            expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
-            for i in range(len(expected_rewards)):
-                next_state, reward, done, info = env.step(actions[i])
-                print("sars', done =", state, actions[i], reward, next_state, done)
-                self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
-                state = next_state
-
-            env.reset()
-            env.close()
-
-        except AssertionError as e:
-            print('Caught Expected exception:', e)
+    # def test_discrete_multi_discrete(self):
+    #     '''
+    #     Same as the test_discrete_reward_delay test above except with state_space_size and action_space_size specified as vectors and the actions slightly different near the end.
+    #     '''
+    #     print('\033[32;1;4mTEST_DISCRETE_MULTI_DISCRETE\033[0m')
+    #
+    #     config = {}
+    #     config["log_filename"] = log_filename
+    #     config["seed"] = {}
+    #     config["seed"]["env"] = 0
+    #     config["seed"]["relevant_state_space"] = 8
+    #     config["seed"]["relevant_action_space"] = 8
+    #
+    #     config["state_space_type"] = "discrete"
+    #     config["action_space_type"] = "discrete"
+    #     config["state_space_size"] = [2, 2, 2]
+    #     config["relevant_indices"] = [0, 1, 2]
+    #     config["action_space_size"] = [2, 2, 2]
+    #     config["action_space_relevant_indices"] = [0, 1, 2]
+    #     config["reward_density"] = 0.25
+    #     config["make_denser"] = True
+    #     config["terminal_state_density"] = 0.25
+    #     config["completely_connected"] = True
+    #     config["repeats_in_sequences"] = False
+    #     config["delay"] = 3
+    #     config["sequence_length"] = 1
+    #     config["reward_scale"] = 1.0
+    #
+    #     config["generate_random_mdp"] = True
+    #
+    #     env = RLToyEnv(**config)
+    #     state = env.get_augmented_state()['curr_state']
+    #
+    #     actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
+    #     expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
+    #     for i in range(len(expected_rewards)):
+    #         next_state, reward, done, info = env.step(actions[i])
+    #         print("sars', done =", state, actions[i], reward, next_state, done)
+    #         self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+    #         state = next_state
+    #
+    #     env.reset()
+    #     env.close()
 
 
-        # Test: Adds one irrelevant dimension
-        config["state_space_size"] = [2, 2, 2, 5]
-        env = RLToyEnv(**config)
-        state = env.get_augmented_state()['curr_state']
-
-        actions = [[1, 4, 1, 0], [0, 3, 1, 0], [1, 4, 0, 1], [1, 0 ,0, 0], [1, 2, 0, 1], [0, 3, 1, 0], [0, 1, 1, 1], [0, 4, 0, 1], [1, 4, 0, 0]]
-        expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
-        expected_states = [[0, 0, 0, 3], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 3], [0, 1, 0, 2], [1, 0, 1, 0], [1, 0, 1, 1], [0, 0, 0, 4], [1, 0, 0, 2]]
-        for i in range(len(expected_rewards)):
-            next_state, reward, done, info = env.step(actions[i])
-            print("sars', done =", state, actions[i], reward, next_state, done)
-            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
-            self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
-            state = next_state
-
-        env.reset()
-        env.close()
+    # def test_discrete_multi_discrete_irrelevant_dimensions(self):
+    #     '''
+    #     Same as the test_discrete_multi_discrete test above except with state_space_size and action_space_size having extra irrelevant dimensions
+    #     '''
+    #     print('\033[32;1;4mTEST_DISCRETE_MULTI_DISCRETE_IRRELEVANT_DIMENSIONS\033[0m')
+    #
+    #     config = {}
+    #     config["log_filename"] = log_filename
+    #     config["seed"] = {}
+    #     config["seed"]["env"] = 0
+    #     config["seed"]["relevant_state_space"] = 8
+    #     config["seed"]["relevant_action_space"] = 8
+    #     config["seed"]["irrelevant_state_space"] = 52
+    #     config["seed"]["irrelevant_action_space"] = 65
+    #     config["seed"]["state_space"] = 87
+    #     config["seed"]["action_space"] = 89
+    #
+    #     config["state_space_type"] = "discrete"
+    #     config["action_space_type"] = "discrete"
+    #     config["state_space_size"] = [2, 2, 2, 3]
+    #     config["relevant_indices"] = [0, 1, 2]
+    #     config["action_space_size"] = [2, 5, 2, 2]
+    #     config["action_space_relevant_indices"] = [0, 2, 3]
+    #     config["reward_density"] = 0.25
+    #     config["make_denser"] = True
+    #     config["terminal_state_density"] = 0.25
+    #     config["completely_connected"] = True
+    #     config["repeats_in_sequences"] = False
+    #     config["delay"] = 3
+    #     config["sequence_length"] = 1
+    #     config["reward_scale"] = 1.0
+    #
+    #     config["generate_random_mdp"] = True
+    #
+    #     try: # Testing for completely_connected options working properly when invalid config specified. #TODO Is this part needed?
+    #         env = RLToyEnv(**config)
+    #         state = env.get_augmented_state()['curr_state']
+    #
+    #         actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
+    #         expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
+    #         for i in range(len(expected_rewards)):
+    #             next_state, reward, done, info = env.step(actions[i])
+    #             print("sars', done =", state, actions[i], reward, next_state, done)
+    #             self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+    #             state = next_state
+    #
+    #         env.reset()
+    #         env.close()
+    #
+    #     except AssertionError as e:
+    #         print('Caught Expected exception:', e)
+    #
+    #
+    #     # Test: Adds one irrelevant dimension
+    #     config["state_space_size"] = [2, 2, 2, 5]
+    #     env = RLToyEnv(**config)
+    #     state = env.get_augmented_state()['curr_state']
+    #
+    #     actions = [[1, 4, 1, 0], [0, 3, 1, 0], [1, 4, 0, 1], [1, 0 ,0, 0], [1, 2, 0, 1], [0, 3, 1, 0], [0, 1, 1, 1], [0, 4, 0, 1], [1, 4, 0, 0]]
+    #     expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
+    #     expected_states = [[0, 0, 0, 3], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 3], [0, 1, 0, 2], [1, 0, 1, 0], [1, 0, 1, 1], [0, 0, 0, 4], [1, 0, 0, 2]]
+    #     for i in range(len(expected_rewards)):
+    #         next_state, reward, done, info = env.step(actions[i])
+    #         print("sars', done =", state, actions[i], reward, next_state, done)
+    #         self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+    #         self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+    #         state = next_state
+    #
+    #     env.reset()
+    #     env.close()
 
 
         # Test: This test lets even irrelevant dimensions be multi-dimensional
-        config["state_space_size"] = [2, 2, 2, 1, 5]
-        config["state_space_relevant_indices"] = [0, 1, 2]
-        config["action_space_size"] = [2, 5, 1, 1, 2, 2]
-        config["action_space_relevant_indices"] = [0, 4, 5]
+        # config["state_space_size"] = [2, 2, 2, 1, 5]
+        # config["relevant_indices"] = [0, 1, 2]
+        # config["action_space_size"] = [2, 5, 1, 1, 2, 2]
+        # config["action_space_relevant_indices"] = [0, 4, 5]
+        # env = RLToyEnv(**config)
+        # state = env.get_augmented_state()['curr_state']
+        #
+        # actions = [[1, 4, 0, 0, 1, 0], [0, 3, 0, 0, 1, 0], [1, 4, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0], [1, 2, 0, 0, 0, 1], [0, 3, 0, 0, 1, 0], [0, 1, 0, 0, 1, 1], [0, 4, 0, 0, 0, 1], [1, 4, 0, 0, 0, 0]]
+        # expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
+        # expected_states = [[0, 0, 0, 0, 3], [0, 1, 0, 0, 1], [0, 1, 0, 0, 1], [1, 0, 1, 0, 3], [0, 1, 0, 0, 2], [1, 0, 1, 0, 0], [1, 0, 1, 0, 1], [0, 0, 0, 0, 4], [1, 0, 0, 0, 2]]
+        # for i in range(len(expected_rewards)):
+        #     next_state, reward, done, info = env.step(actions[i])
+        #     print("sars', done =", state, actions[i], reward, next_state, done)
+        #     self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+        #     self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+        #     state = next_state
+        #
+        # env.reset()
+        # env.close()
+
+    def test_discrete_irr_features(self):
+        '''
+        '''
+        print('\033[32;1;4mTEST_DISCRETE_IRR_FEATURES\033[0m')
+
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = [8, 10]
+        config["action_space_size"] = [8, 10]
+        config["irrelevant_features"] = True
+        config["reward_density"] = 0.25
+        config["make_denser"] = True
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 1
+        config["sequence_length"] = 1
+        config["reward_scale"] = 1.0
+
+        config["generate_random_mdp"] = True
+
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state']
 
-        actions = [[1, 4, 0, 0, 1, 0], [0, 3, 0, 0, 1, 0], [1, 4, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0], [1, 2, 0, 0, 0, 1], [0, 3, 0, 0, 1, 0], [0, 1, 0, 0, 1, 1], [0, 4, 0, 0, 0, 1], [1, 4, 0, 0, 0, 0]]
-        expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
-        expected_states = [[0, 0, 0, 0, 3], [0, 1, 0, 0, 1], [0, 1, 0, 0, 1], [1, 0, 1, 0, 3], [0, 1, 0, 0, 2], [1, 0, 1, 0, 0], [1, 0, 1, 0, 1], [0, 0, 0, 0, 4], [1, 0, 0, 0, 2]]
+        actions = [[7, 0], [5, 0], [5, 0], [1, 2]] + [[5, np.random.randint(config["action_space_size"][1])]] * 5
+        expected_rewards = [0, 1, 0, 1, 0, 0, 0, 0, 0]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
-            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
-            self.assertEqual(state, expected_states[i], "Expected state mismatch in time step: " + str(i + 1) + " when reward delay = 3.")
+            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + " when reward delay = " + str(config["delay"]))
             state = next_state
 
         env.reset()
         env.close()
-
 
     def test_discrete_image_representations(self):
         ''''''
@@ -987,6 +1027,101 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 
+    def test_discrete_custom_P_R(self):
+        ''''''
+        print('\033[32;1;4mTEST_DISCRETE_CUSTOM_P_R\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 5
+        config["terminal_state_density"] = 0.25
+        # config["completely_connected"] = False
+        config["repeats_in_sequences"] = False
+        config["delay"] = 1
+        config["reward_scale"] = 2.0
+
+        config["use_custom_mdp"] = True
+        np.random.seed(0) #seed
+        config["transition_function"] = np.random.randint(8, size=(8,5))
+        config["reward_function"] = np.random.randint(4, size=(8,5))
+        config["init_state_dist"] = np.array([1 / 8 for i in range(8)])
+
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [4, 4, 2, 3, 4, 2, 4, 1, 0, np.random.randint(config["action_space_size"]), 4] #
+        expected_rewards = [0, 0, 6, 4, 4, 0, 4, 6, 6, 2, 0]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + ".")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+        # np.random.seed(0) #seed
+        config["delay"] = 2
+        P = np.random.randint(8, size=(8,5))
+        R = np.random.randint(4, size=(8,5))
+        config["transition_function"] = lambda s, a: P[s, a]
+        config["reward_function"] = lambda s, a: R[s[-2], a]
+        config["init_state_dist"] = np.array([1 / 8 for i in range(8)])
+
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [4, 4, 2, 3, 4, 2, 4, 1, 0, np.random.randint(config["action_space_size"]), 4] #
+        expected_rewards = [0, 0, 0, 2, 2, 0, 0, 6, 0, 4, 6]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            self.assertEqual(reward, expected_rewards[i], "Expected reward mismatch in time step: " + str(i + 1) + ".")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+    def test_continuous_custom_P_R(self):
+        ''''''
+        print('\033[32;1;4mTEST_CONT_CUSTOM_P_R\033[0')
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = 0
+
+        config["state_space_type"] = "continuous"
+        config["action_space_type"] = "continuous"
+        config["state_space_dim"] = 2
+        config["action_space_dim"] = 2
+        # config["target_point"] = [0, 0]
+        config["reward_scale"] = 1.0
+        config["delay"] = 1
+
+        config["use_custom_mdp"] = True
+        np.random.seed(0) #seed
+        config["transition_function"] = lambda s, a: s + a
+        config["reward_function"] = lambda s, a: s[-2][0]
+        # config["init_state_dist"] = np.array([1 / 8 for i in range(8)])
+
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [2, [0.5, 1.5], 2, 3, [-10, -5], 2, 1, 1] #
+        expected_rewards = [0, -1.06496, 0.935036, 1.435036, 3.435036, 6.435036, -3.564964, -1.564964]#, -0.564964]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg="Expected reward mismatch in time step: " + str(i + 1) + ".")
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
     # def test_discrete_imaginary_rollouts(self):
     #     '''### TODO complete test case
     #     '''
@@ -1027,6 +1162,132 @@ class TestRLToyEnv(unittest.TestCase):
     #
     #     env.reset()
     #     env.close()
+
+
+    def test_discrete_r_dist(self):
+        ''''''
+        print('\033[32;1;4mTEST_DISCRETE_R_DIST\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        # config["log_level"] = logging.NOTSET
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 8
+        config["action_space_size"] = 8
+        config["reward_density"] = 0.5
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 0
+        config["sequence_length"] = 1
+        config["reward_scale"] = 1.0
+        config["reward_shift"] = 1.0
+        config["reward_dist"] = lambda rng, r_dict: rng.normal(0, 0.5)
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['curr_state']
+
+        actions = [6, 6, 2, 6] #
+        expected_rewards = [1.131635, 1, 0.316987, 1.424395] # 1st, 3rd and 4th states produce 'true' rewards, every reward has been shifted by 1
+        for i in range(len(actions)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg='Expected reward mismatch in time step: ' + str(i + 1) + ' when R dist = 0.5.')
+
+            state = next_state
+
+        env.reset()
+        env.close()
+
+    def test_discrete_diameter(self):
+        ''''''
+        print('\033[32;1;4mTEST_DISCRETE_DIAMETER\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["log_level"] = logging.NOTSET
+        config["seed"] = 0
+
+        config["state_space_type"] = "discrete"
+        config["action_space_type"] = "discrete"
+        config["state_space_size"] = 24
+        config["action_space_size"] = 24
+        config["reward_density"] = 0.05
+        config["make_denser"] = False
+        config["terminal_state_density"] = 0.25
+        config["completely_connected"] = True
+        config["repeats_in_sequences"] = False
+        config["delay"] = 0
+        config["diameter"] = 3
+        config["sequence_length"] = 3
+        config["reward_scale"] = 1.0
+        config["reward_shift"] = 0.0
+
+        config["generate_random_mdp"] = True
+        env = RLToyEnv(**config)
+
+        for seq_num, sequence in enumerate(env.rewardable_sequences):
+            for i, state in enumerate(sequence):
+                assert state not in [6, 7, 14, 15, 22, 23], "A terminal state was encountered in a rewardable sequence. This is unexpected."
+                rem_ = (state % env.action_space_size[0])
+                assert rem_ < env.action_space_size[0] - env.num_terminal_states, "The effective state number within an independent set was expected to be in range (0, 6). However, it was: " + str(rem_)
+
+        assert len(env.rewardable_sequences) == int(0.05 * np.prod([6, 6, 6])) * 3, "Number of rewardable_sequences: " + str(len(env.rewardable_sequences)) + ". Expected: " + str(int(0.05 * np.prod([6, 6, 6])) * 3)
+        np.testing.assert_allclose(np.sum(env.config['relevant_init_state_dist']), 1.0, rtol=1e-05, err_msg='Expected sum of probabilities in init_state_dist was 1.0. However, actual sum was: ' + str(np.sum(env.config['relevant_init_state_dist']))) #TODO Similar test case for irrelevant_features
+
+        state = env.get_augmented_state()['curr_state']
+        actions = [6, 6, 7, 7, 0, 7, 1] #
+        expected_rewards = [0, 0, 1, 0, 0, 0, 1] # 1st, 3rd and 4th states produce 'true' rewards, every reward has been shifted by 1
+        for i in range(len(actions)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg='Expected reward mismatch in time step: ' + str(i + 1) + ' when diam = ' + str(config["diameter"]))
+
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+        # Sub-test 2 Have sequence length greater than the diameter and check selected rewardable sequences
+        config["sequence_length"] = 5
+        config["reward_density"] = 0.01 # reduce density to have fewer rewardable sequences
+
+        env = RLToyEnv(**config)
+
+        for seq_num, sequence in enumerate(env.rewardable_sequences):
+            for j in range(config["diameter"]):
+                if j / config["diameter"] < seq_num / len(env.rewardable_sequences) and seq_num / len(env.rewardable_sequences) < (j + 1) / config["diameter"]:
+                    for i, state in enumerate(sequence):
+                        min_state = ((i + j) * env.action_space_size[0]) % env.state_space_size[0]
+                        max_state = ((i + j + 1) * env.action_space_size[0]) % env.state_space_size[0]
+                        if max_state < min_state: # edge case
+                            max_state += env.state_space_size[0]
+                        assert sequence[i] >= min_state and sequence[i] < max_state, "" + str(min_state) + " " + str(sequence[i]) + " " + str(max_state)
+
+            for i, state in enumerate(sequence):
+                rem_ = (state % env.action_space_size[0])
+                assert rem_ < env.action_space_size[0] - env.num_terminal_states, "The effective state number within an independent set was expected to be in range (0, 6). However, it was: " + str(rem_)
+
+        assert len(env.rewardable_sequences) == int(0.01 * np.prod([6, 6, 6, 5, 5])) * 3, "Number of rewardable_sequences: " + str(len(env.rewardable_sequences)) + ". Expected: " + str(int(0.05 * np.prod([6, 6, 6, 5, 5])) * 3)
+        np.testing.assert_allclose(np.sum(env.config['relevant_init_state_dist']), 1.0, rtol=1e-05, err_msg='Expected sum of probabilities in init_state_dist was 1.0. However, actual sum was: ' + str(np.sum(env.config['relevant_init_state_dist']))) #TODO Similar test case for irrelevant_features
+
+        state = env.get_augmented_state()['curr_state']
+        actions = [1, 7, 2, 4, 0, 7, 1] # Leads to rewardable sequence 20, 1, 12, 21, 5
+        expected_rewards = [0, 0, 0, 0, 1, 0, 0] # 1st, 3rd and 4th states produce 'true' rewards, every reward has been shifted by 1
+        for i in range(len(actions)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            np.testing.assert_allclose(reward, expected_rewards[i], rtol=1e-05, err_msg='Expected reward mismatch in time step: ' + str(i + 1) + ' when diam = ' + str(config["diameter"]))
+
+            state = next_state
+
+        env.reset()
+        env.close()
+
 
 
     #Unit tests

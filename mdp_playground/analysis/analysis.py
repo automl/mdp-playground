@@ -81,7 +81,7 @@ class MDPP_Analysis():
         self.stats_file = stats_file
 
         if os.path.isfile(stats_file + '.csv'):
-            print("Loading data from a sequential run/already combined runs of experiment configurations.")
+            print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations.\033[0;0m")
         else:
             print("Loading data from a distributed run of experiment configurations. Creating a combined CSV stats file.")
             train_data = dict()
@@ -195,6 +195,19 @@ class MDPP_Analysis():
 #         to_plot_ = np.squeeze(stats_reshaped[:, :, :, :, 0, 0, :, 1])
 #         print('Episode reward (at end of training) for 10 seeds for vanilla env.:', to_plot_)
 
+        # Calculate AUC metrics
+        train_aucs = []
+        for i in range(len(final_rows_for_a_config)):
+            if i == 0:
+                to_avg_ = stats_pd.iloc[0:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            else:
+                to_avg_ = stats_pd.iloc[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            auc = np.mean(to_avg_, axis=0)
+            train_aucs.append(auc)
+            # print(auc)
+
+        train_aucs = np.reshape(np.array(train_aucs), config_counts)
+        print("train_aucs.shape:", train_aucs.shape)
 
         # Calculate AUC metrics
         train_aucs = []
