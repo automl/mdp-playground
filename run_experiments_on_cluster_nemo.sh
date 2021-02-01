@@ -78,8 +78,8 @@ echo ${MOAB_JOBID} ${MOAB_JOBARRAYINDEX} ${MOAB_JOBNAME}
 
 for i in {0..999}
 do
-    echo -e "Running agent config $i:\n"
-    \time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --agent-config-num ${MOAB_JOBARRAYINDEX} --config-num $i
+    echo -e "Running env config $i:\n"
+    \time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX} --agent-config-num $i --framework-dir ${TMPDIR}
 done
 
 
