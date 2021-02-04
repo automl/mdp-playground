@@ -739,7 +739,7 @@ class MDPP_Analysis():
             fig.savefig(stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves_' + str(exp_data['metric_names'][metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
 
     ###### ---------- radar (spider) plot ------------- ######
-    def plot_radar(self, list_exp_data, save_fig=False, train=True, metric_num=-2, plot_type="agent", weights={}):
+    def plot_radar(self, list_exp_data, save_fig=False, train=True, metric_num=-2, plot_type="agent", weights={}, use_aucs=False):
         '''Plots radar (spider) chart across different dimensions
 
         Parameters
@@ -753,13 +753,15 @@ class MDPP_Analysis():
         metric_num :
             allowed values-> '-1' to plot episode mean lengths
                              '-2' to plot episode reward
+        use_aucs : bool, optional
+            A flag used to insert _aucs in the filename of the PDF (default is False)
         plot_type : string describing how to group data and plot, say based on agent or metric
             allowed values-> ['agent' ,'metric']
         weights : dictionary of weights associated per dimension (plot_type) data
             eg weights['reward_noise'] = [.25, .25, .25, .25]
         '''
 
-        stats_data = self.gather_stats(list_exp_data, train, metric_num, plot_type)
+        stats_data = self.gather_stats(list_exp_data, train, metric_num, plot_type, use_aucs)
 
         # get axes labels
         first_group = next(iter(stats_data.values()))
@@ -796,7 +798,7 @@ class MDPP_Analysis():
         # save figure
         if save_fig:
             fig_name = stats_data[group_key][sub_group_key]['stats_file'].split('/')[-1] + \
-                        ('_train' if train else '_eval') + '_final_reward_' + \
+                        ('_train' if train else '_eval') + ( '_aucs' if use_aucs else '')+'_final_reward_' + \
                         stats_data[group_key][sub_group_key]['axis_labels'].replace(' ','_') + \
                         '_' + str(stats_data[group_key][sub_group_key]['metric_names'][metric_num]) + '_spider.pdf'
             plt.savefig(fig_name, dpi=300, bbox_inches="tight")
