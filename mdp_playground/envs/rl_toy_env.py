@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -6,7 +5,6 @@ from __future__ import print_function
 import sys, os
 import warnings
 import logging
-# import os
 import copy
 from datetime import datetime
 import numpy as np
@@ -14,14 +12,13 @@ import scipy
 from scipy import stats
 import gym
 from mdp_playground.spaces import BoxExtended, DiscreteExtended, TupleExtended, ImageMultiDiscrete
-# from gym.utils import seeding
 
 
 class RLToyEnv(gym.Env):
     """
-    The base environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible meta-features. The class extends OpenAI Gym's environment.
+    The base toy environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible dimensions from the accompanying research paper. The class extends OpenAI Gym's environment gym.Env.
 
-    The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated object will emulate. We recommend looking at the examples in example.py to begin using the environment since the config options are mostly self-explanatory. For more details, we list here the meta-features and config options (their names here correspond to the keys to be passed in the config dict):
+    The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated environment will emulate. We recommend looking at the examples in example.py to begin using the environment since the config options are mostly self-explanatory. For more details, we list here the dimensions and config options (their names here correspond to the keys to be passed in the config dict):
         delay : int >= 0
             Delays reward by this number of steps.
         sequence_length : int >= 1
@@ -59,7 +56,7 @@ class RLToyEnv(gym.Env):
             reward_dist :
                 A Python function to sample rewards that will be handed out for randomly generated sequences when generate_random_mdp = True. This function receives the random number generator and rewardable_sequences dict of the environment as arguments.
             image_representations : boolean
-                Boolean to associate an image as the external observation with every discrete categorical state. This is handled by a ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n.
+                Boolean to associate an image as the external observation with every discrete categorical state. This is handled by a ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n. More details can be found in the documentation for the mdp_playground.spaces.ImageMultiDiscrete class.
 
             Only for image_representations:
                 image_transforms :
@@ -122,7 +119,7 @@ class RLToyEnv(gym.Env):
 
     The accompanying paper is available at: https://arxiv.org/abs/1909.07750.
 
-    Instead of implementing a new class for every type of MDP, the intent is to capture as many common meta-features across different types of environments as possible and to be able to control the difficulty of an envrionment by allowing fine-grained control over each of these meta-features. The focus is to be as flexible as possible. Mixed continuous and discrete state and action spaces are currently not supported.
+    Instead of implementing a new class for every type of MDP, the intent is to capture as many common dimensions across different types of environments as possible and to be able to control the difficulty of an envrionment by allowing fine-grained control over each of these dimensions. The focus is to be as flexible as possible. Mixed continuous and discrete state and action spaces are currently not supported.
     Below, we list the important attributes and methods for this class.
 
     Attributes
@@ -175,7 +172,8 @@ class RLToyEnv(gym.Env):
             the member variable config is initialised to this value after inserting defaults
         """
 
-        print("Passed config:", config)
+        print("Passed config:", config, "\n")
+
         # Set default settings for config to be able to use class without any config passed
         if len(config) == 0: #is None:
             # config = {}
@@ -224,7 +222,12 @@ class RLToyEnv(gym.Env):
 
             config["seed"] = 0
 
-        print("\033[32;1m========================================================Initialising Toy MDP========================================================\033[0m")
+        # Print initial "banner"
+        screen_output_width = 132 #hardcoded #TODO get from system
+        repeat_equal_sign = (screen_output_width - 20) // 2
+        set_ansi_escape = "\033[32;1m"
+        reset_ansi_escape = "\033[0m"
+        print(set_ansi_escape + "=" * repeat_equal_sign + "Initialising Toy MDP" + "=" * repeat_equal_sign + reset_ansi_escape)
         print("Current working directory:", os.getcwd())
 
         # Set other default settings for config to use if config is passed without any values for them
@@ -324,6 +327,11 @@ class RLToyEnv(gym.Env):
         else:
             self.make_denser = config["make_denser"]
 
+        if "completely_connected" not in config:
+            self.completely_connected = True
+        else:
+            self.completely_connected = config["completely_connected"]
+
         if "reward_scale" not in config:
             self.reward_scale = 1.0
         else:
@@ -343,9 +351,23 @@ class RLToyEnv(gym.Env):
             self.image_representations = False
         else:
             self.image_representations = config["image_representations"]
+            if "image_transforms" in config:
+                self.image_transforms = config["image_transforms"]
+            else:
+                self.image_transforms = "none"
+
+            if "image_width" in config:
+                self.image_width = config["image_width"]
+            else:
+                self.image_width = 100
+
+            if "image_height" in config:
+                self.image_height = config["image_height"]
+            else:
+                self.image_height = 100
 
             if "image_sh_quant" not in config:
-                if 'shift' in config["image_transforms"]:
+                if 'shift' in self.image_transforms:
                     warnings.warn("Setting image shift quantisation to default of 1, since no config value provided for it.")
                     self.image_sh_quant = 1
                 else:
@@ -354,7 +376,7 @@ class RLToyEnv(gym.Env):
                 self.image_sh_quant = config["image_sh_quant"]
 
             if "image_ro_quant" not in config:
-                if 'rotate' in config["image_transforms"]:
+                if 'rotate' in self.image_transforms:
                     warnings.warn("Setting image rotate quantisation to default of 1, since no config value provided for it.")
                     self.image_ro_quant = 1
                 else:
@@ -380,6 +402,8 @@ class RLToyEnv(gym.Env):
 
         else: # cont. spaces
             # if not self.use_custom_mdp:
+            self.state_space_dim = config["state_space_dim"]
+
             if "transition_dynamics_order" not in config:
                 self.dynamics_order = 1
             else:
@@ -421,7 +445,8 @@ class RLToyEnv(gym.Env):
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
-        config["action_space_type"] = config["action_space_type"].lower()
+        config["action_space_type"] = config["state_space_type"]
+        # config["action_space_type"] = config["action_space_type"].lower()
 
         if config["state_space_type"] == "discrete":
             if self.irrelevant_features:
@@ -438,25 +463,26 @@ class RLToyEnv(gym.Env):
             self.action_space_size = np.array(self.state_space_size) // np.array(self.diameter)
             assert (np.array(self.state_space_size) % np.array(self.diameter) == 0).all(), "state_space_size should be a multiple of the diameter to allow for the generation of regularly connected MDPs."
         else: # cont. space
+            self.action_space_dim = self.state_space_dim
             if self.irrelevant_features:
                 assert "relevant_indices" in config, "Please provide dimensions of state space relevant to rewards."
             if "relevant_indices" not in config:
-                config["relevant_indices"] = range(config["state_space_dim"])
+                config["relevant_indices"] = range(self.state_space_dim)
             # config["irrelevant_indices"] = list(set(range(len(config["state_space_dim"]))) - set(config["relevant_indices"]))
 
         if ("init_state_dist" in config) and ("relevant_init_state_dist" not in config):
             config["relevant_init_state_dist"] = config["init_state_dist"]
 
 
-        assert config["action_space_type"] == config["state_space_type"], 'config["state_space_type"] != config["action_space_type"]. Currently mixed space types are not supported.'
+        # assert config["action_space_type"] == config["state_space_type"], 'config["state_space_type"] != config["action_space_type"]. Currently mixed space types are not supported.'
         assert self.sequence_length > 0, "config[\"sequence_length\"] <= 0. Set to: " + str(self.sequence_length) # also should be int
-        if "completely_connected" in config and config["completely_connected"]: #### TODO remove
+        if "completely_connected" in config and config["completely_connected"]: ###TODO remove
             pass
             # assert config["state_space_size"] == config["action_space_size"], "config[\"state_space_size\"] != config[\"action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values. Vals: " + str(config["state_space_size"]) + " " + str(config["action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
             # assert config["irrelevant_state_space_size"] == config["irrelevant_action_space_size"], "config[\"irrelevant_state_space_size\"] != config[\"irrelevant_action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values! Vals: " + str(config["irrelevant_state_space_size"]) + " " + str(config["irrelevant_action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!" #TODO Currently, irrelevant dimensions have a P similar to that of relevant dimensions. Should this be decoupled?
 
         if config["state_space_type"] == 'continuous':
-            assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
+            # assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
             if config["reward_function"] == "move_to_a_point":
                 config["target_point"] = np.array(config["target_point"], dtype=self.dtype)
                 assert config["target_point"].shape == (len(config["relevant_indices"]),), "target_point should have dimensionality = relevant_state_space dimensionality"
@@ -483,7 +509,7 @@ class RLToyEnv(gym.Env):
 
             if self.image_representations:
                 # underlying_obs_space = MultiDiscreteExtended(self.state_space_size, seed=self.seed_dict["state_space"]) #seed
-                self.observation_space = ImageMultiDiscrete(self.state_space_size, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=20, seed=self.seed_dict["image_representations"]) #seed
+                self.observation_space = ImageMultiDiscrete(self.state_space_size, width=self.image_width, height=self.image_height, transforms=self.image_transforms, sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=20, seed=self.seed_dict["image_representations"]) #seed
                 if self.irrelevant_features:
                     self.action_space = TupleExtended(self.action_spaces, seed=self.seed_dict["action_space"]) #seed
                 else:
@@ -499,11 +525,11 @@ class RLToyEnv(gym.Env):
 
         else: # cont. spaces
             self.state_space_max = config["state_space_max"] if 'state_space_max' in config else np.inf # should we select a random max? #test?
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=self.seed_dict["state_space"], dtype=self.dtype) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
+            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(self.state_space_dim, ), seed=self.seed_dict["state_space"], dtype=self.dtype) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
 
             self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
-            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=self.seed_dict["action_space"], dtype=self.dtype) #seed # hack #TODO
+            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(self.action_space_dim, ), seed=self.seed_dict["action_space"], dtype=self.dtype) #seed # hack #TODO
 
 
         # if config["action_space_type"] == "discrete":
@@ -608,7 +634,7 @@ class RLToyEnv(gym.Env):
                 # relevant dimensions part
                 self.config["transition_function"] = np.zeros(shape=(self.state_space_size[0], self.action_space_size[0]), dtype=object) #hardcoded
                 self.config["transition_function"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
-                if self.config["completely_connected"]:
+                if self.completely_connected:
                     if self.diameter == 1: #hack # TODO Remove this if block; this case is currently separately handled just so that tests do not fail. Using prob=prob in the sample call causes the sampling to change even if the probabilities remain the same. All solutions I can think of are hacky except changing the expected values in all the test cases which would take quite some time.
                         for s in range(self.state_space_size[0]):
                             self.config["transition_function"][s] = self.observation_spaces[0].sample(size=self.action_space_size[0], replace=False) #random #TODO Preferably use the seed of the Env for this? #hardcoded
@@ -659,7 +685,7 @@ class RLToyEnv(gym.Env):
                 if self.irrelevant_features: #test
                     self.config["transition_function_irrelevant"] = np.zeros(shape=(self.state_space_size[1], self.action_space_size[1]), dtype=object)
                     self.config["transition_function_irrelevant"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
-                    if self.config["completely_connected"]:
+                    if self.completely_connected:
                         for s in range(self.state_space_size[1]):
                             i_s = s // self.action_space_size[1] # select the current independent set number
 
@@ -700,7 +726,7 @@ class RLToyEnv(gym.Env):
             if not callable(self.config["transition_function"]):
                 self.transition_matrix = self.config["transition_function"]
                 self.config["transition_function"] = lambda s, a: self.transition_matrix[s, a]
-                print("transition_matrix inited to:" + str(self.transition_matrix) + "Python type of state: " + str(type(self.config["transition_function"](0, 0)))) # The Python type of the state can lead to hard to catch bugs
+                print("transition_matrix inited to:\n" + str(self.transition_matrix) + "\nPython type of state: " + str(type(self.config["transition_function"](0, 0)))) # The Python type of the state can lead to hard to catch bugs
 
         else: # if continuous space
             # self.logger.debug("# TODO for cont. spaces") # transition function is a fixed parameterisation for cont. envs. right now.
@@ -891,7 +917,7 @@ class RLToyEnv(gym.Env):
                 next_state = self.config["transition_function"](state, action)
             else:
                 assert len(action.shape) == 1, 'Action should be specified as a 1-D tensor. However, shape of action was: ' + str(action.shape)
-                assert action.shape[0] == self.config['action_space_dim'], 'Action shape is: ' + str(action.shape[0]) + '. Expected: ' + str(self.config['action_space_dim'])
+                assert action.shape[0] == self.action_space_dim, 'Action shape is: ' + str(action.shape[0]) + '. Expected: ' + str(self.action_space_dim)
                 if self.action_space.contains(action):
                     ### TODO implement for multiple orders, currently only for 1st order systems.
                     # if self.dynamics_order == 1:
@@ -920,7 +946,7 @@ class RLToyEnv(gym.Env):
                 self.logger.info("next_state out of bounds. next_state, clipping to" + str(next_state) + str(np.clip(next_state, -self.state_space_max, self.state_space_max)))
                 next_state = np.clip(next_state, -self.state_space_max, self.state_space_max) # Could also "reflect" next_state when it goes out of bounds. Would seem more logical for a "wall", but would need to take care of multiple reflections near a corner/edge.
                 # Resets all higher order derivatives to 0
-                zero_state = np.array([0.0] * (self.config['state_space_dim']), dtype=self.dtype)
+                zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype)
                 self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
                 self.state_derivatives[0] = next_state
 
@@ -1085,7 +1111,7 @@ class RLToyEnv(gym.Env):
             state, action = self.curr_state, action
 
 
-        ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
+        ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a dimension? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
 
         next_state = self.P(state, action) ###TODO P uses last state while R uses augmented state; for cont. env, P does know underlying state_derivatives - we don't want this to be the case for the imaginary rollout scenario;
 
@@ -1232,12 +1258,12 @@ class RLToyEnv(gym.Env):
 
             # if not self.use_custom_mdp:
             # init the state derivatives needed for continuous spaces
-            zero_state = np.array([0.0] * (self.config['state_space_dim']), dtype=self.dtype)
+            zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype)
             self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
             self.curr_obs = self.curr_state
 
-            self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
+            self.augmented_state = [[np.nan] * self.state_space_dim for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state.copy())
 
         self.logger.info("RESET called. curr_state reset to: " + str(self.curr_state))
