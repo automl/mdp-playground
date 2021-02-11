@@ -1,13 +1,15 @@
 # MDP Playground
-A python package to benchmark low-level dimensions of difficulties for RL agents.
+A python package to inject low-level dimensions of difficulties in RL environments. There are toy environments to design and debug RL agents. And complex environment wrappers for Atari and Mujoco to test robustness to these dimensions in complex environments.
 
 ## Getting started
-There are 3 parts to the package:
-1) **Environments**: The base Environment in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py) implements all the functionality, including discrete and continuous environments, and is parameterised by a `config` dict which contains all the information needed to instantiate the required MDP. Please see [`example.py`](example.py) for some simple examples of how to use the MDP environments in the package. For further details, please refer to the documentation in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py).
+There are 4 parts to the package:
+1) **Toy Environments**: The base toy Environment in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py) implements the toy environment functionality, including discrete and continuous environments, and is parameterised by a `config` dict which contains all the information needed to instantiate the required MDP. Please see [`example.py`](example.py) for some simple examples of how to use the MDP environments in the package. For further details, please refer to the documentation in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py).
 
-2) **Experiments**: Experiments are launched using [`run_experiments.py`](run_experiments.py). Config files for experiments are located inside the [`experiments`](experiments) directory. Please read the [instructions](#running-experiments) below for details.
+2) **Complex Environment Wrappers**: Similar to the toy environment, this is parameterised by a `config` dict which contains all the information needed to inject the dimensions into Atari or Mujoco environments. Please see [`example.py`](example.py) for some simple examples of how to use these. The Atari wrapper is in [`mdp_playground/envs/gym_env_wrapper.py`](mdp_playground/envs/gym_env_wrapper.py) and the Mujoco wrapper is in [`mdp_playground/envs/mujoco_env_wrapper.py`](mdp_playground/envs/mujoco_env_wrapper.py).
 
-3) **Analysis**: [`plot_experiments.ipynb`](plot_experiments.ipynb) contains code to plot the standard plots from the paper.
+3) **Experiments**: Experiments are launched using [`run_experiments.py`](run_experiments.py). Config files for experiments are located inside the [`experiments`](experiments) directory. Please read the [instructions](#running-experiments) below for details.
+
+4) **Analysis**: [`plot_experiments.ipynb`](plot_experiments.ipynb) contains code to plot the standard plots from the paper.
 
 ## Installation
 **IMPORTANT**

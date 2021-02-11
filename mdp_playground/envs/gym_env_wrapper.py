@@ -10,7 +10,7 @@ from mdp_playground.envs.rl_toy_env import RLToyEnv
 # def get_gym_wrapper(base_class):
 
 class GymEnvWrapper(gym.Env):
-    '''Wraps an OpenAI Gym environment to be able to modify its dimensions corresponding to MDP Playground
+    '''Wraps an OpenAI Gym environment to be able to modify its dimensions corresponding to MDP Playground. The documentation for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.
 
     Currently supported dimensions:
         transition noise (discrete)
