@@ -28,6 +28,10 @@ env_config = {
     "env": "ReacherWrapper-v2",
     "horizon": 100,
     "env_config": {
+        'state_space_type': 'continuous',
+        'action_space_type': 'continuous',
+        "MujocoEnv": {
+        },
     },
 }
 

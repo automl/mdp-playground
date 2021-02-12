@@ -493,7 +493,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = True
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 3
@@ -551,7 +551,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = True
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 3
         config["sequence_length"] = 1
@@ -593,7 +593,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 3
@@ -631,7 +631,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 1
@@ -671,7 +671,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 1
@@ -718,7 +718,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 1
         config["sequence_length"] = 3
@@ -771,7 +771,7 @@ class TestRLToyEnv(unittest.TestCase):
     #     config["reward_density"] = 0.25
     #     config["make_denser"] = True
     #     config["terminal_state_density"] = 0.25
-    #     config["completely_connected"] = True
+    #     config["maximally_connected"] = True
     #     config["repeats_in_sequences"] = False
     #     config["delay"] = 3
     #     config["sequence_length"] = 1
@@ -820,7 +820,7 @@ class TestRLToyEnv(unittest.TestCase):
     #     config["reward_density"] = 0.25
     #     config["make_denser"] = True
     #     config["terminal_state_density"] = 0.25
-    #     config["completely_connected"] = True
+    #     config["maximally_connected"] = True
     #     config["repeats_in_sequences"] = False
     #     config["delay"] = 3
     #     config["sequence_length"] = 1
@@ -828,7 +828,7 @@ class TestRLToyEnv(unittest.TestCase):
     #
     #     config["generate_random_mdp"] = True
     #
-    #     try: # Testing for completely_connected options working properly when invalid config specified. #TODO Is this part needed?
+    #     try: # Testing for maximally_connected options working properly when invalid config specified. #TODO Is this part needed?
     #         env = RLToyEnv(**config)
     #         state = env.get_augmented_state()['curr_state']
     #
@@ -904,7 +904,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = True
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 1
         config["sequence_length"] = 1
@@ -944,7 +944,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 1
         config["sequence_length"] = 3
@@ -1004,7 +1004,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.25
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 3
@@ -1039,7 +1039,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["state_space_size"] = 8
         config["action_space_size"] = 5
         config["terminal_state_density"] = 0.25
-        # config["completely_connected"] = False
+        # config["maximally_connected"] = False
         config["repeats_in_sequences"] = False
         config["delay"] = 1
         config["reward_scale"] = 2.0
@@ -1142,7 +1142,7 @@ class TestRLToyEnv(unittest.TestCase):
     #     config["delay"] = 2
     #     config["sequence_length"] = 5
     #     config["reward_scale"] = 1.0
-    #     config["completely_connected"] = True
+    #     config["maximally_connected"] = True
     #     config["repeats_in_sequences"] = False
     #
     #     config["generate_random_mdp"] = True
@@ -1179,7 +1179,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.5
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 1
@@ -1218,7 +1218,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_density"] = 0.05
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
-        config["completely_connected"] = True
+        config["maximally_connected"] = True
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["diameter"] = 3

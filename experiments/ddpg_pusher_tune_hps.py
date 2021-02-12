@@ -36,6 +36,10 @@ env_config = {
     "horizon": 100,
     "soft_horizon": False,
     "env_config": {
+        'state_space_type': 'continuous',
+        'action_space_type': 'continuous',
+        "MujocoEnv": {
+        },
     },
 }
 

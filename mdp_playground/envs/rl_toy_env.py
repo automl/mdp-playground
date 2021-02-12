@@ -398,7 +398,11 @@ class RLToyEnv(gym.Env):
                 self.image_ro_quant = config["image_ro_quant"]
 
             if "image_scale_range" not in config:
-                self.image_scale_range = None # (0.5, 1.5)
+                if 'scale' in self.image_transforms:
+                    warnings.warn("Setting image scale range to default of (0.5, 1.5), since no config value was provided for it.")
+                    self.image_scale_range = (0.5, 1.5)
+                else:
+                    self.image_scale_range = None
             else:
                 self.image_scale_range = config["image_scale_range"]
 

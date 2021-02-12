@@ -198,7 +198,7 @@ def on_train_result(info):
                         str_to_write = "["
                         for elem in field_val:
                             # print(key)
-                            str_to_write += '%.2e' % elem if isinstance(elem, float) else elem
+                            str_to_write += '%.2e' % elem if isinstance(elem, float) else str(elem)
                             str_to_write += ","
                         str_to_write += "]"
                     else:
@@ -309,7 +309,7 @@ if 'random_configs' in dir(config):
         random_configs = [config.random_configs[args.agent_config_num]]
         # print("Single random_config of agent to be run:", random_config)
 else:
-    random_config = [()] * len(cartesian_product_configs)
+    random_configs = [()] * len(cartesian_product_configs)
 
 
 
@@ -443,21 +443,22 @@ for enum_conf_1, current_config_ in enumerate(cartesian_product_configs):
 
         eval_config = config.eval_config
 
-        if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
-            env_config["horizon"] /= env_config["env_config"]["time_unit"]
-            env_config["horizon"] = int(env_config["horizon"])
+        if env_config["env"] in ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]:
+            if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
+                env_config["horizon"] /= env_config["env_config"]["time_unit"]
+                env_config["horizon"] = int(env_config["horizon"])
 
-            agent_config["learning_starts"] /= env_config["env_config"]["time_unit"]
-            agent_config["learning_starts"] = int(agent_config["learning_starts"])
+                agent_config["learning_starts"] /= env_config["env_config"]["time_unit"]
+                agent_config["learning_starts"] = int(agent_config["learning_starts"])
 
-            agent_config["timesteps_per_iteration"] /= env_config["env_config"]["time_unit"]
-            agent_config["timesteps_per_iteration"] = int(agent_config["timesteps_per_iteration"])
+                agent_config["timesteps_per_iteration"] /= env_config["env_config"]["time_unit"]
+                agent_config["timesteps_per_iteration"] = int(agent_config["timesteps_per_iteration"])
 
-            eval_config["evaluation_config"]["horizon"] /= env_config["env_config"]["time_unit"]
-            eval_config["evaluation_config"]["horizon"] = int(eval_config["evaluation_config"]["horizon"])
+                eval_config["evaluation_config"]["horizon"] /= env_config["env_config"]["time_unit"]
+                eval_config["evaluation_config"]["horizon"] = int(eval_config["evaluation_config"]["horizon"])
 
-            agent_config["train_batch_size"] *= env_config["env_config"]["time_unit"] # this is needed because Ray (until version 0.8.6 I think) fixes the ratio of number of samples trained/number of steps sampled in environment
-            agent_config["train_batch_size"] = int(agent_config["train_batch_size"])
+                agent_config["train_batch_size"] *= env_config["env_config"]["time_unit"] # this is needed because Ray (until version 0.8.6 I think) fixes the ratio of number of samples trained/number of steps sampled in environment
+                agent_config["train_batch_size"] = int(agent_config["train_batch_size"])
 
         extra_config = {
             "callbacks": {
@@ -535,9 +536,10 @@ for enum_conf_1, current_config_ in enumerate(cartesian_product_configs):
         if 'timesteps_total' in dir(config):
             timesteps_total = config.timesteps_total
 
-        if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
-            timesteps_total /= env_config["env_config"]["time_unit"]
-            timesteps_total = int(timesteps_total)
+        if env_config["env"] in ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]:
+            if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
+                timesteps_total /= env_config["env_config"]["time_unit"]
+                timesteps_total = int(timesteps_total)
 
 
         print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")

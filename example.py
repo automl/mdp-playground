@@ -35,7 +35,7 @@ def discrete_environment_example():
     config["reward_density"] = 0.25
     config["make_denser"] = False
     config["terminal_state_density"] = 0.25
-    config["completely_connected"] = True
+    config["maximally_connected"] = True
     config["repeats_in_sequences"] = False
 
     config["generate_random_mdp"] = True
@@ -70,7 +70,7 @@ def discrete_environment_image_representations_example():
     config["reward_density"] = 0.25
     config["make_denser"] = False
     config["terminal_state_density"] = 0.25
-    config["completely_connected"] = True
+    config["maximally_connected"] = True
     config["repeats_in_sequences"] = False
 
     config["generate_random_mdp"] = True
@@ -229,4 +229,4 @@ if __name__ == "__main__":
     import mdp_playground
     import gym
     gym.make('RLToy-v0')
-    gym.make('RLToy-v0', **{'state_space_size':8, 'action_space_size':8, 'state_space_type':'discrete', 'action_space_type':'discrete', 'terminal_state_density':0.25, 'completely_connected': True})
+    gym.make('RLToy-v0', **{'state_space_size':8, 'action_space_size':8, 'state_space_type':'discrete', 'action_space_type':'discrete', 'terminal_state_density':0.25, 'maximally_connected': True})
