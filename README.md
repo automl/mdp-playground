@@ -69,12 +69,18 @@ python run_experiments.py -c experiments/ddpg_move_to_a_point_irr_dims.py -e ddp
 # Varying the action range and time unit together for transition_dynamics_order = 2
 python run_experiments.py -c experiments/ddpg_move_to_a_point_p_order_2.py -e ddpg_move_to_a_point_p_order_2
 
-
 # Complex environments:
 conda activate py36_toy_rl_cont_comp
 python run_experiments.py -c experiments/dqn_qbert_del.py -e dqn_qbert_del
 python run_experiments.py -c experiments/ddpg_halfcheetah_time_unit.py -e ddpg_halfcheetah_time_unit
+
+# For the spider plots, experiments for all the agents and dimensions will need to be run from the experiments directory, i.e., for discrete: dqn_p_r_noises.py, a3c_p_r_noises, ..., dqn_seq_del, ..., dqn_sparsity, ..., dqn_image_representations, ...
+# for continuous:, ddpg_move_to_a_point_p_noise, td3_move_to_a_point_p_noise, ..., ddpg_move_to_a_point_r_noise, ..., ddpg_move_to_a_point_irr_dims, ..., ddpg_move_to_a_point_action_loss_weight, ..., ddpg_move_to_a_point_action_max, ..., ddpg_move_to_a_point_target_radius, ..., ddpg_move_to_a_point_time_unit
+# and then follow the instructions in plot_experiments.ipynb
+
+# For the bsuite debugging experiment, please run the bsuite sonnet dqn agent on our toy environment while varying reward density. Commit https://github.com/deepmind/bsuite/commit/5116216b62ce0005100a6036fb5397e358652530 should work fine.
 ```
+
 The CSV stats files will be saved to the current directory and can be analysed in [`plot_experiments.ipynb`](plot_experiments.ipynb).
 
 ## Plotting
