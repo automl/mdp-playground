@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from . import radar_chart
 import os
 import warnings
+import math
 
 class MDPP_Analysis():
     '''Utility class to load and plot data for analysis of experiments from MDP Playground
@@ -11,8 +13,38 @@ class MDPP_Analysis():
     def __init__(self):
         pass
 
-    def load_data(self, dir_name, exp_name, num_metrics=3, load_eval=True): #, max_total_configs=200):
-        '''Loads training and evaluation data from given file
+    def load_data(self, experiements: dict, load_eval=True):
+        '''Loads training and evaluation data from given multiple files
+
+        Parameters
+        ----------
+        experiements : dict<str,str>
+            per experiment -> key-value pair of exp_name & dir_name
+
+            dir_name : str
+                The location where the training and evaluation CSV files were written
+            exp_name : str
+                The name of the experiment: the training and evaluation CSV filenames are formed using this string
+
+            eg: experiments = {
+                    "td3_move_to_a_point_action_max": "<path_to_data_dir>",
+                    .....
+                }
+
+        Returns
+        -------
+            list of experiment data of type <dict>
+            [ for more details refer get_exp_data() ]
+
+        '''
+        list_exp_data = []
+        for exp_name, dir_name in experiements.items():
+            exp_data = self.get_exp_data(dir_name, exp_name, load_eval=load_eval)
+            list_exp_data.append(exp_data)
+        return list_exp_data
+
+    def get_exp_data(self, dir_name, exp_name, num_metrics=3, load_eval=True): #, max_total_configs=200):
+        '''get training and evaluation data from given experiement file
 
         Parameters
         ----------
@@ -27,6 +59,8 @@ class MDPP_Analysis():
 
         Returns
         -------
+        experiement data: dictionary type with following key-value
+
         train_stats : np.ndarray
             Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         eval_stats : np.ndarray
@@ -41,9 +75,9 @@ class MDPP_Analysis():
         self.stats_file = stats_file
 
         if os.path.isfile(stats_file + '.csv'):
-            print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations.\033[0;0m")
+            print("Loading data from a sequential run/already combined runs of experiment configurations.")
         else:
-            print("\033[1;31mLoading data from a distributed run of experiment configurations. Creating a combined CSV stats file.\033[0;0m")
+            print("Loading data from a distributed run of experiment configurations. Creating a combined CSV stats file.")
             def join_files(file_prefix, file_suffix):
                 '''Utility to join files that were written with different experiment configs'''
                 with open(file_prefix + file_suffix, 'ab') as combined_file:
@@ -138,10 +172,12 @@ class MDPP_Analysis():
         print("train_aucs.shape:", train_aucs.shape)
 
 
+
         final_eval_metrics_reshaped, mean_data_eval, eval_aucs = None, None, None
         # Load evaluation stats
         # load_eval = False #hack ####TODO rectify
         if load_eval:
+            # Load evaluation stats
             stats_file_eval = stats_file + '_eval.csv'
             eval_stats = np.loadtxt(stats_file_eval, dtype=float)
             # print(eval_stats, eval_stats.shape)
@@ -157,14 +193,14 @@ class MDPP_Analysis():
                     hack_indices.append(i - len(hack_indices)) # appends index of last eval in this training_iteration
                 i += 1
 
-            # print("len(hack_indices), hack_indices[:5] and [:-5]:", len(hack_indices), hack_indices[:5], hack_indices[-5:])
+            # print(len(hack_indices), hack_indices)
             if hack_indices[0] == 0: #hack
                 hack_indices = hack_indices[1:] #hardcoded removes the 1st hack_index which is at position 0 so that hack_indices_10 below doesn't begin with a -10; apparently Ray seems to have changed logging for evaluation (using on_episode_end) from 0.7.3 to 0.9.0
                 ray_0_9_0 = True
             else:
                 ray_0_9_0 = False
             hack_indices_10 = np.array(hack_indices) - 10
-            # print(hack_indices_10.shape, hack_indices_10[:5], hack_indices_10[-5:])
+            # print(hack_indices_10.shape, hack_indices_10)
             # print(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))
             # print("Min:", min(np.array(hack_indices[1:]) - np.array(hack_indices[:-1]))) # Some problem with Ray? Sometimes no. of eval episodes is less than 10.
             final_10_evals = []
@@ -196,7 +232,6 @@ class MDPP_Analysis():
     #         print("eval stats shapes (before and after reshape):", final_eval_metrics_.shape, final_eval_metrics_reshaped.shape)
             print("eval stats shape:", final_eval_metrics_reshaped.shape)
 
-
             # Calculate AUC metrics
             eval_aucs = []
             for i in range(len(final_rows_for_a_config)):
@@ -210,7 +245,6 @@ class MDPP_Analysis():
 
             eval_aucs = np.reshape(np.array(eval_aucs), config_counts)
             print("eval_aucs.shape:", eval_aucs.shape)
-
 
         self.config_counts = config_counts[:-1] # -1 is added to ignore "no. of stats that were saved" as dimensions of difficulty
         self.dims_values = dims_values
@@ -253,75 +287,263 @@ class MDPP_Analysis():
         for d,v,i in zip(x_axis_labels, x_tick_labels_, dims_varied):
             print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
 
-        return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval, train_aucs, eval_aucs
+        # experiement data
+        exp_data = dict()
+        # related to training & eval data
+        exp_data['train_stats'] = train_aucs
+        exp_data['eval_stats'] = eval_aucs
+        exp_data['train_curves'] = np.array(stats_pd)
+        exp_data['eval_curves'] = mean_data_eval
+
+        # related to plots
+        exp_data['metric_names'] = self.metric_names
+        exp_data['tick_labels'] = self.tick_labels
+        exp_data['axis_labels'] = self.axis_labels
+        exp_data['stats_file'] = self.stats_file
+        exp_data['algorithm'] = self.dims_values[0][0]
+        exp_data['dims_varied'] = self.dims_varied
+        exp_data['config_counts'] = self.config_counts
+        exp_data['final_rows_for_a_config'] = self.final_rows_for_a_config
+        exp_data['config_names'] = self.config_names
+        exp_data['dims_values'] = self.dims_values
+
+        return exp_data
 
 
-    def plot_1d_dimensions(self, stats_data, save_fig=False, train=True, metric_num=-2):
+    def gather_stats(self, list_exp_data, train, metric_num, plot_type):
+        stats_data = dict()
+
+        if plot_type is "agent":
+            #groupby agent
+            groupby = 'algorithm'
+            sub_groupby = 'axis_labels'
+        elif plot_type is "metric":
+            #groupby metric
+            groupby = 'axis_labels'
+            sub_groupby = 'algorithm'
+
+        #iterate and group data based on the their values eg. ['SAC', 'TD3'] or ['action_space_max', 'time_unit']
+        """
+        example of experiment data grouped by agent:
+            {
+            <group_key>
+            "SAC": {
+                   <sub_group_key>
+                   "time_unit": {
+                                "to_plot_": [],
+                                "to_plot_std_": [],
+                                ....
+                                },
+                   "action_space_max": {
+                                       "to_plot_": [],
+                                       "to_plot_std_": [],
+                                       ....
+                                       },
+                   ........
+                   },
+            "TD3": {
+                    ......
+                   }
+            }
+        """
+        for exp_data in list_exp_data:
+            if train:
+                stats = exp_data['train_stats']
+            else:
+                stats = exp_data['eval_stats']
+
+            group_keys = exp_data[groupby]
+            if isinstance(group_keys, str):
+                group_keys = [group_keys]
+
+            for group_key in group_keys:
+                if group_key not in stats_data:
+                    # if group_key is not alreay present initialize
+                    stats_data[group_key] = dict()
+
+                sub_group_keys = exp_data[sub_groupby]
+                if isinstance(sub_group_keys, str):
+                    sub_group_keys = [sub_group_keys]
+
+                for idx in range(len(sub_group_keys)):
+                    sub_group_key = sub_group_keys[idx]
+                    if sub_group_key not in stats_data[group_key]:
+                        # if sub_group_key is not alreay present initialize
+                        stats_data[group_key][sub_group_key] = dict()
+
+
+                    # gather data related to plot
+                    mean_data_ = np.mean(stats[..., metric_num], axis=-1) # the slice sub-selects the metric written in position metric_num from the "last axis of diff. metrics that were written" and then the axis of #seeds becomes axis=-1 ( before slice it was -2).
+                    to_plot_ = np.squeeze(mean_data_)
+
+                    #HACK traspose the array and choose first column elements always
+                    if len(to_plot_.shape) > 1:
+                        axes = np.arange(len(to_plot_.shape))
+                        new_axes = [axes[(i - idx) % len(axes)] for i, x in enumerate(axes)]
+                        to_plot_ = np.transpose(to_plot_, tuple(new_axes))[:, 0]
+                    stats_data[group_key][sub_group_key]['to_plot_'] = to_plot_
+
+                    std_dev_ = np.std(stats[..., metric_num], axis=-1) #seed
+                    to_plot_std_ = np.squeeze(std_dev_)
+
+                    #HACK traspose the array and choose first column elements always
+                    if len(to_plot_std_.shape) > 1:
+                        to_plot_std_ = np.transpose(to_plot_std_, tuple(new_axes))[:, 0]
+                    stats_data[group_key][sub_group_key]['to_plot_std_'] = to_plot_std_
+
+                    stats_data[group_key][sub_group_key]['labels'] = sub_group_key
+                    stats_data[group_key][sub_group_key]['tick_labels'] = exp_data['tick_labels'][idx]
+                    stats_data[group_key][sub_group_key]['axis_labels'] = exp_data[groupby]
+                    stats_data[group_key][sub_group_key]['metric_names'] = exp_data['metric_names']
+                    stats_data[group_key][sub_group_key]['stats_file'] = exp_data['stats_file']
+
+        return stats_data
+
+    def plot_1d_dimensions(self, list_exp_data, save_fig=False, train=True, metric_num=-2, plot_type = "agent"):
         '''Plots 1-D bar plots across a single dimension with mean and std. dev.
 
         Parameters
         ----------
-        stats_data : np.array
-            8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+        list_exp_data : list of experiment data of type <dict>
+                   [ for more details refer load_data(), get_exp_data() ]
         save_fig : bool, optional
-            A flag used to save a PDF (default is
-            False)
+            A flag used to save a PDF (default is False)
         train : bool, optional
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
+        metric_num :
+            allowed values-> '-1' to plot episode mean lengths
+                             '-2' to plot episode reward
+        plot_type : string describing how to group data and plot, say based on agent or metric
+            allowed values-> ['agent' ,'metric']
 
         '''
-        y_axis_label = 'Reward' if 'reward' in self.metric_names[metric_num] else self.metric_names[metric_num]
 
-        plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
-        # print(stats_data.shape)
+        stats_data = self.gather_stats(list_exp_data, train, metric_num, plot_type)
 
-        mean_data_ = np.mean(stats_data[..., metric_num], axis=-1) # the slice sub-selects the metric written in position metric_num from the "last axis of diff. metrics that were written" and then the axis of #seeds becomes axis=-1 ( before slice it was -2).
-        to_plot_ = np.squeeze(mean_data_)
-        std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
-        to_plot_std_ = np.squeeze(std_dev_)
+        #plot
+        for group_key in stats_data.keys():
+            cols = 4 # hard-coded value
+            rows = math.ceil((len(stats_data[group_key].keys())/cols)) # dynamically compute
 
-        fig_width = len(self.tick_labels[0])
-        # plt.figure()
-        plt.figure(figsize=(fig_width, 1.5))
+            plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
+            plt.rcParams['figure.figsize'] = [7 * cols, 5 * rows]
 
-        # print(to_plot_.shape)
-        if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
-            plt.bar(self.tick_labels[0], to_plot_[:, 0], yerr=to_plot_std_[:, 0])
-        else:
-            plt.bar(self.tick_labels[0], to_plot_, yerr=to_plot_std_)
-        plt.xlabel(self.axis_labels[0])
-        plt.ylabel(y_axis_label)
-        if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
-        plt.show()
+            figure, axes = plt.subplots(nrows=rows, ncols=cols) # [n*1] or [n*2] grid
 
-        if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
-            fig_width = len(self.tick_labels[1])
-            plt.figure(figsize=(fig_width, 1.5))
-            plt.bar(self.tick_labels[1], to_plot_[0, :], yerr=to_plot_std_[0, :])
-            # plt.tight_layout()
-            plt.xlabel(self.axis_labels[1])
-            plt.ylabel(y_axis_label)
+            i = j = 0
+            colors = ['blue', 'orange', 'green', 'purple', 'cyan', 'olive', 'brown', 'grey', 'red', 'pink']
+            for sub_group_key, color in zip(stats_data[group_key].keys(), colors):
+                if cols == 1 and rows == 1:
+                    #single row, single column plot
+                    self.plot_bar(axes, stats_data[group_key][sub_group_key], save_fig, metric_num, color)
+                elif rows ==1 :
+                    #single row, multiple column plot
+                    self.plot_bar(axes[j], stats_data[group_key][sub_group_key], save_fig, metric_num, color)
+                    j +=1
+                else :
+                    #multiple row, multiple column plot
+                    self.plot_bar(axes[i, j], stats_data[group_key][sub_group_key], save_fig, metric_num, color)
+                    if j == cols-1:
+                        #switch to next row 1st column
+                        j = 0
+                        i += 1
+                    else:
+                        #switch to same row next column
+                        j += 1
+
+            # hide the blank plot (if any)
+            if j > 0 and j <= cols-1:
+                while j <= cols-1:
+                    if i == 0:
+                        #axes[j].set_visible(False)
+                        axes[j].axis('off')
+                    else:
+                        #axes[i, j].set_visible(False)
+                        axes[i, j].axis('off')
+                    j += 1
+
+            figure.tight_layout(pad=3.0)
+            figure.suptitle(group_key, x=0.2, y=1, fontsize=24, fontweight='bold')
+
+            # save figure
             if save_fig:
-                plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
+                fig_name = stats_data[group_key][sub_group_key]['stats_file'].split('/')[-1] + \
+                                  ('_train' if train else '_eval') + '_final_reward_' + \
+                        stats_data[group_key][sub_group_key]['axis_labels'].replace(' ','_') + \
+                        '_' + str(stats_data[group_key][sub_group_key]['metric_names'][metric_num]) + '_1d.pdf'
+                plt.savefig(fig_name, dpi=300, bbox_inches="tight")
+
             plt.show()
 
-    def plot_2d_heatmap(self, stats_data, save_fig=False, train=True, metric_num=-2):
+    def plot_bar(self, ax, stats_data, save_fig=False, metric_num=-2, bar_color='blue'):
+        '''Plots 1-D bar plots across a single dimension with mean and std. dev.
+
+        Parameters
+        ----------
+        ax: matplotlib axes instance to plot
+        stats_data : dictionary type with data related to ['train_stats', 'eval_stats', ...]
+            [ for more details refer load_data(), get_exp_data() ]
+        save_fig : bool, optional
+            A flag used to save a PDF (default is False)
+        metric_num :
+            allowed values-> '-1' to plot episode mean lengths
+                             '-2' to plot episode reward
+        bar_color : the color of bars in plots
+        '''
+
+        y_axis_label = 'Reward' if 'reward' in stats_data['metric_names'][metric_num] else stats_data['metric_names'][metric_num]
+
+        to_plot_ = stats_data['to_plot_']
+        to_plot_std_ = stats_data['to_plot_std_']
+        labels = stats_data['labels']
+        tick_labels =  stats_data['tick_labels']
+        axis_labels =  stats_data['axis_labels']
+        stats_file = stats_data['stats_file']
+
+        x = np.arange(len(tick_labels))
+        width = (x[1]-x[0])*0.8 # bar width
+
+        ax.bar(x, to_plot_, width, yerr=to_plot_std_, label=labels, color=bar_color)
+
+        ax.set_ylabel(y_axis_label)
+        #ax.set_xlabel(axis_labels)
+        ax.set_xticks(x)
+        #ax.set_title(labels)
+        ax.legend(loc='upper right')
+        ax.set_xticklabels(tick_labels)
+
+
+    def plot_2d_heatmap(self, list_exp_data, save_fig=False, train=True, metric_num=-2):
         '''Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground
 
         Parameters
         ----------
-        stats_data : np.array
-            8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+        list_exp_data : list of experiment data of type <dict>
+                   [ for more details refer load_data(), get_exp_data() ]
         save_fig : bool, optional
-            A flag used to save a PDF (default is
-            False)
+            A flag used to save a PDF (default is False)
         train : bool, optional
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
         '''
+        #HACK
+        if len(list_exp_data) > 0:
+            exp_data = list_exp_data[0] #TODO make changes to handle multiple experiements plot
+        else:
+            return
+
+
         plt.rcParams.update({'font.size': 18}) # default 12, 24 for paper, for poster: 30
         cmap = 'Purples' # 'Blues' #
-        label_ = 'Reward' if 'reward' in self.metric_names[metric_num] else self.metric_names[metric_num]
+        label_ = 'Reward' if 'reward' in exp_data['metric_names'][metric_num] else exp_data['metric_names'][metric_num]
+
+        tick_labels =  exp_data['tick_labels']
+        axis_labels =  exp_data['axis_labels']
+        stats_file = exp_data['stats_file']
+
+        if train:
+            stats_data = exp_data['train_stats']
+        else:
+            stats_data = exp_data['eval_stats']
 
         mean_data_ = np.mean(stats_data[..., metric_num], axis=-1) #seed
         to_plot_ = np.squeeze(mean_data_)
@@ -330,67 +552,84 @@ class MDPP_Analysis():
             # warning.warn("Data contains variation in more than 2 dimensions (apart from seeds). May lead to plotting error!")
             raise ValueError("Data contains variation in more than 2 dimensions (apart from seeds). This is currently not supported") #TODO Add 2-D plots for all combinations of 2 varying dims?
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_))
-        if len(self.tick_labels) == 2:
-            plt.gca().set_xticklabels(self.tick_labels[1])
-            plt.gca().set_yticklabels(self.tick_labels[0])
+        if len(tick_labels) == 2:
+            plt.gca().set_xticklabels(tick_labels[1])
+            plt.gca().set_yticklabels(tick_labels[0])
         else:
-            plt.gca().set_xticklabels(self.tick_labels[0])
+            plt.gca().set_xticklabels(tick_labels[0])
         cbar = plt.colorbar()
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 25
         cbar.set_label(label_, rotation=270)
-        if len(self.axis_labels) == 2:
-            plt.xlabel(self.axis_labels[1])
-            plt.ylabel(self.axis_labels[0])
+        if len(axis_labels) == 2:
+            plt.xlabel(axis_labels[1])
+            plt.ylabel(axis_labels[0])
         else:
-            plt.xlabel(self.axis_labels[0])
+            plt.xlabel(axis_labels[0])
         if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(exp_data['metric_names'][metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
         plt.show()
         std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
         to_plot_ = np.squeeze(std_dev_)
         # print(to_plot_, to_plot_.shape)
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_)) # 60 for DQN, 100 for A3C
-        if len(self.tick_labels) == 2:
-            plt.gca().set_xticklabels(self.tick_labels[1])
-            plt.gca().set_yticklabels([str(i) for i in self.tick_labels[0]])
+        if len(tick_labels) == 2:
+            plt.gca().set_xticklabels(tick_labels[1])
+            plt.gca().set_yticklabels([str(i) for i in tick_labels[0]])
         else:
-            plt.gca().set_xticklabels(self.tick_labels[0])
+            plt.gca().set_xticklabels(tick_labels[0])
         cbar = plt.colorbar()
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 30
         cbar.set_label('Reward Std Dev.', rotation=270)
-        if len(self.axis_labels) == 2:
-            plt.xlabel(self.axis_labels[1])
-            plt.ylabel(self.axis_labels[0])
+        if len(axis_labels) == 2:
+            plt.xlabel(axis_labels[1])
+            plt.ylabel(axis_labels[0])
         else:
-            plt.xlabel(self.axis_labels[0])
+            plt.xlabel(axis_labels[0])
         # plt.tight_layout()
         if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map_' + str(exp_data['metric_names'][metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
             # plt.savefig(stats_file.split('/')[-1] + '_train_heat_map.png')#, dpi=300)
         plt.show()
 
-    def plot_learning_curves(self, stats_data, save_fig=False, train=True, metric_num=-2): # metric_num needs to be minus indexed because stats_pd reutrned for train stats has _all_ columns
+    def plot_learning_curves(self, list_exp_data, save_fig=False, train=True, metric_num=-2): # metric_num needs to be minus indexed because stats_pd reutrned for train stats has _all_ columns
         '''Plots learning curves: Either across 1 or 2 meta-features of MDP Playground. Different colours represent learning curves for different seeds.
 
         Parameters
         ----------
-        stats_data : np.array
-            8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+        list_exp_data : list of experiment data of type <dict>
+                   [ for more details refer load_data(), get_exp_data() ]
         save_fig : bool, optional
-            A flag used to save a PDF (default is
-            False)
+            A flag used to save a PDF (default is False)
         train : bool, optional
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
         '''
+        #HACK
+        if len(list_exp_data) > 0:
+            exp_data = list_exp_data[0] #TODO make changes to handle multiple experiements plot
+        else:
+            return
+
+
+        stats_file = exp_data['stats_file']
+        dims_varied = exp_data['dims_varied']
+        config_counts = exp_data['config_counts']
+        config_names = exp_data['config_names']
+        dims_values = exp_data['dims_values']
+        final_rows_for_a_config = exp_data['final_rows_for_a_config']
+        if train:
+            stats_data = exp_data['train_curves']
+        else:
+            stats_data = exp_data['eval_curves']
+
         # Plot for train metrics: learning curves; with subplot
         # Comment out unneeded labels in code lines 41-44 in this cell
-        if len(self.dims_varied) > 1:
-            ncols_ = self.config_counts[self.dims_varied[1]]
-            nrows_ = self.config_counts[self.dims_varied[0]]
+        if len(dims_varied) > 1:
+            ncols_ = config_counts[dims_varied[1]]
+            nrows_ = config_counts[dims_varied[0]]
         else:
-            ncols_ = self.config_counts[self.dims_varied[0]]
+            ncols_ = config_counts[dims_varied[0]]
             nrows_ = 1
-        nseeds_ = self.config_counts[-1]
+        nseeds_ = config_counts[-1]
         # print(ax, type(ax), type(ax[0]))
 #         color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
         # print("color_cycle", color_cycle)
@@ -400,15 +639,15 @@ class MDPP_Analysis():
         ax = np.atleast_2d(ax)
         # metrics_reshaped_squeezed = np.squeeze(metrics_reshaped)
         # print(np.squeeze(metrics_reshaped).shape)
-        for i in range(len(self.final_rows_for_a_config)):
+        for i in range(len(final_rows_for_a_config)):
             i_index = i//(nseeds_ * ncols_) # = num_seeds * shape of more frequently changing hyperparam
             j_index = (i//nseeds_) % ncols_ #
             if i == 0:
-                to_plot_ = stats_data[0:self.final_rows_for_a_config[i]+1, metric_num]
-                to_plot_x = stats_data[0:self.final_rows_for_a_config[i]+1,-3]
+                to_plot_ = stats_data[0:final_rows_for_a_config[i]+1, metric_num]
+                to_plot_x = stats_data[0:final_rows_for_a_config[i]+1,-3]
             else:
-                to_plot_ = stats_data[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, metric_num]
-                to_plot_x = stats_data[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -3]
+                to_plot_ = stats_data[final_rows_for_a_config[i-1]+1:final_rows_for_a_config[i]+1, metric_num]
+                to_plot_x = stats_data[final_rows_for_a_config[i-1]+1:final_rows_for_a_config[i]+1, -3]
             # print(to_plot_[-1])
         #     if i % 10 == 0:
         #         fig = plt.figure(figsize=(12, 7))
@@ -420,13 +659,13 @@ class MDPP_Analysis():
                 ax[i_index][j_index].set_xlabel("Train Timesteps")
                 ax[i_index][j_index].set_ylabel("Reward")
         #         ax[i_index][j_index].set_title('Delay ' + str(delays[i_index]) + ', Sequence Length ' + str(sequence_lengths[j_index]))
-                if len(self.dims_varied) > 1:
-                    title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][i_index])
-                    title_2nd_dim = self.config_names[self.dims_varied[1]] + ' '  + str(self.dims_values[self.dims_varied[1]][j_index])
-                    ax[i_index][j_index].set_title(title_1st_dim + ', ' + title_2nd_dim)
+                if len(dims_varied) > 1:
+                    title_1st_dim = config_names[dims_varied[0]] + ' ' + str(dims_values[dims_varied[0]][i_index])
+                    title_2nd_dim = config_names[dims_varied[1]] + ' '  + str(dims_values[dims_varied[1]][j_index])
                 else:
-                    title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][j_index])
-                    ax[i_index][j_index].set_title(title_1st_dim)
+                    title_1st_dim = config_names[dims_varied[0]] + ' ' + str(dims_values[dims_varied[0]][j_index])
+                    title_2nd_dim = ''
+                ax[i_index][j_index].set_title(title_1st_dim + ', ' + title_2nd_dim)
         #         ax[i_index][j_index].set_title('Sequence Length ' + str(seq_lens[j_index]))
         #         ax[i_index][j_index].set_title('Reward Density ' + str(reward_densities[j_index]))
 
@@ -435,4 +674,69 @@ class MDPP_Analysis():
         # plt.suptitle("Training Learning Curves")
         plt.show()
         if save_fig:
-            fig.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
+            fig.savefig(stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves_' + str(exp_data['metric_names'][metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
+
+    ###### ---------- radar (spider) plot ------------- ######
+    def plot_radar(self, list_exp_data, save_fig=False, train=True, metric_num=-2, plot_type="agent", weights={}):
+        '''Plots radar (spider) chart across different dimensions
+
+        Parameters
+        ----------
+        list_exp_data : list of experiment data of type <dict>
+                   [ for more details refer load_data(), get_exp_data() ]
+        save_fig : bool, optional
+            A flag used to save a PDF (default is False)
+        train : bool, optional
+            A flag used to insert either _train or _eval in the filename of the PDF (default is True)
+        metric_num :
+            allowed values-> '-1' to plot episode mean lengths
+                             '-2' to plot episode reward
+        plot_type : string describing how to group data and plot, say based on agent or metric
+            allowed values-> ['agent' ,'metric']
+        weights : dictionary of weights associated per dimension (plot_type) data
+            eg weights['reward_noise'] = [.25, .25, .25, .25]
+        '''
+
+        stats_data = self.gather_stats(list_exp_data, train, metric_num, plot_type)
+
+        # get axes labels
+        first_group = next(iter(stats_data.values()))
+        spoke_labels = first_group.keys()
+
+        #plot
+        N = len(spoke_labels)
+        theta = radar_chart.radar_factory(N, frame='circle')
+        plt.rcParams['figure.figsize'] = [7, 5]
+        ax = plt.subplot(111, projection='radar')
+
+        colors = ['blue', 'orange', 'green', 'purple', 'cyan', 'olive', 'brown', 'grey', 'red', 'pink']
+        for group_key, color in zip(stats_data.keys(), colors):
+            d = []
+            for sub_group_key in stats_data[group_key].keys():
+                data = stats_data[group_key][sub_group_key]['to_plot_']
+                if sub_group_key in weights:
+                    d.append(np.average(data, axis=0, weights=weights[sub_group_key]))
+                else:
+                    d.append(np.average(data))
+
+            ax.plot(theta, d, color=color)
+            ax.fill(theta, d, facecolor=color, alpha=0.25)
+
+        # customize plot axis labels
+        ax.set_varlabels(spoke_labels)
+        ax.set_rlabel_position(0)
+        plt.xticks(color="black", fontsize=12)
+        plt.yticks(color="black", fontsize=10)
+
+        labels = stats_data.keys()
+        legend = ax.legend(labels, loc=(0.9, .95), labelspacing=0.1, fontsize=12)
+
+        # save figure
+        if save_fig:
+            fig_name = stats_data[group_key][sub_group_key]['stats_file'].split('/')[-1] + \
+                        ('_train' if train else '_eval') + '_final_reward_' + \
+                        stats_data[group_key][sub_group_key]['axis_labels'].replace(' ','_') + \
+                        '_' + str(stats_data[group_key][sub_group_key]['metric_names'][metric_num]) + '_spider.pdf'
+            plt.savefig(fig_name, dpi=300, bbox_inches="tight")
+
+        plt.show()
