@@ -42,6 +42,10 @@ def main():
     if(framework == "stable_baselines"):
         import run_experiments_baselines
         run_experiments_baselines.main(args)
+    elif( framework == "custom"):
+        import run_experiments_custom
+        run_experiments_custom.main(args)
+        return
     else: #ray
         import run_experiments_ray
         run_experiments_ray.main(args)#_ray.main(args)

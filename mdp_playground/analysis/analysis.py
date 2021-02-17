@@ -8,8 +8,8 @@ class MDPP_Analysis():
     '''Utility class to load and plot data for analysis of experiments from MDP Playground
 
     '''
-    def __init__(self):
-        pass
+    def __init__(self, save_folder = None):
+        self.save_folder = save_folder
 
     def load_data(self, dir_name, exp_name, num_metrics=3, load_eval=True): #, max_total_configs=200):
         '''Loads training and evaluation data from given file
@@ -36,9 +36,13 @@ class MDPP_Analysis():
         eval_curves: np.ndarray
             The loaded evaluation CSV with the columns the evaluation stats that were saved
         '''
-
         stats_file = dir_name + '/' + exp_name #Name of file to which benchmark stats were written
         self.stats_file = stats_file
+        if self.save_folder is None:
+            self.save_folder = self.stats_file.split('/')[-1] 
+        else:
+            self.save_folder = self.save_folder + self.stats_file.split('/')[-1] 
+             #folder to save figures
 
         if os.path.isfile(stats_file + '.csv'):
             print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations.\033[0;0m")
@@ -294,7 +298,8 @@ class MDPP_Analysis():
         plt.xlabel(self.axis_labels[0])
         plt.ylabel(y_axis_label)
         if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
+            x = self.save_folder + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf'
+            plt.savefig(self.save_folder + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
         plt.show()
 
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
@@ -305,7 +310,7 @@ class MDPP_Analysis():
             plt.xlabel(self.axis_labels[1])
             plt.ylabel(y_axis_label)
             if save_fig:
-                plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
+                plt.savefig(self.save_folder+ ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
             plt.show()
 
     def plot_2d_heatmap(self, stats_data, save_fig=False, train=True, metric_num=-2):
@@ -346,7 +351,7 @@ class MDPP_Analysis():
         else:
             plt.xlabel(self.axis_labels[0])
         if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(self.save_folder + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
         plt.show()
         std_dev_ = np.std(stats_data[..., metric_num], axis=self.seed_idx) #seed
         to_plot_ = np.squeeze(std_dev_)
@@ -367,7 +372,7 @@ class MDPP_Analysis():
             plt.xlabel(self.axis_labels[0])
         # plt.tight_layout()
         if save_fig:
-            plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
+            plt.savefig(self.save_folder + ('_train' if train else '_eval') + '_final_reward_std_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
             # plt.savefig(stats_file.split('/')[-1] + '_train_heat_map.png')#, dpi=300)
         plt.show()
 
@@ -437,4 +442,20 @@ class MDPP_Analysis():
         # plt.suptitle("Training Learning Curves")
         plt.show()
         if save_fig:
-            fig.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
+            fig.savefig(self.save_folder + ('_train' if train else '_eval') + '_learning_curves_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
+
+if __name__ == "__main__":
+    # Set dir_name to the location where the CSV files from running an experiment were saved
+    dir_name = '../../../mdp_files/32_net'
+    # Set exp_name to the name that was given to the experiment when running it
+    exp_name = 'dqn_vanilla_train_bs'
+    # Set the following to True to save PDFs of plots that you generate below
+    save_fig = True
+    # Data loading
+    save_folder = "../../../plots/32_net/"
+    mdpp_analysis = MDPP_Analysis(save_folder)
+    train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=True)
+    # 1-D: Plots showing reward after 20k timesteps when varying a single meta-feature
+    # Plots across 10 runs: Training: with std dev across the runs
+    mdpp_analysis.plot_1d_dimensions(train_stats, save_fig)
+    mdpp_analysis.plot_1d_dimensions(train_aucs, save_fig)

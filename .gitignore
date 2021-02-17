@@ -106,3 +106,7 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+.vscode/
+*.pdf
+..mdpp_to_cave/dqn_seq_del/output/.OLD.zip
