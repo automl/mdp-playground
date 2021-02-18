@@ -59,6 +59,37 @@ class MDPPToCave():
             runhistory_df[var] = stats_pd[var].iloc[final_rows_for_a_config]
         return runhistory_df
 
+    def join_files(self, file_prefix, file_suffix):
+        '''Utility to join files that were written with different experiment configs'''
+        with open(file_prefix + file_suffix, 'ab') as combined_file:
+            i = 0
+            num_diff_lines = []
+            while True: 
+                if os.path.isfile(file_prefix + '_' + str(i) + file_suffix):
+                    with open(file_prefix + '_' + str(i) + file_suffix, 'rb') as curr_file:
+                        byte_string = curr_file.read()
+                        newline_count = byte_string.count(10)
+                        num_diff_lines.append(newline_count)
+                        # if newline_count != 21 and file_suffix == '.csv': #hack to check only train files and not eval
+                        #     warnings.warn('Expected 21 \\n chars in each stats file because we usually write stats every 1k timesteps for 20k timesteps. However, this can easily differ, e.g., for TD3 and DDPG where learning starts at 2k timesteps and there is 1 less \\n. Got only: ' + str(newline_count) + ' in file: ' + str(i))
+                        combined_file.write(byte_string)
+                else:
+                    break
+                i += 1
+            print(str(i) + " files were combined into 1 for file:" + file_prefix + '_n' + file_suffix)
+            # print("Files missing for config_nums:", missing_configs, ". Did you pass the right value for max_total_configs as an argument?")
+            # print("Unique line count values:", np.unique(num_diff_lines))
+            if i==0:
+                raise FileNotFoundError("No files to combine were present. Please check your location and/or filenames that they are correct.")
+
+    def _read_stats(self, stats_file):
+        if os.path.isfile(stats_file + '.csv'):
+            print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations.\033[0;0m")
+        else:
+            print("\033[1;31mLoading data from a distributed run of experiment configurations. Creating a combined CSV stats file.\033[0;0m")
+            self.join_files(stats_file,  '.csv')
+            self.join_files(stats_file, '_eval.csv')
+        
     def to_cave_csv(self, args):
         #file_path = args.file_path
         input_folder = "../mdp_files/"
@@ -117,6 +148,7 @@ class MDPPToCave():
         
         ## Read current csvs ##
         stats_file = os.path.join(dir_name, exp_name)
+        self._read_stats(stats_file)
         with open(stats_file + '.csv') as file_:
             col_names = file_.readline().strip().split(', ')
             col_names[0] = col_names[0][2:] # to remove '# ' that was written
@@ -204,7 +236,8 @@ class MDPPToCave():
                 
 if __name__ == "__main__":
     dir_name = '../../../mdp_files/'
-    exp_name = 'dqn_seq_del'
+    exp_name = 'rainbow_image_representations_tune_hps_cave_analysis'
+    dir_name += exp_name
     
     from cave.cavefacade import CAVE
     import os
@@ -214,7 +247,7 @@ if __name__ == "__main__":
     mdpp_cave = MDPPToCave(output_dir)
     cave_input_file = mdpp_cave.to_bohb_results(dir_name, exp_name)
 
-    cave_input_file = "../../../mdpp_to_cave/dqn_seq_del"
+    #cave_input_file = "../../../mdpp_to_cave/dqn_seq_del"
 
     # Similarly, as an example, cave will ouput it's results 
     # to the same directory as cave's input files
