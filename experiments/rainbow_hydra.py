@@ -101,7 +101,7 @@ var_agent_configs = OrderedDict({
     "target_network_update_freq": "int, log, [1, 2000]", # 800,
     "exploration_fraction": "float, [0.01, 0.99]", # 0.1,
     "n_step": "int, [1, 8]", # 1
-    "buffer_size": "int, log, [10, 20000]", # ?? 1000000,
+    "buffer_size": "int, log, [33, 20000]", # ?? 1000000, # Sizes up to 32 crashed with Ray 0.7.3 (but not always!), size 16 did not crash with Ray 0.9.0dev
     "adam_epsilon": "float, log, [1e-12, 1e-1]", # ?? 1e-4,
     "train_batch_size": "cat, [4, 8, 16, 32, 64, 128]", # 32,
 
@@ -140,7 +140,11 @@ cs = create_config_space_from_config_dict(var_agent_configs)
 print("Agent variable ConfigSpace:")
 print(cs)
 random_configs = cs.sample_configuration(size=num_agent_configs)
+# print("type(random_configs):", type(random_configs))
 for i in range(len(random_configs)):
+    # if random_configs[i].get_dictionary()["train_batch_size"] == 4 \
+    # and random_configs[i].get_dictionary()["buffer_size"] < 33:
+    #     print("Config:", i, "train_batch_size, buffer_size:", random_configs[i].get_dictionary()["train_batch_size"], random_configs[i].get_dictionary()["buffer_size"])
     random_configs[i] = tuple(random_configs[i].get_dictionary().values()) #hack ####TODO Change run_experiments.py and here to directly pass whole config dict to run_experiments.py. Would need to replace in every config.py file.
 # print(random_configs)
 

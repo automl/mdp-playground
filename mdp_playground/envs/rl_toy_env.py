@@ -1,4 +1,3 @@
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -6,7 +5,6 @@ from __future__ import print_function
 import sys, os
 import warnings
 import logging
-# import os
 import copy
 from datetime import datetime
 import numpy as np
@@ -14,115 +12,121 @@ import scipy
 from scipy import stats
 import gym
 from mdp_playground.spaces import BoxExtended, DiscreteExtended, TupleExtended, ImageMultiDiscrete
-# from gym.utils import seeding
 
 
 class RLToyEnv(gym.Env):
     """
-    The base environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible meta-features. The class extends OpenAI Gym's environment.
-
-    The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated object will emulate. We recommend looking at the examples in example.py to begin using the environment since the config options are mostly self-explanatory. For more details, we list here the meta-features and config options (their names here correspond to the keys to be passed in the config dict):
-        delay : int >= 0
-            Delays reward by this number of steps.
-        sequence_length : int >= 1
-            Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length rewardable at init if use_custom_mdp = false and generate_random_mdp = true.
-        transition_noise :
-            For discrete environments, a fraction = fraction of times environment, uniformly at random, transitions to a noisy state. For continuous environments, a Python function added to next state. This function receives the random number generator of the environment as an argument.
-        reward_noise :
-            A Python function added to the reward given at every time step. This function receives the random number generator of the environment as an argument.
-        reward_density :
-            The fraction of possible sequences of a given length that will be selected to be rewardable at init.
-        reward_scale :
-            Scales default reward function by this value.
-        reward_shift :
-            Shifts default reward function by this value.
-        diameter : int > 0
-            For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will, thus, be = (number of states) / (d).
-        terminal_state_density :
-            For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states, w.l.o.g. because discrete states are categorical. For continuous, see terminal_states and term_state_edge for how to control terminal states.
-        term_state_reward :
-            Adds this to the _current_ reward if a terminal state was reached at current time step.
-        irrelevant_features :
-            If True, additional irrelevant sub-space (irrelevant to achieving rewards) is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space. For discrete envs, additionally, state_space_size must be specified as a list and for continuous envs, relevant_indices must be specified.
-        use_custom_mdp :
-            If true, users specify their own custom transition and reward functions using config options.
-        transition_function :
-            A Python function emulating P(s, a). For discrete envs it's also possible to specify an |S|x|A| transition matrix.
-        reward_function :
-            A Python function emulating R(state_sequence, action_sequence). The state_sequence is recorded by the environment and transition_function is called before reward_function, so the "current" state (when step() was called) and next state are the last 2 states in the sequence. For discrete envs it's also possible to specify an |S|x|A| transition matrix where reward is assumed to be a function over "current" state and action. If use_custom_mdp = false and env. is continuous, a string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
-
-        Only for discrete environments:
-            state_space_size : int > 0
-                A number specifying size of state space for uni-discrete environments and a list of len = 2 when irrelevant_features is True (The list contains sizes of relevant and irrelevant sub-spaces where the 1st sub-space is assumed relevant and the 2nd sub-space is assumed irrelevant).
-            action_space_size : int > 0
-                Similar description as state_space_size. When generating MDPs, however, its value depends on the state_space_size and the diameter.
-            reward_dist :
-                A Python function to sample rewards that will be handed out for randomly generated sequences when generate_random_mdp = True. This function receives the random number generator and rewardable_sequences dict of the environment as arguments.
-            image_representations : boolean
-                Boolean to associate an image as the external observation with every discrete categorical state. This is handled by a ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n.
-
-            Only for image_representations:
-                image_transforms :
-                    String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever it is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.
-                sh_quant :
-                    An int to quantise the shift transforms.
-                scale_range :
-                    A tuple of real numbers to specify (min_scaling, max_scaling).
-                ro_quant :
-                    An int to quantise the rotation transforms.
-
-        Only for continuous environments:
-            state_space_dim :
-                A number specifying dimensionality. A Gym Box will be instantiated.
-            action_space_dim :
-                Same description as state_space_dim.
-            relevant_indices :
-                A list that provides the relevant "dimensions" for continuous environments. The dynamics for these dimensions are independent of the dynamics for the remaining (irrelevant) dimensions.
-            state_space_max :
-                Max absolute value that a dimension of the space can take. A Gym Box will be instantiated with range [-state_space_max, state_space_max]. Sampling will be done as for Gym Box spaces.
-            action_space_max :
-                Same description as state_space_max.
-            terminal_states :
-                The centres of hypercube subspaces which are terminal.
-            term_state_edge :
-                The edge of the hypercube subspaces which are terminal.
-            transition_dynamics_order :
-                An order of n implies that the n-th state derivative is set equal to the action/inertia.
-            inertia :
-                inertia of the rigid body or point object that is being simulated
-            time_unit :
-                time duration over which the action is applied to the system
-            target_point :
-                The target point in case move_to_a_point a is the reward_function. If make_denser is true, target_radius determines distance from target point at which reward is handed out.
-            action_loss_weight :
-                A coefficient to multiply the norm of the action and subtract it from the reward to penalise action magnitude
-
-    Other important config:
-        Only for discrete environments:
-            generate_random_mdp : boolean
-                If true, random MDPs are generated
-            repeats_in_sequences : boolean
-                If true, allows sequences to have repeating states in them.
-            completely_connected : boolean
-                If true, sets the transition function such that every state can transition to every other state, including itself.
-            reward_every_n_steps : boolean
-                Hand out rewards only at multiples of sequence_length steps. This makes chances of having overlapping rewarding sequences that one is on 0 and makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either make_denser case or continuous environments.
-
-        Only for continuous environments:
-            none as of now
-
-        make_denser :
-            If true, makes the reward denser in environments. For discrete environments, hands out a reward for completing part of a sequence. For continuous environment, for reward function move_to_a_point, it's based on the distance moved towards the target point.
-        seed :
-            Recommended to be passed as an int which generates seeds to be used for various components of the environment. It is however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for it below to see how to do that.
-        log_filename :
-            The name of the log file to which logs are written.
-        log_level :
-            Python log level for logging
+    The base toy environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible dimensions from the accompanying research paper. The class extends OpenAI Gym's environment gym.Env.
 
     The accompanying paper is available at: https://arxiv.org/abs/1909.07750.
 
-    Instead of implementing a new class for every type of MDP, the intent is to capture as many common meta-features across different types of environments as possible and to be able to control the difficulty of an envrionment by allowing fine-grained control over each of these meta-features. The focus is to be as flexible as possible. Mixed continuous and discrete state and action spaces are currently not supported.
+    Instead of implementing a new class for every type of MDP, the intent is to capture as many common dimensions across different types of environments as possible and to be able to control the difficulty of an environment by allowing fine-grained control over each of these dimensions. The focus is to be as flexible as possible.
+
+    The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated environment will emulate. We recommend looking at the examples in example.py to begin using the environment since the dimensions and config options are mostly self-explanatory. If you want to specify custom MDPs, please see the use_custom_mdp config option below. For more details, we list here the dimensions and config options (their names here correspond to the keys to be passed in the config dict):
+        delay : int >= 0
+            Delays each reward by this number of timesteps.
+        sequence_length : int >= 1
+            Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length are set to be rewardable at initialisation if use_custom_mdp = false and generate_random_mdp = true.
+        transition_noise : float in range [0, 1] or Python function(rng)
+            For discrete environments, it is a float that specifies the fraction of times the environment transitions to a noisy next state at each timestep, independently and uniformly at random. For continuous environments, it is a Python function with one argument that is added to next state. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.
+        reward_noise : Python function(rng)
+            A Python function with one argument that is added to the reward given at every time step. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.
+        reward_density : float in range [0, 1]
+            The fraction of possible sequences of a given length that will be selected to be rewardable at initialisation time.
+        reward_scale : float
+            Multiplies the rewards by this value at every time step.
+        reward_shift : float
+            This value is added to the reward at every time step.
+        diameter : int > 0
+            For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will, thus, be = (number of states) / (d).
+        terminal_state_density : float in range [0, 1]
+            For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states when we consider them to be ordered by their numerical value. This is w.l.o.g. because discrete states are categorical. For continuous environments, please see terminal_states and term_state_edge for how to control terminal states.
+        term_state_reward : float
+            Adds this to the reward if a terminal state was reached at the current time step.
+        irrelevant_features : boolean
+            If True, an additional irrelevant sub-space (irrelevant to achieving rewards) is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space. For discrete environments, additionally, state_space_size must be specified as a list. For continuous environments, the option relevant_indices must be specified. This option specifies the dimensions relevant to achieving rewards.
+        use_custom_mdp : boolean
+            If true, users specify their own transition and reward functions using the config options transition_function and reward_function (see below). Optionally, they can also use init_state_dist and terminal_states for discrete spaces (see below).
+        transition_function : Python function(state, action) or a 2-D numpy.ndarray
+            A Python function emulating P(s, a). For discrete envs it's also possible to specify an |S|x|A| transition matrix.
+        reward_function : Python function(state_sequence, action_sequence) or a 2-D numpy.ndarray
+            A Python function emulating R(state_sequence, action_sequence). The state_sequence is recorded by the environment and transition_function is called before reward_function, so the "current" state (when step() was called) and next state are the last 2 states in the sequence. For discrete environments, it's also possible to specify an |S|x|A| transition matrix where reward is assumed to be a function over the "current" state and action. If use_custom_mdp = false and the environment is continuous, this is a string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
+
+
+        Specific to discrete environments:
+            state_space_size : int > 0
+                A number specifying size of the state space for normal discrete environments and a list of len = 2 when irrelevant_features is True (The list contains sizes of relevant and irrelevant sub-spaces where the 1st sub-space is assumed relevant and the 2nd sub-space is assumed irrelevant).
+            action_space_size : int > 0
+                Similar description as state_space_size. When automatically generating MDPs, however, its value depends on the state_space_size and the diameter.
+            reward_dist : Python function(env_rng, reward_sequence_dict)
+                A Python function that samples rewards for the rewardable_sequences dict of the environment. The rewardable_sequences dict of the environment holds the rewardable_sequences with the key as a tuple holding the sequence and value as the reward handed out. The 1st argument for the reward_dist function is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used to sample rewards to ensure reproducibility. The 2nd argument is the rewardable_sequences dict of the environment. This is available because one may need access to the already created reward sequences in the reward_dist function.
+            init_state_dist : 1-D numpy.ndarray
+                Specifies an array of initialisation probabilities for the discrete state space.
+            terminal_states : Python function(state) or 1-D numpy.ndarray
+                A Python function with the state as argument that returns whether the state is terminal. If this is specified as an array, the array lists the discrete states that are terminal.
+            image_representations : boolean
+                Boolean to associate an image as the external observation with every discrete categorical state. This is handled by an mdp_playground.spaces.ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n. More details can be found in the documentation for the ImageMultiDiscrete class.
+
+            Specific to image_representations:
+                image_transforms : str
+                    String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever an observation is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.
+                sh_quant : int
+                    An int to quantise the shift transforms.
+                scale_range : (float, float)
+                    A tuple of real numbers to specify (min_scaling, max_scaling).
+                ro_quant : int
+                    An int to quantise the rotation transforms.
+
+        Specific to continuous environments:
+            state_space_dim : int
+                A number specifying state space dimensionality. A Gym Box space of this dimensionality will be instantiated.
+            action_space_dim : int
+                Same description as state_space_dim. This is currently set equal to the state_space_dim and doesn't need to specified.
+            relevant_indices : list
+                A list that provides the dimensions relevant to achieving rewards for continuous environments. The dynamics for these dimensions are independent of the dynamics for the remaining (irrelevant) dimensions.
+            state_space_max : float
+                Max absolute value that a dimension of the space can take. A Gym Box will be instantiated with range [-state_space_max, state_space_max]. Sampling will be done as for Gym Box spaces.
+            action_space_max : float
+                Similar description as for state_space_max.
+            terminal_states : numpy.ndarray
+                The centres of hypercube sub-spaces which are terminal.
+            term_state_edge : float
+                The edge of the hypercube sub-spaces which are terminal.
+            transition_dynamics_order : int
+                An order of n implies that the n-th state derivative is set equal to the action/inertia.
+            inertia : float or numpy.ndarray
+                inertia of the rigid body or point object that is being simulated. If numpy.ndarray, it specifies independent inertiae for the dimensions and the shape should be (state_space_dim,).
+            time_unit : float
+                time duration over which the action is applied to the system.
+            target_point : numpy.ndarray
+                The target point in case move_to_a_point is the reward_function. If make_denser is false, target_radius determines distance from the target point at which the sparse reward is handed out.
+            action_loss_weight : float
+                A coefficient to multiply the norm of the action and subtract it from the reward to penalise the action magnitude.
+
+    Other important config:
+        Specific to discrete environments:
+            repeats_in_sequences : boolean
+                If true, allows rewardable sequences to have repeating states in them.
+            maximally_connected : boolean
+                If true, sets the transition function such that every state in independent set i can transition to every state in independent set i + 1. If false, then sets the transition function such that a state in independent set i may have any state in independent set i + 1 as the next state for a transition.
+            reward_every_n_steps : boolean
+                Hand out rewards only at multiples of sequence_length steps. This makes the probability that an agent is executing overlapping rewarding sequences 0. This makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either the make_denser = true case or for continuous environments.
+            generate_random_mdp : boolean
+                If true, automatically generate MDPs when use_custom_mdp = false. Currently, this option doesn't need to be specified because random MDPs are always generated when use_custom_mdp = false.
+
+        Specific to continuous environments:
+            none as of now
+
+        For both, continuous and discrete environments:
+        make_denser : boolean
+            If true, makes the reward denser in environments. For discrete environments, hands out a partial reward for completing partial sequences. For continuous environments, for reward function move_to_a_point, the base reward handed out is equal to the distance moved towards the target point in the current timestep.
+        seed : int or dict
+            Recommended to be passed as an int which generates seeds to be used for the various components of the environment. It is, however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for seeds below to see how to do that.
+        log_filename : str
+            The name of the log file to which logs are written.
+        log_level : logging.LOG_LEVEL option
+            Python log level for logging
+
     Below, we list the important attributes and methods for this class.
 
     Attributes
@@ -130,13 +134,13 @@ class RLToyEnv(gym.Env):
     config : dict
         the config contains all the details required to generate an environment
     seed : int or dict
-        recommended to set to int, which would set seeds for the env, relevant and irrelevant and externally visible observation and action spaces automatically. If fine-grained control over the seeds is necessary, a dict, with key values as in the source code further below, can be passed
+        recommended to set to an int, which would set seeds for the env, relevant and irrelevant and externally visible observation and action spaces automatically. If fine-grained control over the seeds is necessary, a dict, with key values as in the source code further below, can be passed.
     observation_space : Gym.Space
-        The externally visible observation space for the enviroment
+        The externally visible observation space for the enviroment.
     action_space : Gym.Space
-        The externally visible action space for the enviroment
+        The externally visible action space for the enviroment.
     rewardable_sequences : dict
-        holds the rewardable sequences. The keys are tuples of rewardable sequences and values are the rewards handed out. When make_denser is True, this dict also holds the rewardable sub-sequences.
+        holds the rewardable sequences. The keys are tuples of rewardable sequences and values are the rewards handed out. When make_denser is True for discrete environments, this dict also holds the rewardable partial sequences.
 
     Methods
     -------
@@ -167,7 +171,7 @@ class RLToyEnv(gym.Env):
     """
 
     def __init__(self, **config): # = None):
-        """Initialises the MDP to be emulated using the settings provided in config
+        """Initialises the MDP to be emulated using the settings provided in config.
 
         Parameters
         ----------
@@ -175,8 +179,9 @@ class RLToyEnv(gym.Env):
             the member variable config is initialised to this value after inserting defaults
         """
 
-        print("Passed config:", config)
-        # Set default settings for config to be able to use class without any config passed
+        print("Passed config:", config, "\n")
+
+        # Set default settings for config to be able to use class without any config being passed
         if len(config) == 0: #is None:
             # config = {}
 
@@ -196,8 +201,8 @@ class RLToyEnv(gym.Env):
             # config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
             # config["action_space_max"] = 5 # Will be a Box in the range [-max, max]
             # config["time_unit"] = 0.01 # Discretization of time domain
-            config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
-            config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
+            # config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
+            # config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
 
             # config for user specified P, R, rho_0, T. Examples here are for discrete spaces
             # config["transition_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["action_space_size"])]) #TODO ###IMP For all these prob. dist., there's currently a difference in what is returned for discrete vs continuous!
@@ -217,14 +222,19 @@ class RLToyEnv(gym.Env):
             # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
             config["make_denser"] = False
             config["terminal_state_density"] = 0.25 # Number between 0 and 1
-            config["completely_connected"] = True # Make every state reachable from every state; If completely_connected, then no. of actions has to be at least equal to no. of states( - 1 if without self-loop); if repeating sequences allowed, then we have to have self-loops. Self-loops are ok even in non-repeating sequences - we just have a harder search problem then! Or make it maximally connected by having transitions to as many different states as possible - the row for P would have as many different transitions as possible!
+            config["maximally_connected"] = True # Make every state reachable from every state; If maximally_connected, then no. of actions has to be at least equal to no. of states( - 1 if without self-loop); if repeating sequences allowed, then we have to have self-loops. Self-loops are ok even in non-repeating sequences - we just have a harder search problem then! Or make it maximally connected by having transitions to as many different states as possible - the row for P would have as many different transitions as possible!
             # print(config)
             #TODO asserts for the rest of the config settings
             # next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
 
             config["seed"] = 0
 
-        print("\033[32;1m========================================================Initialising Toy MDP========================================================\033[0m")
+        # Print initial "banner"
+        screen_output_width = 132 #hardcoded #TODO get from system
+        repeat_equal_sign = (screen_output_width - 20) // 2
+        set_ansi_escape = "\033[32;1m"
+        reset_ansi_escape = "\033[0m"
+        print(set_ansi_escape + "=" * repeat_equal_sign + "Initialising Toy MDP" + "=" * repeat_equal_sign + reset_ansi_escape)
         print("Current working directory:", os.getcwd())
 
         # Set other default settings for config to use if config is passed without any values for them
@@ -295,8 +305,14 @@ class RLToyEnv(gym.Env):
             if self.use_custom_mdp:
                 assert "transition_function" in config
                 assert "reward_function" in config
-                if config["state_space_type"] == "discrete":
-                    assert "init_state_dist" in config
+                # if config["state_space_type"] == "discrete":
+                #     assert "init_state_dist" in config
+
+        if not self.use_custom_mdp:
+            if "generate_random_mdp" not in config:
+                self.generate_random_mdp = True
+            else:
+                self.generate_random_mdp = config["generate_random_mdp"]
 
         if "term_state_reward" not in config:
             self.term_state_reward = 0.0
@@ -324,6 +340,11 @@ class RLToyEnv(gym.Env):
         else:
             self.make_denser = config["make_denser"]
 
+        if "maximally_connected" not in config:
+            self.maximally_connected = True
+        else:
+            self.maximally_connected = config["maximally_connected"]
+
         if "reward_scale" not in config:
             self.reward_scale = 1.0
         else:
@@ -343,9 +364,23 @@ class RLToyEnv(gym.Env):
             self.image_representations = False
         else:
             self.image_representations = config["image_representations"]
+            if "image_transforms" in config:
+                self.image_transforms = config["image_transforms"]
+            else:
+                self.image_transforms = "none"
+
+            if "image_width" in config:
+                self.image_width = config["image_width"]
+            else:
+                self.image_width = 100
+
+            if "image_height" in config:
+                self.image_height = config["image_height"]
+            else:
+                self.image_height = 100
 
             if "image_sh_quant" not in config:
-                if 'shift' in config["image_transforms"]:
+                if 'shift' in self.image_transforms:
                     warnings.warn("Setting image shift quantisation to default of 1, since no config value provided for it.")
                     self.image_sh_quant = 1
                 else:
@@ -354,7 +389,7 @@ class RLToyEnv(gym.Env):
                 self.image_sh_quant = config["image_sh_quant"]
 
             if "image_ro_quant" not in config:
-                if 'rotate' in config["image_transforms"]:
+                if 'rotate' in self.image_transforms:
                     warnings.warn("Setting image rotate quantisation to default of 1, since no config value provided for it.")
                     self.image_ro_quant = 1
                 else:
@@ -363,7 +398,11 @@ class RLToyEnv(gym.Env):
                 self.image_ro_quant = config["image_ro_quant"]
 
             if "image_scale_range" not in config:
-                self.image_scale_range = None # (0.5, 1.5)
+                if 'scale' in self.image_transforms:
+                    warnings.warn("Setting image scale range to default of (0.5, 1.5), since no config value was provided for it.")
+                    self.image_scale_range = (0.5, 1.5)
+                else:
+                    self.image_scale_range = None
             else:
                 self.image_scale_range = config["image_scale_range"]
 
@@ -380,6 +419,8 @@ class RLToyEnv(gym.Env):
 
         else: # cont. spaces
             # if not self.use_custom_mdp:
+            self.state_space_dim = config["state_space_dim"]
+
             if "transition_dynamics_order" not in config:
                 self.dynamics_order = 1
             else:
@@ -421,7 +462,8 @@ class RLToyEnv(gym.Env):
 
         #TODO Make below code more compact by reusing parts for state and action spaces?
         config["state_space_type"] = config["state_space_type"].lower()
-        config["action_space_type"] = config["action_space_type"].lower()
+        config["action_space_type"] = config["state_space_type"]
+        # config["action_space_type"] = config["action_space_type"].lower()
 
         if config["state_space_type"] == "discrete":
             if self.irrelevant_features:
@@ -438,25 +480,26 @@ class RLToyEnv(gym.Env):
             self.action_space_size = np.array(self.state_space_size) // np.array(self.diameter)
             assert (np.array(self.state_space_size) % np.array(self.diameter) == 0).all(), "state_space_size should be a multiple of the diameter to allow for the generation of regularly connected MDPs."
         else: # cont. space
+            self.action_space_dim = self.state_space_dim
             if self.irrelevant_features:
                 assert "relevant_indices" in config, "Please provide dimensions of state space relevant to rewards."
             if "relevant_indices" not in config:
-                config["relevant_indices"] = range(config["state_space_dim"])
+                config["relevant_indices"] = range(self.state_space_dim)
             # config["irrelevant_indices"] = list(set(range(len(config["state_space_dim"]))) - set(config["relevant_indices"]))
 
         if ("init_state_dist" in config) and ("relevant_init_state_dist" not in config):
             config["relevant_init_state_dist"] = config["init_state_dist"]
 
 
-        assert config["action_space_type"] == config["state_space_type"], 'config["state_space_type"] != config["action_space_type"]. Currently mixed space types are not supported.'
+        # assert config["action_space_type"] == config["state_space_type"], 'config["state_space_type"] != config["action_space_type"]. Currently mixed space types are not supported.'
         assert self.sequence_length > 0, "config[\"sequence_length\"] <= 0. Set to: " + str(self.sequence_length) # also should be int
-        if "completely_connected" in config and config["completely_connected"]: #### TODO remove
+        if "maximally_connected" in config and config["maximally_connected"]: ###TODO remove
             pass
-            # assert config["state_space_size"] == config["action_space_size"], "config[\"state_space_size\"] != config[\"action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values. Vals: " + str(config["state_space_size"]) + " " + str(config["action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
-            # assert config["irrelevant_state_space_size"] == config["irrelevant_action_space_size"], "config[\"irrelevant_state_space_size\"] != config[\"irrelevant_action_space_size\"]. For completely_connected transition graphs, they should be equal. Please provide valid values! Vals: " + str(config["irrelevant_state_space_size"]) + " " + str(config["irrelevant_action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!" #TODO Currently, irrelevant dimensions have a P similar to that of relevant dimensions. Should this be decoupled?
+            # assert config["state_space_size"] == config["action_space_size"], "config[\"state_space_size\"] != config[\"action_space_size\"]. For maximally_connected transition graphs, they should be equal. Please provide valid values. Vals: " + str(config["state_space_size"]) + " " + str(config["action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!"
+            # assert config["irrelevant_state_space_size"] == config["irrelevant_action_space_size"], "config[\"irrelevant_state_space_size\"] != config[\"irrelevant_action_space_size\"]. For maximally_connected transition graphs, they should be equal. Please provide valid values! Vals: " + str(config["irrelevant_state_space_size"]) + " " + str(config["irrelevant_action_space_size"]) + ". In future, \"maximally_connected\" graphs are planned to be supported!" #TODO Currently, irrelevant dimensions have a P similar to that of relevant dimensions. Should this be decoupled?
 
         if config["state_space_type"] == 'continuous':
-            assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
+            # assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
             if config["reward_function"] == "move_to_a_point":
                 config["target_point"] = np.array(config["target_point"], dtype=self.dtype)
                 assert config["target_point"].shape == (len(config["relevant_indices"]),), "target_point should have dimensionality = relevant_state_space dimensionality"
@@ -483,7 +526,7 @@ class RLToyEnv(gym.Env):
 
             if self.image_representations:
                 # underlying_obs_space = MultiDiscreteExtended(self.state_space_size, seed=self.seed_dict["state_space"]) #seed
-                self.observation_space = ImageMultiDiscrete(self.state_space_size, width=config["image_width"], height=config["image_height"], transforms=config["image_transforms"], sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=20, seed=self.seed_dict["image_representations"]) #seed
+                self.observation_space = ImageMultiDiscrete(self.state_space_size, width=self.image_width, height=self.image_height, transforms=self.image_transforms, sh_quant=self.image_sh_quant, scale_range=self.image_scale_range, ro_quant=self.image_ro_quant, circle_radius=20, seed=self.seed_dict["image_representations"]) #seed
                 if self.irrelevant_features:
                     self.action_space = TupleExtended(self.action_spaces, seed=self.seed_dict["action_space"]) #seed
                 else:
@@ -499,11 +542,11 @@ class RLToyEnv(gym.Env):
 
         else: # cont. spaces
             self.state_space_max = config["state_space_max"] if 'state_space_max' in config else np.inf # should we select a random max? #test?
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(config["state_space_dim"], ), seed=self.seed_dict["state_space"], dtype=self.dtype) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
+            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(self.state_space_dim, ), seed=self.seed_dict["state_space"], dtype=self.dtype) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
 
             self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
             # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
-            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(config["action_space_dim"], ), seed=self.seed_dict["action_space"], dtype=self.dtype) #seed # hack #TODO
+            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(self.action_space_dim, ), seed=self.seed_dict["action_space"], dtype=self.dtype) #seed # hack #TODO
 
 
         # if config["action_space_type"] == "discrete":
@@ -608,7 +651,7 @@ class RLToyEnv(gym.Env):
                 # relevant dimensions part
                 self.config["transition_function"] = np.zeros(shape=(self.state_space_size[0], self.action_space_size[0]), dtype=object) #hardcoded
                 self.config["transition_function"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
-                if self.config["completely_connected"]:
+                if self.maximally_connected:
                     if self.diameter == 1: #hack # TODO Remove this if block; this case is currently separately handled just so that tests do not fail. Using prob=prob in the sample call causes the sampling to change even if the probabilities remain the same. All solutions I can think of are hacky except changing the expected values in all the test cases which would take quite some time.
                         for s in range(self.state_space_size[0]):
                             self.config["transition_function"][s] = self.observation_spaces[0].sample(size=self.action_space_size[0], replace=False) #random #TODO Preferably use the seed of the Env for this? #hardcoded
@@ -630,7 +673,7 @@ class RLToyEnv(gym.Env):
                             # self.config["transition_function"][s] = self.observation_spaces[0].sample(max=self.action_space_size[0], size=self.action_space_size[0], replace=False) #random #TODO Preferably use the seed of the Env for this? #hardcoded
                             # Set the transitions from current state to be to the next independent set's states
                             # self.config["transition_function"][s] += ((i_s + 1) * self.action_space_size[0]) % self.state_space_size[0]
-                else: # if not completely_connected
+                else: # if not maximally_connected
                     for s in range(self.state_space_size[0]):
                         i_s = s // self.action_space_size[0] # select the current independent set number
 
@@ -659,7 +702,7 @@ class RLToyEnv(gym.Env):
                 if self.irrelevant_features: #test
                     self.config["transition_function_irrelevant"] = np.zeros(shape=(self.state_space_size[1], self.action_space_size[1]), dtype=object)
                     self.config["transition_function_irrelevant"][:] = -1 #IMP # To avoid having a valid value from the state space before we actually assign a usable value below!
-                    if self.config["completely_connected"]:
+                    if self.maximally_connected:
                         for s in range(self.state_space_size[1]):
                             i_s = s // self.action_space_size[1] # select the current independent set number
 
@@ -700,7 +743,7 @@ class RLToyEnv(gym.Env):
             if not callable(self.config["transition_function"]):
                 self.transition_matrix = self.config["transition_function"]
                 self.config["transition_function"] = lambda s, a: self.transition_matrix[s, a]
-                print("transition_matrix inited to:" + str(self.transition_matrix) + "Python type of state: " + str(type(self.config["transition_function"](0, 0)))) # The Python type of the state can lead to hard to catch bugs
+                print("transition_matrix inited to:\n" + str(self.transition_matrix) + "\nPython type of state: " + str(type(self.config["transition_function"](0, 0)))) # The Python type of the state can lead to hard to catch bugs
 
         else: # if continuous space
             # self.logger.debug("# TODO for cont. spaces") # transition function is a fixed parameterisation for cont. envs. right now.
@@ -891,7 +934,7 @@ class RLToyEnv(gym.Env):
                 next_state = self.config["transition_function"](state, action)
             else:
                 assert len(action.shape) == 1, 'Action should be specified as a 1-D tensor. However, shape of action was: ' + str(action.shape)
-                assert action.shape[0] == self.config['action_space_dim'], 'Action shape is: ' + str(action.shape[0]) + '. Expected: ' + str(self.config['action_space_dim'])
+                assert action.shape[0] == self.action_space_dim, 'Action shape is: ' + str(action.shape[0]) + '. Expected: ' + str(self.action_space_dim)
                 if self.action_space.contains(action):
                     ### TODO implement for multiple orders, currently only for 1st order systems.
                     # if self.dynamics_order == 1:
@@ -920,7 +963,7 @@ class RLToyEnv(gym.Env):
                 self.logger.info("next_state out of bounds. next_state, clipping to" + str(next_state) + str(np.clip(next_state, -self.state_space_max, self.state_space_max)))
                 next_state = np.clip(next_state, -self.state_space_max, self.state_space_max) # Could also "reflect" next_state when it goes out of bounds. Would seem more logical for a "wall", but would need to take care of multiple reflections near a corner/edge.
                 # Resets all higher order derivatives to 0
-                zero_state = np.array([0.0] * (self.config['state_space_dim']), dtype=self.dtype)
+                zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype)
                 self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
                 self.state_derivatives[0] = next_state
 
@@ -1085,7 +1128,7 @@ class RLToyEnv(gym.Env):
             state, action = self.curr_state, action
 
 
-        ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a meta-feature? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
+        ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a dimension? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
 
         next_state = self.P(state, action) ###TODO P uses last state while R uses augmented state; for cont. env, P does know underlying state_derivatives - we don't want this to be the case for the imaginary rollout scenario;
 
@@ -1232,12 +1275,12 @@ class RLToyEnv(gym.Env):
 
             # if not self.use_custom_mdp:
             # init the state derivatives needed for continuous spaces
-            zero_state = np.array([0.0] * (self.config['state_space_dim']), dtype=self.dtype)
+            zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype)
             self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
             self.curr_obs = self.curr_state
 
-            self.augmented_state = [[np.nan] * self.config["state_space_dim"] for i in range(self.augmented_state_length - 1)]
+            self.augmented_state = [[np.nan] * self.state_space_dim for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state.copy())
 
         self.logger.info("RESET called. curr_state reset to: " + str(self.curr_state))
@@ -1322,7 +1365,7 @@ if __name__ == "__main__":
     # config["reward_density"] = 0.25 # Number between 0 and 1
     # config["make_denser"] = True
     # config["terminal_state_density"] = 0.25 # Number between 0 and 1
-    # config["completely_connected"] = True # Make every state reachable from every state
+    # config["maximally_connected"] = True # Make every state reachable from every state
     # config["repeats_in_sequences"] = False
     # config["delay"] = 1
     # config["sequence_length"] = 3

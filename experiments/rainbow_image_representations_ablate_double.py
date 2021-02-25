@@ -33,7 +33,7 @@ var_env_configs = OrderedDict({
     'image_scale_range': [(0.5, 2)],
     'image_width': [100],
     'image_height': [100],
-    # 'ablate': ['none'],
+    'ablate': ['double'],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -59,7 +59,7 @@ algorithm = "DQN"
 agent_config = {
     "adam_epsilon": 1e-4,
     "buffer_size": 1000000,
-    "double_q": True,
+    "double_q": False,
     "dueling": True,
     "lr": 1e-4,
     "exploration_final_eps": 0.01,

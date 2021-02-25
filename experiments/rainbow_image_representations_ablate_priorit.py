@@ -33,7 +33,7 @@ var_env_configs = OrderedDict({
     'image_scale_range': [(0.5, 2)],
     'image_width': [100],
     'image_height': [100],
-    # 'ablate': ['none'],
+    'ablate': ['prio_repl'],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -71,7 +71,7 @@ agent_config = {
     "n_step": 1, # delay + sequence_length [1, 2, 4, 8]
     "noisy": True,
     "num_atoms": 10, # [5, 10, 20]
-    "prioritized_replay": True,
+    "prioritized_replay": False,
     "prioritized_replay_alpha": 0.75, #
     "prioritized_replay_beta": 0.4,
     "final_prioritized_replay_beta": 1.0, #
