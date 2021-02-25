@@ -229,4 +229,7 @@ if __name__ == "__main__":
     import mdp_playground
     import gym
     gym.make('RLToy-v0')
-    gym.make('RLToy-v0', **{'state_space_size':8, 'action_space_size':8, 'state_space_type':'discrete', 'action_space_type':'discrete', 'terminal_state_density':0.25, 'maximally_connected': True})
+    env = gym.make('RLToyFiniteHorizon-v0', **{'state_space_size':8, 'action_space_size':8, 'state_space_type':'discrete', 'action_space_type':'discrete', 'terminal_state_density':0.25, 'maximally_connected': True})
+    env.reset()
+    for i in range(10):
+        print(env.step(env.action_space.sample()))
