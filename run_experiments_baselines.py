@@ -21,11 +21,13 @@ print("default_config:", default_config)
 
 import gym
 from gym.wrappers.time_limit import TimeLimit
+#from gym.wrappers.monitor import Monitor
 
 import tensorflow as tf
 import stable_baselines as sb
 from stable_baselines import DQN, DDPG, SAC, A2C, TD3
 from stable_baselines.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
+from stable_baselines.common.vec_env import DummyVecEnv, VecNormalize, VecEnv
 from stable_baselines.common.env_checker import check_env
 from stable_baselines.common.tf_layers import conv, linear, conv_to_fc, lstm
 from stable_baselines.common.vec_env import DummyVecEnv, VecEnv, sync_envs_normalization
@@ -50,7 +52,8 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         self,
         eval_env: Union[gym.Env, VecEnv],
         n_eval_episodes: int = 5,
-        eval_freq: int = 10000,
+        eval_interval: int = 1,
+        timesteps_per_iteration: int = 1000,
         deterministic: bool = True,
         verbose: int = 1,
         file_name: str = "./evaluation.csv",
@@ -59,15 +62,16 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
     ):
         super(CustomCallback, self).__init__(verbose=verbose)
         self.n_eval_episodes = n_eval_episodes
-        self.eval_freq = eval_freq
+        self.eval_freq = timesteps_per_iteration * eval_interval
         self.deterministic = deterministic
         self.file_name = file_name
+        self.timesteps_per_iteration = timesteps_per_iteration
         self.training_iteration = 1
-        self.timesteps_per_iteration = 0
-        self.last_iter_ts = 0
+        self.total_timesteps = 0
         self.config_algorithm = config_algorithm
         self.var_configs = var_configs
         self.last_episode_count = 0
+        self.episodes_in_iter = 0
         # Convert to VecEnv for consistency
         if not isinstance(eval_env, VecEnv):
             eval_env = DummyVecEnv([lambda: eval_env])
@@ -79,8 +83,14 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
     
     #evaluate policy when step % eval_freq == 0, return rewards and lengths list of n_eval_episodes elements
     def _on_step(self):
-        #count steps per iteration
-        self.timesteps_per_iteration+=1
+        #count steps
+        self.total_timesteps+=1
+        #training log
+        if(self.total_timesteps % self.timesteps_per_iteration == 0): #training iteration done, log train csv
+            self.write_train_result()
+            self.training_iteration+=1
+
+        #evaluation
         if self.eval_freq > 0 and self.n_calls % self.eval_freq == 0:
             # Sync training and eval env if there is VecNormalize
             sync_envs_normalization(self.training_env, self.eval_env)
@@ -92,14 +102,9 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
                 render=False,
                 deterministic=self.deterministic,
                 return_episode_rewards=True,
-            )
-            
-            #write csv results
-            self.write_train_result()
+            )    
+            #write evaluation csv
             self.write_eval_results(episode_rewards, episode_lengths)
-            # self.last_iter_ts = self.timesteps_per_iteration
-            # self.timesteps_per_iteration = 0
-            self.training_iteration+=1
 
             mean_reward, std_reward = np.mean(episode_rewards), np.std(episode_rewards)
             mean_ep_length, std_ep_length = np.mean(episode_lengths), np.std(episode_lengths)
@@ -120,8 +125,11 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
             
     # Write training stats to CSV file at end of every training iteration
     def write_train_result(self):
-        env, training_iteration, timesteps_total = self.training_env, self.training_iteration, self.timesteps_per_iteration
+        env, training_iteration, total_timesteps = self.training_env, self.training_iteration, self.total_timesteps
         file_name, config_algorithm, var_configs = self.file_name, self.config_algorithm, self.var_configs
+
+        if isinstance(env, VecEnv):
+            env = env.unwrapped.envs[0]#only using one environment
 
         #A2C can handle multiple envs..
         if(self.config_algorithm == "A2C" or self.config_algorithm =="A3C"):
@@ -147,25 +155,30 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
                     else:
                         fout.write(str(getattr(self.model, "policy_kwargs")[key]).replace(' ', '') + ' ')
 
-        # Write train stats
-        rewards = env.get_episode_rewards()
+        # Write train statss
+        episode_rewards = env.get_episode_rewards()
         episode_lengths = env.get_episode_lengths()
-        episode_times = env.get_episode_times()
-        total_steps = env.get_total_steps()
-        if(len(rewards) == 0):#no episodes yet
-            episode_reward_mean = np.mean( env.rewards )
-            episode_len_mean = env.total_steps
+        #update episodes
+        n_episodes = len(episode_rewards)
+        self.episodes_in_iter = n_episodes - self.last_episode_count
+        if(self.episodes_in_iter == 0):#no episodes in iteration
+            if(n_episodes) == 0: #special case when there are no episodes so far
+                episode_reward_mean = np.sum(env.rewards)#cummulative reward so far
+                episode_len_mean = env.get_total_steps()#all steps so far
+            else:#iteration end, no episode end
+                # start = self.timesteps_per_iteration*training_iteration
+                # episode_reward_mean = np.sum(env.rewards[start:])
+                # episode_length_mean = self.timesteps_per_iteration
+                episode_reward_mean = np.mean(episode_rewards)
+                episode_length_mean = self.timesteps_per_iteration
         else:
-            #episode stats are from all steps taken in env then we need to count "iterations" mean per iteration
-            # n_episodes = len(episode_lengths)
-            # episode_reward_mean = np.mean(rewards[self.last_episode_count: n_episodes])
-            # episode_len_mean =  np.mean(episode_lengths[self.last_episode_count: n_episodes])
-            # self.last_episode_count =  n_episodes
-            episode_reward_mean = np.mean(rewards)
-            episode_len_mean = np.mean(episode_lengths)
-
-        fout.write(str(timesteps_total) + ' ' + str(episode_reward_mean) +
-                ' ' + str(episode_len_mean) + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
+            # episode stats are from all steps taken in env then we need to take mean over "iterations":
+            #start , stop =  self.last_episode_count, self.last_episode_count + self.episodes_in_iter - 1
+            episode_reward_mean = np.mean(episode_rewards[self.last_episode_count : ])
+            episode_length_mean = np.mean(episode_lengths[self.last_episode_count : ])
+        self.last_episode_count = n_episodes
+        fout.write(str(total_timesteps) + ' ' + str(episode_reward_mean) +
+                ' ' + str(episode_length_mean) + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
         fout.close()
 
         # We did not manage to find an easy way to log evaluation stats for Ray without the following hack which demarcates the end of a training iteration in the evaluation stats file
@@ -341,7 +354,8 @@ def agent_to_baselines(config):
 
         exchange_keys = [('noisy', 'param_noise'),
                         ('lr','learning_rate'),
-                        ('train_batch_size', 'batch_size')]
+                        ('train_batch_size', 'batch_size'),
+                        ("rollout_fragment_length", "train_freq")]
         #Move dueling to policy parameters
         agent_to_model+=[("dueling","dueling")]
     elif algorithm == "DDPG":
@@ -351,6 +365,7 @@ def agent_to_baselines(config):
                         "clip_norm", "nb_rollout_steps", "nb_train_steps"]
         valid_keys.remove("learning_starts") #For some reason it's the only one that does not have this implemented
         exchange_keys = [
+                ('rollout_fragment_length','nb_rollout_steps'),
                 ("l2_reg", "critic_l2_reg"),
                 ("grad_norm_clipping", "clip_norm"),
                 ('train_batch_size',   'batch_size')]
@@ -389,9 +404,10 @@ def agent_to_baselines(config):
         agent_config["gradient_steps"] = 1
         agent_config["action_noise"] = NormalActionNoise(mean=0, sigma=0) #s.t. it clips actions between [-1,1]
     elif algorithm == "SAC":
-        valid_keys += ["learning_rate", "tau", "ent_coef",
+        valid_keys += ["learning_rate", "tau", "ent_coef","train_freq",
                        "target_update_interval","clip_norm","target_entropy"]
         exchange_keys = [
+                ("rollout_fragment_length","train_freq"),
                 ("entropy_learning_rate","learning_rate"), #same learning rate for 
                 ("critic_learning_rate", "learning_rate"), #entropy 
                 ("actor_learning_rate", "learning_rate"), #actor and critic
@@ -543,6 +559,8 @@ def model_to_policy_kwargs(env, config):
     if("use_lstm" in policy_kwargs.keys()):
         #use_lstm does not exist in baselines, here is used to define the policy
         use_lstm =  policy_kwargs.pop("use_lstm")
+    else:
+        use_lstm = False
     
     if("n_lstm" in policy_kwargs.keys() and not use_lstm):
         policy_kwargs.pop("n_lstm")#not valid if not lstm policy
@@ -562,10 +580,9 @@ def model_to_policy_kwargs(env, config):
     
     return policy_kwargs, use_lstm
 
-def main():   
+def main(args):   
     #-------------------------  init configuration ----------------------------#
     #print("Config file", os.path.abspath(args.config_file)) # 'experiments/dqn_seq_del.py'
-    args = parse_args()
     if args.config_file[-3:] == '.py':
         args.config_file = args.config_file[:-3]
 
@@ -626,16 +643,17 @@ def main():
         agent_config, model_config, env_config = process_dictionaries(config, current_config, var_env_configs, var_agent_configs, var_model_configs) #hacks
 
         #------------ Env init  ------------------ #
-        #if time limit, wrap it
         env = gym.make(env_config['env'],**env_config['env_config'])
-        env = sb.bench.monitor.Monitor(env, None)
-        #env = RLToyEnv(env_config["env_config"]) #alternative
+
+        #if time limit, wrap it
         if( "horizon" in env_config ):
             train_horizon = env_config["horizon"]
             env = TimeLimit(env, max_episode_steps = train_horizon) #horizon
-        
-        #check_env(env)
-        #limit max timesteps in training too... (idk why but seems like ray does this (?))
+        env = sb.bench.Monitor(env, None)#, "../", force=True)
+        # Automatically normalize the input features and reward
+        if (config.algorithm == "DDPG" or config.algorithm == "A2C" or config.algorithm == "A3C"):
+            env = DummyVecEnv([lambda: env])
+            env = VecNormalize(env, norm_obs=False, norm_reward=True, clip_obs=10.)   
         
         #limit max timesteps in evaluation
         eval_horizon = 100
@@ -661,6 +679,14 @@ def main():
         if config.algorithm == 'DQN':
             model = DQN(env = env, policy = sb.deepq.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1)
         elif config.algorithm == 'DDPG': #hack
+            #action noise is none by default meaning it does not explore..
+            #condiguration using ray defaults https://docs.ray.io/en/latest/rllib-algorithms.html?highlight=ddpg#deep-deterministic-policy-gradients-ddpg-td3
+            n_actions = env.action_space.shape[0]
+            agent_config_baselines["action_noise"] = OrnsteinUhlenbeckActionNoise(
+                 mean=np.zeros(n_actions),\
+                 sigma=float(0.2) * np.ones(n_actions))
+            #ddpg
+            #can also use as agent parameter "normalize_observations = True " or "normalize_returns" = True
             model = DDPG(env = env, policy = sb.ddpg.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1 )
         elif config.algorithm == "TD3":
             model = TD3(env = env, policy = sb.td3.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1 )
@@ -678,13 +704,13 @@ def main():
 
         # train your model for n_iter timesteps
         #Define evaluation
-        evaluation_interval = 1 #every x training iterations
-        eval_frequency = timesteps_per_iteration * evaluation_interval
-        eval_callback = CustomCallback(eval_env, n_eval_episodes=10, eval_freq=eval_frequency, \
-                        deterministic=True, file_name = stats_file_name, \
+        eval_interval = 1 #every x training iterations
+        csv_callbacks = CustomCallback(eval_env, n_eval_episodes=10, \
+                        timesteps_per_iteration = timesteps_per_iteration,\
+                        eval_interval=eval_interval, deterministic=True, file_name = stats_file_name, \
                         config_algorithm = config.algorithm, var_configs = var_configs_deepcopy)
         #Train
-        learn_params = {"callback": eval_callback,
+        learn_params = {"callback": csv_callbacks,
                         "total_timesteps": timesteps_total}
         if(config.algorithm == "DDPG"): #Log interval is handled differently for each algorithm, e.g. each log_interval episodes(DQN) or log_interval steps(DDPG).
             learn_params["log_interval"] = timesteps_per_iteration
@@ -696,6 +722,6 @@ def main():
     end = time.time()
     print("No. of seconds to run:", end - start)
 
-
 if __name__ == '__main__':
-    main()
+    args = parse_args()
+    main(args)
