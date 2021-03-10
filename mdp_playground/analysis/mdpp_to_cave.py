@@ -16,19 +16,22 @@ class MDPPToCave():
                     "python_module_version": "0.4.11",
                     "json_format_version": 0.1}
         for param in var_configs:
-            param_config = {"name": param,
-                            "type": "uniform_int",
-                            }
+            param_config = {"name": param}
             var_type = str( type(stats_pd[param].iloc[0]) )    
             if("int" in var_type or "bool" in var_type):
                 param_config["lower"] = int( stats_pd[param].min() )
                 param_config["upper"] = int( stats_pd[param].max() )
                 param_config["default"] = int(param_config["lower"] + param_config["upper"]//2)
                 param_config["type"] = "uniform_int"
-            else:#Float
+            elif('str' in var_type):
+                # Categorical
+                param_config["type"] = "categorical"
+                param_config["choices"] = list(stats_pd['conv_filters'].unique())
+                param_config["default"] = param_config["choices"][0]
+            else: # Float
                 param_config["lower"] = float( stats_pd[param].min() )
                 param_config["upper"] = float( stats_pd[param].max() )
-                param_config["default"] = (param_config["lower"] + param_config["upper"])//2
+                param_config["default"] = (param_config["lower"] + param_config["upper"])/2
                 param_config["type"] = "uniform_float"
             
             if "lr" in param:
@@ -70,13 +73,11 @@ class MDPPToCave():
                         byte_string = curr_file.read()
                         newline_count = byte_string.count(10)
                         num_diff_lines.append(newline_count)
-                        # if newline_count != 21 and file_suffix == '.csv': #hack to check only train files and not eval
-                        #     warnings.warn('Expected 21 \\n chars in each stats file because we usually write stats every 1k timesteps for 20k timesteps. However, this can easily differ, e.g., for TD3 and DDPG where learning starts at 2k timesteps and there is 1 less \\n. Got only: ' + str(newline_count) + ' in file: ' + str(i))
                         combined_file.write(byte_string)
                 else:
                     break
                 i += 1
-            print(str(i) + " files were combined into 1 for file:" + file_prefix + '_n' + file_suffix)
+            print(str(i) + " files were combined into 1 for file:" + file_prefix + file_suffix)
             # print("Files missing for config_nums:", missing_configs, ". Did you pass the right value for max_total_configs as an argument?")
             # print("Unique line count values:", np.unique(num_diff_lines))
             if i==0:
@@ -202,7 +203,11 @@ class MDPPToCave():
             #configs.json
             config_lst = [config_id]
             for name in var_configs:
-                config_dict[name] = stats_pd[name].iloc[group_labels[0]].item()
+                value = stats_pd[name].iloc[group_labels[0]]
+                if(isinstance(value, str)):
+                    config_dict[name] = value
+                else:
+                    config_dict[name] = value.item()
             config_lst.append(config_dict)
             config_lst.append({"model_based_pick": False})
             diff_configs_lst.append(config_lst)
@@ -236,8 +241,7 @@ class MDPPToCave():
                 
 if __name__ == "__main__":
     dir_name = '../../../mdp_files/'
-    exp_name = 'rainbow_image_representations_tune_hps_cave_analysis'
-    dir_name += exp_name
+    exp_name = 'dqn_seq_del'
     
     from cave.cavefacade import CAVE
     import os
