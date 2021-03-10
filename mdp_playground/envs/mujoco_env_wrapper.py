@@ -5,7 +5,15 @@ from gym.envs.mujoco.reacher import ReacherEnv
 import copy
 
 def get_mujoco_wrapper(base_class):
-    '''Wraps a mujoco-py environment to be able to modify its XML attributes.'''
+    '''Wraps a mujoco-py environment to be able to modify its XML attributes and inject the dimensions from MDP Playground. The values for these dimensions are passed in a config dict as for mdp_playground.envs.RLToyEnv.
+
+    Currently supported dimensions:
+        time_unit
+        action_space_max
+
+    For both of these dimensions the scalar value passed in the dict is used to multiply the base environments values. For the Mujoco envs, the time_unit is achieved by multiplying the Gym Mujoco env's frame_skip and thus needs to be such that time_unit * frame_skip is an integer. The time_unit is NOT achieved by changing Mujoco's timestep because that would change the numerical integration done my Mujoco.
+
+    '''
     #TODO This makes a subclass and not a wrapper. Change name. Or make it a wrapper by using composition? Some frameworks might need an instance of this class to also be an instance of base_class?
 
     class MujocoEnvWrapper(base_class):
@@ -28,6 +36,9 @@ def get_mujoco_wrapper(base_class):
                 del config["time_unit"]
             if "dummy_seed" in config: #hack
                 del config["dummy_seed"]
+
+            if "MujocoEnv" not in config:
+                config["MujocoEnv"] = {}
 
             super(MujocoEnvWrapper, self).__init__(**config["MujocoEnv"]) #hack ###IMP This helps by sending only Mujoco specific config to Mujoco, if anything else is sent by using **config, program crashes because each 'MujocoEnv', e.g. HalfCheetahV3, has a static call signature for __init__ ##TODO Thanks to this, now the above del statements can be removed I think.
             self.model.opt.disableflags = 128 ##IMP disables clamping of controls to the range in the XML, i.e., [-1, 1]

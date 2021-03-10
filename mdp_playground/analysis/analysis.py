@@ -443,19 +443,3 @@ class MDPP_Analysis():
         plt.show()
         if save_fig:
             fig.savefig(self.save_folder + ('_train' if train else '_eval') + '_learning_curves_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
-
-if __name__ == "__main__":
-    # Set dir_name to the location where the CSV files from running an experiment were saved
-    dir_name = '../../../mdp_files/32_net'
-    # Set exp_name to the name that was given to the experiment when running it
-    exp_name = 'dqn_vanilla_train_bs'
-    # Set the following to True to save PDFs of plots that you generate below
-    save_fig = True
-    # Data loading
-    save_folder = "../../../plots/32_net/"
-    mdpp_analysis = MDPP_Analysis(save_folder)
-    train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=True)
-    # 1-D: Plots showing reward after 20k timesteps when varying a single meta-feature
-    # Plots across 10 runs: Training: with std dev across the runs
-    mdpp_analysis.plot_1d_dimensions(train_stats, save_fig)
-    mdpp_analysis.plot_1d_dimensions(train_aucs, save_fig)
