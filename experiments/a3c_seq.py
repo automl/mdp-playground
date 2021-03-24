@@ -3,8 +3,8 @@ from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0] + [2**i for i in range(4)],
-    'sequence_length': [1],
+    'delay': [0],
+    'sequence_length': [1, 2, 3, 4],#i for i in range(1,4)]
     'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
@@ -31,7 +31,6 @@ env_config = {
     },
 }
 
-timesteps_total = 1e6
 algorithm = "A3C"
 agent_config = {
     # Size of rollout batch
@@ -62,7 +61,7 @@ agent_config = {
     "num_envs_per_worker": 5,
 
     "optimizer": {
-        "grads_per_step": 1
+        "grads_per_step": 10
     },
 }
 
@@ -72,9 +71,7 @@ model_config = {
         "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         "fcnet_activation": "tanh",
-        "use_lstm": True,
-        "lstm_cell_size": 64,
-        "lstm_use_prev_action_reward": True,
+        "use_lstm": False,
     },
 }
 

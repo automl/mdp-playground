@@ -38,6 +38,28 @@ import time
 import itertools
 import pprint
 
+
+def create_gym_env_wrapper_atari(config):
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    ae = AtariEnv(**config["AtariEnv"])
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
+def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
+    '''When using frameStack GymEnvWrapper should wrap AtariEnv using wrap_deepmind_ray and therefore this function sets "wrap_deepmind_ray": True and 'frame_skip': 1 inside config so as to keep config same as for create_gym_env_wrapper_atari above and reduce manual errors when switching between the 2.
+    '''
+    config["wrap_deepmind_ray"] = True #hack
+    config["frame_skip"] = 1 #hack
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    import gym
+    game = config["AtariEnv"]["game"]
+    game = ''.join([g.capitalize() for g in game.split('_')])
+    ae = gym.make('{}NoFrameskip-v4'.format(game))
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
 class CustomCallback(sb.common.callbacks.BaseCallback):
     """
     Callback for evaluating an agent.
@@ -75,6 +97,7 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         # Convert to VecEnv for consistency
         if not isinstance(eval_env, VecEnv):
             eval_env = DummyVecEnv([lambda: eval_env])
+            eval_env = VecNormalize(eval_env, norm_obs=False, norm_reward=True, clip_obs=10.)
 
         if isinstance(eval_env, VecEnv):
             assert eval_env.num_envs == 1, "You must pass only one environment for evaluation"
@@ -132,8 +155,9 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
             env = env.unwrapped.envs[0]#only using one environment
 
         #A2C can handle multiple envs..
-        if(self.config_algorithm == "A2C" or self.config_algorithm =="A3C"):
-            env = env.envs[0]#take first env
+        # if(self.config_algorithm == "A2C" or self.config_algorithm =="A3C"):
+        #     env = env.envs[0]#take first env
+
         # Writes every iteration, would slow things down. #hack
         fout = open(self.file_name + '.csv', 'a') #hardcoded
         fout.write(str(training_iteration) + ' ' + config_algorithm + ' ')
@@ -239,6 +263,51 @@ def cartesian_prod(args, config):
         cartesian_product_configs = [cartesian_product_configs[args.config_num]]
     
     return cartesian_product_configs
+
+def default_timesteps_total(env_config, algorithm):
+    #default settings for #timesteps_total
+    if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack
+        timesteps_total = 3000000
+
+        # from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+        # from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+        # wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
+        # register_env("HalfCheetahWrapper-v3", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
+
+    elif env_config["env"] in ["HopperWrapper-v3"]: #hack
+        timesteps_total = 1000000
+        # from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+        # from gym.envs.mujoco.hopper_v3 import HopperEnv
+        # wrapped_mujoco_env = get_mujoco_wrapper(HopperEnv)
+        # register_env("HopperWrapper-v3", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
+
+    elif env_config["env"] in ["PusherWrapper-v2"]: #hack
+        timesteps_total = 500000
+
+        # from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+        # from gym.envs.mujoco.pusher import PusherEnv
+        # wrapped_mujoco_env = get_mujoco_wrapper(PusherEnv)
+        # register_env("PusherWrapper-v2", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
+
+    elif env_config["env"] in ["ReacherWrapper-v2"]: #hack
+        timesteps_total = 500000
+
+        # from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
+        # from gym.envs.mujoco.reacher import ReacherEnv
+        # wrapped_mujoco_env = get_mujoco_wrapper(ReacherEnv)
+        # register_env("ReacherWrapper-v2", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
+
+    elif env_config["env"] in ["GymEnvWrapper-Atari"]:
+        if "AtariEnv" in env_config["env_config"]:
+            timesteps_total = 10_000_000
+    else:
+        if algorithm == 'DQN':
+            timesteps_total = 20000
+        elif algorithm == 'A3C' or algorithm == "A2C":
+            timesteps_total = 150000
+        else: #if algorithm == 'DDPG':
+            timesteps_total = 20000
+    return timesteps_total
 
 def process_dictionaries(config, current_config, var_env_configs, var_agent_configs, var_model_configs):
     algorithm = config.algorithm
@@ -581,8 +650,7 @@ def model_to_policy_kwargs(env, config):
     return policy_kwargs, use_lstm
 
 def main(args):   
-    #-------------------------  init configuration ----------------------------#
-    #print("Config file", os.path.abspath(args.config_file)) # 'experiments/dqn_seq_del.py'
+    # print("Config file", os.path.abspath(args.config_file)) # 'experiments/dqn_seq_del.py'
     if args.config_file[-3:] == '.py':
         args.config_file = args.config_file[:-3]
 
@@ -633,7 +701,12 @@ def main(args):
     
     #---------- Compute cartesian product of configs ----------------#
     start = time.time()
-    cartesian_product_configs = cartesian_prod(args, config)
+    # cartesian_product_configs = cartesian_prod(args, config)
+    if args.config_num is None:
+        cartesian_product_configs = config.cartesian_product_configs
+    else:
+        cartesian_product_configs = [config.cartesian_product_configs[args.config_num]]
+
 
     #------------ Run every configuration  ------------------ #
     pp = pprint.PrettyPrinter(indent=4)
@@ -653,7 +726,7 @@ def main(args):
         # Automatically normalize the input features and reward
         if (config.algorithm == "DDPG" or config.algorithm == "A2C" or config.algorithm == "A3C"):
             env = DummyVecEnv([lambda: env])
-            env = VecNormalize(env, norm_obs=False, norm_reward=True, clip_obs=10.)   
+            env = VecNormalize(env, norm_obs=False, norm_reward=True, clip_obs=10.)
         
         #limit max timesteps in evaluation
         eval_horizon = 100
@@ -669,7 +742,7 @@ def main(args):
             agent_config_baselines = copy.deepcopy(agent_config)
             agent_config_baselines.pop('timesteps_per_iteration') #this is not part of baselines parameters, need to separate
         else:
-            timesteps_per_iteration = 1000#default
+            timesteps_per_iteration = 1000  # default
 
         #Set model parameters
         policy_kwargs, use_lstm = model_to_policy_kwargs(env, config) #return policy_kwargs
@@ -678,9 +751,10 @@ def main(args):
         #Use feed forward policies and specify cnn feature extractor in configuration
         if config.algorithm == 'DQN':
             model = DQN(env = env, policy = sb.deepq.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1)
-        elif config.algorithm == 'DDPG': #hack
-            #action noise is none by default meaning it does not explore..
-            #condiguration using ray defaults https://docs.ray.io/en/latest/rllib-algorithms.html?highlight=ddpg#deep-deterministic-policy-gradients-ddpg-td3
+        elif config.algorithm == 'DDPG':
+            # action noise is none by default meaning it does not explore..
+            # condiguration using ray defaults
+            # https://docs.ray.io/en/latest/rllib-algorithms.html?highlight=ddpg#deep-deterministic-policy-gradients-ddpg-td3
             n_actions = env.action_space.shape[0]
             agent_config_baselines["action_noise"] = OrnsteinUhlenbeckActionNoise(
                  mean=np.zeros(n_actions),\
@@ -697,10 +771,10 @@ def main(args):
             model = SAC(env = env, policy = sb.sac.policies.FeedForwardPolicy ,**agent_config_baselines, verbose=1)
 
         #------------ train/evaluation ------------------ #
-        if env_config["env"] in ["HopperWrapper-v3", "HalfCheetahWrapper-v3"]:
-            timesteps_total = 500000
+        if 'timesteps_total' in dir(config):
+            timesteps_total = config.timesteps_total
         else:
-            timesteps_total = 20000 #DQN, DDPG, TD3, SAC
+            timesteps_total = default_timesteps_total(env_config, config.algorithm)
 
         # train your model for n_iter timesteps
         #Define evaluation

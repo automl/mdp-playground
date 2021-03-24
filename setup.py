@@ -1,5 +1,9 @@
 from setuptools import setup
 
+hpo_analysis_require = [
+    'cave==1.4.0',
+]
+
 extras_require = [
     'ray[rllib,debug]==0.7.3',
     'tensorflow==1.13.0rc1',

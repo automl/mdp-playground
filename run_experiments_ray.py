@@ -7,16 +7,47 @@ from __future__ import print_function
 
 import numpy as np
 import copy
+import warnings
+import logging
 
 import ray
 from ray import tune
-#from ray.rllib.utils.seed import seed as rllib_seed
+from ray.rllib.utils.seed import seed as rllib_seed
 import mdp_playground
 from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
-register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 import sys, os
 import argparse
+
+register_env("RLToy-v0", lambda config: RLToyEnv(**config))
+register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
+register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack_atari(config))
+register_env("RLToy-v0", lambda config: RLToyEnv(**config))
+
+def create_gym_env_wrapper_atari(config):
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    ae = AtariEnv(**config["AtariEnv"])
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
+
+
+def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
+    '''When using frameStack GymEnvWrapper should wrap AtariEnv using wrap_deepmind_ray and therefore this function sets "wrap_deepmind_ray": True and 'frame_skip': 1 inside config so as to keep config same as for create_gym_env_wrapper_atari above and reduce manual errors when switching between the 2.
+    '''
+    config["wrap_deepmind_ray"] = True #hack
+    config["frame_skip"] = 1 #hack
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    import gym
+    game = config["AtariEnv"]["game"]
+    game = ''.join([g.capitalize() for g in game.split('_')])
+    ae = gym.make('{}NoFrameskip-v4'.format(game))
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
@@ -40,37 +71,11 @@ def parse_args():
     #                    ' A Cartesian product of different configuration values for the experiment will be taken and ordered as a list and this number corresponds to the configuration number in this list.'
     #                    ' Please look in to the code for details.')
 
-
     args = parser.parse_args()
     print("Parsed args:", args)
     return args
 
 def main(args):
-    def create_gym_env_wrapper_atari(config):
-        from gym.envs.atari import AtariEnv
-        from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-        ae = AtariEnv(**config["AtariEnv"])
-        gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
-        return gew
-
-    register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
-
-
-    def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
-        '''When using frameStack GymEnvWrapper should wrap AtariEnv using wrap_deepmind_ray and therefore this function sets "wrap_deepmind_ray": True and 'frame_skip': 1 inside config so as to keep config same as for create_gym_env_wrapper_atari above and reduce manual errors when switching between the 2.
-        '''
-        config["wrap_deepmind_ray"] = True #hack
-        config["frame_skip"] = 1 #hack
-        from gym.envs.atari import AtariEnv
-        from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-        import gym
-        game = config["AtariEnv"]["game"]
-        game = ''.join([g.capitalize() for g in game.split('_')])
-        ae = gym.make('{}NoFrameskip-v4'.format(game))
-        gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
-        return gew
-
-    register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack_atari(config))
 
     if args.config_file[-3:] == '.py':
         args.config_file = args.config_file[:-3]
@@ -313,7 +318,6 @@ def main(args):
     from functools import reduce
     def deepmerge(a, b, path=None):
         '''Merges dict b into dict a
-
         Based on: https://stackoverflow.com/questions/7204805/how-to-merge-dictionaries-of-dictionaries/7205107#7205107
         '''
         if path is None: path = []
@@ -553,6 +557,9 @@ def main(args):
                 local_dir=args.framework_dir + '/_ray_results',
                 #return_trials=True # add trials = tune.run( above
             )
+
+    end = time.time()
+    print("No. of seconds to run:", end - start)
 
 if __name__ == '__main__':
     args = parse_args()

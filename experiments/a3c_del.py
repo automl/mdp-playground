@@ -62,7 +62,7 @@ agent_config = {
     "num_envs_per_worker": 5,
 
     "optimizer": {
-        "grads_per_step": 1
+        "grads_per_step": 10
     },
 }
 
@@ -72,9 +72,7 @@ model_config = {
         "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         "fcnet_activation": "tanh",
-        "use_lstm": True,
-        "lstm_cell_size": 64,
-        "lstm_use_prev_action_reward": True,
+        "use_lstm": False,
     },
 }
 
