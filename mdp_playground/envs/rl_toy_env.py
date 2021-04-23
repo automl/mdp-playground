@@ -297,7 +297,7 @@ class RLToyEnv(gym.Env):
         self.logger.warning('Seeds set to:' + str(self.seed_dict))
         # print(f'Seeds set to {self.seed_dict=}') # Available from Python 3.8
 
-        #defaults
+        #defaults ###TODO throw warning in case unknown config option is passed
         if "use_custom_mdp" not in config:
             self.use_custom_mdp = False
         else:

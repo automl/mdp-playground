@@ -13,12 +13,12 @@ class MDPP_Analysis():
     def __init__(self):
         pass
 
-    def load_data(self, experiements: dict):
+    def load_data(self, experiments: dict, load_eval=True, exp_type='grid'):
         '''Loads training and evaluation data from given multiple files
 
         Parameters
         ----------
-        experiements : dict<str,str>
+        experiments : dict<str,str>
             per experiment -> key-value pair of exp_name & dir_name
 
             dir_name : str
@@ -38,13 +38,13 @@ class MDPP_Analysis():
 
         '''
         list_exp_data = []
-        for exp_name, dir_name in experiements.items():
-            exp_data = self.get_exp_data(dir_name, exp_name)
+        for exp_name, dir_name in experiments.items():
+            exp_data = self.get_exp_data(dir_name, exp_name, exp_type=exp_type, load_eval=load_eval)
             list_exp_data.append(exp_data)
         return list_exp_data
 
-    def get_exp_data(self, dir_name, exp_name, num_metrics=3, load_eval=True, threshold=0.05, sample_freq=1): #, max_total_configs=200):
-        '''get training and evaluation data from given experiement file
+    def get_exp_data(self, dir_name, exp_name, exp_type='grid', num_metrics=3, load_eval=True, threshold=0.05, sample_freq=1): #, max_total_configs=200):
+        '''Get training and evaluation data from a single set of recorded CSV stats files.
 
         Parameters
         ----------
@@ -52,20 +52,20 @@ class MDPP_Analysis():
             The location where the training and evaluation CSV files were written
         exp_name : str
             The name of the experiment: the training and evaluation CSV filenames are formed using this string
+        exp_type : str
+            One of ['grid', 'random']. If it's 'grid', it's assumed that a grid of configurations was run and data loading takes place in a manner specific to grids. Otherwise, data loading tries to look for different unique configurations run.
         num_metrics : int
             The number of metrics that were written to CSV stats files. Default is 3 (timesteps_total, episode_reward_mean, episode_len_mean).
         load_eval : bool
             Whether to load evaluation stats CSV or not.
         threshold : float
-            The fault tolerance threshold while loading data. Show warning for files whose data rows are less than threshold value.
-            eg. threshold=0.6 and mean_row_cnt=20, warning is displayed if file row_count < 20 * (1 - 0.6)
+            The fault tolerance threshold while loading data. Show warnings for files where the number of data rows deviates by more than the threshold value (from the mean number of rows across the loaded files), e.g., if the threshold = 0.05 and mean number of rows across the loaded files = 20, a warning is displayed when for a loaded file the number of rows < 19.
         sample_freq : int
-            The subsample frequency value. Sample data lines based on this value
-            eg. sample_freq=5 means choose every consecutive 5th data row
+            The subsampling frequency when loading data. Sub-select data lines based on this value, e.g., if sample_freq = 5, load every 5th row in a file.
 
         Returns
         -------
-        experiement data: dictionary type with following key-value
+        experiment data: dictionary type with following key-value
 
         train_stats : np.ndarray
             Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
@@ -124,11 +124,11 @@ class MDPP_Analysis():
 
             # fault tolerance check
             for file_name, line_count in train_data.items():
-                if line_count < train_mean_cnt*(1-threshold):
-                    warnings.warn('Expected minimum {0} chars in each stats file. Got only: {1}  in file: {2}'.format(train_mean_cnt*(1-threshold), line_count, file_name))
+                if line_count < train_mean_cnt * (1 - threshold):
+                    warnings.warn('Expected a minimum of {0} rows in each stats file. Got only: {1} in file: {2}'.format(train_mean_cnt * (1 - threshold), line_count, file_name))
             for file_name, line_count in eval_data.items():
-                if line_count < eval_mean_cnt*(1-threshold):
-                    warnings.warn('Expected minimum {0} chars in each stats file. Got only: {1}  in file: {2}'.format(eval_mean_cnt*(1-threshold), line_count, file_name))
+                if line_count < eval_mean_cnt * (1 - threshold):
+                    warnings.warn('Expected a minimum of {0} rows in each stats file. Got only: {1} in file: {2}'.format(eval_mean_cnt * (1 - threshold), line_count, file_name))
 
         # Read column names
         with open(stats_file + '.csv') as file_:
@@ -158,10 +158,10 @@ class MDPP_Analysis():
 
         #config counts includes seed
         self.seed_idx = -1
-        for i, c in enumerate(full_config_names[:-num_metrics]): # hardcoded 3 for no. of stats written
+        for i, c in enumerate(full_config_names[:-num_metrics]):
             dims_values.append(stats_pd[c].unique())
             config_counts.append(stats_pd[c].nunique())
-            if("seed" in c):
+            if("seed" in c): ##TODO this will just set seed index to be the "last" column name with seed in it.
                 self.seed_idx = i
 
         config_counts.append(num_metrics) #hardcoded number of training stats that were recorded
@@ -184,24 +184,15 @@ class MDPP_Analysis():
         final_rows_for_a_config.append(i + 1) # Always append the last row!
         self.final_rows_for_a_config = final_rows_for_a_config
         stats_end_of_training = stats_pd.iloc[final_rows_for_a_config]
-        stats_reshaped = stats_end_of_training.iloc[:, -num_metrics:] # last vals are timesteps_total, episode_reward_mean, episode_len_mean
-        stats_reshaped = np.reshape(np.array(stats_reshaped), config_counts)
+        train_stats = stats_end_of_training.iloc[:, -num_metrics:] # last vals are timesteps_total, episode_reward_mean, episode_len_mean
+        if exp_type == 'grid':
+            train_stats = np.reshape(np.array(train_stats), config_counts)
+        elif exp_type == 'random':
+            pass
+        else:
+            raise ValueError('Please check exp_type passed. Was:' + exp_type)
 
-        print("train stats shape:", stats_reshaped.shape)
-
-        # Calculate AUC metrics
-        train_aucs = []
-        for i in range(len(final_rows_for_a_config)):
-            if i == 0:
-                to_avg_ = stats_pd.iloc[0:self.final_rows_for_a_config[i]+1, -num_metrics:]
-            else:
-                to_avg_ = stats_pd.iloc[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -num_metrics:]
-            auc = np.mean(to_avg_, axis=0)
-            train_aucs.append(auc)
-            # print(auc)
-
-        train_aucs = np.reshape(np.array(train_aucs), config_counts)
-        print("train_aucs.shape:", train_aucs.shape)
+        print("train stats shape:", train_stats.shape)
 
         # Calculate AUC metrics
         train_aucs = []
@@ -213,14 +204,18 @@ class MDPP_Analysis():
             auc = np.mean(to_avg_, axis=0)
             train_aucs.append(auc)
             # print(auc)
+        train_aucs = np.array(train_aucs)
 
-        train_aucs = np.reshape(np.array(train_aucs), config_counts)
+        if exp_type == 'grid':
+            train_aucs = np.reshape(train_aucs, config_counts)
+        elif exp_type == 'random':
+            pass
         print("train_aucs.shape:", train_aucs.shape)
 
-        final_eval_metrics_reshaped, mean_data_eval, eval_aucs = None, None, None
+        eval_stats, mean_data_eval, eval_aucs = None, None, None
 
         # Load evaluation stats
-        # load_eval = False #hack ####TODO rectify
+        # load_eval = False # hack #### TODO rectify
         if load_eval:
             stats_file_eval = stats_file + '_eval.csv'
             eval_stats = np.loadtxt(stats_file_eval, dtype=float)
@@ -273,10 +268,14 @@ class MDPP_Analysis():
 
             final_eval_metrics_ = mean_data_eval[final_rows_for_a_config, :] # 1st column is episode reward, 2nd is episode length in original _eval.csv file, here it's 2nd and 3rd after prepending timesteps_total column above.
             # print(dims_values, config_counts)
-            final_eval_metrics_reshaped = np.reshape(final_eval_metrics_, config_counts)
-            # print(final_eval_metrics_)
 
-            print("eval stats shape:", final_eval_metrics_reshaped.shape)
+            if exp_type == 'grid':
+                eval_stats = np.reshape(final_eval_metrics_, config_counts)
+                # print(final_eval_metrics_)
+            elif exp_type == 'random':
+                eval_stats = final_eval_metrics_
+
+            print("eval stats shape:", eval_stats.shape)
 
 
             # Calculate AUC metrics
@@ -289,21 +288,27 @@ class MDPP_Analysis():
                 auc = np.mean(to_avg_, axis=0)
                 eval_aucs.append(auc)
                 # print(auc)
+            eval_aucs = np.array(eval_aucs)
 
-            eval_aucs = np.reshape(np.array(eval_aucs), config_counts)
+            if exp_type == 'grid': #TODO Do this at once for train_stats, eval_stats, train_aucs and eval_aucs
+                eval_aucs = np.reshape(eval_aucs, config_counts)
+            elif exp_type == 'random':
+                pass
+
             print("eval_aucs.shape:", eval_aucs.shape)
 
 
-        # -1 is added to ignore "no. of stats that were saved" as dimensions of difficulty
+        # -1 is added to ignore "no. of stats that were saved" as a dimension of difficulty
         self.config_counts = config_counts[:-1]
         self.dims_values = dims_values
 
-        # Catpure the dimensions that were varied, i.e. ones which had more than 1 value across experiments
+        # Capture the dimensions that were varied, i.e. ones which had more than 1 value across experiments
         x_axis_labels = []
         x_tick_labels_ = []
         dims_varied = []
         for i in range(len(self.config_counts)):
             if("seed" in self.config_names[i]): # ignore #seeds as dimensions of difficulty
+                print("Number of seeds:", config_counts[i])
                 continue
             if self.config_counts[i]> 1:
                 x_axis_labels.append(self.config_names[i])
@@ -335,14 +340,14 @@ class MDPP_Analysis():
         self.axis_labels = x_axis_labels
         self.tick_labels = x_tick_labels_
         self.dims_varied = dims_varied
-        for d,v,i in zip(x_axis_labels, x_tick_labels_, dims_varied):
-            print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
+        for d, v, i in zip(x_axis_labels, x_tick_labels_, dims_varied):
+            print("Dimension varied:", d, ". The values it took:", v if len(v) < 10 else str(v[:5] + v[-5:]) + " (1st 5 and last 5)", ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
 
-        # experiement data
+        # experiment data
         exp_data = dict()
         # related to training & eval data
-        exp_data['train_stats'] = stats_reshaped
-        exp_data['eval_stats'] = final_eval_metrics_reshaped
+        exp_data['train_stats'] = train_stats
+        exp_data['eval_stats'] = eval_stats
         exp_data['train_curves'] = np.array(stats_pd)
         exp_data['eval_curves'] = mean_data_eval
         exp_data['train_aucs'] = train_aucs
@@ -589,7 +594,7 @@ class MDPP_Analysis():
         '''
         #HACK
         if len(list_exp_data) > 0:
-            exp_data = list_exp_data[0] #TODO make changes to handle multiple experiements plot
+            exp_data = list_exp_data[0] #TODO make changes to handle multiple experiments plot
         else:
             return
 
@@ -667,7 +672,7 @@ class MDPP_Analysis():
         '''
         #HACK
         if len(list_exp_data) > 0:
-            exp_data = list_exp_data[0] #TODO make changes to handle multiple experiements plot
+            exp_data = list_exp_data[0] #TODO make changes to handle multiple experiments plot
         else:
             return
 
