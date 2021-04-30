@@ -100,7 +100,6 @@ if args.config_num is not None:
 
 print("Stats file being written to:", stats_file_name)
 
-
 #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
 from ray.rllib.models.preprocessors import OneHotPreprocessor
 from ray.rllib.models import ModelCatalog
@@ -109,14 +108,14 @@ ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 log_level_ = logging.WARNING ##TODO Make a runtime argument
 
 if config.algorithm == 'DQN':
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), temp_dir='/tmp/ray' + str(args.config_num), include_webui=False, logging_level=log_level_, local_mode=True) #webui_host='0.0.0.0'); logging_level=logging.INFO,
+    ray.init(object_store_memory=int(2e9), _redis_max_memory=int(1e9), _temp_dir='/tmp/ray' + str(args.config_num), logging_level=log_level_, local_mode=True) #webui_host='0.0.0.0'); logging_level=logging.INFO,
 
     # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # local_mode (bool): If true, the code will be executed serially. This is useful for debugging. # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
 elif config.algorithm == 'A3C': #hack
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), temp_dir='/tmp/ray' + str(args.config_num), include_webui=False, logging_level=log_level_)
+    ray.init(object_store_memory=int(2e9), _redis_max_memory=int(1e9), _temp_dir='/tmp/ray' + str(args.config_num), logging_level=log_level_)
     # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
 else:
-    ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, temp_dir='/tmp/ray' + str(args.config_num), include_webui=False, logging_level=log_level_)
+    ray.init(object_store_memory=int(2e9), _redis_max_memory=int(1e9), local_mode=True, _temp_dir='/tmp/ray' + str(args.config_num), logging_level=log_level_)
 
 
 var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
