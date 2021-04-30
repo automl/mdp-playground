@@ -676,16 +676,22 @@ for enum_conf_1, current_config_ in enumerate(cartesian_product_configs):
             from gym.envs.mujoco.pusher import PusherEnv
             wrapped_mujoco_env = get_mujoco_wrapper(PusherEnv)
             register_env(
-                "PusherWrapper-v2", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
+                "PusherWrapper-v2",
+                lambda config: create_gym_env_wrapper_mujoco_wrapper(
+                    config, wrapped_mujoco_env))
 
         elif env_config["env"] in ["ReacherWrapper-v2"]:  # hack
             timesteps_total = 500000
 
-            from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper  # hack
+            # hack
+            from mdp_playground.envs.mujoco_env_wrapper import (
+                get_mujoco_wrapper,)
             from gym.envs.mujoco.reacher import ReacherEnv
             wrapped_mujoco_env = get_mujoco_wrapper(ReacherEnv)
             register_env(
-                "ReacherWrapper-v2", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
+                "ReacherWrapper-v2",
+                lambda config: create_gym_env_wrapper_mujoco_wrapper(
+                    config, wrapped_mujoco_env))
 
         elif env_config["env"] in ["GymEnvWrapper-Atari"]:  # hack
             if "AtariEnv" in env_config["env_config"]:
@@ -702,20 +708,25 @@ for enum_conf_1, current_config_ in enumerate(cartesian_product_configs):
         if 'timesteps_total' in dir(config):
             timesteps_total = config.timesteps_total
 
-        if env_config["env"] in ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]:
-            # hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
+        if env_config["env"] in ["HalfCheetahWrapper-v3", "HopperWrapper-v3",
+                                 "PusherWrapper-v2", "ReacherWrapper-v2"]:
+            # hack This is needed so that the environment runs the same amount
+            # of seconds of simulation, even though episode steps are different
             if "time_unit" in env_config["env_config"]:
                 timesteps_total /= env_config["env_config"]["time_unit"]
                 timesteps_total = int(timesteps_total)
 
-        print("\n\033[1;32m======== Running on environment: " +
-              env_config["env"] + " =========\033[0;0m\n")
-        print("\n\033[1;32m======== for " + str(timesteps_total) + " steps =========\033[0;0m\n")
+        print("\n\033[1;32m======== Running on environment: " + env_config[
+            "env"] + " =========\033[0;0m\n")
+        print("\n\033[1;32m======== for " + str(
+            timesteps_total) + " steps =========\033[0;0m\n")
 
         tune.run(
             algorithm,
-            # IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
-            name=algorithm + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num),
+            # IMP Name has to be specified otherwise, may lead to clashing for
+            # temp file in ~/ray_results/... directory.
+            name=algorithm + str(args.exp_name.split('/')[-1]) + '_' + str(
+                args.config_num),
             stop={
                 "timesteps_total": timesteps_total,
             },
