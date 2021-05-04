@@ -352,7 +352,7 @@ class MDPP_Analysis():
         self.tick_labels = x_tick_labels_
         self.dims_varied = dims_varied
         for d, v, i in zip(x_axis_labels, x_tick_labels_, dims_varied):
-            print("Dimension varied:", d, ". The values it took:", v if len(v) < 10 else str(v[:5] + v[-5:]) + " (1st 5 and last 5)", ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
+            print("Dimension varied:", d, ". The values it took:", v if (len(v) < 10 or type(v) != list) else str(v[:5] + v[-5:]) + " (1st 5 and last 5)", ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
 
         # experiment data
         exp_data = dict()
