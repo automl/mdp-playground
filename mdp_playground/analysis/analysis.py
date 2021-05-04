@@ -81,7 +81,7 @@ class MDPP_Analysis():
         self.stats_file = stats_file
 
         if os.path.isfile(stats_file + '.csv'):
-            print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations.\033[0;0m")
+            print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations:\033[0;0m " + stats_file + '.csv')
         else:
             print("Loading data from a distributed run of experiment configurations. Creating a combined CSV stats file.")
             train_data = dict()
@@ -115,7 +115,7 @@ class MDPP_Analysis():
                     # print("Files missing for config_nums:", missing_configs, ". Did you pass the right value for max_total_configs as an argument?")
                     # print("Unique line count values:", np.unique(num_diff_lines))
                     if i==0:
-                        raise FileNotFoundError("No files to combine were present. Please check your location and/or filenames that they are correct.")
+                        raise FileNotFoundError("No files to combine were present. Please check your location and/or filenames that they are correct. Filename passed: " + file_prefix + file_suffix)
             join_files(stats_file,  '.csv')
             join_files(stats_file, '_eval.csv')
 
@@ -184,10 +184,13 @@ class MDPP_Analysis():
         final_rows_for_a_config.append(i + 1) # Always append the last row!
         self.final_rows_for_a_config = final_rows_for_a_config
         stats_end_of_training = stats_pd.iloc[final_rows_for_a_config]
-        train_stats = stats_end_of_training.iloc[:, -num_metrics:] # last vals are timesteps_total, episode_reward_mean, episode_len_mean
         if exp_type == 'grid':
+            train_stats = stats_end_of_training.iloc[:, -num_metrics:] # last vals are timesteps_total, episode_reward_mean, episode_len_mean
             train_stats = np.reshape(np.array(train_stats), config_counts)
         elif exp_type == 'random':
+            train_stats = stats_end_of_training # Includes config values within dataframe as opposed to only perf. metrics for the grid case above
+            # train_stats = stats_end_of_training.iloc[:, -num_metrics:] # Saves space by not including config values. # last vals are timesteps_total, episode_reward_mean, episode_len_mean ### TODO remove
+
             pass
         else:
             raise ValueError('Please check exp_type passed. Was:' + exp_type)
@@ -209,12 +212,15 @@ class MDPP_Analysis():
         if exp_type == 'grid':
             train_aucs = np.reshape(train_aucs, config_counts)
         elif exp_type == 'random':
+            train_aucs_ = train_stats.copy()
+            train_aucs_.iloc[:, -num_metrics:] = train_aucs
+            train_aucs = train_aucs_
             pass
         print("train_aucs.shape:", train_aucs.shape)
 
-        eval_stats, mean_data_eval, eval_aucs = None, None, None
 
         # Load evaluation stats
+        eval_stats, mean_data_eval, eval_aucs = None, None, None
         # load_eval = False # hack #### TODO rectify
         if load_eval:
             stats_file_eval = stats_file + '_eval.csv'
@@ -265,7 +271,6 @@ class MDPP_Analysis():
             # Adds timesteps_total column to the eval stats which did not have them:
             mean_data_eval = np.concatenate((np.atleast_2d(np.array(stats_pd.iloc[:, -num_metrics])).T, mean_data_eval), axis=1)
 
-
             final_eval_metrics_ = mean_data_eval[final_rows_for_a_config, :] # 1st column is episode reward, 2nd is episode length in original _eval.csv file, here it's 2nd and 3rd after prepending timesteps_total column above.
             # print(dims_values, config_counts)
 
@@ -274,7 +279,9 @@ class MDPP_Analysis():
                 # print(final_eval_metrics_)
             elif exp_type == 'random':
                 eval_stats = final_eval_metrics_
+                eval_stats = np.concatenate((np.atleast_2d(np.array(train_stats.iloc[:, :-num_metrics])), eval_stats), axis=1) # Includes config values within dataframe as opposed to only perf. metrics for the grid case above
 
+            eval_stats = pd.DataFrame(eval_stats, columns=train_stats.columns)
             print("eval stats shape:", eval_stats.shape)
 
 
@@ -293,6 +300,10 @@ class MDPP_Analysis():
             if exp_type == 'grid': #TODO Do this at once for train_stats, eval_stats, train_aucs and eval_aucs
                 eval_aucs = np.reshape(eval_aucs, config_counts)
             elif exp_type == 'random':
+                eval_aucs_ = eval_stats.copy()
+                eval_aucs_.iloc[:, -num_metrics:] = eval_aucs
+                eval_aucs = eval_aucs_
+
                 pass
 
             print("eval_aucs.shape:", eval_aucs.shape)
