@@ -1,4 +1,5 @@
 num_seeds = 10
+timesteps_total = 1000000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
@@ -40,7 +41,7 @@ agent_config = {
     "use_pytorch": False,
     # GAE(gamma) parameter
     "gamma": 0.99,
-    "lambda": 0.95, #
+    "lambda": 0, #
     # Max global norm for each gradient calculated by worker
     "grad_clip": 10.0, # low prio.
     # Learning rate

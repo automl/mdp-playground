@@ -1,4 +1,5 @@
 num_seeds = 10
+timesteps_total = 1000000
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
@@ -7,7 +8,7 @@ var_env_configs = OrderedDict({
     'sequence_length': [1],
     'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
-    'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
+    'terminal_state_density': [0], # np.linspace(0.1, 1.0, num=5)
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],

@@ -5,9 +5,7 @@ import json
 
 class MDPPToCave():
     def __init__(self, output_dir = "../mdpp_to_cave/"):
-        self.output_folder = output_dir
-        if not os.path.exists(self.output_folder):
-            os.makedirs(self.output_folder)
+        return
 
     def _create_configspace_json(self, stats_pd, var_configs):
         configspace = {"hyperparameters":[],
@@ -141,7 +139,12 @@ class MDPPToCave():
 
     ## Creates the bohb file from the mdpp output in the output_folder directory
     ## this file can be fed into cave for analysis
-    def to_bohb_results(self, dir_name, exp_name):
+    def to_bohb_results(self, dir_name, exp_name, output_dir="../cave_output/"):
+        self.output_folder = output_dir
+        if not os.path.exists(self.output_folder):
+            print("Writing bohb to cave output to %s"%(os.path.abspath(output_dir)))
+            os.makedirs(self.output_folder)
+
         #file_path = args.file_path
         output_folder = os.path.join(self.output_folder, exp_name)
         if not os.path.exists(output_folder):
@@ -238,20 +241,21 @@ class MDPPToCave():
                 json.dump(d, fout)
                 fout.write('\n')
         return output_folder
-                
+
+
 if __name__ == "__main__":
     dir_name = '../../../mdp_files/'
     exp_name = 'dqn_seq_del'
     
     from cave.cavefacade import CAVE
     import os
-    #The converted mdpp csvs will be stored in output_dir
+    # The converted mdpp csvs will be stored in output_dir
     output_dir = "../../../mdpp_to_cave"
     mdpp_file =  os.path.join(dir_name, exp_name)
     mdpp_cave = MDPPToCave(output_dir)
     cave_input_file = mdpp_cave.to_bohb_results(dir_name, exp_name)
 
-    #cave_input_file = "../../../mdpp_to_cave/dqn_seq_del"
+    # cave_input_file = "../../../mdpp_to_cave/dqn_seq_del"
 
     # Similarly, as an example, cave will ouput it's results 
     # to the same directory as cave's input files
@@ -265,5 +269,12 @@ if __name__ == "__main__":
                 show_jupyter=True,
     )
     
-    #cave.plot_scatter()
-    cave.pimp_forward_selection()
+    # Common analysis
+    cave.performance_table()
+    cave.local_parameter_importance()
+
+    # fanova can only be used with more
+    # more than 1 meta-feature
+    cave.cave_fanova()
+
+    # Other analysis

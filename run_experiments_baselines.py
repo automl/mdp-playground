@@ -60,6 +60,7 @@ def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
     gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
     return gew
 
+
 class CustomCallback(sb.common.callbacks.BaseCallback):
     """
     Callback for evaluating an agent.
@@ -94,6 +95,8 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         self.var_configs = var_configs
         self.last_episode_count = 0
         self.episodes_in_iter = 0
+        self.best_eval_mean = 0
+        # self.best_train_return = 0
         # Convert to VecEnv for consistency
         if not isinstance(eval_env, VecEnv):
             eval_env = DummyVecEnv([lambda: eval_env])
@@ -103,17 +106,18 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
             assert eval_env.num_envs == 1, "You must pass only one environment for evaluation"
 
         self.eval_env = eval_env
-    
-    #evaluate policy when step % eval_freq == 0, return rewards and lengths list of n_eval_episodes elements
-    def _on_step(self):
-        #count steps
-        self.total_timesteps+=1
-        #training log
-        if(self.total_timesteps % self.timesteps_per_iteration == 0): #training iteration done, log train csv
-            self.write_train_result()
-            self.training_iteration+=1
 
-        #evaluation
+    # evaluate policy when step % eval_freq == 0, return rewards and lengths list of n_eval_episodes elements
+    def _on_step(self):
+        # count steps
+        self.total_timesteps+=1
+        # training log
+        # training iteration done, log train csv
+        if(self.total_timesteps % self.timesteps_per_iteration == 0):
+            self.write_train_result()
+            self.training_iteration += 1
+
+        # evaluation
         if self.eval_freq > 0 and self.n_calls % self.eval_freq == 0:
             # Sync training and eval env if there is VecNormalize
             sync_envs_normalization(self.training_env, self.eval_env)
@@ -125,34 +129,48 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
                 render=False,
                 deterministic=self.deterministic,
                 return_episode_rewards=True,
-            )    
-            #write evaluation csv
+            )
+
+            # write evaluation csv
             self.write_eval_results(episode_rewards, episode_lengths)
 
             mean_reward, std_reward = np.mean(episode_rewards), np.std(episode_rewards)
             mean_ep_length, std_ep_length = np.mean(episode_lengths), np.std(episode_lengths)
+
+            if(self.best_eval_mean < mean_reward):
+                self.model.save("%s_best_eval" % (self.file_name))
+                self.best_eval_mean = mean_reward
 
             if self.verbose > 0:
                 print(f"Eval num_timesteps={self.num_timesteps}, " f"episode_reward={mean_reward:.2f} +/- {std_reward:.2f}")
                 print(f"Episode length: {mean_ep_length:.2f} +/- {std_ep_length:.2f}")
         return True
 
+    # def _on_rollout_end(self):
+    #     env = self.training_env
+    #     if isinstance(self.training_env, VecEnv):
+    #         env = env.unwrapped.envs[0]  # only using one environment
+    #     episode_rewards = env.get_episode_rewards()
+    #     if(episode_rewards[-1] > self.best_train_return):
+    #         self.model.save("%s_best_train" % (self.file_name))
+    #         self.best_train_return = episode_rewards[-1]
+
     # Used in callback after every episode has ended during evaluation
     # replaces: def on_episode_end(info)
     def write_eval_results(self, episode_rewards, episode_lengths):
         eval_filename = self.file_name + '_eval.csv'
-        fout = open(eval_filename, 'a') #hardcoded
+        fout = open(eval_filename, 'a')  # hardcoded
         for reward_this_episode, length_this_episode in zip(episode_rewards, episode_lengths):
             fout.write(str(reward_this_episode[0]) + ' ' + str(length_this_episode) + "\n")
         fout.close()
-            
+
     # Write training stats to CSV file at end of every training iteration
     def write_train_result(self):
         env, training_iteration, total_timesteps = self.training_env, self.training_iteration, self.total_timesteps
-        file_name, config_algorithm, var_configs = self.file_name, self.config_algorithm, self.var_configs
+        config_algorithm, var_configs = self.config_algorithm, self.var_configs
 
         if isinstance(env, VecEnv):
-            env = env.unwrapped.envs[0]#only using one environment
+            env = env.unwrapped.envs[0]  # only using one environment
 
         #A2C can handle multiple envs..
         # if(self.config_algorithm == "A2C" or self.config_algorithm =="A3C"):
@@ -182,14 +200,15 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         # Write train statss
         episode_rewards = env.get_episode_rewards()
         episode_lengths = env.get_episode_lengths()
-        #update episodes
+        # update episodes
         n_episodes = len(episode_rewards)
         self.episodes_in_iter = n_episodes - self.last_episode_count
-        if(self.episodes_in_iter == 0):#no episodes in iteration
-            if(n_episodes) == 0: #special case when there are no episodes so far
-                episode_reward_mean = np.sum(env.rewards)#cummulative reward so far
-                episode_len_mean = env.get_total_steps()#all steps so far
-            else:#iteration end, no episode end
+        if(self.episodes_in_iter == 0):  # no episodes in iteration
+            if(n_episodes) == 0:  # special case when there are no episodes so far
+                episode_reward_mean = np.sum(env.rewards)  # cummulative reward so far
+                episode_len_mean = env.get_total_steps()  # all steps so far
+            else:
+                # iteration end, no episode end
                 # start = self.timesteps_per_iteration*training_iteration
                 # episode_reward_mean = np.sum(env.rewards[start:])
                 # episode_length_mean = self.timesteps_per_iteration
@@ -197,12 +216,15 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
                 episode_length_mean = self.timesteps_per_iteration
         else:
             # episode stats are from all steps taken in env then we need to take mean over "iterations":
-            #start , stop =  self.last_episode_count, self.last_episode_count + self.episodes_in_iter - 1
-            episode_reward_mean = np.mean(episode_rewards[self.last_episode_count : ])
-            episode_length_mean = np.mean(episode_lengths[self.last_episode_count : ])
+            # start , stop =  self.last_episode_count, self.last_episode_count + self.episodes_in_iter - 1
+            episode_reward_mean = np.mean(episode_rewards[self.last_episode_count:])
+            episode_length_mean = np.mean(episode_lengths[self.last_episode_count:])
         self.last_episode_count = n_episodes
-        fout.write(str(total_timesteps) + ' ' + str(episode_reward_mean) +
-                ' ' + str(episode_length_mean) + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
+
+        # timesteps_total always HAS to be the 1st written: analysis.py depends on it
+        fout.write(str(total_timesteps) + ' ' +
+                   str(episode_reward_mean) +
+                   ' ' + str(episode_length_mean) + '\n')
         fout.close()
 
         # We did not manage to find an easy way to log evaluation stats for Ray without the following hack which demarcates the end of a training iteration in the evaluation stats file
@@ -213,6 +235,7 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
 
         #info["result"]["callback_ok"] = True
         return True
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
@@ -785,13 +808,14 @@ def main(args):
                         config_algorithm = config.algorithm, var_configs = var_configs_deepcopy)
         #Train
         learn_params = {"callback": csv_callbacks,
-                        "total_timesteps": timesteps_total}
+                        "total_timesteps": int(timesteps_total)}
         if(config.algorithm == "DDPG"): #Log interval is handled differently for each algorithm, e.g. each log_interval episodes(DQN) or log_interval steps(DDPG).
             learn_params["log_interval"] = timesteps_per_iteration
         else:
             learn_params["log_interval"] = timesteps_per_iteration//10
         
         model.learn(**learn_params)
+        model.save('%s_last'%(args.exp_name))
 
     end = time.time()
     print("No. of seconds to run:", end - start)

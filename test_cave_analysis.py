@@ -2,12 +2,13 @@ from cave.cavefacade import CAVE
 from mdp_playground.analysis.mdpp_to_cave import MDPPToCave
 import os
 
-files_dir = "/mnt/484A4CAB4A4C9798/GoogleDrive/Maestria-Drive/HiWi/mdp_files"
+files_dir = "/mnt/484A4CAB4A4C9798/GoogleDrive/Maestria-Drive/HiWi/mdp_files/" #baselines"
 experiments = {
 #     "a3c_seq" : "%s/a3c_seq/"%files_dir,
 #     "a3c_lstm_seq" : "%s/a3c_lstm_seq/"%files_dir,
 #     "a3c_del" : "%s/a3c_del/"%files_dir,
-    "a3c_lstm_del" : "%s/a3c_lstm_del/"%files_dir,
+#    "a3c_lstm_del" : "%s/a3c_lstm_del/"%files_dir,
+    "dqn_seq_del": files_dir
 }
 
 #The converted mdpp csvs will be stored in output_dir
@@ -27,6 +28,6 @@ cave = CAVE(folders = [cave_input_file],
             file_format = "BOHB",
             show_jupyter=True,
            )
-cave.performance_table()
-cave.local_parameter_importance()
-# cave.cave_fanova()
+# cave.performance_table()
+# cave.local_parameter_importance()
+cave.cave_fanova()
