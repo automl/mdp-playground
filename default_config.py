@@ -1,6 +1,8 @@
+from mdp_playground.config_processor import *
+
 num_seeds = 3
 from collections import OrderedDict
-env_configs = OrderedDict({
+var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
     'delay': [0] + [2**i for i in range(4)],
@@ -13,6 +15,26 @@ env_configs = OrderedDict({
     # 'reward_scale': [10.0],
     'dummy_seed': [i for i in range(num_seeds)],
 })
+
+var_configs = OrderedDict({
+"env": var_env_configs
+})
+
+env_config = {
+    "env": "RLToy-v0",
+    "horizon": 100,
+    "env_config": {
+        'seed': 0, #seed
+        'state_space_type': 'discrete',
+        'action_space_type': 'discrete',
+        'generate_random_mdp': True,
+        'repeats_in_sequences': False,
+        'reward_scale': 1.0,
+        'completely_connected': True,
+    },
+}
+
+eval_config = {}
 
 algorithm = "DQN"
 agent_config = {
@@ -53,3 +75,8 @@ model_config = {
         "lstm_use_prev_action_reward": False,
     },
 }
+
+varying_configs = get_grid_of_configs(var_configs)
+# print("VARYING_CONFIGS:", varying_configs)
+
+final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm='SAC')

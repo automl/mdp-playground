@@ -28,9 +28,11 @@ class RLToyEnv(gym.Env):
         sequence_length : int >= 1
             Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length are set to be rewardable at initialisation if use_custom_mdp = false and generate_random_mdp = true.
         transition_noise : float in range [0, 1] or Python function(rng)
-            For discrete environments, it is a float that specifies the fraction of times the environment transitions to a noisy next state at each timestep, independently and uniformly at random. For continuous environments, it is a Python function with one argument that is added to next state. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.
-        reward_noise : Python function(rng)
-            A Python function with one argument that is added to the reward given at every time step. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.
+            For discrete environments, it is a float that specifies the fraction of times the environment transitions to a noisy next state at each timestep, independently and uniformly at random.
+            For continuous environments, if it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise. If it is a Python function with one argument, it is added to next state. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.
+        reward_noise : float or Python function(rng)
+            If it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise.
+            If it's a Python function with one argument, it is added to the reward given at every time step. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.
         reward_density : float in range [0, 1]
             The fraction of possible sequences of a given length that will be selected to be rewardable at initialisation time.
         reward_scale : float
@@ -54,12 +56,14 @@ class RLToyEnv(gym.Env):
 
 
         Specific to discrete environments:
-            state_space_size : int > 0
+            state_space_size : int > 0 or list of length 2
                 A number specifying size of the state space for normal discrete environments and a list of len = 2 when irrelevant_features is True (The list contains sizes of relevant and irrelevant sub-spaces where the 1st sub-space is assumed relevant and the 2nd sub-space is assumed irrelevant).
+                NOTE: When automatically generating MDPs, do not specify this value as its value depends on the action_space_size and the diameter as state_space_size = action_space_size * diameter.
             action_space_size : int > 0
-                Similar description as state_space_size. When automatically generating MDPs, however, its value depends on the state_space_size and the diameter.
-            reward_dist : Python function(env_rng, reward_sequence_dict)
-                A Python function that samples rewards for the rewardable_sequences dict of the environment. The rewardable_sequences dict of the environment holds the rewardable_sequences with the key as a tuple holding the sequence and value as the reward handed out. The 1st argument for the reward_dist function is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used to sample rewards to ensure reproducibility. The 2nd argument is the rewardable_sequences dict of the environment. This is available because one may need access to the already created reward sequences in the reward_dist function.
+                Similar description as state_space_size. When automatically generating MDPs, however, its value determines the state_space_size.
+            reward_dist : list with 2 floats or a Python function(env_rng, reward_sequence_dict)
+                If it's a list with 2 floats, then these 2 values are interpreted as a closed interval and taken as the end points of a categorical distribution which points equally spaced along the interval.
+                If it's a Python function, it samples rewards for the rewardable_sequences dict of the environment. The rewardable_sequences dict of the environment holds the rewardable_sequences with the key as a tuple holding the sequence and value as the reward handed out. The 1st argument for the reward_dist function is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used to sample rewards to ensure reproducibility. The 2nd argument is the rewardable_sequences dict of the environment. This is available because one may need access to the already created reward sequences in the reward_dist function.
             init_state_dist : 1-D numpy.ndarray
                 Specifies an array of initialisation probabilities for the discrete state space.
             terminal_states : Python function(state) or 1-D numpy.ndarray
@@ -345,6 +349,27 @@ class RLToyEnv(gym.Env):
         else:
             self.maximally_connected = config["maximally_connected"]
 
+        if "reward_noise" in config:
+            if callable(config["reward_noise"]):
+                self.reward_noise = config["reward_noise"]
+            else:
+                reward_noise_std = config["reward_noise"]
+                self.reward_noise = lambda a: a.normal(0, reward_noise_std)
+        else:
+            self.reward_noise = None
+
+        if "transition_noise" in config:
+            if config["state_space_type"] == "continuous":
+                if callable(config["transition_noise"]):
+                    self.transition_noise = config["transition_noise"]
+                else:
+                    transition_noise_std = config["transition_noise"]
+                    self.transition_noise = lambda a: a.normal(0, transition_noise_std)
+            else: # discrete case
+                self.transition_noise = config["transition_noise"]
+        else: # no transition noise
+            self.transition_noise = None
+
         if "reward_scale" not in config:
             self.reward_scale = 1.0
         else:
@@ -408,7 +433,7 @@ class RLToyEnv(gym.Env):
 
         if config["state_space_type"] == "discrete":
             if "reward_dist" not in config:
-                self.reward_dist = 1.0
+                self.reward_dist = None
             else:
                 self.reward_dist = config["reward_dist"]
 
@@ -470,15 +495,18 @@ class RLToyEnv(gym.Env):
                 # assert "relevant_indices" in config, "You have to provide relevant_indices when state_space_size is a list because it's supposed to be a list only when injecting irrelevant features."
                 # config["irrelevant_indices"] = list(set(range(len(config["state_space_size"]))) - set(config["relevant_indices"]))
                 # config["all_indices"] = list(set(range(len(config["state_space_size"])))
-                assert len(config["state_space_size"]) == 2, "Currently, 1st sub-state space is assumed to be relevant to rewards and 2nd one is irrelevant. Please provide a list with sizes for the 2."
-                self.state_space_size = config["state_space_size"]
+                assert len(config["action_space_size"]) == 2, "Currently, 1st sub-state (and action) space is assumed to be relevant to rewards and 2nd one is irrelevant. Please provide a list with sizes for the 2."
+                self.action_space_size = config["action_space_size"]
             else: # uni-discrete space
                 # config["relevant_indices"] = config["all_indices"] = [0]
-                assert isinstance(config["state_space_size"], int), "Did you mean to turn irrelevant_features? If so, please set irrelevant_features = True in config. If not, please provide an int for state_space_size."
-                self.state_space_size = [config["state_space_size"]] # Make a list to be able to iterate over observation spaces in for loops later
+                assert isinstance(config["action_space_size"], int), "Did you mean to turn irrelevant_features? If so, please set irrelevant_features = True in config. If not, please provide an int for action_space_size."
+                self.action_space_size = [config["action_space_size"]] # Make a list to be able to iterate over observation spaces in for loops later
                 # assert type(config["state_space_size"]) == int, 'config["state_space_size"] has to be provided as an int when we have a simple Discrete environment. Was:' + str(type(config["state_space_size"]))
-            self.action_space_size = np.array(self.state_space_size) // np.array(self.diameter)
-            assert (np.array(self.state_space_size) % np.array(self.diameter) == 0).all(), "state_space_size should be a multiple of the diameter to allow for the generation of regularly connected MDPs."
+            if self.use_custom_mdp:
+                self.state_space_size = [config["state_space_size"]]
+            else:
+                self.state_space_size = np.array(self.action_space_size) * np.array(self.diameter)
+                # assert (np.array(self.state_space_size) % np.array(self.diameter) == 0).all(), "state_space_size should be a multiple of the diameter to allow for the generation of regularly connected MDPs."
         else: # cont. space
             self.action_space_dim = self.state_space_dim
             if self.irrelevant_features:
@@ -869,22 +897,33 @@ class RLToyEnv(gym.Env):
                 if self.repeats_in_sequences:
                     rewardable_sequences = get_sequences(maximum=non_term_state_space_size, length=self.sequence_length, fraction=self.reward_density, repeats=True, diameter=self.diameter)
 
-                    if len(rewardable_sequences) > 1000:
-                        warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(len(rewardable_sequences))) #TODO Maybe even exit the program if too much memory is (expected to be) taken.;
-
-                    for specific_sequence in rewardable_sequences:
-                        insert_sequence(specific_sequence)
-
                 else: # if no repeats_in_sequences
                     rewardable_sequences = get_sequences(maximum=non_term_state_space_size, length=self.sequence_length, fraction=self.reward_density, repeats=False, diameter=self.diameter)
 
-                    if len(rewardable_sequences) > 1000:
-                        warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(len(rewardable_sequences))) #TODO Maybe even exit the program if too much memory is (expected to be) taken.; Took about 80s for 40k iterations of the for loop below on my laptop
+                # Common to both cases: repeats_in_sequences or not
+                if type(self.reward_dist) == list: # Specified as interval
+                    reward_dist_ = self.reward_dist
+                    num_rews = self.diameter * len(rewardable_sequences)
+                    print("num_rewardable_sequences set to:", num_rews)
+                    if num_rews == 1:
+                        rews = [1.0]
+                    else:
+                        rews = np.linspace(reward_dist_[0], reward_dist_[1], num=num_rews)
+                    assert rews[-1] == 1.0
+                    self.np_random.shuffle(rews)
 
-                    for specific_sequence in rewardable_sequences:
-                        insert_sequence(specific_sequence)
-                    # else: # "repeats" in sequences are allowed until diameter - 1 steps have been taken: We sample the sequences as the state number inside each independent set, which are numbered from 0 to action_space_size - 1
-                    #     pass
+                    def get_rews(rng, r_dict):
+                        return rews[len(r_dict)]
+
+                    self.reward_dist = get_rews
+
+                if len(rewardable_sequences) > 1000:
+                    warnings.warn('Too many rewardable sequences and/or too long rewardable sequence length. Environment might be too slow. Please consider setting the reward_density to be lower or reducing the sequence length. No. of rewardable sequences:' + str(len(rewardable_sequences))) #TODO Maybe even exit the program if too much memory is (expected to be) taken.; Took about 80s for 40k iterations of the for loop below on my laptop
+
+                for specific_sequence in rewardable_sequences:
+                    insert_sequence(specific_sequence)
+                # else: # "repeats" in sequences are allowed until diameter - 1 steps have been taken: We sample the sequences as the state number inside each independent set, which are numbered from 0 to action_space_size - 1
+                #     pass
 
                 print("rewardable_sequences: " + str(self.rewardable_sequences)) #debug print
         else: # if continuous space
@@ -915,9 +954,9 @@ class RLToyEnv(gym.Env):
 
         if self.config["state_space_type"] == "discrete":
             next_state = self.config["transition_function"](state, action)
-            if "transition_noise" in self.config:
-                probs = np.ones(shape=(self.state_space_size[0],)) * self.config["transition_noise"] / (self.state_space_size[0] - 1)
-                probs[next_state] = 1 - self.config["transition_noise"]
+            if self.transition_noise:
+                probs = np.ones(shape=(self.state_space_size[0],)) * self.transition_noise / (self.state_space_size[0] - 1)
+                probs[next_state] = 1 - self.transition_noise
                 # TODO Samples according to new probs to get noisy discrete transition
                 new_next_state = self.observation_spaces[0].sample(prob=probs) #random
                 # print("noisy old next_state, new_next_state", next_state, new_next_state)
@@ -955,7 +994,7 @@ class RLToyEnv(gym.Env):
                     next_state = state
                     warnings.warn("WARNING: Action " + str(action) + " out of range of action space. Applying 0 action!!")
             # if "transition_noise" in self.config:
-            noise_in_transition = self.config["transition_noise"](self.np_random) if "transition_noise" in self.config else 0 #random
+            noise_in_transition = self.transition_noise(self.np_random) if self.transition_noise else 0 #random
             self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
             next_state += noise_in_transition ##IMP Noise is only applied to state and not to higher order derivatives
             ### TODO Check if next_state is within state space bounds
@@ -1084,7 +1123,7 @@ class RLToyEnv(gym.Env):
                     reward -= self.action_loss_weight * np.linalg.norm(np.array(action, dtype=self.dtype))
 
         reward *= self.reward_scale
-        noise_in_reward = self.config["reward_noise"](self.np_random) if "reward_noise" in self.config else 0 #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
+        noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0 #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
@@ -1146,9 +1185,9 @@ class RLToyEnv(gym.Env):
         if self.config["state_space_type"] == "discrete":
             if self.irrelevant_features:
                 next_state_irrelevant = self.config["transition_function_irrelevant"][state_irrelevant, action_irrelevant]
-                if "transition_noise" in self.config:
-                    probs = np.ones(shape=(self.state_space_size[1],)) * self.config["transition_noise"] / (self.state_space_size[1] - 1)
-                    probs[next_state_irrelevant] = 1 - self.config["transition_noise"]
+                if self.transition_noise:
+                    probs = np.ones(shape=(self.state_space_size[1],)) * self.transition_noise / (self.state_space_size[1] - 1)
+                    probs[next_state_irrelevant] = 1 - self.transition_noise
                     new_next_state_irrelevant = self.observation_spaces[1].sample(prob=probs) #random
                     # if next_state_irrelevant != new_next_state_irrelevant:
                     #     print("NOISE inserted! old next_state_irrelevant, new_next_state_irrelevant", next_state_irrelevant, new_next_state_irrelevant)

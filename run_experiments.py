@@ -14,37 +14,6 @@ import logging
 import ray
 from ray import tune
 from ray.rllib.utils.seed import seed as rllib_seed
-import mdp_playground
-from mdp_playground.envs import RLToyEnv
-from ray.tune.registry import register_env
-register_env("RLToy-v0", lambda config: RLToyEnv(**config))
-
-def create_gym_env_wrapper_atari(config):
-    from gym.envs.atari import AtariEnv
-    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-    ae = AtariEnv(**config["AtariEnv"])
-    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
-    return gew
-
-register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
-
-
-def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
-    '''When using frameStack GymEnvWrapper should wrap AtariEnv using wrap_deepmind_ray and therefore this function sets "wrap_deepmind_ray": True and 'frame_skip': 1 inside config so as to keep config same as for create_gym_env_wrapper_atari above and reduce manual errors when switching between the 2.
-    '''
-    config["wrap_deepmind_ray"] = True #hack
-    config["frame_skip"] = 1 #hack
-    from gym.envs.atari import AtariEnv
-    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-    import gym
-    game = config["AtariEnv"]["game"]
-    game = ''.join([g.capitalize() for g in game.split('_')])
-    ae = gym.make('{}NoFrameskip-v4'.format(game))
-    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
-    return gew
-
-register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack_atari(config))
-
 
 import sys, os
 import argparse
@@ -176,6 +145,7 @@ import time
 start = time.time()
 
 # Ray callback to write training stats to CSV file at end of every training iteration
+# Don't know how to move this function to config. It requires the filename which _has_ to be possible to set in this file. Need to take care of hack_filename and hacky_timesteps_total and initialise file writing in there.
 def on_train_result(info):
     training_iteration = info["result"]["training_iteration"]
     # algorithm = info["trainer"]._name
@@ -186,25 +156,20 @@ def on_train_result(info):
     for config_type, config_dict in var_configs_deepcopy.items():
         for key in config_dict:
             if config_type == "env":
-                if key == 'reward_noise':
-                    fout.write('%.2e' % info["result"]["config"]["env_config"]['reward_noise_std'] + ' ') #hack
-                elif key == 'transition_noise' and info["result"]["config"]["env_config"]["state_space_type"] == "continuous":
-                    fout.write('%.2e' % info["result"]["config"]["env_config"]['transition_noise_std'] + ' ') #hack
+                field_val = info["result"]["config"]["env_config"][key]
+                if isinstance(field_val, float):
+                    str_to_write = '%.2e' % field_val
+                elif type(field_val) == list:
+                    str_to_write = "["
+                    for elem in field_val:
+                        # print(key)
+                        str_to_write += '%.2e' % elem if isinstance(elem, float) else str(elem)
+                        str_to_write += ","
+                    str_to_write += "]"
                 else:
-                    field_val = info["result"]["config"]["env_config"][key]
-                    if isinstance(field_val, float):
-                        str_to_write = '%.2e' % field_val
-                    elif type(field_val) == list:
-                        str_to_write = "["
-                        for elem in field_val:
-                            # print(key)
-                            str_to_write += '%.2e' % elem if isinstance(elem, float) else str(elem)
-                            str_to_write += ","
-                        str_to_write += "]"
-                    else:
-                        str_to_write = str(field_val).replace(' ', '')
-                    str_to_write += ' '
-                    fout.write(str_to_write)
+                    str_to_write = str(field_val).replace(' ', '')
+                str_to_write += ' '
+                fout.write(str_to_write)
             elif config_type == "agent":
                 if config_algorithm == 'SAC' and key == "critic_learning_rate":
                     real_key = "lr" #hack due to Ray's weird ConfigSpaces
@@ -286,258 +251,62 @@ def on_episode_step(info):
 
 
 
-# value_tuples = []
-# for config_type, config_dict in config.var_configs.items():
-#     for key in config_dict:
-#         assert type(config.var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
-#         value_tuples.append(config.var_configs[config_type][key])
-#
-# import itertools
-# cartesian_product_configs = list(itertools.product(*value_tuples))
-# print("Total number of configs. to run:", len(cartesian_product_configs))
-
 if args.config_num is None:
-    cartesian_product_configs = config.cartesian_product_configs
+    final_configs = config.final_configs
     # pass
 else:
-    cartesian_product_configs = [config.cartesian_product_configs[args.config_num]]
-
-#hack ###TODO remove?
-if 'random_configs' in dir(config):
-    random_configs = config.random_configs # [args.agent_config_num]
-    if args.agent_config_num is not None:
-        random_configs = [config.random_configs[args.agent_config_num]]
-        # print("Single random_config of agent to be run:", random_config)
-else:
-    random_configs = [()] * len(cartesian_product_configs)
-
+    final_configs = [config.final_configs[args.config_num]]
 
 
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
-for enum_conf_1, current_config_ in enumerate(cartesian_product_configs):
-    for enum_conf_2, random_config_ in enumerate(random_configs):
-        print("current_config of agent to be run:", current_config_, enum_conf_1)
-        print("random_config of agent to be run:", random_config_, enum_conf_2)
+for enum_conf_1, current_config_ in enumerate(final_configs):
+    print("current_config of agent to be run:", current_config_, enum_conf_1)
 
-        current_config = current_config_ + random_config_ ###TODO Remove #hack because this ignores model_config that may be at end of current_config!
-        algorithm = config.algorithm
-
-        agent_config = config.agent_config
-        model_config = config.model_config
-        env_config = config.env_config
-        # sys.exit(0)
-
-        for config_type, config_dict in config.var_configs.items():
-            for key in config_dict:
-            # if config_type == "env_config": # There is a dummy seed in the env_config because it's not used in the environment. It implies a different seed for the agent on every launch as the seed for Ray is not being set here. I faced problems with Ray's seeding process.
-                if config_type == "env": #hack All these are hacks to get around different limitations
-                    if key == 'reward_noise':
-                        reward_noise_ = current_config[list(var_env_configs).index(key)] # this works because env_configs are 1st in the OrderedDict
-                        env_config["env_config"][key] = tune.function(lambda a: a.normal(0, reward_noise_))
-                        env_config["env_config"]['reward_noise_std'] = reward_noise_ #hack Needed to be able to write scalar value of std dev. to stats file instead of the lambda function above ###TODO Could remove the hack by creating a class for the noises and changing its repr()
-                    elif key == 'transition_noise' and env_config["env_config"]["state_space_type"] == "continuous":
-                        transition_noise_ = current_config[list(var_env_configs).index(key)]
-                        env_config["env_config"][key] = tune.function(lambda a: a.normal(0, transition_noise_))
-                        env_config["env_config"]['transition_noise_std'] = transition_noise_ #hack
-                    elif key == 'reward_dist_end_pts':
-                        reward_dist_ = current_config[list(var_env_configs).index(key)] # this works because env_configs are 1st in the OrderedDict
-
-                        permutations = []
-                        length = current_config[list(var_env_configs).index("sequence_length")]
-                        diameter = current_config[list(var_env_configs).index("diameter")]
-                        action_space_size = current_config[list(var_env_configs).index("action_space_size")]
-                        state_space_size = action_space_size * diameter
-                        terminal_state_density = current_config[list(var_env_configs).index("terminal_state_density")]
-                        maximum = state_space_size  * (1 - terminal_state_density)/diameter
-                        fraction = current_config[list(var_env_configs).index("reward_density")]
-
-                        for i in range(length):
-                            permutations.append(maximum - i // diameter)
-                        num_possible_permutations = np.prod(permutations)
-                        num_sel_sequences = int(fraction * num_possible_permutations)
-                        if num_sel_sequences == 0:
-                            num_sel_sequences = 1
-                            warnings.warn('0 rewardable sequences per independent set for given reward_density, sequence_length, diameter and terminal_state_density. Setting it to 1.')
-
-                        num_rews = diameter * num_sel_sequences
-                        print("num_rewardable_sequences set to:", num_rews)
-                        if num_rews == 1:
-                            rews = [1.0]
-                        else:
-                            rews = np.linspace(reward_dist_[0], reward_dist_[1], num=num_rews)
-                        assert rews[-1] == 1.0
-                        np.random.shuffle(rews)
-
-                        def get_rews(rng, r_dict):
-                            return rews[len(r_dict)]
-
-                        env_config["env_config"]['reward_dist'] = tune.function(get_rews)
-                        env_config["env_config"]['reward_dist_end_pts'] = reward_dist_
-                        env_config["env_config"]['state_space_size'] = action_space_size * diameter
-                    else:
-                        env_config["env_config"][key] = current_config[list(var_env_configs).index(key)]
-
-                elif config_type == "agent":
-                    num_configs_done = len(list(var_env_configs))
-                    if algorithm == 'SAC' and key == 'critic_learning_rate': #hack
-                        value = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
-                        agent_config['optimization'] = {
-                                                        key: value,
-                                                        'actor_learning_rate': value,
-                                                        'entropy_learning_rate': value,
-                                                        }
-                    elif algorithm == 'SAC' and key == 'fcnet_hiddens': #hack
-                        agent_config['Q_model'] = {
-                                                    key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
-                                                    "fcnet_activation": "relu",
-                                                    }
-                        agent_config['policy_model'] = {
-                                                    key: current_config[num_configs_done + list(config.var_configs[config_type]).index(key)],
-                                                    "fcnet_activation": "relu",
-                                                    }
-                    else:
-                        agent_config[key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
-
-                elif config_type == "model":
-                    num_configs_done = len(list(var_env_configs)) + len(list(var_agent_configs))
-                    model_config["model"][key] = current_config[num_configs_done + list(config.var_configs[config_type]).index(key)]
-
-        #hacks begin:
-        if "model" in model_config and model_config["model"]["use_lstm"]:
-            model_config["model"]["max_seq_len"] = env_config["env_config"]["delay"] + env_config["env_config"]["sequence_length"] + 1
-
-        if algorithm == 'DDPG': ###TODO Find a better way to enforce these?? Especially problematic for TD3 because then more values for target_noise_clip are witten to CSVs than actually used during HPO but for normal (non-HPO) runs this needs to be not done.
-            agent_config["actor_lr"] = agent_config["critic_lr"]
-            agent_config["actor_hiddens"] = agent_config["critic_hiddens"]
-        elif algorithm == 'TD3':
-            agent_config["target_noise_clip"] = agent_config["target_noise_clip_relative"] * agent_config["target_noise"]
-            del agent_config["target_noise_clip_relative"] #hack have to delete it otherwise Ray will crash for unknown config param.
-
-        # else: #if algorithm == 'SAC':
-        if "state_space_type" in env_config:
-            if env_config["env_config"]["state_space_type"] == 'continuous':
-                env_config["env_config"]["action_space_dim"] = env_config["env_config"]["state_space_dim"]
-
-        #hacks end
-
-        eval_config = config.eval_config
-
-        if env_config["env"] in ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]:
-            if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
-                env_config["horizon"] /= env_config["env_config"]["time_unit"]
-                env_config["horizon"] = int(env_config["horizon"])
-
-                agent_config["learning_starts"] /= env_config["env_config"]["time_unit"]
-                agent_config["learning_starts"] = int(agent_config["learning_starts"])
-
-                agent_config["timesteps_per_iteration"] /= env_config["env_config"]["time_unit"]
-                agent_config["timesteps_per_iteration"] = int(agent_config["timesteps_per_iteration"])
-
-                eval_config["evaluation_config"]["horizon"] /= env_config["env_config"]["time_unit"]
-                eval_config["evaluation_config"]["horizon"] = int(eval_config["evaluation_config"]["horizon"])
-
-                agent_config["train_batch_size"] *= env_config["env_config"]["time_unit"] # this is needed because Ray (until version 0.8.6 I think) fixes the ratio of number of samples trained/number of steps sampled in environment
-                agent_config["train_batch_size"] = int(agent_config["train_batch_size"])
-
-        extra_config = {
-            "callbacks": {
-    #                 "on_episode_start": tune.function(on_episode_start),
-                # "on_episode_step": tune.function(on_episode_step),
-                "on_episode_end": tune.function(on_episode_end),
-    #                 "on_sample_end": tune.function(on_sample_end),
-                "on_train_result": tune.function(on_train_result),
-    #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
-                    },
-            # "log_level": 'WARN',
-        }
-
-        # tune_config = reduce(deepmerge, [agent_config, env_config, model_config, eval_config, extra_config])
-        tune_config = {**agent_config, **model_config, **env_config, **eval_config, **extra_config} # This works because the dictionaries involved have mutually exclusive sets of keys, otherwise we would need to use a deepmerge!
-        print("tune_config:",)
-        pp.pprint(tune_config)
-
-        #hack Common #mujoco wrapper to allow Mujoco envs to be wrapped by MujocoEnvWrapper (which fiddles with lower-level Mujoco stuff) and then by GymEnvWrapper which is more general and basically adds dimensions from MDPP which are common to discrete and continuous environments
-        if env_config["env"] in ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]:
-            def create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env):
-                '''Creates a GymEnvWrapper around a MujocoEnvWrapper
-                '''
-                from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-                me = wrapped_mujoco_env(**config)
-                gew = GymEnvWrapper(me, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
-                return gew
+    algorithm = config.algorithm
 
 
-        #default settings for #timesteps_total
-        if env_config["env"] in ["HalfCheetahWrapper-v3"]: #hack
-            timesteps_total = 3000000
+    extra_config = {
+        "callbacks": {
+#                 "on_episode_start": tune.function(on_episode_start),
+            # "on_episode_step": tune.function(on_episode_step),
+            "on_episode_end": tune.function(on_episode_end),
+#                 "on_sample_end": tune.function(on_sample_end),
+            "on_train_result": tune.function(on_train_result),
+#                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+                },
+        # "log_level": 'WARN',
+    }
 
-            from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
-            from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
-            wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
-            register_env("HalfCheetahWrapper-v3", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
-
-        elif env_config["env"] in ["HopperWrapper-v3"]: #hack
-            timesteps_total = 1000000
-
-            from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
-            from gym.envs.mujoco.hopper_v3 import HopperEnv
-            wrapped_mujoco_env = get_mujoco_wrapper(HopperEnv)
-            register_env("HopperWrapper-v3", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
-
-        elif env_config["env"] in ["PusherWrapper-v2"]: #hack
-            timesteps_total = 500000
-
-            from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
-            from gym.envs.mujoco.pusher import PusherEnv
-            wrapped_mujoco_env = get_mujoco_wrapper(PusherEnv)
-            register_env("PusherWrapper-v2", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
-
-        elif env_config["env"] in ["ReacherWrapper-v2"]: #hack
-            timesteps_total = 500000
-
-            from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
-            from gym.envs.mujoco.reacher import ReacherEnv
-            wrapped_mujoco_env = get_mujoco_wrapper(ReacherEnv)
-            register_env("ReacherWrapper-v2", lambda config: create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env))
-
-        elif env_config["env"] in ["GymEnvWrapper-Atari"]: #hack
-            if "AtariEnv" in env_config["env_config"]:
-                timesteps_total = 10_000_000
-
-        else:
-            if algorithm == 'DQN':
-                timesteps_total = 20000
-            elif algorithm == 'A3C': #hack
-                timesteps_total = 150000
-            else: #if algorithm == 'DDPG': #hack
-                timesteps_total = 20000
-
-        if 'timesteps_total' in dir(config):
-            timesteps_total = config.timesteps_total
-
-        if env_config["env"] in ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]:
-            if "time_unit" in env_config["env_config"]: #hack This is needed so that the environment runs the same amount of seconds of simulation, even though episode steps are different.
-                timesteps_total /= env_config["env_config"]["time_unit"]
-                timesteps_total = int(timesteps_total)
+    tune_config = {**current_config_, **extra_config} # This works because the dictionaries involved have mutually exclusive sets of keys, otherwise we would need to use a deepmerge!
+    print("tune_config:",)
+    pp.pprint(tune_config)
 
 
-        print("\n\033[1;32m======== Running on environment: " + env_config["env"] + " =========\033[0;0m\n")
-        print("\n\033[1;32m======== for " + str(timesteps_total) + " steps =========\033[0;0m\n")
+    if 'timesteps_total' in dir(config):
+        timesteps_total = config.timesteps_total
+    else:
+        timesteps_total = tune_config["timesteps_total"]
 
-        tune.run(
-            algorithm,
-            name=algorithm + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
-            stop={
-                "timesteps_total": timesteps_total,
-                  },
-            config=tune_config,
-            checkpoint_at_end=args.save_model,
-            local_dir=args.framework_dir + '/_ray_results',
-            #return_trials=True # add trials = tune.run( above
-        )
+    del tune_config["timesteps_total"] # Ray doesn't allow unknown configs
+
+
+    print("\n\033[1;32m======== Running on environment: " + tune_config["env"] + " =========\033[0;0m\n")
+    print("\n\033[1;32m======== for " + str(timesteps_total) + " steps =========\033[0;0m\n")
+
+    tune.run(
+        algorithm,
+        name=algorithm + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
+        stop={
+            "timesteps_total": timesteps_total,
+              },
+        config=tune_config,
+        checkpoint_at_end=args.save_model,
+        local_dir=args.framework_dir + '/_ray_results',
+        #return_trials=True # add trials = tune.run( above
+    )
 
 end = time.time()
 print("No. of seconds to run:", end - start)
