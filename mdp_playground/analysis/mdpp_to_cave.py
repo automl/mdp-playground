@@ -4,15 +4,15 @@ import argparse, os
 import json
 
 class MDPPToCave():
-    def __init__(self, output_dir = "../mdpp_to_cave/"):
+    def __init__(self):
         return
 
     def _create_configspace_json(self, stats_pd, var_configs):
         configspace = {"hyperparameters":[],
-                    "conditions": [],
-                    "forbiddens": [],
-                    "python_module_version": "0.4.11",
-                    "json_format_version": 0.1}
+                        "conditions": [],
+                        "forbiddens": [],
+                        "python_module_version": "0.4.11",
+                        "json_format_version": 0.1}
         for param in var_configs:
             param_config = {"name": param}
             var_type = str( type(stats_pd[param].iloc[0]) )    
@@ -88,7 +88,7 @@ class MDPPToCave():
             print("\033[1;31mLoading data from a distributed run of experiment configurations. Creating a combined CSV stats file.\033[0;0m")
             self.join_files(stats_file,  '.csv')
             self.join_files(stats_file, '_eval.csv')
-        
+
     def to_cave_csv(self, args):
         #file_path = args.file_path
         input_folder = "../mdp_files/"
@@ -96,7 +96,7 @@ class MDPPToCave():
         output_folder = "../to_cave_format/%s"%file_name
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
-        
+
         ## Read current csvs ##
         stats_file = os.path.join(input_folder, file_name)
         with open(stats_file + '.csv') as file_:
@@ -145,22 +145,27 @@ class MDPPToCave():
             print("Writing bohb to cave output to %s"%(os.path.abspath(output_dir)))
             os.makedirs(self.output_folder)
 
-        #file_path = args.file_path
+        # file_path = args.file_path
         output_folder = os.path.join(self.output_folder, exp_name)
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
-        
-        ## Read current csvs ##
+
+        # Read current csvs ##
         stats_file = os.path.join(dir_name, exp_name)
+        stats_file = os.path.abspath(stats_file)
         self._read_stats(stats_file)
         with open(stats_file + '.csv') as file_:
             col_names = file_.readline().strip().split(', ')
-            col_names[0] = col_names[0][2:] # to remove '# ' that was written
+            col_names[0] = col_names[0][2:]  # to remove '# ' that was written
         # print("config_names:", col_names)
-        stats_pd = pd.read_csv(stats_file + '.csv', skip_blank_lines=True,\
-                                    header=None, names = col_names, comment='#', sep=' ')
+        stats_pd = pd.read_csv(stats_file + '.csv',
+                               skip_blank_lines=True,
+                               header=None,
+                               names=col_names,
+                               comment='#',
+                               sep=' ')
         remove_names = ["training_iteration", "algorithm", "seed"]
-        
+
         parameters = col_names[:-3].copy()#All paramaters tracked in run
         for x in col_names:
             for name in remove_names:
@@ -244,16 +249,16 @@ class MDPPToCave():
 
 
 if __name__ == "__main__":
-    dir_name = '../../../mdp_files/'
+    dir_name = '../mdp_files/'
     exp_name = 'dqn_seq_del'
     
     from cave.cavefacade import CAVE
     import os
     # The converted mdpp csvs will be stored in output_dir
-    output_dir = "../../../mdpp_to_cave"
+    output_dir = "../mdpp_to_cave"
     mdpp_file =  os.path.join(dir_name, exp_name)
-    mdpp_cave = MDPPToCave(output_dir)
-    cave_input_file = mdpp_cave.to_bohb_results(dir_name, exp_name)
+    mdpp_cave = MDPPToCave()
+    cave_input_file = mdpp_cave.to_bohb_results(dir_name, exp_name, output_dir)
 
     # cave_input_file = "../../../mdpp_to_cave/dqn_seq_del"
 
@@ -272,9 +277,19 @@ if __name__ == "__main__":
     # Common analysis
     cave.performance_table()
     cave.local_parameter_importance()
-
-    # fanova can only be used with more
-    # more than 1 meta-feature
-    cave.cave_fanova()
+    cave.cave_fanova()  # can only be used with more than 1 meta-feature
 
     # Other analysis
+    # cave.parallel_coordinates()
+    # cave.cost_over_time()
+    # cave.algorithm_footprints()
+    # cave.pimp_comparison_table()
+    # cave.cave_ablation()
+    # cave.pimp_forward_selection()
+    # cave.feature_importance()
+    # cave.configurator_footprint()
+    # cave.algorithm_footprints()
+    # cave.plot_ecdf()
+    # cave.plot_scatter()
+    # cave.compare_default_incumbent()
+    # cave.overview_table()

@@ -37,16 +37,19 @@ def main():
             #set default value
             framework = "ray"
 
-    #Run file
+    # Run file
     print("Running framework:", framework)
     if(framework == "stable_baselines"):
         import run_experiments_baselines
         run_experiments_baselines.main(args)
-    elif( framework == "custom"):
+    elif(framework == "stable_baselines3"):
+        import run_experiments_baselines3
+        run_experiments_baselines3.main(args)
+    elif(framework == "custom"):
         import run_experiments_custom
         run_experiments_custom.main(args)
         return
-    else: #ray
+    else:  # ray
         import run_experiments_ray
         run_experiments_ray.main(args)#_ray.main(args)
 
