@@ -6,6 +6,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from mdp_playground.config_processor import *
 import numpy as np
 import copy
 import warnings
@@ -18,6 +19,12 @@ from ray.rllib.utils.seed import seed as rllib_seed
 import sys, os
 import argparse
 # import configparser
+
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
+#TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
+log_level_ = logging.WARNING ##TODO Make a runtime argument
 
 parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
 parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
@@ -32,7 +39,7 @@ parser.add_argument('-n', '--config-num', dest='config_num', action='store', def
 parser.add_argument('-a', '--agent-config-num', dest='agent_config_num', action='store', default=None, type=int,
                    help='Used for running the configurations of experiments in parallel. This is appended to the prefix of the output files (after exp_name).') ###TODO Remove? #hack to run 1000 x 1000 env configs x agent configs. Storing all million of them in memory may be too inefficient?
 parser.add_argument('-m', '--save-model', dest='save_model', action='store', default=False, type=bool,
-                   help='Option to save trained NN model at the end of training.')
+                   help='Option to specify whether or not to save trained NN model at the end of training.')
 parser.add_argument('-t', '--framework-dir', dest='framework_dir', action='store', default='/tmp/', type=str,
                    help='Prefix of directory to be used by underlying framework (e.g. Ray Rllib, Stable Baselines 3). This name will be passed to the framework.')
 # parser.add_argument('-t', '--tune-hps', dest='tune_hps', action='store', default=False, type=bool,
@@ -42,7 +49,7 @@ parser.add_argument('-t', '--framework-dir', dest='framework_dir', action='store
 
 
 args = parser.parse_args()
-print("Parsed args:", args)
+print("Parsed arguments:", args)
 
 if args.config_file[-3:] == '.py':
     args.config_file = args.config_file[:-3]
@@ -60,8 +67,7 @@ print("Configuration number(s) that will be run:", "all" if args.config_num is N
 # print("default_config:", default_config)
 # print(os.path.abspath(args.config_file)) # 'experiments/dqn_seq_del.py'
 
-args.exp_name = os.path.abspath(args.exp_name)
-stats_file_name = args.exp_name
+stats_file_name = os.path.abspath(args.exp_name)
 
 if args.config_num is not None:
     stats_file_name += '_' + str(args.config_num)
@@ -71,12 +77,6 @@ if args.config_num is not None:
 print("Stats file being written to:", stats_file_name)
 
 
-#TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
-from ray.rllib.models.preprocessors import OneHotPreprocessor
-from ray.rllib.models import ModelCatalog
-ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
-
-log_level_ = logging.WARNING ##TODO Make a runtime argument
 
 if config.algorithm == 'DQN':
     ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), temp_dir='/tmp/ray' + str(args.config_num), include_webui=False, logging_level=log_level_, local_mode=True) #webui_host='0.0.0.0'); logging_level=logging.INFO,
@@ -89,37 +89,38 @@ else:
     ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, temp_dir='/tmp/ray' + str(args.config_num), include_webui=False, logging_level=log_level_)
 
 
+# if "env" in config.var_configs:
+#     var_env_configs = config.var_configs["env"] #hack
+# else:
+#     var_env_configs = []
+# if "agent" in config.var_configs:
+#     var_agent_configs = config.var_configs["agent"] #hack
+# else:
+#     var_agent_configs = []
+# if "model" in config.var_configs:
+#     var_model_configs = config.var_configs["model"] #hack
+# else:
+#     var_model_configs = []
+
+
+
+# print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
+
+# configs_to_print = ''
+# for config_type, config_dict in var_configs_deepcopy.items():
+#     if config_type == 'env':
+#         for key in config_dict:
+#             configs_to_print += str(config_dict[key]) + ', '
+#
+# print(config.algorithm, configs_to_print)
+
+
 var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
 if "timesteps_total" in dir(config):
     hacky_timesteps_total = config.timesteps_total #hack
 
-if "env" in config.var_configs:
-    var_env_configs = config.var_configs["env"] #hack
-else:
-    var_env_configs = []
-if "agent" in config.var_configs:
-    var_agent_configs = config.var_configs["agent"] #hack
-else:
-    var_agent_configs = []
-if "model" in config.var_configs:
-    var_model_configs = config.var_configs["model"] #hack
-else:
-    var_model_configs = []
-
 config_algorithm = config.algorithm #hack
 # sys.exit(0)
-
-
-print('# Algorithm, state_space_size, action_space_size, delay, sequence_length, reward_density, make_denser, terminal_state_density, transition_noise, reward_noise ')
-
-configs_to_print = ''
-for config_type, config_dict in var_configs_deepcopy.items():
-    if config_type == 'env':
-        for key in config_dict:
-            configs_to_print += str(config_dict[key]) + ', '
-
-print(config.algorithm, configs_to_print)
-
 
 hack_filename = stats_file_name + '.csv'
 fout = open(hack_filename, 'a') #hardcoded
@@ -221,7 +222,9 @@ def on_train_result(info):
 
 
 # Ray callback to write evaluation stats to CSV file at end of every training iteration
-# on_episode_end is used because these results won't be available on_train_result but only after every episode has ended during evaluation (evaluation phase is checked for by using dummy_eval)
+# on_episode_end is used because these results won't be available on_train_result
+# but only after every episode has ended during evaluation (evaluation phase is
+# checked for by using dummy_eval)
 def on_episode_end(info):
     if "dummy_eval" in info["env"].get_unwrapped()[0].config:
         # print("###on_episode_end info", info["env"].get_unwrapped()[0].config["make_denser"], info["episode"].total_reward, info["episode"].length) #, info["episode"]._agent_reward_history)
@@ -239,14 +242,17 @@ def on_episode_step(info):
         step_reward =  episode.total_reward
     else:
         step_reward =  episode.total_reward - np.sum(episode.custom_metrics["step_reward"])
-        episode.custom_metrics["step_reward"].append(step_reward) # This line should not be executed the 1st time this function is called because no step has actually taken place then (Ray 0.9.0)!!
+        episode.custom_metrics["step_reward"].append(step_reward) # This line
+        # should not be executed the 1st time this function is called because
+        # no step has actually taken place then (Ray 0.9.0)!!
     # episode.custom_metrics = {}
     # episode.user_data = {}
     # episode.hist_data = {}
     # Next 2 are the same, except 1st one is total episodic reward _per_ agent
     # episode.agent_rewards = defaultdict(float)
     # episode.total_reward += reward
-    # only hack to get per step reward seems to be to store prev total_reward and subtract it from that
+    # only hack to get per step reward seems to be to store prev total_reward
+    # and subtract it from that
     # episode._agent_reward_history[agent_id].append(reward)
 
 
@@ -259,8 +265,6 @@ else:
 
 
 
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
 
 for enum_conf_1, current_config_ in enumerate(final_configs):
     print("current_config of agent to be run:", current_config_, enum_conf_1)
@@ -280,7 +284,9 @@ for enum_conf_1, current_config_ in enumerate(final_configs):
         # "log_level": 'WARN',
     }
 
-    tune_config = {**current_config_, **extra_config} # This works because the dictionaries involved have mutually exclusive sets of keys, otherwise we would need to use a deepmerge!
+    tune_config = {**current_config_, **extra_config} # This works because the
+    # dictionaries involved have mutually exclusive sets of keys, otherwise we
+    # would need to use a deepmerge!
     print("tune_config:",)
     pp.pprint(tune_config)
 
@@ -290,15 +296,19 @@ for enum_conf_1, current_config_ in enumerate(final_configs):
     else:
         timesteps_total = tune_config["timesteps_total"]
 
-    del tune_config["timesteps_total"] # Ray doesn't allow unknown configs
+    del tune_config["timesteps_total"] #hack Ray doesn't allow unknown configs
 
 
-    print("\n\033[1;32m======== Running on environment: " + tune_config["env"] + " =========\033[0;0m\n")
-    print("\n\033[1;32m======== for " + str(timesteps_total) + " steps =========\033[0;0m\n")
+    print("\n\033[1;32m======== Running on environment: " + tune_config["env"] \
+    + " =========\033[0;0m\n")
+    print("\n\033[1;32m======== for " + str(timesteps_total) \
+    + " steps =========\033[0;0m\n")
 
     tune.run(
         algorithm,
-        name=algorithm + str(args.exp_name.split('/')[-1]) + '_' + str(args.config_num), ####IMP Name has to be specified otherwise, may lead to clashing for temp file in ~/ray_results/... directory.
+        name=algorithm + str(stats_file_name.split('/')[-1]) + '_' \
+        + str(args.config_num), ####IMP "name" has to be specified, otherwise,
+        # it may lead to clashing for temp file in ~/ray_results/... directory.
         stop={
             "timesteps_total": timesteps_total,
               },

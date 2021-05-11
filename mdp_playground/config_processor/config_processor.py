@@ -3,6 +3,18 @@ import copy
 
 mujoco_envs = ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]
 
+import mdp_playground
+from mdp_playground.envs import RLToyEnv
+from ray.tune.registry import register_env
+register_env("RLToy-v0", lambda config: RLToyEnv(**config))
+register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
+register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack_atari(config))
+
+from ray.rllib.models.preprocessors import OneHotPreprocessor
+from ray.rllib.models import ModelCatalog
+ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
+
+
 def get_grid_of_configs(var_configs):
     '''
     var_configs: dict of dicts of lists as values
@@ -205,7 +217,7 @@ def combined_processing(*static_configs, varying_configs, framework='ray', algor
                 elif key == "model":
                     for key_2 in final_configs[i][key]:
                         if key_2 == "use_lstm":
-                            final_configs[i][key][key_2]["max_seq_len"] = final_configs[i]["env"]["env_config"]["delay"] + final_configs[i]["env"]["env_config"]["sequence_length"] + 1
+                            final_configs[i][key][key_2]["max_seq_len"] = final_configs[i]["env_config"]["delay"] + final_configs[i]["env_config"]["sequence_length"] + 1
 
 
     # Post-processing for Stable Baselines:
@@ -257,10 +269,6 @@ def deepmerge(a, b, path=None):
     return a
 
 
-import mdp_playground
-from mdp_playground.envs import RLToyEnv
-from ray.tune.registry import register_env
-register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 
 def create_gym_env_wrapper_atari(config):
     from gym.envs.atari import AtariEnv
@@ -268,8 +276,6 @@ def create_gym_env_wrapper_atari(config):
     ae = AtariEnv(**config["AtariEnv"])
     gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
     return gew
-
-register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
 
 
 def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
@@ -285,5 +291,3 @@ def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
     ae = gym.make('{}NoFrameskip-v4'.format(game))
     gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
     return gew
-
-register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack_atari(config))

@@ -1,5 +1,6 @@
 from mdp_playground.config_processor import *
 
+# framework = 'ray'
 timesteps_total = 10_000
 num_seeds = 10
 from collections import OrderedDict
@@ -95,7 +96,7 @@ eval_config = {
 varying_configs = get_grid_of_configs(var_configs)
 # print("VARYING_CONFIGS:", varying_configs)
 
-final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm='SAC')
+final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm=algorithm)
 
 # value_tuples = []
 # for config_type, config_dict in var_configs.items():
