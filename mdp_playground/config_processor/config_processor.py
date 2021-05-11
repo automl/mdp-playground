@@ -1,5 +1,6 @@
 from ray.tune.registry import register_env
 import copy
+import sys, os
 
 mujoco_envs = ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", "ReacherWrapper-v2"]
 
@@ -14,6 +15,215 @@ from ray.rllib.models.preprocessors import OneHotPreprocessor
 from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
+
+def process_configs(config_file, stats_file_prefix, config_num, log_level, framework='ray'):
+    config_file_path = os.path.abspath('/'.join(config_file.split('/')[:-1]))
+
+    sys.path.insert(1, config_file_path) #hack
+    import importlib
+    config = importlib.import_module(config_file.split('/')[-1], package=None)
+    print("Number of seeds for environment:", config.num_seeds)
+
+
+
+    #hacks needed to setup Ray callbacks below
+    var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
+    if "timesteps_total" in dir(config):
+        hacky_timesteps_total = config.timesteps_total #hack
+
+    config_algorithm = config.algorithm #hack
+    # sys.exit(0)
+
+    columns_to_write = []
+    for config_type, config_dict in var_configs_deepcopy.items():
+        for key in config_dict:
+            columns_to_write.append(key)
+
+    stats_file_name = stats_file_prefix + '.csv'
+
+    init_stats_file(stats_file_name, columns_to_write)
+
+    # Ray specific
+    if framework.lower() == 'ray':
+        from ray import tune
+        setup_ray(config, config_num, log_level)
+        on_train_result, on_episode_end = setup_ray_callbacks(stats_file_prefix, var_configs_deepcopy, hacky_timesteps_total, config_algorithm)
+
+        extra_config = {
+            "callbacks": {
+    #                 "on_episode_start": tune.function(on_episode_start),
+                # "on_episode_step": tune.function(on_episode_step),
+                "on_episode_end": tune.function(on_episode_end),
+    #                 "on_sample_end": tune.function(on_sample_end),
+                "on_train_result": tune.function(on_train_result),
+    #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+                    },
+            # "log_level": 'WARN',
+        }
+
+    # Stable Baselines specific
+    elif framework.lower() == 'stable_baselines':
+        ...
+
+
+    else:
+        raise ValueError("Framework passed was not a valid option. It was: " + framework + ". Available options are: ray and stable_baselines.")
+
+
+    varying_configs = get_grid_of_configs(config.var_configs)
+    # print("VARYING_CONFIGS:", varying_configs)
+
+    final_configs = combined_processing(config.env_config, config.agent_config, config.model_config, config.eval_config, extra_config, varying_configs=varying_configs, framework='ray', algorithm=config.algorithm)
+
+
+
+    return config, final_configs
+
+
+def setup_ray(config, config_num, log_level):
+    import ray
+    if config.algorithm == 'DQN': #hack
+        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), temp_dir='/tmp/ray' + str(config_num), include_webui=False, logging_level=log_level, local_mode=True) #webui_host='0.0.0.0'); logging_level=logging.INFO, #hardcoded
+
+        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # local_mode (bool): If true, the code will be executed serially. This is useful for debugging. # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
+    elif config.algorithm == 'A3C': #hack
+        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), temp_dir='/tmp/ray' + str(config_num), include_webui=False, logging_level=log_level)
+        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
+    else:
+        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, temp_dir='/tmp/ray' + str(config_num), include_webui=False, logging_level=log_level)
+
+
+def init_stats_file(stats_file_name, columns_to_write):
+    fout = open(stats_file_name, 'a') #hardcoded
+    fout.write('# training_iteration, algorithm, ')
+    for column in columns_to_write:
+            # if config_type == "agent":
+            #     if config_algorithm == 'SAC' and key == "critic_learning_rate":
+            #         real_key = "lr" #hack due to Ray's weird ConfigSpaces
+            #         fout.write(real_key + ', ')
+            #     elif config_algorithm == 'SAC' and key == "fcnet_hiddens":
+            #         #hack due to Ray's weird ConfigSpaces
+            #         fout.write('fcnet_hiddens' + ', ')
+            #     else:
+            #         fout.write(key + ', ')
+            # else:
+        fout.write(column + ', ')
+    fout.write('timesteps_total, episode_reward_mean, episode_len_mean\n')
+    fout.close()
+
+def setup_ray_callbacks(stats_file_prefix, var_configs_deepcopy, hacky_timesteps_total, config_algorithm):
+    # Setup Ray callbacks
+    # Ray callback to write training stats to CSV file at end of every training iteration
+    #hack Didn't know how to move this function to config. It requires the filename which _has_ to be possible to set in run_experiments.py. Had to take care of stats_file_prefix, var_configs_deepcopy, hacky_timesteps_total, config_algorithm; and had to initialise file writing in here (config_processor).
+    def on_train_result(info):
+        training_iteration = info["result"]["training_iteration"]
+        # algorithm = info["trainer"]._name
+
+        # Writes every iteration, would slow things down. #hack
+        fout = open(stats_file_prefix + '.csv', 'a') #hardcoded
+        fout.write(str(training_iteration) + ' ' + config_algorithm + ' ')
+        for config_type, config_dict in var_configs_deepcopy.items():
+            for key in config_dict:
+                if config_type == "env":
+                    field_val = info["result"]["config"]["env_config"][key]
+                    if isinstance(field_val, float):
+                        str_to_write = '%.2e' % field_val
+                    elif type(field_val) == list:
+                        str_to_write = "["
+                        for elem in field_val:
+                            # print(key)
+                            str_to_write += '%.2e' % elem if isinstance(elem, float) else str(elem)
+                            str_to_write += ","
+                        str_to_write += "]"
+                    else:
+                        str_to_write = str(field_val).replace(' ', '')
+                    str_to_write += ' '
+                    fout.write(str_to_write)
+                elif config_type == "agent":
+                    if config_algorithm == 'SAC' and key == "critic_learning_rate":
+                        real_key = "lr" #hack due to Ray's weird ConfigSpaces
+                        fout.write('%.2e' % info["result"]["config"]['optimization'][key].replace(' ', '') + ' ')
+                    elif config_algorithm == 'SAC' and key == "fcnet_hiddens":
+                        #hack due to Ray's weird ConfigSpaces
+                        str_to_write = str(info["result"]["config"]["Q_model"][key]).replace(' ', '') + ' '
+                        fout.write(str_to_write)
+                    # elif config_algorithm == 'SAC' and key == "policy_model":
+                    #     #hack due to Ray's weird ConfigSpaces
+                    #     pass
+                        # fout.write(str(info["result"]["config"][key]['fcnet_hiddens']).replace(' ', '') + ' ')
+                    else:
+                        if key == "exploration_fraction" and "exploration_fraction" not in info["result"]["config"]: #hack ray 0.7.3 will have exploration_fraction but not versions later than ~0.9
+                            field_val = info["result"]["config"]["exploration_config"]["epsilon_timesteps"] / hacky_timesteps_total # convert to fraction to be similar to old exploration_fraction
+                        else:
+                            field_val = info["result"]["config"][key]
+                        str_to_write = '%.2e' % field_val if isinstance(field_val, float) else str(field_val).replace(' ', '')
+                        str_to_write += ' '
+                        fout.write(str_to_write)
+                elif config_type == "model":
+                    # if key == 'conv_filters':
+                    fout.write(str(info["result"]["config"]["model"][key]).replace(' ', '') + ' ')
+
+        # Write train stats
+        timesteps_total = info["result"]["timesteps_total"] # also has episodes_total and training_iteration
+        episode_reward_mean = info["result"]["episode_reward_mean"] # also has max and min
+        # print("Custom_metrics: ", info["result"]["step_reward_mean"], info["result"]["step_reward_max"], info["result"]["step_reward_min"])
+        episode_len_mean = info["result"]["episode_len_mean"]
+
+        fout.write(str(timesteps_total) + ' ' + '%.2e' % episode_reward_mean +
+                   ' ' + '%.2e' % episode_len_mean + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
+        fout.close()
+
+        # print("##### stats_file_name: ", stats_file_name)
+        # print(os.getcwd())
+
+        # We did not manage to find an easy way to log evaluation stats for Ray without the following hack which demarcates the end of a training iteration in the evaluation stats file
+        stats_file_eval = stats_file_prefix + '_eval.csv'
+        fout = open(stats_file_eval, 'a') #hardcoded
+
+        import os, psutil
+        mem_used_mb = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
+
+        fout.write('#HACK STRING EVAL, mem_used_mb: ' + str(mem_used_mb) + "\n")
+        fout.close()
+
+        info["result"]["callback_ok"] = True
+
+
+    # Ray callback to write evaluation stats to CSV file at end of every training iteration
+    # on_episode_end is used because these results won't be available on_train_result
+    # but only after every episode has ended during evaluation (evaluation phase is
+    # checked for by using dummy_eval)
+    def on_episode_end(info):
+        if "dummy_eval" in info["env"].get_unwrapped()[0].config:
+            # print("###on_episode_end info", info["env"].get_unwrapped()[0].config["make_denser"], info["episode"].total_reward, info["episode"].length) #, info["episode"]._agent_reward_history)
+            reward_this_episode = info["episode"].total_reward
+            length_this_episode = info["episode"].length
+            stats_file_eval = stats_file_prefix + '_eval.csv'
+            fout = open(stats_file_eval, 'a') #hardcoded
+            fout.write('%.2e' % reward_this_episode + ' ' + str(length_this_episode) + "\n")
+            fout.close()
+
+    def on_episode_step(info):
+        episode = info["episode"]
+        if "step_reward" not in episode.custom_metrics:
+            episode.custom_metrics["step_reward"] = []
+            step_reward =  episode.total_reward
+        else:
+            step_reward =  episode.total_reward - np.sum(episode.custom_metrics["step_reward"])
+            episode.custom_metrics["step_reward"].append(step_reward) # This line
+            # should not be executed the 1st time this function is called because
+            # no step has actually taken place then (Ray 0.9.0)!!
+        # episode.custom_metrics = {}
+        # episode.user_data = {}
+        # episode.hist_data = {}
+        # Next 2 are the same, except 1st one is total episodic reward _per_ agent
+        # episode.agent_rewards = defaultdict(float)
+        # episode.total_reward += reward
+        # only hack to get per step reward seems to be to store prev total_reward
+        # and subtract it from that
+        # episode._agent_reward_history[agent_id].append(reward)
+
+    return on_train_result, on_episode_end
 
 def get_grid_of_configs(var_configs):
     '''
@@ -217,7 +427,7 @@ def combined_processing(*static_configs, varying_configs, framework='ray', algor
                 elif key == "model":
                     for key_2 in final_configs[i][key]:
                         if key_2 == "use_lstm":
-                            final_configs[i][key][key_2]["max_seq_len"] = final_configs[i]["env_config"]["delay"] + final_configs[i]["env_config"]["sequence_length"] + 1
+                            final_configs[i][key]["max_seq_len"] = final_configs[i]["env_config"]["delay"] + final_configs[i]["env_config"]["sequence_length"] + 1
 
 
     # Post-processing for Stable Baselines:

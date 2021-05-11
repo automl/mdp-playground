@@ -1,5 +1,6 @@
 from mdp_playground.config_processor import *
 
+timesteps_total = 10_000
 num_seeds = 3
 from collections import OrderedDict
 var_env_configs = OrderedDict({
