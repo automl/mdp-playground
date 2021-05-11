@@ -25,7 +25,6 @@ def process_configs(config_file, stats_file_prefix, config_num, log_level, frame
     print("Number of seeds for environment:", config.num_seeds)
 
 
-
     #hacks needed to setup Ray callbacks below
     var_configs_deepcopy = copy.deepcopy(config.var_configs) #hack because this needs to be read in on_train_result and trying to read config there raises an error because it's been imported from a Python module and I think they try to reload it there.
     if "timesteps_total" in dir(config):
@@ -43,13 +42,14 @@ def process_configs(config_file, stats_file_prefix, config_num, log_level, frame
 
     init_stats_file(stats_file_name, columns_to_write)
 
-    # Ray specific
+    # Ray specific setup:
     if framework.lower() == 'ray':
         from ray import tune
         setup_ray(config, config_num, log_level)
         on_train_result, on_episode_end = setup_ray_callbacks(stats_file_prefix, var_configs_deepcopy, hacky_timesteps_total, config_algorithm)
 
-        extra_config = {
+        #default Define default config which gets overwritten with config in config.py file if present.
+        default_config = {
             "callbacks": {
     #                 "on_episode_start": tune.function(on_episode_start),
                 # "on_episode_step": tune.function(on_episode_step),
@@ -61,7 +61,7 @@ def process_configs(config_file, stats_file_prefix, config_num, log_level, frame
             # "log_level": 'WARN',
         }
 
-    # Stable Baselines specific
+    # Stable Baselines specific setup:
     elif framework.lower() == 'stable_baselines':
         ...
 
@@ -73,7 +73,7 @@ def process_configs(config_file, stats_file_prefix, config_num, log_level, frame
     varying_configs = get_grid_of_configs(config.var_configs)
     # print("VARYING_CONFIGS:", varying_configs)
 
-    final_configs = combined_processing(config.env_config, config.agent_config, config.model_config, config.eval_config, extra_config, varying_configs=varying_configs, framework='ray', algorithm=config.algorithm)
+    final_configs = combined_processing(default_config, config.env_config, config.agent_config, config.model_config, config.eval_config, varying_configs=varying_configs, framework='ray', algorithm=config.algorithm)
 
 
 
@@ -437,8 +437,6 @@ def combined_processing(*static_configs, varying_configs, framework='ray', algor
     return final_configs
 
 
-###TODO **extra_config}
-
 def create_gym_env_wrapper_mujoco_wrapper(config, wrapped_mujoco_env):
     '''Creates a GymEnvWrapper around a MujocoEnvWrapper
     '''
@@ -460,8 +458,11 @@ def deepmerge_multiple_dicts(*configs):
 
 
 from functools import reduce
-def deepmerge(a, b, path=None):
+def deepmerge(a, b, path=None, overwrite=True):
     '''Merges dict b into dict a
+
+    overwrite : bool
+        Overwrites value in a with value in b if True with a warning, else raises Exception
 
     Based on: https://stackoverflow.com/questions/7204805/how-to-merge-dictionaries-of-dictionaries/7205107#7205107
     '''
@@ -473,7 +474,11 @@ def deepmerge(a, b, path=None):
             elif a[key] == b[key]:
                 pass # same leaf value
             else:
-                raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+                if overwrite:
+                    a[key] = b[key]
+                    warnings.warn("Overwrote value " + str(a[key]) + " with " + str(b[key]) + " while merging dicts.")
+                else:
+                    raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
         else:
             a[key] = b[key]
     return a
