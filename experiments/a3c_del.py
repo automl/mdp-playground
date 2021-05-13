@@ -1,3 +1,6 @@
+from mdp_playground.config_processor.config_processor import get_grid_of_configs, combined_processing
+
+
 num_seeds = 10
 timesteps_total = 1000000
 from collections import OrderedDict
@@ -14,8 +17,18 @@ var_env_configs = OrderedDict({
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
+var_agent_configs = OrderedDict({
+    # Learning rate
+    "lr": [1e-3],
+    # Value Function Loss coefficient
+    "vf_loss_coeff": [0.1, 0.5, 2.5],
+    # Entropy coefficient
+    "entropy_coeff": [0.001, 0.01, 0.1, 1],
+})
+
 var_configs = OrderedDict({
-"env": var_env_configs
+"env": var_env_configs,
+"agent": var_agent_configs
 })
 
 env_config = {
@@ -45,14 +58,8 @@ agent_config = {
     "lambda": 0.95, #
     # Max global norm for each gradient calculated by worker
     "grad_clip": 10.0, # low prio.
-    # Learning rate
-    "lr": 0.0001, #
     # Learning rate schedule
-    "lr_schedule": None,
-    # Value Function Loss coefficient
-    "vf_loss_coeff": 0.1, #
-    # Entropy coefficient
-    "entropy_coeff": 0.1, #
+    "lr_schedule": "linear",
     # Min time per iteration
     "min_iter_time_s": 0,
     # Workers sample async. Note that this increases the effective
@@ -67,9 +74,16 @@ agent_config = {
     },
 }
 
+filters_100x100 = [
+    [16, [8, 8], 4],
+    [32, [4, 4], 2],
+    [256, [13, 13], 1],
+]
+
 model_config = {
     "model": {
         "fcnet_hiddens": [128, 128, 128],
+        "conv_filters": filters_100x100,
         "custom_preprocessor": "ohe",
         "custom_options": {},  # extra options to pass to your preprocessor
         "fcnet_activation": "tanh",
@@ -94,13 +108,3 @@ eval_config = {
         }
     },
 }
-
-value_tuples = []
-for config_type, config_dict in var_configs.items():
-    for key in config_dict:
-        assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
-        value_tuples.append(var_configs[config_type][key])
-
-import itertools
-cartesian_product_configs = list(itertools.product(*value_tuples))
-print("Total number of configs. to run:", len(cartesian_product_configs))

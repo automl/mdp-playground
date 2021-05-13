@@ -1,4 +1,5 @@
 
+from psutil import net_if_addrs
 from stable_baselines.common.noise import NormalActionNoise, OrnsteinUhlenbeckActionNoise
 import gym
 from stable_baselines.common.tf_layers import conv, linear, conv_to_fc, lstm
@@ -8,7 +9,8 @@ import stable_baselines as sb
 from typing import Any, Dict, List, Optional, Union
 from stable_baselines.common.vec_env import DummyVecEnv, VecEnv, sync_envs_normalization
 from stable_baselines import DQN, DDPG, SAC, A2C, TD3
-
+from stable_baselines.common.vec_env import DummyVecEnv, VecNormalize
+from gym.wrappers.time_limit import TimeLimit
 
 # change config.agent_config,
 # config.var_model_config
@@ -131,14 +133,30 @@ def agent_to_baselines(config):
                 for k in model_config[move_key].keys():
                     model_config["model"][k] = model_config[move_key][k]
                 model_config.pop(move_key)  # Remove from model_config
-    else: #A2C
+    else:  # A2C
         algorithm = "A2C"
-        valid_keys += ["learning_rate","vf_coef", "ent_coef","max_grad_norm"] #"lr_schedule" cannot be none
+        valid_keys += ["learning_rate",
+                       "vf_coef",
+                       "ent_coef",
+                       "max_grad_norm"]  # "lr_schedule" cannot be none
         exchange_keys = [
                 ("vf_loss_coeff","vf_coef"),
                 ("entropy_coeff","ent_coef"),
                 ("lr", "learning_rate"),
                 ("grad_clip", "max_grad_norm")]
+
+        valid_schedulers = ["linear", "constant", "double_linear_con", "middle_drop","double_middle_drop"]
+        if("lr_schedule" in agent_config.keys()):
+            if(agent_config["lr_schedule"] in valid_schedulers):
+                valid_keys.append("lr_schedule")
+        # all schedulers must be valid
+        if("lr_schedule" in var_agent_configs.keys()):
+            add = True
+            for scheduler in var_agent_configs["lr_schedule"]:
+                if(scheduler not in valid_schedulers):
+                    add = False
+            if(add):
+                valid_keys.append("lr_schedule")
 
     # -------- Change keys from Agent to Model dict when needed--------#
     for key_tuple in agent_to_model:
@@ -231,16 +249,12 @@ def agent_to_baselines(config):
 
 
 # change model_config to baselines framework/ decide MLP or CNN policy
-def model_to_policy_kwargs(feat_ext, model_config):
-    # -------------- Model configuration ------------#
-    # # decide whether to use cnn or mlp, taken from ray code..
-    # # Discrete/1D obs-spaces.
-    # if isinstance(env.observation_space, gym.spaces.Discrete) or \
-    #         len(env.observation_space.shape) <= 2:
-    #     feat_ext = "mlp"
-    # else:  # Default Conv2D net.
-    #     feat_ext = "cnn"
-
+def model_to_policy_kwargs(env, model_config):
+    if(isinstance(env.observation_space, gym.spaces.Discrete) or \
+        len(env.observation_space.shape) <= 2):
+        feat_ext = "mlp"
+    else:
+        feat_ext = "cnn"
     # Move model config(already on baselines framework) to policy_kwargs
     policy_kwargs, cnn_config = {}, {}
     for key in model_config["model"].keys():
@@ -266,10 +280,10 @@ def model_to_policy_kwargs(feat_ext, model_config):
         policy_kwargs['cnn_extractor'] = vision_net
         policy_kwargs["kwargs"] = cnn_config
 
+    if(feat_ext=="mlp" and "net_arch" in policy_kwargs):
+        policy_kwargs.pop("net_arch")
+
     policy_kwargs['feature_extraction'] = feat_ext 
-    # # add policy arguments to agent configuration
-    # if('lr_schedule'in agent_config.keys()): #schedule is part of model instead of agent in baselines
-    #     agent_config['policy_kwargs']['lr_schedule'] = agent_config['lr_schedule']
 
     return policy_kwargs, use_lstm
 
@@ -288,27 +302,48 @@ def act_fnc_from_name(key):
 def vision_net(scaled_images, kwargs):
     if ("act_fun" in kwargs):
         activ_fn = kwargs['act_fun']
-    else: #default
+    else:  # default
         activ_fn = tf.nn.relu
 
     output, i = scaled_images, 0
     for i, layer_def in enumerate(kwargs['net_arch'][:-1], start=1):
         n_filters, kernel, stride = layer_def
-        scope = "c%d"%(i)
-        output = activ_fn(conv(output, scope, n_filters = n_filters, filter_size = kernel[0], stride = stride, pad="SAME", init_scale=np.sqrt(2)))
-    
-    #last layer has valid padding
+        scope = "c%d" % (i)
+        output = activ_fn(conv(output,
+                               scope,
+                               n_filters=n_filters,
+                               filter_size=kernel[0],
+                               stride=stride,
+                               pad="SAME",
+                               init_scale=np.sqrt(2)))
+
+    # last layer has valid padding
     n_filters, kernel, stride = kwargs['net_arch'][-1]
-    output = activ_fn(conv(output, scope = "c%d"%(i+1), n_filters = n_filters, filter_size = kernel[0], stride = stride, pad="VALID", init_scale=np.sqrt(2)))
-    output = conv_to_fc(output) #No linear layer
-    #output = activ_fn(linear(output, 'fc1', n_hidden=512, init_scale=np.sqrt(2)))
+    output = activ_fn(conv(output,
+                           scope="c%d" % (i+1),
+                           n_filters=n_filters,
+                           filter_size=kernel[0],
+                           stride=stride,
+                           pad="VALID",
+                           init_scale=np.sqrt(2)))
+    output = conv_to_fc(output)  # No linear layer
+    # output = activ_fn(linear(output, 'fc1', n_hidden=512, init_scale=np.sqrt(2)))
     return output
 
 
-def init_agent(env, config_algorithm, agent_config_baselines, use_lstm):
-    #Use feed forward policies and specify cnn feature extractor in configuration
+def init_agent(env, config_algorithm, model_cfg, agent_config_baselines):
+    policy_kwargs, use_lstm = \
+        model_to_policy_kwargs(env, model_cfg) 
+    # Change feature extractor depending on environment as in ray
+    agent_config_baselines["policy_kwargs"] = policy_kwargs
+
+    # Use feed forward policies and
+    # specify cnn feature extractor in configuration
     if config_algorithm == 'DQN':
-        model = DQN(env = env, policy = sb.deepq.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1)
+        model = DQN(env=env,
+                    policy=sb.deepq.policies.FeedForwardPolicy,
+                    **agent_config_baselines,
+                    verbose=1)
     elif config_algorithm == 'DDPG':
         # action noise is none by default meaning it does not explore..
         # condiguration using ray defaults
@@ -317,16 +352,82 @@ def init_agent(env, config_algorithm, agent_config_baselines, use_lstm):
         agent_config_baselines["action_noise"] = OrnsteinUhlenbeckActionNoise(
                 mean=np.zeros(n_actions),\
                 sigma=float(0.2) * np.ones(n_actions))
-        #ddpg
-        #can also use as agent parameter "normalize_observations = True " or "normalize_returns" = True
-        model = DDPG(env = env, policy = sb.ddpg.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1 )
+        # ddpg
+        # can also use as agent parameter
+        # "normalize_observations = True "
+        # or "normalize_returns" = True
+        model = DDPG(env=env,
+                     policy=sb.ddpg.policies.FeedForwardPolicy,
+                     **agent_config_baselines,
+                     verbose=1)
     elif config_algorithm == "TD3":
-        model = TD3(env = env, policy = sb.td3.policies.FeedForwardPolicy, **agent_config_baselines, verbose=1 )
+        model = TD3(env=env,
+                    policy=sb.td3.policies.FeedForwardPolicy,
+                    **agent_config_baselines,
+                    verbose=1)
     elif config_algorithm == "A3C" or config_algorithm == "A2C":
-        policy = sb.common.policies.LstmPolicy if use_lstm else sb.common.policies.FeedForwardPolicy
-        model = A2C(env = env, policy = policy ,**agent_config_baselines, verbose=1)
-    else: #'SAC
-        model = SAC(env = env, policy = sb.sac.policies.FeedForwardPolicy ,**agent_config_baselines, verbose=1)
+        policy = sb.common.policies.LstmPolicy if use_lstm \
+                 else sb.common.policies.FeedForwardPolicy
+        model = A2C(env=env,
+                    policy=policy,
+                    **agent_config_baselines,
+                    verbose=1)
+    else:  # 'SAC
+        model = SAC(env=env,
+                    policy=sb.sac.policies.FeedForwardPolicy,
+                    **agent_config_baselines,
+                    verbose=1)
+    return model
+
+
+def init_environments(config_algorithm, current_config, env_config, eval_cfg):
+    env_config = process_env_keys(env_config,
+                                  current_config)
+    env = gym.make(current_config['env'],
+                    **env_config)
+
+    # if time limit, wrap it
+    if("horizon" in current_config['env']):
+        train_horizon = current_config['env']["horizon"]
+        env = TimeLimit(env, max_episode_steps=train_horizon)  # horizon
+    env = sb.bench.Monitor(env, None)  # , "../", force=True)
+    # Automatically normalize the input features and reward
+    if (config_algorithm == "DDPG"
+        or config_algorithm == "A2C"
+        or config_algorithm == "A3C"):
+        env = DummyVecEnv([lambda: env])
+        env = VecNormalize(env,
+                           norm_obs=False,
+                           norm_reward=True,
+                           clip_obs=10.)
+
+    # limit max timesteps in evaluation
+    eval_horizon = 100
+    if("horizon" in eval_cfg):
+        eval_horizon = eval_cfg["horizon"]
+    eval_env = gym.make(current_config['env'],
+                        **env_config)
+    eval_env = TimeLimit(eval_env, max_episode_steps=eval_horizon)
+    return env, eval_env
+
+
+def process_env_keys(env_config, current_config):
+    dict_keys = list(env_config.keys())
+    for key in dict_keys:
+        if key == 'reward_noise':
+            reward_noise_ = current_config["env_config"][key]
+            env_config[key] = lambda a: a.normal(0, reward_noise_)
+            env_config['reward_noise_std'] = reward_noise_
+        elif key == 'transition_noise' and env_config["state_space_type"] == "continuous":
+            transition_noise_ = current_config["transition_noise"][key]
+            env_config[key] = lambda a: a.normal(0, transition_noise_)
+            env_config['transition_noise_std'] = transition_noise_
+
+    if("state_space_type" in env_config):
+        if env_config["state_space_type"] == 'continuous':
+            env_config["action_space_dim"] = env_config["state_space_dim"]
+
+    return env_config
 
 
 class CustomCallback(sb.common.callbacks.BaseCallback):
@@ -349,7 +450,7 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         verbose: int = 1,
         file_name: str = "./evaluation.csv",
         config_algorithm: str ="",
-        var_configs = None
+        var_configs=None
     ):
         super(CustomCallback, self).__init__(verbose=verbose)
         self.n_eval_episodes = n_eval_episodes
@@ -440,21 +541,21 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         if isinstance(env, VecEnv):
             env = env.unwrapped.envs[0]  # only using one environment
 
-        #A2C can handle multiple envs..
+        # A2C can handle multiple envs..
         # if(self.config_algorithm == "A2C" or self.config_algorithm =="A3C"):
         #     env = env.envs[0]#take first env
 
         # Writes every iteration, would slow things down. #hack
-        fout = open(self.file_name + '.csv', 'a') #hardcoded
+        fout = open(self.file_name + '.csv', 'a')  # hardcoded
         fout.write(str(training_iteration) + ' ' + config_algorithm + ' ')
         for config_type, config_dict in var_configs.items():
             for key in config_dict:
                 if config_type == "env":
                     env_config = env.config
                     if key == 'reward_noise':
-                        fout.write(str(env_config['reward_noise_std']) + ' ') #hack
+                        fout.write(str(env_config['reward_noise_std']) + ' ')  # hack
                     elif key == 'transition_noise' and env_config["state_space_type"] == "continuous":
-                        fout.write(str(env_config['transition_noise_std']) + ' ') #hack
+                        fout.write(str(env_config['transition_noise_std']) + ' ')  # hack
                     else:
                         fout.write(str(env_config[key]).replace(' ', '') + ' ')
                 elif config_type == "agent":
@@ -474,7 +575,7 @@ class CustomCallback(sb.common.callbacks.BaseCallback):
         if(self.episodes_in_iter == 0):  # no episodes in iteration
             if(n_episodes) == 0:  # special case when there are no episodes so far
                 episode_reward_mean = np.sum(env.rewards)  # cummulative reward so far
-                episode_len_mean = env.get_total_steps()  # all steps so far
+                episode_length_mean = env.get_total_steps()  # all steps so far
             else:
                 # iteration end, no episode end
                 # start = self.timesteps_per_iteration*training_iteration
