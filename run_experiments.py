@@ -23,7 +23,7 @@ def parse_args():
 def main():
     args = parse_args()
     if args.framework is not None: # get from arguments
-        framework =  args.framework
+        framework = args.framework
     else: #check config file
         if args.config_file[-3:] == '.py':
             args.config_file = args.config_file[:-3]
