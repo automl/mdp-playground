@@ -79,8 +79,10 @@ parser.add_argument('-a', '--agent-config-num', dest='agent_config_num',
                     help='Used for running the configurations of experiments '
                     'in parallel. This is appended to the prefix of the output'
                     ' files (after exp_name).')
-# TODO Remove? #hack to run 1000 x 1000 env configs x agent configs.
-# Storing all million of them in memory may be too inefficient?
+parser.add_argument('-f', '--framework', dest='framework', action='store',
+                    default='ray', type=str, help='Specify framework to run '
+                    'experiments (Current options: Ray Rllib, Stable Baselines'
+                    ').')
 parser.add_argument('-m', '--save-model', dest='save_model', action='store',
                     default=False, type=bool,
                     help='Option to save trained NN model at the end of '
