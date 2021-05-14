@@ -15,7 +15,7 @@ var_env_configs = OrderedDict({
     'reward_density': "float, [0.03, 0.5]", # np.linspace(0.0, 1.0, num=5)
     'make_denser': (False,),
     'terminal_state_density': (0.25,), # np.linspace(0.1, 1.0, num=5)
-    'reward_dist_end_pts': "float, [0.01, 0.8]",
+    'reward_dist': "float, [0.01, 0.8]",
     'reward_scale': "float, log, [0.1, 100]",
     'dummy_seed': (0,), #"cat, " + str([i for i in range(num_seeds)]),
 })
@@ -70,7 +70,7 @@ def sobol_configs_from_config_dict(config_dict):
                 sobol_val = lower + (upper - lower) * sample[j]
                 if log:
                     sobol_val = np.exp(sobol_val)
-                if key == "reward_dist_end_pts":
+                if key == "reward_dist":
                     sobol_val = [sobol_val, 1.0]
                 cartesian_product_configs[-1][key] = sobol_val
                 j += 1

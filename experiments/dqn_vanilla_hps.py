@@ -1,24 +1,28 @@
-from mdp_playground.config_processor import *
-
-timesteps_total = 10_000
-num_seeds = 3
+num_seeds = 10
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0] + [2**i for i in range(4)],
-    'sequence_length': [1, 2, 3, 4],#i for i in range(1,4)]
+    'delay': [0],
+    'sequence_length': [1],#i for i in range(1,4)]
     'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
-    # 'reward_scale': [10.0],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
+var_agent_configs = OrderedDict({
+    # normalise obs./reward, atari preprocessing
+    'learning_starts' : [200, 500, 1000, 5000, 10000]
+    #'target_network_update_freq': [200, 400, 800, 1600, 3200]
+    #'train_batch_size': [4, 8, 16, 32, 64, 128],
+})
+
 var_configs = OrderedDict({
-"env": var_env_configs
+    "env": var_env_configs,
+    "agent": var_agent_configs
 })
 
 env_config = {
@@ -35,8 +39,6 @@ env_config = {
     },
 }
 
-eval_config = {}
-
 algorithm = "DQN"
 agent_config = {
     "adam_epsilon": 1e-4,
@@ -49,19 +51,19 @@ agent_config = {
     "final_prioritized_replay_beta": 1.0,
     "hiddens": None,
     "learning_starts": 1000,
-    "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    "lr": 1e-4, # 
     "n_step": 1,
     "noisy": False,
     "num_atoms": 1,
     "prioritized_replay": False,
     "prioritized_replay_alpha": 0.5,
-    "sample_batch_size": 4,
+    #"sample_batch_size": 4,
+    "rollout_fragment_length":4,
     "schedule_max_timesteps": 20000,
     "target_network_update_freq": 800,
     "timesteps_per_iteration": 1000,
     "min_iter_time_s": 0,
     "train_batch_size": 32,
-    # "use_pytorch": True,
 }
 
 model_config = {
@@ -77,7 +79,20 @@ model_config = {
     },
 }
 
-varying_configs = get_grid_of_configs(var_configs)
-# print("VARYING_CONFIGS:", varying_configs)
-
-final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm='SAC')
+from ray import tune
+eval_config = {
+    "evaluation_interval": 1, # I think this means every x training_iterations
+    "evaluation_config": {
+        "explore": False,
+        "exploration_fraction": 0,
+        "exploration_final_eps": 0,
+        "evaluation_num_episodes": 10,
+        "horizon": 100,
+        "env_config": {
+            "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+            'transition_noise': 0 if "state_space_type" in env_config["env_config"] and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+            'reward_noise': tune.function(lambda a: a.normal(0, 0)),
+            'action_loss_weight': 0.0,
+        }
+    },
+}

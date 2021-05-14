@@ -1,7 +1,8 @@
 from mdp_playground.config_processor import *
 
+# framework = 'ray'
 timesteps_total = 10_000
-num_seeds = 3
+num_seeds = 10
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
@@ -13,7 +14,6 @@ var_env_configs = OrderedDict({
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
-    # 'reward_scale': [10.0],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -34,8 +34,6 @@ env_config = {
         'completely_connected': True,
     },
 }
-
-eval_config = {}
 
 algorithm = "DQN"
 agent_config = {
@@ -61,7 +59,6 @@ agent_config = {
     "timesteps_per_iteration": 1000,
     "min_iter_time_s": 0,
     "train_batch_size": 32,
-    # "use_pytorch": True,
 }
 
 model_config = {
@@ -77,7 +74,36 @@ model_config = {
     },
 }
 
-varying_configs = get_grid_of_configs(var_configs)
-# print("VARYING_CONFIGS:", varying_configs)
+from ray import tune
+eval_config = {
+    "evaluation_interval": 1, # I think this means every x training_iterations
+    "evaluation_config": {
+        "explore": False,
+        "exploration_fraction": 0,
+        "exploration_final_eps": 0,
+        "evaluation_num_episodes": 10,
+        "horizon": 100,
+        "env_config": {
+            "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+            'transition_noise': 0 if "state_space_type" in env_config["env_config"] and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
+            'reward_noise': tune.function(lambda a: a.normal(0, 0)),
+            'action_loss_weight': 0.0,
+        }
+    },
+}
 
-final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm='SAC')
+
+# varying_configs = get_grid_of_configs(var_configs)
+# # print("VARYING_CONFIGS:", varying_configs)
+#
+# final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm=algorithm)
+
+# value_tuples = []
+# for config_type, config_dict in var_configs.items():
+#     for key in config_dict:
+#         assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
+#         value_tuples.append(var_configs[config_type][key])
+#
+# import itertools
+# cartesian_product_configs = list(itertools.product(*value_tuples))
+# print("Total number of configs. to run:", len(cartesian_product_configs))

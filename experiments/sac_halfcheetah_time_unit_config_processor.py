@@ -1,6 +1,8 @@
-'''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
+'''
 '''
 num_seeds = 5
+
+from mdp_playground.config_processor import *
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
@@ -11,6 +13,7 @@ var_env_configs = OrderedDict({
 var_configs = OrderedDict({
 "env": var_env_configs
 })
+
 
 env_config = {
     "env": "HalfCheetahWrapper-v3",
@@ -94,12 +97,20 @@ eval_config = {
         }
     },
 }
-value_tuples = []
-for config_type, config_dict in var_configs.items():
-    for key in config_dict:
-        assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
-        value_tuples.append(var_configs[config_type][key])
 
-import itertools
-cartesian_product_configs = list(itertools.product(*value_tuples))
-print("Total number of configs. to run:", len(cartesian_product_configs))
+varying_configs = get_grid_of_configs(var_configs)
+print("VARYING_CONFIGS:", varying_configs)
+
+final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm='SAC')
+# print("FINAL", final_configs)
+
+# value_tuples = []
+# for config_type, config_dict in var_configs.items():
+#     for key in config_dict:
+#         assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
+#         value_tuples.append(var_configs[config_type][key])
+#
+# import itertools
+# cartesian_product_configs = list(itertools.product(*value_tuples))
+# print("Total number of configs. to run:", len(cartesian_product_configs))
+# print(cartesian_product_configs)

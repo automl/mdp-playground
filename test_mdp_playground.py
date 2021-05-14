@@ -1214,7 +1214,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
         config["state_space_size"] = 24
-        config["action_space_size"] = 24
+        config["action_space_size"] = 8
         config["reward_density"] = 0.05
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25
