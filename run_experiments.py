@@ -1,53 +1,106 @@
 '''Script to run experiments on MDP Playground.
 
-Takes a configuration file, experiment name and config number to run as optional arguments.
+Takes a configuration file, experiment name and config number to run as
+optional arguments.
 '''
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import mdp_playground.config_processor as config_processor
-import numpy as np
-import copy
-import warnings
-import logging
-
-import ray
-from ray import tune
-from ray.rllib.utils.seed import seed as rllib_seed
-
-import sys, os
 import argparse
-# import configparser
+import mdp_playground.config_processor as config_processor
+import os
+import logging
+import dill as pickle
 
+from ray import tune
+
+# import configparser
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
 log_level_ = logging.WARNING ##TODO Make a runtime argument
-
-parser = argparse.ArgumentParser(description=__doc__) # docstring at beginning of the file is stored in __doc__
-parser.add_argument('-c', '--config-file', dest='config_file', action='store', default='default_config',
-                   help='Configuration file containing configuration to run experiments. It must be a Python file so config can be given programmatically. There are 2 types of configs - VARIABLE CONFIG across the experiments and STATIC CONFIG across the experiments. \nVARIABLE CONFIGS: The OrderedDicts var_env_configs, var_agent_configs and var_model_configs hold configuration options that are variable for the environment, agent and model across the current experiment. For each configuration option, the option is the key in the dict and its value is a list of values it can take for the current experiment. A Cartesian product of these lists is taken to generate various possible configurations to be run. For example, you might want to vary "delay" for the current experiment. Then "delay" would be a key in var_env_configs dict and its value would be a list of values it can take. Because Ray does not have a common way to address this specification of configurations for its agents, there are a few hacky ways to set var_agent_configs and var_model_configs currently. Please see sample experiment config files in the experiments directory to see how to set the values for a given algorithm. \nSTATIC CONFIGS: env_config, agent_config and model_config are dicts which hold the static configuration for the current experiment as a normal Python dict.') ####TODO Update docs regarding how to get configs to run: i.e., Cartesian product, or random, etc.
-parser.add_argument('-e', '--exp-name', dest='exp_name', action='store', default='mdpp_default_experiment',
-                   help='The user-chosen name of the experiment. This is used as the prefix of the output files (the prefix also contains config_num if that is provided). It will save stats to 2 CSV files, with the filenames as the one given as argument'
-                   ' and another file with an extra "_eval" in the filename that contains evaluation stats during the training. Appends to existing files or creates new ones if they don\'t exist.')
-parser.add_argument('-n', '--config-num', dest='config_num', action='store', default=None, type=int,
-                   help='Used for running the configurations of experiments in parallel. This is appended to the prefix of the output files (after exp_name).'
-                   ' A Cartesian product of different configuration values for the experiment will be taken and ordered as a list and this number corresponds to the configuration number in this list.'
-                   ' Please look in to the code for details.')
-parser.add_argument('-f', '--framework', dest='framework', action='store', default='ray', type=str,
-                   help='Specify framework to run experiments (Current options: Ray Rllib, Stable Baselines).')
-parser.add_argument('-a', '--agent-config-num', dest='agent_config_num', action='store', default=None, type=int,
-                   help='Used for running the configurations of experiments in parallel. This is appended to the prefix of the output files (after exp_name).') ###TODO Remove? #hack to run 1000 x 1000 env configs x agent configs. Storing all million of them in memory may be too inefficient?
-parser.add_argument('-m', '--save-model', dest='save_model', action='store', default=False, type=bool,
-                   help='Option to specify whether or not to save trained NN model at the end of training.')
-parser.add_argument('-t', '--framework-dir', dest='framework_dir', action='store', default='/tmp/', type=str,
-                   help='Prefix of directory to be used by underlying framework (e.g. Ray Rllib, Stable Baselines 3). This name will be passed to the framework.')
-# parser.add_argument('-t', '--tune-hps', dest='tune_hps', action='store', default=False, type=bool,
-#                    help='Used for tuning the hyperparameters that can be used for experiments later.'
-#                    ' A Cartesian product of different configuration values for the experiment will be taken and ordered as a list and this number corresponds to the configuration number in this list.'
-#                    ' Please look in to the code for details.')
+# docstring at beginning of the file is stored in __doc__
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument('-c', '--config-file', dest='config_file', action='store',
+                    default='default_config',
+                    help='Configuration file containing configuration to run '
+                    'experiments. It must be a Python file so config can be '
+                    'given programmatically. There are 2 types of configs - '
+                    'VARIABLE CONFIG across the experiments and STATIC CONFIG '
+                    'across the experiments. \nVARIABLE CONFIGS: The '
+                    'OrderedDicts var_env_configs, var_agent_configs and '
+                    'var_model_configs hold configuration options that are '
+                    'variable for the environment, agent and model across the '
+                    'current experiment. For each configuration option, the '
+                    'option is the key in the dict and its value is a list of '
+                    'values it can take for the current experiment. A '
+                    'Cartesian product of these lists is taken to generate '
+                    'various possible configurations to be run. For example, '
+                    'you might want to vary "delay" for the current '
+                    'experiment. Then "delay" would be a key in '
+                    'var_env_configs dict and its value would be a list of '
+                    'values it can take. Because Ray does not have a common '
+                    'way to address this specification of configurations for '
+                    'its agents, there are a few hacky ways to set '
+                    'var_agent_configs and var_model_configs currently. '
+                    'Please see sample experiment config files in the '
+                    'experiments directory to see how to set the values for a '
+                    'given algorithm. \n STATIC CONFIGS: env_config, '
+                    'agent_config and model_config are dicts which hold the '
+                    'static configuration for the current experiment as a '
+                    'normal Python dict.')
+# TODO Update docs regarding how to get configs to run: i.e., Cartesian
+# product, or random, etc.
+parser.add_argument('-e', '--exp-name', dest='exp_name', action='store',
+                    default='mdpp_default_experiment',
+                    help='The user-chosen name of the experiment. This is used'
+                    ' as the prefix of the output files (the prefix also '
+                    'contains config_num if that is provided). It will save '
+                    'stats to 2 CSV files, with the filenames as the one given'
+                    ' as argument'
+                    ' and another file with an extra "_eval" in the filename '
+                    'that contains evaluation stats during the training. '
+                    'Appends to existing files or creates new ones if they '
+                    'don\'t exist.')
+parser.add_argument('-n', '--config-num', dest='config_num', action='store',
+                    default=None, type=int,
+                    help='Used for running the configurations of experiments '
+                    'in parallel. This is appended to the prefix of the output'
+                    ' files (after exp_name).'
+                    ' A Cartesian product of different configuration values '
+                    'for the experiment will be taken and ordered as a list '
+                    'and this number corresponds to the configuration number '
+                    'in this list. Please look in to the code for details.')
+parser.add_argument('-a', '--agent-config-num', dest='agent_config_num',
+                    action='store', default=None, type=int,
+                    help='Used for running the configurations of experiments '
+                    'in parallel. This is appended to the prefix of the output'
+                    ' files (after exp_name).')
+parser.add_argument('-f', '--framework', dest='framework', action='store',
+                    default='ray', type=str, help='Specify framework to run '
+                    'experiments (Current options: Ray Rllib, Stable Baselines'
+                    ').')
+parser.add_argument('-m', '--save-model', dest='save_model', action='store',
+                    default=False, type=bool,
+                    help='Option to save trained NN model at the end of '
+                    'training.')
+parser.add_argument('-t', '--framework-dir', dest='framework_dir',
+                    action='store', default='/tmp/', type=str,
+                    help='Prefix of directory to be used by underlying '
+                    'framework (e.g. Ray Rllib, Stable Baselines 3). This '
+                    'name will be passed to the framework.')
+# parser.add_argument('-t', '--tune-hps', dest='tune_hps', action='store',
+#                     default=False, type=bool,
+#                     help='Used for tuning the hyperparameters that can be '
+#                     'used for experiments later.'
+#                     ' A Cartesian product of different configuration values '
+#                     'for the experiment will be taken and ordered as a list '
+#                     'and this number corresponds to the configuration number'
+#                     ' in this list.'
+#                     ' Please look in to the code for details.')
 
 
 args = parser.parse_args()
@@ -115,7 +168,7 @@ for enum_conf_1, current_config_ in enumerate(final_configs):
     print("\n\033[1;32m======== for " + str(timesteps_total) \
     + " steps =========\033[0;0m\n")
 
-    tune.run(
+    analysis = tune.run(
         algorithm,
         name=algorithm + str(stats_file_name.split('/')[-1]) + '_' \
         + str(args.config_num), ####IMP "name" has to be specified, otherwise,
@@ -128,6 +181,9 @@ for enum_conf_1, current_config_ in enumerate(final_configs):
         local_dir=args.framework_dir + '/_ray_results',
         #return_trials=True # add trials = tune.run( above
     )
+
+    pickle.dump(analysis, open("{}_analysis.pickle".format(args.exp_name),
+                "wb"))
 
 end = time.time()
 print("No. of seconds to run:", end - start)

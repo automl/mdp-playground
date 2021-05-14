@@ -7,6 +7,32 @@ mujoco_envs = ["HalfCheetahWrapper-v3", "HopperWrapper-v3", "PusherWrapper-v2", 
 import mdp_playground
 from mdp_playground.envs import RLToyEnv
 from ray.tune.registry import register_env
+
+
+
+def create_gym_env_wrapper_atari(config):
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    ae = AtariEnv(**config["AtariEnv"])
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
+
+def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
+    '''When using frameStack GymEnvWrapper should wrap AtariEnv using wrap_deepmind_ray and therefore this function sets "wrap_deepmind_ray": True and 'frame_skip': 1 inside config so as to keep config same as for create_gym_env_wrapper_atari above and reduce manual errors when switching between the 2.
+    '''
+    config["wrap_deepmind_ray"] = True #hack
+    config["frame_skip"] = 1 #hack
+    from gym.envs.atari import AtariEnv
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    import gym
+    game = config["AtariEnv"]["game"]
+    game = ''.join([g.capitalize() for g in game.split('_')])
+    ae = gym.make('{}NoFrameskip-v4'.format(game))
+    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
+    return gew
+
+
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
 register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
 register_env("GymEnvWrapperFrameStack-Atari", lambda config: create_gym_env_wrapper_frame_stack_atari(config))
@@ -83,15 +109,27 @@ def process_configs(config_file, stats_file_prefix, config_num, log_level, frame
 def setup_ray(config, config_num, log_level):
     import ray
     if config.algorithm == 'DQN': #hack
-        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), temp_dir='/tmp/ray' + str(config_num), include_webui=False, logging_level=log_level, local_mode=True) #webui_host='0.0.0.0'); logging_level=logging.INFO, #hardcoded
-
+        ray.init(object_store_memory=int(2e9), _redis_max_memory=int(1e9),
+                 _temp_dir='/tmp/ray' + str(config_num),
+                 logging_level=log_level,
+                 # local_mode=True,
+                 # webui_host='0.0.0.0'); logging_level=logging.INFO,
+                 )
         # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # local_mode (bool): If true, the code will be executed serially. This is useful for debugging. # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
     elif config.algorithm == 'A3C': #hack
-        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), temp_dir='/tmp/ray' + str(config_num), include_webui=False, logging_level=log_level)
-        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
+        ray.init(object_store_memory=int(2e9), _redis_max_memory=int(1e9),
+                 _temp_dir='/tmp/ray' + str(config_num),
+                 logging_level=log_level,
+                 # local_mode=True,
+                 # webui_host='0.0.0.0'); logging_level=logging.INFO,
+                 )        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
     else:
-        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, temp_dir='/tmp/ray' + str(config_num), include_webui=False, logging_level=log_level)
-
+        ray.init(object_store_memory=int(2e9), _redis_max_memory=int(1e9),
+                 _temp_dir='/tmp/ray' + str(config_num),
+                 logging_level=log_level,
+                 local_mode=True,
+                 # webui_host='0.0.0.0'); logging_level=logging.INFO,
+                 )
 
 def init_stats_file(stats_file_name, columns_to_write):
     fout = open(stats_file_name, 'a') #hardcoded
@@ -482,27 +520,3 @@ def deepmerge(a, b, path=None, overwrite=True):
         else:
             a[key] = b[key]
     return a
-
-
-
-def create_gym_env_wrapper_atari(config):
-    from gym.envs.atari import AtariEnv
-    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-    ae = AtariEnv(**config["AtariEnv"])
-    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
-    return gew
-
-
-def create_gym_env_wrapper_frame_stack_atari(config): #hack ###TODO remove?
-    '''When using frameStack GymEnvWrapper should wrap AtariEnv using wrap_deepmind_ray and therefore this function sets "wrap_deepmind_ray": True and 'frame_skip': 1 inside config so as to keep config same as for create_gym_env_wrapper_atari above and reduce manual errors when switching between the 2.
-    '''
-    config["wrap_deepmind_ray"] = True #hack
-    config["frame_skip"] = 1 #hack
-    from gym.envs.atari import AtariEnv
-    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-    import gym
-    game = config["AtariEnv"]["game"]
-    game = ''.join([g.capitalize() for g in game.split('_')])
-    ae = gym.make('{}NoFrameskip-v4'.format(game))
-    gew = GymEnvWrapper(ae, **config) ##IMP Had initially thought to put this config in config["GymEnvWrapper"] but because of code below which converts var_env_configs to env_config, it's best to leave those configs as top level configs in the dict!
-    return gew
