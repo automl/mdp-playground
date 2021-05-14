@@ -52,7 +52,7 @@ parser.add_argument('-c', '--config-file', dest='config_file', action='store',
                     'agent_config and model_config are dicts which hold the '
                     'static configuration for the current experiment as a '
                     'normal Python dict.')
-# TODO Update docs regarding how to get configs to run: i.e., Cartesian
+# ####TODO Update docs regarding how to get configs to run: i.e., Cartesian
 # product, or random, etc.
 parser.add_argument('-e', '--exp-name', dest='exp_name', action='store',
                     default='mdpp_default_experiment',
@@ -74,6 +74,8 @@ parser.add_argument('-n', '--config-num', dest='config_num', action='store',
                     'for the experiment will be taken and ordered as a list '
                     'and this number corresponds to the configuration number '
                     'in this list. Please look in to the code for details.')
+# ###TODO Remove? #hack to run 1000 x 1000 env configs x agent configs. 
+# Storing all million of them in memory may be too inefficient?
 parser.add_argument('-a', '--agent-config-num', dest='agent_config_num',
                     action='store', default=None, type=int,
                     help='Used for running the configurations of experiments '
