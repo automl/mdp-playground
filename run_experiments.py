@@ -20,6 +20,7 @@ import numpy as np
 import copy
 import warnings
 import logging
+import dill as pickle
 
 import ray
 from ray import tune
@@ -96,7 +97,7 @@ parser.add_argument('-c', '--config-file', dest='config_file', action='store',
                     'var_agent_configs and var_model_configs currently. '
                     'Please see sample experiment config files in the '
                     'experiments directory to see how to set the values for a '
-                    'given algorithm. \nSTATIC CONFIGS: env_config, '
+                    'given algorithm. \n STATIC CONFIGS: env_config, '
                     'agent_config and model_config are dicts which hold the '
                     'static configuration for the current experiment as a '
                     'normal Python dict.')
@@ -721,7 +722,7 @@ for enum_conf_1, current_config_ in enumerate(cartesian_product_configs):
         print("\n\033[1;32m======== for " + str(
             timesteps_total) + " steps =========\033[0;0m\n")
 
-        tune.run(
+        analysis = tune.run(
             algorithm,
             # IMP Name has to be specified otherwise, may lead to clashing for
             # temp file in ~/ray_results/... directory.
@@ -735,6 +736,9 @@ for enum_conf_1, current_config_ in enumerate(cartesian_product_configs):
             local_dir=args.framework_dir + '/_ray_results',
             # return_trials=True # add trials = tune.run( above
         )
+
+        pickle.dump(analysis, open("{}_analysis.pickle".format(args.exp_name),
+                    "wb"))
 
 end = time.time()
 print("No. of seconds to run:", end - start)
