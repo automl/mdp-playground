@@ -21,7 +21,6 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
-log_level_ = logging.WARNING ##TODO Make a runtime argument
 # docstring at beginning of the file is stored in __doc__
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('-c', '--config-file', dest='config_file', action='store',
@@ -101,10 +100,28 @@ parser.add_argument('-t', '--framework-dir', dest='framework_dir',
 #                     'and this number corresponds to the configuration number'
 #                     ' in this list.'
 #                     ' Please look in to the code for details.')
+parser.add_argument('-l', '--log-level', default='WARNING',
+                    help='Set log level.')
 
 
 args = parser.parse_args()
 print("Parsed arguments:", args)
+
+log_levels = {
+    'CRITICIAL': logging.CRITICAL,
+    'ERROR': logging.ERROR,
+    'WARNING': logging.WARNING,
+    'INFO': logging.INFO,
+    'DEBUG': logging.DEBUG,
+    'NOTSET': logging.NOTSET
+}
+
+try:
+    log_level_ = log_levels[args.log_level]
+except ValueError:
+    logging.error("Log level {} not in {}.".format(args.log_level,
+                                                   log_levels.keys()))
+
 
 if args.config_file[-3:] == '.py':
     config_file = args.config_file[:-3]
