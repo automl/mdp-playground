@@ -1,6 +1,3 @@
-from mdp_playground.config_processor import *
-
-# framework = 'ray'
 timesteps_total = 10_000
 num_seeds = 10
 from collections import OrderedDict
