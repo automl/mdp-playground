@@ -76,8 +76,3 @@ model_config = {
         "lstm_use_prev_action_reward": False,
     },
 }
-
-varying_configs = get_grid_of_configs(var_configs)
-# print("VARYING_CONFIGS:", varying_configs)
-
-final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm='SAC')

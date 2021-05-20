@@ -2,27 +2,18 @@ num_seeds = 1
 timesteps_total = 10_000_000
 from collections import OrderedDict
 
-var_env_configs = OrderedDict({
+sobol_env_configs = OrderedDict({
     'delay': [0],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
-var_configs = OrderedDict({
-"env": var_env_configs
+sobol_configs = OrderedDict({
+"env": sobol_env_configs
+
 })
 
-value_tuples = []
-for config_type, config_dict in var_configs.items():
-    for key in config_dict:
-        assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
-        value_tuples.append(var_configs[config_type][key])
 
-import itertools
-cartesian_product_configs = list(itertools.product(*value_tuples))
-print("Total number of grid configs. to run:", len(cartesian_product_configs))
-
-
-var_agent_configs = OrderedDict({
+random_agent_configs = OrderedDict({
 
     "lr": "float, log, [1e-5, 1e-3]", # 1e-4
     "learning_starts": "int, [1, 2000]", # 500
@@ -35,7 +26,7 @@ var_agent_configs = OrderedDict({
 
 })
 
-var_agent_configs = OrderedDict(sorted(var_agent_configs.items(), key=lambda t: t[0])) #hack because saved configs used below as random_configs are ordered alphabetically.
+random_agent_configs = OrderedDict(sorted(random_agent_configs.items(), key=lambda t: t[0])) #hack because ConfigSpace below orders alphabetically, the returned configs are in a jumbled order compared to the order above, which would create problems with config processing.
 
 random_configs = \
 [(1.86e-12, 1480, 0.0697, 311, 0.000545, 8, 1845, 64), # top 10 configs begin from here
@@ -59,14 +50,12 @@ random_configs = \
  (0.0133, 6541, 0.218, 1393, 1.21e-05, 1, 3, 16),
  (0.0515, 507, 0.48100000000000004, 1866, 1.23e-05, 3, 136, 128)]
 
-for i in range(len(random_configs)):
-    random_configs[i] = tuple(random_configs[i]) ##IMP I think these are tuples because cartesian_product_configs by default has tuples.
 
-var_configs = OrderedDict({
-"env": var_env_configs,
-"agent": var_agent_configs,
-
-})
+# var_configs = OrderedDict({
+# "env": var_env_configs,
+# "agent": var_agent_configs,
+#
+# })
 
 env_config = {
     "env": "GymEnvWrapper-Atari",

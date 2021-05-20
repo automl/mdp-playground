@@ -74,7 +74,7 @@ parser.add_argument('-n', '--config-num', dest='config_num', action='store',
                     'for the experiment will be taken and ordered as a list '
                     'and this number corresponds to the configuration number '
                     'in this list. Please look in to the code for details.')
-# ###TODO Remove? #hack to run 1000 x 1000 env configs x agent configs. 
+# ###TODO Remove? #hack to run 1000 x 1000 env configs x agent configs.
 # Storing all million of them in memory may be too inefficient?
 parser.add_argument('-a', '--agent-config-num', dest='agent_config_num',
                     action='store', default=None, type=int,
@@ -87,7 +87,8 @@ parser.add_argument('-f', '--framework', dest='framework', action='store',
                     ').')
 parser.add_argument('-m', '--save-model', dest='save_model', action='store',
                     default=False, type=bool,
-                    help='Option to save trained NN model at the end of '
+                    help='Option to save trained NN model and framework \
+                    generated files at the end of '
                     'training.')
 parser.add_argument('-t', '--framework-dir', dest='framework_dir',
                     action='store', default='/tmp/', type=str,
@@ -139,6 +140,7 @@ start = time.time()
 
 if args.config_num is None:
     # final_configs = config.final_configs
+    print("Total number of configs to run:", len(final_configs))
     pass
 else:
     final_configs = [final_configs[args.config_num]]
@@ -184,8 +186,11 @@ for enum_conf_1, current_config_ in enumerate(final_configs):
         #return_trials=True # add trials = tune.run( above
     )
 
-    pickle.dump(analysis, open("{}_analysis.pickle".format(args.exp_name),
-                "wb"))
+    if args.save_model:
+        pickle.dump(analysis, open("{}_analysis.pickle".format(args.exp_name),
+                    "wb"))
+
+    config_processor.post_processing(framework=args.framework)
 
 end = time.time()
 print("No. of seconds to run:", end - start)
