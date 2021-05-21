@@ -1,5 +1,5 @@
 num_seeds = 1
-timesteps_total = 20_000
+timesteps_total = 10_000_000
 num_configs = 100
 
 from collections import OrderedDict

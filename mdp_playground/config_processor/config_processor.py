@@ -17,7 +17,8 @@ from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
 
-def process_configs(config_file, stats_file_prefix, config_num, log_level, framework='ray'):
+def process_configs(config_file, stats_file_prefix, config_num, log_level,
+                    framework='ray', framework_dir='/tmp/ray'):
     config_file_path = os.path.abspath('/'.join(config_file.split('/')[:-1]))
 
     sys.path.insert(1, config_file_path) # #hack
@@ -62,7 +63,7 @@ def process_configs(config_file, stats_file_prefix, config_num, log_level, frame
     # Ray specific setup:
     if framework.lower() == 'ray':
         from ray import tune
-        setup_ray(config, config_num, log_level)
+        setup_ray(config, config_num, log_level, framework_dir)
         on_train_result, on_episode_end = setup_ray_callbacks(stats_file_prefix, variable_configs_deepcopy, hacky_timesteps_total, config_algorithm)
 
         #default Define default config which gets overwritten with config in config.py file if present.
@@ -127,11 +128,12 @@ def process_configs(config_file, stats_file_prefix, config_num, log_level, frame
     return config, final_configs
 
 
-def setup_ray(config, config_num, log_level):
+def setup_ray(config, config_num, log_level, framework_dir):
     import ray
+    tmp_dir = framework_dir + '/tmp_' + str(config_num)
     if config.algorithm == 'DQN': #hack
         ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-                 temp_dir='/tmp/ray' + str(config_num),
+                 temp_dir=tmp_dir,
                  logging_level=log_level,
                  # local_mode=True,
                  # webui_host='0.0.0.0'); logging_level=logging.INFO,
@@ -139,14 +141,14 @@ def setup_ray(config, config_num, log_level):
         # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # local_mode (bool): If true, the code will be executed serially. This is useful for debugging. # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
     elif config.algorithm == 'A3C': #hack
         ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-                 temp_dir='/tmp/ray' + str(config_num),
+                 temp_dir=tmp_dir,
                  logging_level=log_level,
                  # local_mode=True,
                  # webui_host='0.0.0.0'); logging_level=logging.INFO,
                  )        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
     else:
         ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-                 temp_dir='/tmp/ray' + str(config_num),
+                 temp_dir=tmp_dir,
                  logging_level=log_level,
                  local_mode=True,
                  # webui_host='0.0.0.0'); logging_level=logging.INFO,

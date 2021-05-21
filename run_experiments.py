@@ -125,7 +125,7 @@ if args.config_num is not None:
 
 print("Stats file being written to:", stats_file_name)
 
-config, final_configs =  config_processor.process_configs(config_file, stats_file_prefix=stats_file_name, framework=args.framework, config_num=args.config_num, log_level=log_level_)
+config, final_configs =  config_processor.process_configs(config_file, stats_file_prefix=stats_file_name, framework=args.framework, config_num=args.config_num, log_level=log_level_, framework_dir=args.framework_dir)
 
 print("Configuration number(s) that will be run:", "all" if args.config_num is None else args.config_num)
 
