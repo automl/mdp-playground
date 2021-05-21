@@ -109,8 +109,10 @@ parser.add_argument('-t', '--framework-dir', dest='framework_dir',
 args = parser.parse_args()
 print("Parsed arguments:", args)
 
-if args.config_file[-3:] == '.py':
-    config_file = args.config_file[:-3]
+config_file = args.config_file
+
+if config_file[-3:] == '.py':
+    config_file = config_file[:-3]
 
 # print("config_file_path:", config_file_path)
 
