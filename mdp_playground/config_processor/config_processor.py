@@ -169,7 +169,7 @@ def init_stats_file(stats_file_name, columns_to_write):
             #         fout.write(key + ', ')
             # else:
         fout.write(column + ', ')
-    fout.write('timesteps_total, episode_reward_mean, episode_len_mean\n')
+    fout.write('timesteps_total, episode_reward_mean, episode_len_mean, mem_used_mb\n')
     fout.close()
 
 def setup_ray_callbacks(stats_file_prefix, variable_configs_deepcopy, hacky_timesteps_total, config_algorithm):
@@ -230,22 +230,28 @@ def setup_ray_callbacks(stats_file_prefix, variable_configs_deepcopy, hacky_time
         # print("Custom_metrics: ", info["result"]["step_reward_mean"], info["result"]["step_reward_max"], info["result"]["step_reward_min"])
         episode_len_mean = info["result"]["episode_len_mean"]
 
+
+        # ##TODO write CSV stats configs only once in each case, write runtime and memory, td_error - check tempoRL logs;
+        import os, psutil
+        mem_used_mb = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
+
         fout.write(str(timesteps_total) + ' ' + '%.2e' % episode_reward_mean +
-                   ' ' + '%.2e' % episode_len_mean + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
+                   ' ' + '%.2e' % episode_len_mean + ' ' + '%.2e' % mem_used_mb\
+                    + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
         fout.close()
+
+
 
         # print("##### stats_file_name: ", stats_file_name)
         # print(os.getcwd())
 
         # We did not manage to find an easy way to log evaluation stats for Ray without the following hack which demarcates the end of a training iteration in the evaluation stats file
-        stats_file_eval = stats_file_prefix + '_eval.csv'
-        fout = open(stats_file_eval, 'a') #hardcoded
+        if info["result"]["config"]["evaluation_interval"] is not None:
+            stats_file_eval = stats_file_prefix + '_eval.csv'
+            fout = open(stats_file_eval, 'a') #hardcoded
 
-        import os, psutil
-        mem_used_mb = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
-
-        fout.write('#HACK STRING EVAL, mem_used_mb: ' + str(mem_used_mb) + "\n")
-        fout.close()
+            fout.write('#HACK STRING EVAL\n')
+            fout.close()
 
         info["result"]["callback_ok"] = True
 

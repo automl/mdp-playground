@@ -43,7 +43,7 @@ class MDPP_Analysis():
             list_exp_data.append(exp_data)
         return list_exp_data
 
-    def get_exp_data(self, dir_name, exp_name, exp_type='grid', num_metrics=3, load_eval=True, threshold=0.05, sample_freq=1): #, max_total_configs=200):
+    def get_exp_data(self, dir_name, exp_name, exp_type='grid', num_metrics=4, load_eval=True, threshold=0.05, sample_freq=1): #, max_total_configs=200):
         '''Get training and evaluation data from a single set of recorded CSV stats files.
 
         Parameters
@@ -55,7 +55,7 @@ class MDPP_Analysis():
         exp_type : str
             One of ['grid', 'random']. If it's 'grid', it's assumed that a grid of configurations was run and data loading takes place in a manner specific to grids. Otherwise, data loading tries to look for different unique configurations run.
         num_metrics : int
-            The number of metrics that were written to CSV stats files. Default is 3 (timesteps_total, episode_reward_mean, episode_len_mean).
+            The number of metrics that were written to CSV stats files. Default is 4 (timesteps_total, episode_reward_mean, episode_len_mean, mem_used_mb).
         load_eval : bool
             Whether to load evaluation stats CSV or not.
         threshold : float
@@ -72,7 +72,7 @@ class MDPP_Analysis():
         eval_stats : np.ndarray
             Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         train_curves: np.ndarray
-            The loaded training CSV with the last 3 columns the train stats that were saved and the initial columns are various setting for the algorithm and environment.
+            The loaded training CSV with the last 4 columns the train stats that were saved and the initial columns are various setting for the algorithm and environment.
         eval_curves: np.ndarray
             The loaded evaluation CSV with the columns the evaluation stats that were saved
         '''
@@ -157,12 +157,16 @@ class MDPP_Analysis():
         #                 for val in stats_pd["target_network_update_freq"].unique() ]
 
         #config counts includes seed
-        self.seed_idx = -1
+        self.seed_idx = None
+        self.ts_idx = None
         for i, c in enumerate(full_config_names[:-num_metrics]):
             dims_values.append(stats_pd[c].unique())
             config_counts.append(stats_pd[c].nunique())
             if("seed" in c): ##TODO this will just set seed index to be the "last" column name with seed in it.
                 self.seed_idx = i
+            if c == "timesteps_total":
+                self.ts_idx = i
+
 
         config_counts.append(num_metrics) #hardcoded number of training stats that were recorded
         config_counts = tuple(config_counts)
@@ -365,6 +369,7 @@ class MDPP_Analysis():
         exp_data['eval_aucs'] = eval_aucs
 
         # related to plots
+        # #TODO Remove the self from these since they are per expt. variables?
         exp_data['metric_names'] = self.metric_names
         exp_data['tick_labels'] = self.tick_labels
         exp_data['axis_labels'] = self.axis_labels
@@ -376,6 +381,7 @@ class MDPP_Analysis():
         exp_data['config_names'] = self.config_names
         exp_data['dims_values'] = self.dims_values
         exp_data['seed_idx'] = self.seed_idx
+        exp_data['ts_idx'] = self.ts_idx
 
         return exp_data
 
@@ -684,6 +690,7 @@ class MDPP_Analysis():
         #HACK
         if len(list_exp_data) > 0:
             exp_data = list_exp_data[0] #TODO make changes to handle multiple experiments plot
+            warnings.warn("")
         else:
             return
 
@@ -722,10 +729,10 @@ class MDPP_Analysis():
             j_index = (i//nseeds_) % ncols_ #
             if i == 0:
                 to_plot_ = stats_data[0:final_rows_for_a_config[i]+1, metric_num]
-                to_plot_x = stats_data[0:final_rows_for_a_config[i]+1,-3]
+                to_plot_x = stats_data[0:final_rows_for_a_config[i]+1, exp_data['ts_idx']]
             else:
                 to_plot_ = stats_data[final_rows_for_a_config[i-1]+1:final_rows_for_a_config[i]+1, metric_num]
-                to_plot_x = stats_data[final_rows_for_a_config[i-1]+1:final_rows_for_a_config[i]+1, -3]
+                to_plot_x = stats_data[final_rows_for_a_config[i-1]+1:final_rows_for_a_config[i]+1, exp_data['ts_idx']]
             # print(to_plot_[-1])
         #     if i % 10 == 0:
         #         fig = plt.figure(figsize=(12, 7))
