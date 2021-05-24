@@ -1,9 +1,9 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-99 # specifies array job indices
-#MOAB -l nodes=1:ppn=5
-#MOAB -l walltime=0:90:00:00
-#MOAB -l pmem=8GB # Seems like it is memory per CPU core
+#MOAB -t 0-479 # specifies array job indices
+#MOAB -l nodes=1:ppn=1
+#MOAB -l walltime=0:00:10:00
+#MOAB -l pmem=2GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 
 ##MOAB -V # export env. variables from launch env. I think
@@ -23,7 +23,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='rainbow_random_agent_configs_qbert' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='dqn_r_noises_various_lrs' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
@@ -76,11 +76,8 @@ cd mdpp_${JOB_ID}
 # cd /home/rajanr/mdpp
 echo ${MOAB_JOBID} ${MOAB_JOBARRAYINDEX} ${MOAB_JOBNAME}
 
-# for i in {0..0}
-# do
-# echo -e "Running env config $i:\n"
+
 \time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX} --framework-dir ${TMPDIR}
-# done
 
 
 #python output_argv_1.py

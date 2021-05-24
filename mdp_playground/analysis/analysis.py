@@ -43,7 +43,9 @@ class MDPP_Analysis():
             list_exp_data.append(exp_data)
         return list_exp_data
 
-    def get_exp_data(self, dir_name, exp_name, exp_type='grid', num_metrics=4, load_eval=True, threshold=0.05, sample_freq=1): #, max_total_configs=200):
+    def get_exp_data(self, dir_name, exp_name, exp_type='grid', num_metrics=4,
+                    load_eval=True, threshold=0.05, sample_freq=1):
+                    #, max_total_configs=200):
         '''Get training and evaluation data from a single set of recorded CSV stats files.
 
         Parameters
@@ -147,33 +149,37 @@ class MDPP_Analysis():
 
         config_counts = []
         dims_values = []
-        #Keep only config_names that we wan't to measure
-        #traning iteration is always first, metrics are always last.
+        # Keep only config_names that we want to measure
+        # traning iteration is always first, metrics are always last.
         self.full_config_names = col_names.copy()
         full_config_names = self.full_config_names
         full_config_names.remove("training_iteration")
 
-        # mean_vals = [ np.mean(stats_pd.loc[stats_pd['target_network_update_freq'] == val]["episode_reward_mean"])
-        #                 for val in stats_pd["target_network_update_freq"].unique() ]
 
         #config counts includes seed
-        self.seed_idx = None
+        self.seed_idx = None # seed used to be fixed as the last, i.e.,
+        # quickest varying dimension in the <experiment config>.py file's
+        # config space because then all runs on a single env would be recorded
+        # consecutively in the stats CSV
         self.ts_idx = None
         for i, c in enumerate(full_config_names[:-num_metrics]):
             dims_values.append(stats_pd[c].unique())
             config_counts.append(stats_pd[c].nunique())
-            if("seed" in c): ##TODO this will just set seed index to be the "last" column name with seed in it.
+            if("seed" in c): # ##TODO this will just set seed index to be
+            # the "last" column name with seed in it.
                 self.seed_idx = i
             if c == "timesteps_total":
                 self.ts_idx = i
 
 
-        config_counts.append(num_metrics) #hardcoded number of training stats that were recorded
+        config_counts.append(num_metrics) # #hardcoded number of training
+        # stats that were recorded
         config_counts = tuple(config_counts)
         self.metric_names = full_config_names[-num_metrics:]
         self.config_names = full_config_names[:-num_metrics]
 
-        # Slice into training stats and get end of training stats for individual training runs in the experiment
+        # Slice into training stats and get end of training stats for
+        # individual training runs in the experiment
         final_rows_for_a_config = []
         previous_i = 0
         list_of_learning_curves = []
