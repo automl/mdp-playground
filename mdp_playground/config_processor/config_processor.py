@@ -169,7 +169,7 @@ def init_stats_file(stats_file_name, columns_to_write):
             #         fout.write(key + ', ')
             # else:
         fout.write(column + ', ')
-    fout.write('timesteps_total, episode_reward_mean, episode_len_mean, mem_used_mb\n')
+    fout.write('timesteps_total, episode_reward_mean, episode_len_mean\n') # , mem_used_mb
     fout.close()
 
 def setup_ray_callbacks(stats_file_prefix, variable_configs_deepcopy, hacky_timesteps_total, config_algorithm):
@@ -232,11 +232,11 @@ def setup_ray_callbacks(stats_file_prefix, variable_configs_deepcopy, hacky_time
 
 
         # ##TODO write CSV stats configs only once in each case, write runtime and memory, td_error - check tempoRL logs;
-        import os, psutil
-        mem_used_mb = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
+        # import os, psutil
+        # mem_used_mb = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 2
 
         fout.write(str(timesteps_total) + ' ' + '%.2e' % episode_reward_mean +
-                   ' ' + '%.2e' % episode_len_mean + ' ' + '%.2e' % mem_used_mb\
+                   ' ' + '%.2e' % episode_len_mean #  + ' ' + '%.2e' % mem_used_mb
                     + '\n') # timesteps_total always HAS to be the 1st written: analysis.py depends on it
         fout.close()
 
