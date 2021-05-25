@@ -10,13 +10,13 @@ var_env_configs = OrderedDict({
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
     'transition_noise': [0],
-    'reward_noise': [5, 10, 25], # Std dev. of normal dist.
+    'reward_noise': [0, 1, 5, 10, 25], # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
 import numpy as np
 var_agent_configs = OrderedDict({
-    "lr": list(np.power(10.,np.linspace(-3, -6, 16))), # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    "lr": list(np.power(10.,np.linspace(-1, -6, 16))), # "lr": grid_search([1e-2, 1e-4, 1e-6]),
 })
 
 
