@@ -696,7 +696,7 @@ class MDPP_Analysis():
         #HACK
         if len(list_exp_data) > 0:
             exp_data = list_exp_data[0] #TODO make changes to handle multiple experiments plot
-            warnings.warn("")
+            warnings.warn("Using only 1st expt. for the foll. plots")
         else:
             return
 

@@ -74,7 +74,7 @@ JOB_ID=`echo ${MOAB_JOBID} | cut -d'[' -f 1`
 mkdir -p mdpp_${JOB_ID}
 cd mdpp_${JOB_ID}
 # cd /home/rajanr/mdpp
-echo ${MOAB_JOBID} ${MOAB_JOBARRAYINDEX} ${MOAB_JOBNAME}
+echo "MOAB_JOBID:" ${MOAB_JOBID} "MOAB_JOBARRAYINDEX:" ${MOAB_JOBARRAYINDEX} "MOAB_JOBNAME:" ${MOAB_JOBNAME}
 
 
 \time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX} --framework-dir ${TMPDIR}

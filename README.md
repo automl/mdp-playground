@@ -90,12 +90,12 @@ To plot results from experiments, run `jupyter-notebook` and open [`plot_experim
 If you use MDP Playground in your work, please cite the following paper:
 
 ```bibtex
-@article{rajan2019mdp,
-    title={MDP Playground: Meta-Features in Reinforcement Learning},
-    author={Raghu Rajan and Frank Hutter},
-    year={2019},
-    eprint={1909.07750},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+@article{rajan2020mdp,
+      title={MDP Playground: Controlling Dimensions of Hardness in Reinforcement Learning},
+      author={Raghu Rajan and Jessica Lizeth Borja Diaz and Suresh Guttikonda and Fabio Ferreira and André Biedenkapp and Frank Hutter},
+      year={2020},
+      eprint={1909.07750},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
 }
 ```
