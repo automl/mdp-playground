@@ -78,6 +78,7 @@ echo "MOAB_JOBID:" ${MOAB_JOBID} "MOAB_JOBARRAYINDEX:" ${MOAB_JOBARRAYINDEX} "MO
 
 
 \time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX} --framework-dir ${TMPDIR}
+#/work/ws/nemo/fr_rr1034-ws_mdpp-0/mdpp_10405451/ray
 
 
 #python output_argv_1.py

@@ -43,7 +43,7 @@ class MDPP_Analysis():
             list_exp_data.append(exp_data)
         return list_exp_data
 
-    def get_exp_data(self, dir_name, exp_name, exp_type='grid', num_metrics=4,
+    def get_exp_data(self, dir_name, exp_name, exp_type='grid', num_metrics=3,
                     load_eval=True, threshold=0.05, sample_freq=1):
                     #, max_total_configs=200):
         '''Get training and evaluation data from a single set of recorded CSV stats files.
@@ -57,7 +57,7 @@ class MDPP_Analysis():
         exp_type : str
             One of ['grid', 'random']. If it's 'grid', it's assumed that a grid of configurations was run and data loading takes place in a manner specific to grids. Otherwise, data loading tries to look for different unique configurations run.
         num_metrics : int
-            The number of metrics that were written to CSV stats files. Default is 4 (timesteps_total, episode_reward_mean, episode_len_mean, mem_used_mb).
+            The number of metrics that were written to CSV stats files. Default is 3 (timesteps_total, episode_reward_mean, episode_len_mean).
         load_eval : bool
             Whether to load evaluation stats CSV or not.
         threshold : float
@@ -74,7 +74,7 @@ class MDPP_Analysis():
         eval_stats : np.ndarray
             Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         train_curves: np.ndarray
-            The loaded training CSV with the last 4 columns the train stats that were saved and the initial columns are various setting for the algorithm and environment.
+            The loaded training CSV with the last 3 columns the train stats that were saved and the initial columns are various setting for the algorithm and environment.
         eval_curves: np.ndarray
             The loaded evaluation CSV with the columns the evaluation stats that were saved
         '''

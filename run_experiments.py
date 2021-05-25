@@ -176,15 +176,15 @@ for enum_conf_1, current_config_ in enumerate(final_configs):
 
     analysis = tune.run(
         algorithm,
-        name=algorithm + str(stats_file_name.split('/')[-1]) + '_' \
-        + str(args.config_num), ####IMP "name" has to be specified, otherwise,
+        name=algorithm + '_' + str(stats_file_name.split('/')[-1]) + '_' \
+        , ####IMP "name" has to be specified, otherwise,
         # it may lead to clashing for temp file in ~/ray_results/... directory.
         stop={
             "timesteps_total": timesteps_total,
               },
         config=tune_config,
         checkpoint_at_end=args.save_model,
-        local_dir=args.framework_dir + '/_ray_results',
+        local_dir=args.framework_dir + '/_ray_results_' + str(args.config_num),
         #return_trials=True # add trials = tune.run( above
     )
 
