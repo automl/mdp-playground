@@ -3,7 +3,7 @@ timesteps_total = 10_000_000
 from collections import OrderedDict
 import numpy as np
 var_env_configs = OrderedDict({
-    'reward_noise': list(np.array([0, 1, 5, 10, 25])/100), # Std dev. of normal dist.
+    'reward_noise': list(np.array([0, 1, 5, 10, 25, 50, 100, 200, 400, 800])/100), # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -35,7 +35,7 @@ algorithm = "DQN"
 agent_config = { # Taken from Ray tuned_examples
     'adam_epsilon': 0.00015,
     'buffer_size': 500000,
-    'clip_rewards': True,
+    'clip_rewards': False,
     'double_q': False,
     'dueling': False,
     'exploration_config': {   'epsilon_timesteps': 200000,
