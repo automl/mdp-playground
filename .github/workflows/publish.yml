@@ -2,7 +2,7 @@ name: Build and Publish
 
 on:  # TODO: should only trigger when intending to create a release (eg tag in commit)
   push:
-    branches: [ master, dev/jan ]  # for testing only currently
+    branches: [ dev/jan ]  # for testing only currently
 
 jobs:
   publish:
