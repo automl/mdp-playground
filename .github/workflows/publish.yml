@@ -13,10 +13,11 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: "3.6"
-      - name: Install poetry
+      - name: Install Poetry
         run: |
-          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
-          source $HOME/.poetry/env
+          curl -fsS -o get-poetry.py https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
+          python get-poetry.py -y
+          echo "$HOME/.poetry/bin" >> $GITHUB_PATH
       - name: Configure poetry
         run: poetry config virtualenvs.in-project true
       - name: Set up cache
@@ -28,8 +29,8 @@ jobs:
       - name: Ensure cache is healthy
         if: steps.cache.outputs.cache-hit == 'true'
         run: poetry run pip --version >/dev/null 2>&1 || rm -rf .venv
-      - name: Install Dependencies
-        run: poetry install
+      - name: Install dependencies
+        run: poetry install --no-interaction
       - name: Publish
         env:
           PYPI_TOKEN: ${{ secrets.TestPYPI_TOKEN }}
