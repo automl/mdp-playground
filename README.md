@@ -1,3 +1,23 @@
+<p align="center">
+
+<a href="https://github.com/automl/mdp-playground/actions/workflows/gh-test.yml" target="_blank">
+    <img src="https://github.com/automl/mdp-playground/actions/workflows/gh-test.yml/badge.svg" alt="Test">
+</a>
+<a href="https://github.com/automl/mdp-playground/actions/workflows/publish.yml" target="_blank">
+    <img src="https://github.com/automl/mdp-playground/actions/workflows/publish.yml/badge.svg" alt="Publish">
+</a>
+<a href="https://codecov.io/gh/iancleary/fastrf" target="_blank">
+    <img src="https://img.shields.io/codecov/c/github/iancleary/fastrf?color=%2334D058" alt="Coverage">
+</a>
+<a href="https://pypi.org/project/mdp-playground/" target="_blank">
+    <img src="https://img.shields.io/pypi/v/mdp-playground?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+<a href="https://pypi.org/project/mdp-playground/" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/mdp-playground.svg" alt="Python Versions">
+</a>
+</p>
+
+
 # MDP Playground
 A python package to inject low-level dimensions of difficulties in RL environments. There are toy environments to design and debug RL agents. And complex environment wrappers for Atari and Mujoco to test robustness to these dimensions in complex environments.
 
