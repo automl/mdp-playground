@@ -36,6 +36,26 @@ The `pyproject.toml` is set up using `poetry`.
 
 Build via `poetry build`, and publish via `poetry publish`.
 
-## Future stuff
+
+## Docs
+
+The documentation can be build using sphinx via:
+```bash
+cd docs
+make html
+```
+
+To clean up:
+```bash
+make clean
+rm -rf _autosummary  # optional
+```
+
+To publish:
+```bash
+git subtree docs/_build/html --prefix dist origin gh-pages
+```
+
+## WIP
 
 Add CI/CD for codecov etc.
