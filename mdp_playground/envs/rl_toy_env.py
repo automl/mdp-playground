@@ -363,8 +363,8 @@ class RLToyEnv(gym.Env):
                 if callable(config["transition_noise"]):
                     self.transition_noise = config["transition_noise"]
                 else:
-                    transition_noise_std = config["transition_noise"]
-                    self.transition_noise = lambda a: a.normal(0, transition_noise_std)
+                    p_noise_std = config["transition_noise"]
+                    self.transition_noise = lambda a: a.normal(0, p_noise_std)
             else: # discrete case
                 self.transition_noise = config["transition_noise"]
         else: # no transition noise
@@ -390,6 +390,8 @@ class RLToyEnv(gym.Env):
         else:
             self.image_representations = config["image_representations"]
             if "image_transforms" in config:
+                assert config["state_space_type"].lower() == "discrete", "Image\
+                        transforms are only applicable to discrete envs."
                 self.image_transforms = config["image_transforms"]
             else:
                 self.image_transforms = "none"
@@ -404,32 +406,37 @@ class RLToyEnv(gym.Env):
             else:
                 self.image_height = 100
 
-            if "image_sh_quant" not in config:
-                if 'shift' in self.image_transforms:
-                    warnings.warn("Setting image shift quantisation to default of 1, since no config value provided for it.")
-                    self.image_sh_quant = 1
+            # The following transforms are only applicable in discrete envs:
+            if config["state_space_type"] == "discrete":
+                if "image_sh_quant" not in config:
+                    if 'shift' in self.image_transforms:
+                        warnings.warn("Setting image shift quantisation to the \
+                        default of 1, since no config value was provided for it.")
+                        self.image_sh_quant = 1
+                    else:
+                        self.image_sh_quant = None
                 else:
-                    self.image_sh_quant = None
-            else:
-                self.image_sh_quant = config["image_sh_quant"]
+                    self.image_sh_quant = config["image_sh_quant"]
 
-            if "image_ro_quant" not in config:
-                if 'rotate' in self.image_transforms:
-                    warnings.warn("Setting image rotate quantisation to default of 1, since no config value provided for it.")
-                    self.image_ro_quant = 1
+                if "image_ro_quant" not in config:
+                    if 'rotate' in self.image_transforms:
+                        warnings.warn("Setting image rotate quantisation to the \
+                        default of 1, since no config value was provided for it.")
+                        self.image_ro_quant = 1
+                    else:
+                        self.image_ro_quant = None
                 else:
-                    self.image_ro_quant = None
-            else:
-                self.image_ro_quant = config["image_ro_quant"]
+                    self.image_ro_quant = config["image_ro_quant"]
 
-            if "image_scale_range" not in config:
-                if 'scale' in self.image_transforms:
-                    warnings.warn("Setting image scale range to default of (0.5, 1.5), since no config value was provided for it.")
-                    self.image_scale_range = (0.5, 1.5)
+                if "image_scale_range" not in config:
+                    if 'scale' in self.image_transforms:
+                        warnings.warn("Setting image scale range to the default \
+                        of (0.5, 1.5), since no config value was provided for it.")
+                        self.image_scale_range = (0.5, 1.5)
+                    else:
+                        self.image_scale_range = None
                 else:
-                    self.image_scale_range = None
-            else:
-                self.image_scale_range = config["image_scale_range"]
+                    self.image_scale_range = config["image_scale_range"]
 
         if config["state_space_type"] == "discrete":
             if "reward_dist" not in config:
