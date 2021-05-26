@@ -6,8 +6,8 @@
 <a href="https://github.com/automl/mdp-playground/actions/workflows/publish.yml" target="_blank">
     <img src="https://github.com/automl/mdp-playground/actions/workflows/publish.yml/badge.svg" alt="Publish">
 </a>
-<a href="https://codecov.io/gh/iancleary/fastrf" target="_blank">
-    <img src="https://img.shields.io/codecov/c/github/iancleary/fastrf?color=%2334D058" alt="Coverage">
+<a href="https://codecov.io/gh/automl/mdp-playground" target="_blank">
+    <img src="https://img.shields.io/codecov/c/github/automl/mdp-playground?color=%2334D058" alt="Coverage">
 </a>
 <a href="https://pypi.org/project/mdp-playground/" target="_blank">
     <img src="https://img.shields.io/pypi/v/mdp-playground?color=%2334D058&label=pypi%20package" alt="Package version">
