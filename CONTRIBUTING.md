@@ -53,7 +53,7 @@ rm -rf _autosummary  # optional
 
 To publish:
 ```bash
-git subtree docs/_build/html --prefix dist origin gh-pages
+git subtree push --prefix docs/_build/html/ origin gh-pages
 ```
 
 ## WIP
