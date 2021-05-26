@@ -16,6 +16,7 @@ jobs:
       - name: Install poetry
         run: |
           curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+          source $HOME/.poetry/env
       - name: Configure poetry
         run: poetry config virtualenvs.in-project true
       - name: Set up cache
