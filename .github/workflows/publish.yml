@@ -15,9 +15,7 @@ jobs:
           python-version: "3.6"
       - name: Install poetry
         run: |
-          curl -fsS -o get-poetry.py https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py
-          python get-poetry.py -y
-          echo "::set-env name=PATH::$HOME/.poetry/bin:$PATH"
+          curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
       - name: Configure poetry
         run: poetry config virtualenvs.in-project true
       - name: Set up cache
