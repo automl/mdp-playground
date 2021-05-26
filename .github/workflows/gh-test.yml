@@ -30,7 +30,7 @@ jobs:
         wget -q https://www.roboti.us/download/mujoco200_linux.zip
         mkdir ~/.mujoco
         unzip mujoco200_linux.zip -d ~/.mujoco
-        pip install mujoco_py
+        pip install mujoco-py
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
