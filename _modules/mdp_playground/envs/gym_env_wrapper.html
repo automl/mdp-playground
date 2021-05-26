@@ -1,0 +1,665 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdp_playground.envs.gym_env_wrapper &#8212; MDP Playground 0.0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">MDP Playground 0.0.1 documentation</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../_autosummary/mdp_playground.html">
+   mdp_playground
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.html">
+     mdp_playground.analysis
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.analysis.html">
+       mdp_playground.analysis.analysis
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+      <label for="toctree-checkbox-3">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.analysis.MDPP_Analysis.html">
+         mdp_playground.analysis.analysis.MDPP_Analysis
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.radar_chart.html">
+       mdp_playground.analysis.radar_chart
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+      <label for="toctree-checkbox-4">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.radar_chart.radar_factory.html">
+         mdp_playground.analysis.radar_chart.radar_factory
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.config_processor.html">
+     mdp_playground.config_processor
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.html">
+     mdp_playground.envs
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.html">
+       mdp_playground.envs.gym_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+      <label for="toctree-checkbox-6">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html">
+         mdp_playground.envs.gym_env_wrapper.GymEnvWrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.html">
+       mdp_playground.envs.rl_toy_env
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+      <label for="toctree-checkbox-7">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.dist_of_pt_from_line.html">
+         mdp_playground.envs.rl_toy_env.dist_of_pt_from_line
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.transform_discrete_to_multi_discrete.html">
+         mdp_playground.envs.rl_toy_env.transform_discrete_to_multi_discrete
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.transform_multi_discrete_to_discrete.html">
+         mdp_playground.envs.rl_toy_env.transform_multi_discrete_to_discrete
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.RLToyEnv.html">
+         mdp_playground.envs.rl_toy_env.RLToyEnv
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.html">
+     mdp_playground.spaces
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+    <label for="toctree-checkbox-8">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.box_extended.html">
+       mdp_playground.spaces.box_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+      <label for="toctree-checkbox-9">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.box_extended.BoxExtended.html">
+         mdp_playground.spaces.box_extended.BoxExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.discrete_extended.html">
+       mdp_playground.spaces.discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+      <label for="toctree-checkbox-10">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.discrete_extended.DiscreteExtended.html">
+         mdp_playground.spaces.discrete_extended.DiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.html">
+       mdp_playground.spaces.image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+      <label for="toctree-checkbox-11">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html">
+         mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.multi_discrete_extended.html">
+       mdp_playground.spaces.multi_discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+      <label for="toctree-checkbox-12">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended.html">
+         mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.tuple_extended.html">
+       mdp_playground.spaces.tuple_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+      <label for="toctree-checkbox-13">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.tuple_extended.TupleExtended.html">
+         mdp_playground.spaces.tuple_extended.TupleExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <h1>Source code for mdp_playground.envs.gym_env_wrapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">gym</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">gym.wrappers</span> <span class="kn">import</span> <span class="n">AtariPreprocessing</span>
+<span class="kn">from</span> <span class="nn">ray.rllib.env.atari_wrappers</span> <span class="kn">import</span> <span class="n">wrap_deepmind</span><span class="p">,</span> <span class="n">is_atari</span>
+<span class="kn">from</span> <span class="nn">mdp_playground.envs.rl_toy_env</span> <span class="kn">import</span> <span class="n">RLToyEnv</span>
+
+<span class="c1"># def get_gym_wrapper(base_class):</span>
+
+<div class="viewcode-block" id="GymEnvWrapper"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html#mdp_playground.envs.gym_env_wrapper.GymEnvWrapper">[docs]</a><span class="k">class</span> <span class="nc">GymEnvWrapper</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Wraps an OpenAI Gym environment to be able to modify its dimensions corresponding to MDP Playground. The documentation for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.</span>
+
+<span class="sd">    Currently supported dimensions:</span>
+<span class="sd">        transition noise (discrete)</span>
+<span class="sd">        reward delay</span>
+<span class="sd">        reward noise</span>
+
+<span class="sd">    Also supports wrapping with AtariPreprocessing from OpenAI Gym or wrap_deepmind from Ray Rllib.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c1"># Should not be a gym.Wrapper because 1) gym.Wrapper has member variables observation_space and action_space while here with irrelevant_features we would have multiple observation_spaces and this could cause conflict with code that assumes any subclass of gym.Wrapper should have these member variables.</span>
+    <span class="c1"># However, it _should_ be at least a gym.Env</span>
+    <span class="c1"># Does it need to be a subclass of base_class because some external code may check if it&#39;s an AtariEnv, for instance, and do further stuff based on that?</span>
+
+<div class="viewcode-block" id="GymEnvWrapper.__init__"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html#mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="o">**</span><span class="n">config</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="c1"># self.env = config[&quot;env&quot;]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
+
+        <span class="n">seed_int</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s2">&quot;seed&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="n">seed_int</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed_int</span><span class="p">)</span> <span class="c1">#seed</span>
+        <span class="c1">###IMP Move below code from here to seed()? Because if seed is called during the run of an env, the expectation is that all obs., act. space, etc. seeds are set? Only Atari in Gym seems to do something similar, the others I saw there don&#39;t seem to set seed for obs., act. spaces.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed_int</span><span class="p">)</span> <span class="c1">#seed ###IMP Apparently Atari also has a seed. :/ Without this, for beam_rider(?), about 1 in 5 times I got reward of 88.0 and 44.0 the remaining times with the same action sequence!! With setting this seed, I got the same reward of 44.0 when I ran about 20 times.; ##TODO If this is really a wrapper, should it be modifying the seed of the env?</span>
+        <span class="n">obs_space_seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">)</span> <span class="c1">#random</span>
+        <span class="n">act_space_seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">)</span> <span class="c1">#random</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">obs_space_seed</span><span class="p">)</span> <span class="c1">#seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">act_space_seed</span><span class="p">)</span> <span class="c1">#seed</span>
+
+        <span class="c1"># if &quot;dummy_eval&quot; in config: #hack</span>
+        <span class="c1">#     del config[&quot;dummy_eval&quot;]</span>
+        <span class="k">if</span> <span class="s2">&quot;delay&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reward_buffer</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="s2">&quot;transition_noise&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;transition_noise&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;state_space_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;continuous&quot;</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">callable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span><span class="p">),</span> <span class="s2">&quot;transition_noise must be a function when env is continuous, it was of type:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span> <span class="o">&lt;=</span> <span class="mf">1.0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s2">&quot;transition_noise must be a value in [0.0, 1.0] when env is discrete, it was:&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;state_space_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;discrete&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="s2">&quot;reward_noise&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reward_noise</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;reward_noise&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reward_noise</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="s2">&quot;wrap_deepmind_ray&quot;</span> <span class="ow">in</span> <span class="n">config</span> <span class="ow">and</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;wrap_deepmind_ray&quot;</span><span class="p">]:</span> <span class="c1">#hack ##TODO remove?</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">wrap_deepmind</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">framestack</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;atari_preprocessing&quot;</span> <span class="ow">in</span> <span class="n">config</span> <span class="ow">and</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;atari_preprocessing&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frame_skip</span> <span class="o">=</span> <span class="mi">4</span> <span class="c1">#default for AtariPreprocessing</span>
+            <span class="k">if</span> <span class="s2">&quot;frame_skip&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">frame_skip</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;frame_skip&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grayscale_obs</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="s2">&quot;grayscale_obs&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">grayscale_obs</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;grayscale_obs&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Use AtariPreprocessing with frame_skip</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">AtariPreprocessing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">,</span> <span class="n">frame_skip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">frame_skip</span><span class="p">,</span> <span class="n">grayscale_obs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">grayscale_obs</span><span class="p">,</span> <span class="n">noop_max</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># noop_max set to 1 because we want to keep the vanilla env as deterministic as possible and setting it 0 was not allowed. ##TODO noop_max=0 is poosible in new Gym version, so update Gym version.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;self.env.noop_max set to: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">noop_max</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;irrelevant_features&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="c1"># self.irrelevant_features =  config[&quot;irrelevant_features&quot;]</span>
+            <span class="n">irr_toy_env_conf</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;irrelevant_features&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;seed&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">irr_toy_env_conf</span><span class="p">:</span>
+                <span class="n">irr_toy_env_conf</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">)</span> <span class="c1">#random</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span> <span class="o">=</span> <span class="n">RLToyEnv</span><span class="p">(</span><span class="o">**</span><span class="n">irr_toy_env_conf</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;state_space_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;discrete&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">action_space</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">observation_space</span><span class="p">))</span> <span class="c1">###TODO for image observations, concatenate to 1 obs. space here and in step() and reset()?</span>
+            <span class="k">else</span><span class="p">:</span> <span class="c1">####TODO Check the test case added for cont. irr features case and code for it in run_experiments.py.</span>
+                <span class="n">env_obs_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">low</span>
+                <span class="n">env_obs_high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">high</span>
+                <span class="n">env_obs_dtype</span> <span class="o">=</span> <span class="n">env_obs_low</span><span class="o">.</span><span class="n">dtype</span>
+                <span class="n">env_obs_shape</span> <span class="o">=</span> <span class="n">env_obs_low</span><span class="o">.</span><span class="n">shape</span>
+                <span class="n">irr_env_obs_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">low</span>
+                <span class="n">irr_env_obs_high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">high</span>
+                <span class="n">irr_env_obs_dtype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">low</span><span class="o">.</span><span class="n">dtype</span>
+                <span class="k">assert</span> <span class="n">env_obs_dtype</span> <span class="o">==</span> <span class="n">irr_env_obs_dtype</span><span class="p">,</span> <span class="s2">&quot;Datatypes of base env and irrelevant toy env should match. Were: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">env_obs_dtype</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">irr_env_obs_dtype</span><span class="p">)</span>
+                <span class="n">ext_low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">env_obs_low</span><span class="p">,</span> <span class="n">irr_env_obs_low</span><span class="p">))</span>
+                <span class="n">ext_high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">env_obs_high</span><span class="p">,</span> <span class="n">irr_env_obs_high</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="n">Box</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="n">ext_low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">ext_high</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">env_obs_dtype</span><span class="p">)</span>
+
+                <span class="n">env_act_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">low</span>
+                <span class="n">env_act_high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">high</span>
+                <span class="n">env_act_dtype</span> <span class="o">=</span> <span class="n">env_act_low</span><span class="o">.</span><span class="n">dtype</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">env_act_shape</span> <span class="o">=</span> <span class="n">env_act_low</span><span class="o">.</span><span class="n">shape</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_act_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Length of shape of action space should be 1.&quot;</span>
+                <span class="n">irr_env_act_low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">low</span>
+                <span class="n">irr_env_act_high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">high</span>
+                <span class="n">irr_env_act_dtype</span> <span class="o">=</span> <span class="n">irr_env_act_low</span><span class="o">.</span><span class="n">dtype</span>
+                <span class="c1"># assert env_obs_dtype == env_act_dtype, &quot;Datatypes of obs. and act. of base env should match. Were: &quot; + str(env_obs_dtype) + &quot;, &quot; + str(env_act_dtype) #TODO Apparently, observations are np.float64 and actions np.float32 for Mujoco.</span>
+                <span class="n">ext_low</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">env_act_low</span><span class="p">,</span> <span class="n">irr_env_act_low</span><span class="p">))</span>
+                <span class="n">ext_high</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">env_act_high</span><span class="p">,</span> <span class="n">irr_env_act_high</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="n">Box</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="n">ext_low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="n">ext_high</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">env_act_dtype</span><span class="p">)</span> <span class="c1">#TODO Use BoxExtended here and above?</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">obs_space_seed</span><span class="p">)</span> <span class="c1">#seed</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">act_space_seed</span><span class="p">)</span> <span class="c1">#seed</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span>
+
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># if &quot;action_loss_weight&quot; in config: #hack</span>
+        <span class="c1">#     del config[&quot;action_loss_weight&quot;]</span>
+        <span class="c1"># if &quot;action_space_max&quot; in config: #hack</span>
+        <span class="c1">#     action_space_max = config[&quot;action_space_max&quot;]</span>
+        <span class="c1">#     del config[&quot;action_space_max&quot;]</span>
+        <span class="c1"># if &quot;time_unit&quot; in config: #hack</span>
+        <span class="c1">#     time_unit = config[&quot;time_unit&quot;]</span>
+        <span class="c1">#     del config[&quot;time_unit&quot;]</span>
+        <span class="c1"># if &quot;dummy_seed&quot; in config: #hack</span>
+        <span class="c1">#     del config[&quot;dummy_seed&quot;]</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">GymEnvWrapper</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span></div>
+        <span class="c1"># if &quot;action_space_max&quot; in locals():</span>
+        <span class="c1">#     print(&quot;Setting Mujoco self.action_space.low, self.action_space.high from:&quot;, self.action_space.low, self.action_space.high)</span>
+        <span class="c1">#     self.action_space.low *= action_space_max</span>
+        <span class="c1">#     self.action_space.high *= action_space_max</span>
+        <span class="c1">#     print(&quot;to:&quot;, self.action_space.low, self.action_space.high)</span>
+
+            <span class="c1"># if base_class == HalfCheetahEnv and action_space_max &gt;= 4: #hack</span>
+            <span class="c1">#     self.model.opt.timestep /= 2 # 0.005</span>
+            <span class="c1">#     self.frame_skip *= 2</span>
+            <span class="c1">#     print(&quot;Setting Mujoco timestep to&quot;, self.model.opt.timestep, &quot;half of the usual to avoid instabilities. At the same time action repeat increased to twice its usual.&quot;)</span>
+
+        <span class="c1"># if &quot;time_unit&quot; in locals(): #hack In HalfCheetah, this is needed because the reward function is dependent on the time_unit because it depends on velocity achieved which depends on amount of time torque was applied. In Pusher, Reacher, it is also needed because the reward is similar to the distance from current position to goal at _each_ step, which means if we calculate the reward multiple times in the same amount of &quot;real&quot; time, we&#39;d need to average out the reward the more times we calculate the reward in the same amount of &quot;real&quot; time (i.e., when we have shorter acting timesteps). This is not the case with the toy enviroments because there the reward is amount of distance moved from current position to goal in the current timestep, so it&#39;s dependent on &quot;real&quot; time and not on acting timesteps.</span>
+            <span class="c1"># self.frame_skip *= time_unit</span>
+            <span class="c1"># self.frame_skip = int(self.frame_skip)</span>
+            <span class="c1"># self._ctrl_cost_weight *= time_unit</span>
+            <span class="c1"># self._forward_reward_weight *= time_unit</span>
+            <span class="c1"># print(&quot;Setting Mujoco self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight to&quot;, self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight, &quot;corresponding to time_unit in config.&quot;)</span>
+
+<div class="viewcode-block" id="GymEnvWrapper.step"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html#mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="c1"># next_state, reward, done, info = super(GymEnvWrapper, self).step(action)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_transitions_episode</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;state_space_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;discrete&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">n</span><span class="p">,))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">probs</span><span class="p">[</span><span class="n">action</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span>
+            <span class="n">old_action</span> <span class="o">=</span> <span class="n">action</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probs</span><span class="p">))</span> <span class="c1">#random</span>
+            <span class="k">if</span> <span class="n">old_action</span> <span class="o">!=</span> <span class="n">action</span><span class="p">:</span>
+                <span class="c1"># print(&quot;NOISE inserted&quot;, old_action, action)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">total_noisy_transitions_episode</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1"># cont. envs</span>
+            <span class="k">pass</span> <span class="c1">###TODO</span>
+            <span class="c1"># self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)</span>
+
+
+        <span class="k">if</span> <span class="s2">&quot;irrelevant_features&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;state_space_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;discrete&quot;</span><span class="p">:</span>
+                <span class="n">next_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">next_state_irr</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done_irr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">next_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">next_state</span><span class="p">,</span> <span class="n">next_state_irr</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">next_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">env_act_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+                <span class="n">next_state_irr</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done_irr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">env_act_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:])</span>
+                <span class="n">next_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">next_state</span><span class="p">,</span> <span class="n">next_state_irr</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">next_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+            <span class="n">reward</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reward_buffer</span><span class="p">)</span> <span class="c1"># if episode is finished return the rewards that were delayed and not handed out before ##TODO add test case for this</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reward_buffer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reward</span><span class="p">)</span>
+            <span class="n">old_reward</span> <span class="o">=</span> <span class="n">reward</span>
+            <span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># print(&quot;rewards:&quot;, self.reward_buffer, old_reward, reward)</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">noise_in_reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_noise</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="p">)</span> <span class="c1">#random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_abs_noise_in_reward_episode</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">noise_in_reward</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_reward_episode</span> <span class="o">+=</span> <span class="n">reward</span>
+        <span class="n">reward</span> <span class="o">+=</span> <span class="n">noise_in_reward</span>
+
+        <span class="k">return</span> <span class="n">next_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span></div>
+
+<div class="viewcode-block" id="GymEnvWrapper.reset"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html#mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># on episode &quot;end&quot; stuff (to not be invoked when reset() called when self.total_episodes = 0; end is in quotes because it may not be a true episode end reached by reaching a terminal state, but reset() may have been called in the middle of an episode):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Noise stats for previous episode num.: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_abs_noise_in_reward_episode</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_abs_noise_in_transition_episode</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_reward_episode</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_noisy_transitions_episode</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">total_transitions_episode</span><span class="p">))</span>
+
+        <span class="c1"># on episode start stuff:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reward_buffer</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_episodes</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_abs_noise_in_reward_episode</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_abs_noise_in_transition_episode</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># only present in continuous spaces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_noisy_transitions_episode</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># only present in discrete spaces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_reward_episode</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_transitions_episode</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="s2">&quot;irrelevant_features&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;state_space_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;discrete&quot;</span><span class="p">:</span>
+                <span class="n">reset_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                <span class="n">reset_state_irr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                <span class="n">reset_state</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">reset_state</span><span class="p">,</span> <span class="n">reset_state_irr</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">reset_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                <span class="n">reset_state_irr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">irr_toy_env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                <span class="n">reset_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">reset_state</span><span class="p">,</span> <span class="n">reset_state_irr</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reset_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">reset_state</span></div>
+        <span class="c1"># return super(GymEnvWrapper, self).reset()</span>
+
+<div class="viewcode-block" id="GymEnvWrapper.seed"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html#mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.seed">[docs]</a>    <span class="k">def</span> <span class="nf">seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialises the Numpy RNG for the environment by calling a utility for this in Gym.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        seed : int</span>
+<span class="sd">            seed to initialise the np_random instance held by the environment. Cannot use numpy.int64 or similar because Gym doesn&#39;t accept it.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The seed returned by Gym</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If seed is None, you get a randomly generated seed from gym.utils...</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed_</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">seeding</span><span class="o">.</span><span class="n">np_random</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="c1">#random</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Env SEED set to: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;. Returned seed from Gym: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed_</span></div></div>
+
+
+
+    <span class="c1"># return GymEnvWrapper</span>
+
+
+<span class="c1"># from mdp_playground.envs.gym_env_wrapper import get_gym_wrapper</span>
+<span class="c1"># from gym.envs.atari import AtariEnv</span>
+<span class="c1"># from gym.wrappers import AtariPreprocessing</span>
+<span class="c1"># AtariPreprocessing()</span>
+<span class="c1"># AtariEnvWrapper = get_gym_wrapper(AtariEnv)</span>
+<span class="c1"># from ray.tune.registry import register_env</span>
+<span class="c1"># register_env(&quot;AtariEnvWrapper&quot;, lambda config: AtariEnvWrapper(**config))</span>
+<span class="c1"># aew = AtariEnvWrapper(**{&#39;game&#39;: &#39;breakout&#39;, &#39;obs_type&#39;: &#39;image&#39;, &#39;frameskip&#39;: 4})</span>
+<span class="c1"># ob = aew.reset()</span>
+
+<span class="c1"># from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper</span>
+<span class="c1"># from gym.envs.atari import AtariEnv</span>
+<span class="c1"># ae = AtariEnv(**{&#39;game&#39;: &#39;beam_rider&#39;, &#39;obs_type&#39;: &#39;image&#39;, &#39;frameskip&#39;: 1})</span>
+<span class="c1"># aew = GymEnvWrapper(ae, **{&#39;reward_noise&#39;: lambda a: a.normal(0, 0.1), &#39;transition_noise&#39;: 0.1, &#39;delay&#39;: 1, &#39;frame_skip&#39;: 4, &quot;atari_preprocessing&quot;: True, &quot;state_space_type&quot;: &quot;discrete&quot;, &#39;seed&#39;: 0})</span>
+<span class="c1"># ob = aew.reset()</span>
+<span class="c1"># print(ob.shape)</span>
+<span class="c1"># print(ob)</span>
+<span class="c1"># total_reward = 0.0</span>
+<span class="c1"># for i in range(200):</span>
+<span class="c1">#     act = aew.action_space.sample()</span>
+<span class="c1">#     next_state, reward, done, info = aew.step(act)</span>
+<span class="c1">#     print(reward, done, act)</span>
+<span class="c1">#     if reward &gt; 10:</span>
+<span class="c1">#         print(&quot;reward in step:&quot;, i, reward)</span>
+<span class="c1">#     total_reward += reward</span>
+<span class="c1"># print(&quot;total_reward:&quot;, total_reward)</span>
+<span class="c1"># aew.reset()</span>
+
+<span class="c1"># # AtariPreprocessing()</span>
+<span class="c1"># # from ray.tune.registry import register_env</span>
+<span class="c1"># # register_env(&quot;AtariEnvWrapper&quot;, lambda config: AtariEnvWrapper(**config))</span>
+</pre></div>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Raghu Rajan<br/>
+        
+            &copy; Copyright 2021, Raghu Rajan.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
