@@ -19,7 +19,6 @@ mdp\_playground.spaces.discrete\_extended
       :toctree:
       :template: custom-class-template.rst
    
-      Discrete
       DiscreteExtended
    
    

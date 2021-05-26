@@ -19,7 +19,6 @@ mdp\_playground.spaces.box\_extended
       :toctree:
       :template: custom-class-template.rst
    
-      Box
       BoxExtended
    
    

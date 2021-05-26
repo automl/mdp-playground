@@ -19,7 +19,6 @@ mdp\_playground.spaces.tuple\_extended
       :toctree:
       :template: custom-class-template.rst
    
-      Tuple
       TupleExtended
    
    

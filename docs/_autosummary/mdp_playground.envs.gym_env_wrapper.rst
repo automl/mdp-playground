@@ -9,14 +9,6 @@ mdp\_playground.envs.gym\_env\_wrapper
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:
-   
-      is_atari
-      wrap_deepmind
-   
    
 
    
@@ -27,11 +19,7 @@ mdp\_playground.envs.gym\_env\_wrapper
       :toctree:
       :template: custom-class-template.rst
    
-      AtariPreprocessing
-      Box
       GymEnvWrapper
-      RLToyEnv
-      Tuple
    
    
 

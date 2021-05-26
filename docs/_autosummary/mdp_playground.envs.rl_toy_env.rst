@@ -28,12 +28,7 @@ mdp\_playground.envs.rl\_toy\_env
       :toctree:
       :template: custom-class-template.rst
    
-      BoxExtended
-      DiscreteExtended
-      ImageMultiDiscrete
       RLToyEnv
-      TupleExtended
-      datetime
    
    
 

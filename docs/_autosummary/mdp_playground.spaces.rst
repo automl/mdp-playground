@@ -13,18 +13,6 @@ mdp\_playground.spaces
 
    
    
-   .. rubric:: Classes
-
-   .. autosummary::
-      :toctree:
-      :template: custom-class-template.rst
-   
-      BoxExtended
-      DiscreteExtended
-      ImageMultiDiscrete
-      MultiDiscreteExtended
-      TupleExtended
-   
    
 
    

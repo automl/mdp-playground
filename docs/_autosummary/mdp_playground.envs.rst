@@ -13,14 +13,6 @@ mdp\_playground.envs
 
    
    
-   .. rubric:: Classes
-
-   .. autosummary::
-      :toctree:
-      :template: custom-class-template.rst
-   
-      RLToyEnv
-   
    
 
    

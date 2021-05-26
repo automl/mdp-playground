@@ -19,11 +19,7 @@ mdp\_playground.spaces.image\_multi\_discrete
       :toctree:
       :template: custom-class-template.rst
    
-      Box
-      Discrete
       ImageMultiDiscrete
-      MultiDiscrete
-      Space
    
    
 

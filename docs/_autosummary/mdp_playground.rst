@@ -9,13 +9,6 @@
 
    
    
-   .. rubric:: Functions
-
-   .. autosummary::
-      :toctree:
-   
-      register
-   
    
 
    
@@ -36,6 +29,7 @@
    :recursive:
 
    mdp_playground.analysis
+   mdp_playground.config_processor
    mdp_playground.envs
    mdp_playground.spaces
 
