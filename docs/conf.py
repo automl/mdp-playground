@@ -44,7 +44,7 @@ napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 
 autosummary_generate = True
-autosummary_imported_members = True
+autosummary_imported_members = False
 autoclass_content = "both"  # Add __init__ doc (ie. params) to class summaries
 html_show_sourcelink = False  # Remove 'view source code' from top of page
 autodoc_inherit_docstrings = True  # If no docstring, inherit from base class
