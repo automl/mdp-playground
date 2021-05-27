@@ -192,7 +192,7 @@ for enum_conf_1, current_config_ in enumerate(final_configs):
         pickle.dump(analysis, open("{}_analysis.pickle".format(args.exp_name),
                     "wb"))
 
-    config_processor.post_processing(framework=args.framework)
+config_processor.post_processing(framework=args.framework)
 
 end = time.time()
 print("No. of seconds to run:", end - start)

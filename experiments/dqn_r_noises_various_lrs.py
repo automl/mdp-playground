@@ -16,7 +16,7 @@ var_env_configs = OrderedDict({
 
 import numpy as np
 var_agent_configs = OrderedDict({
-    "lr": list(np.power(10.,np.linspace(-1, -6, 16))), # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    "lr": [1e-4] #list(np.power(10.,np.linspace(-1, -6, 16))), # "lr": grid_search([1e-2, 1e-4, 1e-6]),
 })
 
 
@@ -44,6 +44,7 @@ agent_config = {
     "adam_epsilon": 1e-4,
     "beta_annealing_fraction": 1.0,
     "buffer_size": 20_000,
+    'clip_rewards': False,
     "double_q": False,
     "dueling": False,
     "exploration_final_eps": 0.01,
