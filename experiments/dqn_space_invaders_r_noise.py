@@ -43,7 +43,7 @@ agent_config = { # Taken from Ray tuned_examples
     'final_prioritized_replay_beta': 1.0,
     'hiddens': [512],
     'learning_starts': 20000,
-    'lr': 6.25e-05,
+    # 'lr': 6.25e-05,
     'n_step': 1,
     'noisy': False,
     'num_atoms': 1,
