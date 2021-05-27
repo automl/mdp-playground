@@ -135,7 +135,7 @@ def setup_ray(config, config_num, log_level, framework_dir):
         ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
                  temp_dir=tmp_dir,
                  logging_level=log_level,
-                 local_mode=True,
+                 # local_mode=True,
                  # webui_host='0.0.0.0'); logging_level=logging.INFO,
                  )
         # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # local_mode (bool): If true, the code will be executed serially. This is useful for debugging. # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
