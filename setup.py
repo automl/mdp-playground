@@ -69,4 +69,10 @@ setup(
       'extras_disc': extras_require,
       'extras_cont': extras_require_cont,
     },
+
+    entry_points={
+        'console_scripts': """
+            run-mdpp-experiments = run-experiments:main
+        """
+    }
 )

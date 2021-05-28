@@ -32,10 +32,11 @@ There are 4 parts to the package:
 4) **Analysis**: [`plot_experiments.ipynb`](plot_experiments.ipynb) contains code to plot the standard plots from the paper.
 
 ## Installation
+### Manual
 We recommend using `conda` environments to manage virtual `Python` environments to run the experiments. Unfortunately, you will have to maintain 2 environments - 1 for the "older" **discrete toy** experiments and 1 for the "newer" **continuous and complex** experiments from the paper. As mentioned in Appendix P in the paper, this is because of issues with Ray, the library that we used for our baseline agents.
 
 Please follow the following commands to install for the discrete toy experiments:
-```
+```bash
 conda create -n py36_toy_rl_disc_toy python=3.6
 conda activate py36_toy_rl_disc_toy
 cd mdp-playground
@@ -43,7 +44,7 @@ pip install -e .[extras_disc]
 ```
 
 Please follow the following commands to install for the continuous and complex experiments:
-```
+```bash
 conda create -n py36_toy_rl_cont_comp python=3.6
 conda activate py36_toy_rl_cont_comp
 cd mdp-playground
@@ -51,6 +52,28 @@ pip install -e .[extras_cont]
 wget 'https://ray-wheels.s3-us-west-2.amazonaws.com/master/8d0c1b5e068853bf748f72b1e60ec99d240932c6/ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl'
 pip install ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl[rllib,debug]
 ```
+
+### From PyPI
+MDP Playground is also on PyPI. As with the manual installation, we recommend using `conda` to manage environments. After setup of the environment, you can install MDP Playground like this:
+```bash
+# for production use:
+pip install tensorflow==2.2.0
+pip install ray[rllib,debug]==0.9.0
+pip install mdp_playground
+
+# for the discrete toy experiments:
+pip install tensorflow==1.13.0rc1
+pip install ray[rllib,debug]==0.7.3
+pip install mdp_playground[extras_cont]
+
+# for the continuous and complex experiments:
+pip install tensorflow==2.2.0
+wget 'https://ray-wheels.s3-us-west-2.amazonaws.com/master/8d0c1b5e068853bf748f72b1e60ec99d240932c6/ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl'
+pip install ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl[rllib,debug]
+pip install mdp_playground[extras_disc]
+```
+
+Instead of calling `$ python run_experiments.py` in the cloned repository, you would then use `$ run-mdpp-experiments` from anywhere.
 
 ## Running experiments
 For reproducing experiments from the main paper, please see [below](#running-experiments-from-the-main-paper).
@@ -73,7 +96,7 @@ For example, for algorithm **DQN** when varying dimensions **delay** and **seque
 
 ## Running experiments from the main paper
 We list here the commands for the experiments from the main paper:
-```
+```bash
 # Discrete toy environments:
 # Image representation experiments:
 conda activate py36_toy_rl_disc_toy

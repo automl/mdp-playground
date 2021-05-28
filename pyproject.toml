@@ -3,7 +3,7 @@ name = "mdp_playground"
 version = "0.0.3"
 description = "A python package to design and debug RL agents"
 readme = "README.md"
-homepage = "https://raghuspacerajan.github.io/mdp-playground"
+homepage = "https://automl.github.io/mdp-playground"
 authors = [
   "Raghu Rajan <rajanr@cs.uni-freiburg.de>",
   "Jessica Borja",
@@ -30,7 +30,7 @@ classifiers = [
 # packages = [{ include = "mdp_playground" },
 
 [tool.poetry.urls]
-"Bug Tracker" = "https://github.com/RaghuSpaceRajan/mdp-playground/issues"
+"Bug Tracker" = "https://github.com/automl/mdp-playground/issues"
 
 [tool.poetry.dependencies]
 python = "^3.6"
