@@ -25,12 +25,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi\
-    - name: Install mujoco
-      run: |
-        wget -q https://www.roboti.us/download/mujoco200_linux.zip
-        mkdir ~/.mujoco
-        unzip -j mujoco200_linux.zip -d ~/.mujoco/mujoco200
-        pip install mujoco-py
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
