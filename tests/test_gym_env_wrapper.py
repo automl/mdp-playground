@@ -1,4 +1,5 @@
 import unittest
+import pytest
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
@@ -208,6 +209,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         print("total_reward:", total_reward)
         aew.reset()
 
+    @pytest.mark.skip(reason="Cannot run mojoco in CI/CD currently.")
     def test_cont_irr_features(self):
         '''
         '''
