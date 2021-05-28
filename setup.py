@@ -25,6 +25,7 @@ extras_require_cont = [
 
 AUTHORS = ', '.join(["Raghu Rajan", "Jessica Borja",
                      "Suresh Guttikonda", "Fabio Ferreira",
+                     "Jan Ole von Hartz",
                      "André Biedenkapp", "Frank Hutter",
                      ]),
 
