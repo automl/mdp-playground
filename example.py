@@ -25,7 +25,7 @@ def discrete_environment_example():
     config["seed"] = 0
 
     config["state_space_type"] = "discrete"
-    config["state_space_size"] = 8
+    config["action_space_size"] = 8
     config["delay"] = 1
     config["sequence_length"] = 3
     config["reward_scale"] = 2.5
@@ -59,7 +59,7 @@ def discrete_environment_image_representations_example():
     config["seed"] = 0
 
     config["state_space_type"] = "discrete"
-    config["state_space_size"] = 8
+    config["action_space_size"] = 8
     config["image_representations"] = True
     config["delay"] = 1
     config["sequence_length"] = 3

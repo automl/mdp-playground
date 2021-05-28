@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from gym.spaces.image_multi_discrete import ImageMultiDiscrete
+from mdp_playground.spaces.image_multi_discrete import ImageMultiDiscrete
 from gym.spaces import Discrete, MultiDiscrete
 # import gym
 # from gym.spaces import MultiDiscrete
@@ -13,6 +13,8 @@ class TestImageMultiDiscrete(unittest.TestCase):
 
     def test_image_multi_discrete(self):
         ds4 = Discrete(4)
+        ds4 = [ds4.n]
+        print(ds4)
         imd = ImageMultiDiscrete(ds4, transforms='shift')
         from PIL import Image
         # img1 = Image.fromarray(imd.disjoint_states[0][1], 'L')

@@ -476,6 +476,69 @@ class TestRLToyEnv(unittest.TestCase):
         env.close()
 
 
+    def test_continuous_image_representations(self):
+        ''''''
+        print('\033[32;1;4mTEST_CONTINUOUS_IMAGE_REPRESENTATIONS\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = 0
+
+        config["state_space_type"] = "continuous"
+        config["action_space_type"] = "continuous"
+        config["state_space_dim"] = 2
+        config["action_space_dim"] = 2
+        config["delay"] = 0
+        config["sequence_length"] = 1 # seq_len is always going to be 1 for move_to_a_point R. assert for this?
+        config["transition_dynamics_order"] = 1
+        config["inertia"] = 1.0
+        config["time_unit"] = 1
+
+        config["reward_function"] = "move_to_a_point"
+        # config["make_denser"] = False
+        config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
+        config["target_point"] = [-0.29792, 1.71012]
+        config["target_radius"] = 0.172 # to give reward in 3rd last step. At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test.
+        config["reward_scale"] = 2.0
+
+
+        config["image_representations"] = True
+        config["image_width"] = 100
+        config["image_height"] = 100
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['augmented_state'][-1]
+        # init state: [ 1.9652315 -2.4397445]
+        expected_image_sums = [7546980, 7546980, 7546980, 7547490, 7587270]
+
+        # obs = env.curr_obs
+        # import PIL.Image as Image
+        # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+        # img1.show()
+
+        for i in range(5):
+            # action = env.action_space.sample()
+            action = np.array([-0.45, 0.8]) # just to test if acting "in a line" works
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+
+            # obs = env.curr_obs
+            # import PIL.Image as Image
+            # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+            # img1.show()
+
+            if i < len(expected_image_sums):
+                assert next_obs.sum() == expected_image_sums[i], "Expected sum over image pixels: " + str(expected_image_sums[i]) + ". Was: " + str(next_obs.sum())
+
+        final_dist = np.linalg.norm(state - np.array(config["target_point"]))
+        assert final_dist < config["target_radius"]
+
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+
     def test_discrete_dynamics(self):
         '''Tests the P dynamics. Tests whether actions taken in terminal states lead back to the same terminal state. Tests if state in discrete environments is an int.
         '''
