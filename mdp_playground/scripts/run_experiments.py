@@ -21,7 +21,7 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 
-def main():
+def main(args):
     #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
     # docstring at beginning of the file is stored in __doc__
     parser = argparse.ArgumentParser(description=__doc__)
@@ -109,7 +109,7 @@ def main():
                         help='Set log level.')
 
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     print("Parsed arguments:", args)
 
     log_levels = {
@@ -217,4 +217,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    import sys
+    main(sys.argv[1:])
