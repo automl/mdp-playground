@@ -73,7 +73,7 @@ setup(
 
     entry_points={
         'console_scripts': """
-            run-mdpp-experiments = run-experiments:main
+            run-mdpp-experiments = run_experiments:main
         """
     }
 )

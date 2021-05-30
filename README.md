@@ -58,7 +58,8 @@ MDP Playground is also on PyPI. As with the manual installation, we recommend us
 ```bash
 # for production use:
 pip install tensorflow==2.2.0
-pip install ray[rllib,debug]==0.9.0
+wget 'https://ray-wheels.s3-us-west-2.amazonaws.com/master/8d0c1b5e068853bf748f72b1e60ec99d240932c6/ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl'
+pip install ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl[rllib,debug]
 pip install mdp_playground
 
 # for the discrete toy experiments:
