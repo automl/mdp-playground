@@ -23,7 +23,7 @@ class TestRunExperiments(unittest.TestCase):
 
     def test_dqn_test_expt(self):
 
-        exit_code = os.system(sys.executable + " run_experiments.py -a 0 -n 0 -c experiments/dqn_test_expt.py -e dqn_test_expt")
+        exit_code = os.system(sys.executable + " mdp_playground/scripts/run_experiments.py -a 0 -n 0 -c experiments/dqn_test_expt.py -e dqn_test_expt")
         assert exit_code == 0
 
         from mdp_playground.analysis import MDPP_Analysis
@@ -42,7 +42,7 @@ class TestRunExperiments(unittest.TestCase):
 
     def test_default_config(self):
 
-        exit_code = os.system(sys.executable + " run_experiments.py -a 0 -n 0 -c default_config.py -e default_config")
+        exit_code = os.system(sys.executable + " mdp_playground/scripts/run_experiments.py -a 0 -n 0 -c default_config.py -e default_config")
         assert exit_code == 0
 
 
