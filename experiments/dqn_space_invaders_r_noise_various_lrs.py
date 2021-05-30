@@ -3,12 +3,18 @@ timesteps_total = 10_000_000
 from collections import OrderedDict
 import numpy as np
 var_env_configs = OrderedDict({
-    'reward_noise': list(np.array([0, 1, 5, 10, 25, 50, 100, 200, 400, 800])/100), # Std dev. of normal dist.
+    'reward_noise': list(np.array([0])/100), # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
+import numpy as np
+var_agent_configs = OrderedDict({
+    "lr": list(np.power(10.,np.linspace(-1, -6, 11))), # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+})
+
 var_configs = OrderedDict({
-"env": var_env_configs
+"env": var_env_configs,
+"agent": var_agent_configs,
 })
 
 env_config = {

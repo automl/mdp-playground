@@ -1,8 +1,8 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-19 # specifies array job indices
+#MOAB -t 0-49 # specifies array job indices
 #MOAB -l nodes=1:ppn=5
-#MOAB -l walltime=0:50:00:00
+#MOAB -l walltime=0:40:00:00
 #MOAB -l pmem=8GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 
@@ -23,7 +23,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='rainbow_hydra_qbert' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='dqn_space_invaders_r_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
@@ -48,7 +48,7 @@ echo Shell used is $SHELL
 # source activate /home/rajanr/anaconda2/envs/py36
 # source activate /home/rajanr/anaconda3/envs/py36_toy_rl
 . /home/fr/fr_fr/fr_rr1034/anaconda3/etc/profile.d/conda.sh # for anaconda3
-conda activate /home/fr/fr_fr/fr_rr1034/anaconda3/envs/old_py36_toy_rl # should be conda activate and not source when using anaconda3?
+conda activate /home/fr/fr_fr/fr_rr1034/anaconda3/envs/py36_toy_rl # should be conda activate and not source when using anaconda3?
 echo $?
 echo Paths: $PATH
 #/home/rajanr/anaconda3/bin/conda activate /home/rajanr/anaconda2/envs/py36
@@ -74,13 +74,11 @@ JOB_ID=`echo ${MOAB_JOBID} | cut -d'[' -f 1`
 mkdir -p mdpp_${JOB_ID}
 cd mdpp_${JOB_ID}
 # cd /home/rajanr/mdpp
-echo ${MOAB_JOBID} ${MOAB_JOBARRAYINDEX} ${MOAB_JOBNAME}
+echo "MOAB_JOBID:" ${MOAB_JOBID} "MOAB_JOBARRAYINDEX:" ${MOAB_JOBARRAYINDEX} "MOAB_JOBNAME:" ${MOAB_JOBNAME}
 
-# for i in {0..0}
-# do
-echo -e "Running env config $i:\n"
-\time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num 0 --agent-config-num ${MOAB_JOBARRAYINDEX} --framework-dir ${TMPDIR}
-# done
+
+\time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX} --framework-dir ${TMPDIR}
+#/work/ws/nemo/fr_rr1034-ws_mdpp-0/mdpp_10405451/ray
 
 
 #python output_argv_1.py

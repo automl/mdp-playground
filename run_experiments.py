@@ -51,7 +51,7 @@ parser.add_argument('-c', '--config-file', dest='config_file', action='store',
                     'agent_config and model_config are dicts which hold the '
                     'static configuration for the current experiment as a '
                     'normal Python dict.')
-# TODO Update docs regarding how to get configs to run: i.e., Cartesian
+# ####TODO Update docs regarding how to get configs to run: i.e., Cartesian
 # product, or random, etc.
 parser.add_argument('-e', '--exp-name', dest='exp_name', action='store',
                     default='mdpp_default_experiment',
@@ -73,6 +73,8 @@ parser.add_argument('-n', '--config-num', dest='config_num', action='store',
                     'for the experiment will be taken and ordered as a list '
                     'and this number corresponds to the configuration number '
                     'in this list. Please look in to the code for details.')
+# ###TODO Remove? #hack to run 1000 x 1000 env configs x agent configs.
+# Storing all million of them in memory may be too inefficient?
 parser.add_argument('-a', '--agent-config-num', dest='agent_config_num',
                     action='store', default=None, type=int,
                     help='Used for running the configurations of experiments '
@@ -84,7 +86,8 @@ parser.add_argument('-f', '--framework', dest='framework', action='store',
                     ').')
 parser.add_argument('-m', '--save-model', dest='save_model', action='store',
                     default=False, type=bool,
-                    help='Option to save trained NN model at the end of '
+                    help='Option to save trained NN model and framework \
+                    generated files at the end of '
                     'training.')
 parser.add_argument('-t', '--framework-dir', dest='framework_dir',
                     action='store', default='/tmp/', type=str,
@@ -122,6 +125,7 @@ except ValueError:
     logging.error("Log level {} not in {}.".format(args.log_level,
                                                    log_levels.keys()))
 
+config_file = args.config_file
 
 if args.config_file[-3:] == '.py':
     config_file = args.config_file[:-3]
@@ -137,7 +141,7 @@ if args.config_num is not None:
 
 print("Stats file being written to:", stats_file_name)
 
-config, final_configs =  config_processor.process_configs(config_file, stats_file_prefix=stats_file_name, framework=args.framework, config_num=args.config_num, log_level=log_level_)
+config, final_configs =  config_processor.process_configs(config_file, stats_file_prefix=stats_file_name, framework=args.framework, config_num=args.config_num, log_level=log_level_, framework_dir=args.framework_dir)
 
 print("Configuration number(s) that will be run:", "all" if args.config_num is None else args.config_num)
 
@@ -154,6 +158,7 @@ start = time.time()
 
 if args.config_num is None:
     # final_configs = config.final_configs
+    print("Total number of configs to run:", len(final_configs))
     pass
 else:
     final_configs = [final_configs[args.config_num]]
@@ -187,20 +192,23 @@ for enum_conf_1, current_config_ in enumerate(final_configs):
 
     analysis = tune.run(
         algorithm,
-        name=algorithm + str(stats_file_name.split('/')[-1]) + '_' \
-        + str(args.config_num), ####IMP "name" has to be specified, otherwise,
+        name=algorithm + '_' + str(stats_file_name.split('/')[-1]) + '_' \
+        , ####IMP "name" has to be specified, otherwise,
         # it may lead to clashing for temp file in ~/ray_results/... directory.
         stop={
             "timesteps_total": timesteps_total,
               },
         config=tune_config,
         checkpoint_at_end=args.save_model,
-        local_dir=args.framework_dir + '/_ray_results',
+        local_dir=args.framework_dir + '/_ray_results_' + str(args.config_num),
         #return_trials=True # add trials = tune.run( above
     )
 
-    pickle.dump(analysis, open("{}_analysis.pickle".format(args.exp_name),
-                "wb"))
+    if args.save_model:
+        pickle.dump(analysis, open("{}_analysis.pickle".format(args.exp_name),
+                    "wb"))
+
+config_processor.post_processing(framework=args.framework)
 
 end = time.time()
 print("No. of seconds to run:", end - start)

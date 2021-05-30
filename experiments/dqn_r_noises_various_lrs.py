@@ -1,21 +1,28 @@
-timesteps_total = 10_000
+timesteps_total = 20_000
 num_seeds = 10
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0] + [2**i for i in range(4)],
-    'sequence_length': [1, 2, 3, 4],#i for i in range(1,4)]
+    'delay': [0],
+    'sequence_length': [1],#i for i in range(1,4)]
     'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
-    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
-    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
+    'transition_noise': [0],
+    'reward_noise': [0, 1, 5, 10, 25], # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
+import numpy as np
+var_agent_configs = OrderedDict({
+    "lr": [1e-4] #list(np.power(10.,np.linspace(-1, -6, 16))), # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+})
+
+
 var_configs = OrderedDict({
-"env": var_env_configs
+"env": var_env_configs,
+"agent": var_agent_configs,
 })
 
 env_config = {
@@ -36,7 +43,8 @@ algorithm = "DQN"
 agent_config = {
     "adam_epsilon": 1e-4,
     "beta_annealing_fraction": 1.0,
-    "buffer_size": 1000000,
+    "buffer_size": 20_000,
+    'clip_rewards': False,
     "double_q": False,
     "dueling": False,
     "exploration_final_eps": 0.01,
@@ -44,7 +52,7 @@ agent_config = {
     "final_prioritized_replay_beta": 1.0,
     "hiddens": None,
     "learning_starts": 1000,
-    "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    # "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
     "n_step": 1,
     "noisy": False,
     "num_atoms": 1,
@@ -88,19 +96,3 @@ eval_config = {
         }
     },
 }
-
-
-# varying_configs = get_grid_of_configs(var_configs)
-# # print("VARYING_CONFIGS:", varying_configs)
-#
-# final_configs = combined_processing(env_config, agent_config, model_config, eval_config, varying_configs=varying_configs, framework='ray', algorithm=algorithm)
-
-# value_tuples = []
-# for config_type, config_dict in var_configs.items():
-#     for key in config_dict:
-#         assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
-#         value_tuples.append(var_configs[config_type][key])
-#
-# import itertools
-# cartesian_product_configs = list(itertools.product(*value_tuples))
-# print("Total number of configs. to run:", len(cartesian_product_configs))

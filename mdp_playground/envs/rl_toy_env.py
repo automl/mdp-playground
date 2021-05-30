@@ -11,7 +11,8 @@ import numpy as np
 import scipy
 from scipy import stats
 import gym
-from mdp_playground.spaces import BoxExtended, DiscreteExtended, TupleExtended, ImageMultiDiscrete
+from mdp_playground.spaces import BoxExtended, DiscreteExtended, TupleExtended,\
+        ImageMultiDiscrete, ImageContinuous
 
 
 class RLToyEnv(gym.Env):
@@ -363,8 +364,8 @@ class RLToyEnv(gym.Env):
                 if callable(config["transition_noise"]):
                     self.transition_noise = config["transition_noise"]
                 else:
-                    transition_noise_std = config["transition_noise"]
-                    self.transition_noise = lambda a: a.normal(0, transition_noise_std)
+                    p_noise_std = config["transition_noise"]
+                    self.transition_noise = lambda a: a.normal(0, p_noise_std)
             else: # discrete case
                 self.transition_noise = config["transition_noise"]
         else: # no transition noise
@@ -390,6 +391,8 @@ class RLToyEnv(gym.Env):
         else:
             self.image_representations = config["image_representations"]
             if "image_transforms" in config:
+                assert config["state_space_type"].lower() == "discrete", "Image\
+                        transforms are only applicable to discrete envs."
                 self.image_transforms = config["image_transforms"]
             else:
                 self.image_transforms = "none"
@@ -404,32 +407,37 @@ class RLToyEnv(gym.Env):
             else:
                 self.image_height = 100
 
-            if "image_sh_quant" not in config:
-                if 'shift' in self.image_transforms:
-                    warnings.warn("Setting image shift quantisation to default of 1, since no config value provided for it.")
-                    self.image_sh_quant = 1
+            # The following transforms are only applicable in discrete envs:
+            if config["state_space_type"] == "discrete":
+                if "image_sh_quant" not in config:
+                    if 'shift' in self.image_transforms:
+                        warnings.warn("Setting image shift quantisation to the \
+                        default of 1, since no config value was provided for it.")
+                        self.image_sh_quant = 1
+                    else:
+                        self.image_sh_quant = None
                 else:
-                    self.image_sh_quant = None
-            else:
-                self.image_sh_quant = config["image_sh_quant"]
+                    self.image_sh_quant = config["image_sh_quant"]
 
-            if "image_ro_quant" not in config:
-                if 'rotate' in self.image_transforms:
-                    warnings.warn("Setting image rotate quantisation to default of 1, since no config value provided for it.")
-                    self.image_ro_quant = 1
+                if "image_ro_quant" not in config:
+                    if 'rotate' in self.image_transforms:
+                        warnings.warn("Setting image rotate quantisation to the \
+                        default of 1, since no config value was provided for it.")
+                        self.image_ro_quant = 1
+                    else:
+                        self.image_ro_quant = None
                 else:
-                    self.image_ro_quant = None
-            else:
-                self.image_ro_quant = config["image_ro_quant"]
+                    self.image_ro_quant = config["image_ro_quant"]
 
-            if "image_scale_range" not in config:
-                if 'scale' in self.image_transforms:
-                    warnings.warn("Setting image scale range to default of (0.5, 1.5), since no config value was provided for it.")
-                    self.image_scale_range = (0.5, 1.5)
+                if "image_scale_range" not in config:
+                    if 'scale' in self.image_transforms:
+                        warnings.warn("Setting image scale range to the default \
+                        of (0.5, 1.5), since no config value was provided for it.")
+                        self.image_scale_range = (0.5, 1.5)
+                    else:
+                        self.image_scale_range = None
                 else:
-                    self.image_scale_range = None
-            else:
-                self.image_scale_range = config["image_scale_range"]
+                    self.image_scale_range = config["image_scale_range"]
 
         if config["state_space_type"] == "discrete":
             if "reward_dist" not in config:
@@ -492,13 +500,9 @@ class RLToyEnv(gym.Env):
 
         if config["state_space_type"] == "discrete":
             if self.irrelevant_features:
-                # assert "relevant_indices" in config, "You have to provide relevant_indices when state_space_size is a list because it's supposed to be a list only when injecting irrelevant features."
-                # config["irrelevant_indices"] = list(set(range(len(config["state_space_size"]))) - set(config["relevant_indices"]))
-                # config["all_indices"] = list(set(range(len(config["state_space_size"])))
                 assert len(config["action_space_size"]) == 2, "Currently, 1st sub-state (and action) space is assumed to be relevant to rewards and 2nd one is irrelevant. Please provide a list with sizes for the 2."
                 self.action_space_size = config["action_space_size"]
             else: # uni-discrete space
-                # config["relevant_indices"] = config["all_indices"] = [0]
                 assert isinstance(config["action_space_size"], int), "Did you mean to turn irrelevant_features? If so, please set irrelevant_features = True in config. If not, please provide an int for action_space_size."
                 self.action_space_size = [config["action_space_size"]] # Make a list to be able to iterate over observation spaces in for loops later
                 # assert type(config["state_space_size"]) == int, 'config["state_space_size"] has to be provided as an int when we have a simple Discrete environment. Was:' + str(type(config["state_space_size"]))
@@ -510,7 +514,8 @@ class RLToyEnv(gym.Env):
         else: # cont. space
             self.action_space_dim = self.state_space_dim
             if self.irrelevant_features:
-                assert "relevant_indices" in config, "Please provide dimensions of state space relevant to rewards."
+                assert "relevant_indices" in config, "Please provide dimensions\
+                 of state space relevant to rewards."
             if "relevant_indices" not in config:
                 config["relevant_indices"] = range(self.state_space_dim)
             # config["irrelevant_indices"] = list(set(range(len(config["state_space_dim"]))) - set(config["relevant_indices"]))
@@ -529,20 +534,24 @@ class RLToyEnv(gym.Env):
         if config["state_space_type"] == 'continuous':
             # assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
             if config["reward_function"] == "move_to_a_point":
-                config["target_point"] = np.array(config["target_point"], dtype=self.dtype)
-                assert config["target_point"].shape == (len(config["relevant_indices"]),), "target_point should have dimensionality = relevant_state_space dimensionality"
+                self.target_point = np.array(config["target_point"], dtype=self.dtype)
+                assert self.target_point.shape == (len(config["relevant_indices"]),), "target_point should have dimensionality = relevant_state_space dimensionality"
 
         self.config = config
         self.augmented_state_length = self.sequence_length + self.delay + 1
 
         self.total_episodes = 0
 
+        # This init_...() is done before the others below because it's needed
+        # for image_representations for continuous
+        self.init_terminal_states()
+
         if config["state_space_type"] == "discrete":
             self.observation_spaces = [DiscreteExtended(self.state_space_size[0], seed=self.seed_dict["relevant_state_space"])]  #seed #hardcoded, many time below as well
             self.action_spaces = [DiscreteExtended(self.action_space_size[0], seed=self.seed_dict["relevant_action_space"])]  #seed #hardcoded
             if self.irrelevant_features:
                 self.observation_spaces.append(DiscreteExtended(self.state_space_size[1], seed=self.seed_dict["irrelevant_state_space"])) #seed #hardcoded
-                self.action_spaces = [DiscreteExtended(self.action_space_size[1], seed=self.seed_dict["irrelevant_action_space"])]  #seed #hardcoded
+                self.action_spaces.append(DiscreteExtended(self.action_space_size[1], seed=self.seed_dict["irrelevant_action_space"]))  #seed #hardcoded
             # Commented code below may used to generalise relevant sub-spaces to more than the current max of 2.
             # self.observation_spaces = [None] * len(config["all_indices"])
             # for i in config["relevant_indices"]:
@@ -569,12 +578,32 @@ class RLToyEnv(gym.Env):
 
 
         else: # cont. spaces
-            self.state_space_max = config["state_space_max"] if 'state_space_max' in config else np.inf # should we select a random max? #test?
-            self.observation_space = BoxExtended(-self.state_space_max, self.state_space_max, shape=(self.state_space_dim, ), seed=self.seed_dict["state_space"], dtype=self.dtype) #seed # hack #TODO # low and high are 1st 2 and required arguments for instantiating BoxExtended
+            self.state_space_max = config["state_space_max"] \
+                    if 'state_space_max' in config else np.inf # should we
+                    # select a random max? #test?
+            self.feature_space = BoxExtended(-self.state_space_max,\
+                    self.state_space_max, shape=(self.state_space_dim,),\
+                    seed=self.seed_dict["state_space"], dtype=self.dtype) #seed
+                    # hack #TODO # low and high are 1st 2 and required arguments
+                    # for instantiating BoxExtended
 
-            self.action_space_max = config["action_space_max"] if 'action_space_max' in config else np.inf #test?
-            # config["action_space_max"] = num_to_list(config["action_space_max"]) * config["action_space_dim"]
-            self.action_space = BoxExtended(-self.action_space_max, self.action_space_max, shape=(self.action_space_dim, ), seed=self.seed_dict["action_space"], dtype=self.dtype) #seed # hack #TODO
+            self.action_space_max = config["action_space_max"] \
+                    if 'action_space_max' in config else np.inf #test?
+            # config["action_space_max"] = \
+            # num_to_list(config["action_space_max"]) * config["action_space_dim"]
+            self.action_space = BoxExtended(-self.action_space_max,\
+                    self.action_space_max, shape=(self.action_space_dim,),\
+                    seed=self.seed_dict["action_space"], dtype=self.dtype) #seed
+                    # hack #TODO
+
+
+            if self.image_representations:
+                self.observation_space = ImageContinuous(self.feature_space,\
+                    width=self.image_width, height=self.image_height, \
+                    term_spaces=self.term_spaces, target_point=self.target_point,\
+                    circle_radius=5, seed=self.seed_dict["image_representations"]) #seed
+            else:
+                self.observation_space = self.feature_space
 
 
         # if config["action_space_type"] == "discrete":
@@ -587,7 +616,6 @@ class RLToyEnv(gym.Env):
         ##TODO Support imaginary rollouts for continuous envs. and user-defined P and R? Will do it depending on demand for it. In fact, for imagined rollouts, let our code handle storing augmented_state, curr_state, etc. in separate variables, so that it's easy for user to perform imagined rollouts instead of having to maintain their own state and action sequences.
         #TODO Generate state and action space sizes also randomly?
         ###IMP The order in which the following inits are called is important, so don't change!!
-        self.init_terminal_states()
         self.init_init_state_dist() #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; After looking into Gym code, I can say that for continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (and is done for the defined limits for the respective dimension).
         self.init_transition_function()
         # print("Mersenne1, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
@@ -1003,11 +1031,13 @@ class RLToyEnv(gym.Env):
                 next_state = np.clip(next_state, -self.state_space_max, self.state_space_max) # Could also "reflect" next_state when it goes out of bounds. Would seem more logical for a "wall", but would need to take care of multiple reflections near a corner/edge.
                 # Resets all higher order derivatives to 0
                 zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype)
-                self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
+                # #####IMP to have copy() otherwise it's the same array
+                # (in memory) at every position in the list:
+                self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)]
                 self.state_derivatives[0] = next_state
 
             if self.config["reward_function"] == "move_to_a_point":
-                if np.linalg.norm(np.array(next_state, dtype=self.dtype)[self.config["relevant_indices"]] - self.config["target_point"]) < self.target_radius:
+                if np.linalg.norm(np.array(next_state, dtype=self.dtype)[self.config["relevant_indices"]] - self.target_point) < self.target_radius:
                     self.reached_terminal = True
 
         return next_state
@@ -1033,17 +1063,6 @@ class RLToyEnv(gym.Env):
 
         #TODO Make reward depend on the action sequence too instead of just state sequence, as it is currently?
         """
-
-        # Transform multi-discrete to discrete if needed. This is only needed for imaginary_rollout = True to be able to transform multi-discrete state and action passed by user into underlying discrete state and action! When imaginary_rollout = False, we don't need to convert passed state and action because internal uni-discrete representation is used to calculate reward.
-        # if imaginary_rollout: #test
-        #     if self.config["state_space_type"] == "discrete":
-        #         if isinstance(self.config["state_space_size"], list):
-        #             # The following part is commented out because irrelevant parts are not needed in the reward_function.
-        #             # if self.config["irrelevant_state_space_size"] > 0:
-        #             #     state, action, state_irrelevant, action_irrelevant = self.multi_discrete_to_discrete(state, action, irrelevant_parts=True)
-        #             # else:
-        #             for i in range(len(state)):
-        #                 state[i], action, _, _ = self.multi_discrete_to_discrete(state[i], action)
 
         delay = self.delay
         sequence_length = self.sequence_length
@@ -1109,15 +1128,15 @@ class RLToyEnv(gym.Env):
                     if self.make_denser == True:
                         old_relevant_state = np.array(state_considered, dtype=self.dtype)[-2 - delay, self.config["relevant_indices"]]
                         new_relevant_state = np.array(state_considered, dtype=self.dtype)[-1 - delay, self.config["relevant_indices"]]
-                        reward = -np.linalg.norm(new_relevant_state - self.config["target_point"]) # Should allow other powers of the distance from target_point, or more norms?
-                        reward += np.linalg.norm(old_relevant_state - self.config["target_point"]) # Reward is the distance moved towards the target point.
+                        reward = -np.linalg.norm(new_relevant_state - self.target_point) # Should allow other powers of the distance from target_point, or more norms?
+                        reward += np.linalg.norm(old_relevant_state - self.target_point) # Reward is the distance moved towards the target point.
                         # Should rather be the change in distance to target point, so reward given is +ve if "correct" action was taken and so reward function is more natural (this _is_ the current implementation)
                         # It's true that giving the total -ve distance from target as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural (as in the other case loss/reward go up quadratically with distance from target point while in this case it's linear). The value function is in both cases higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
                         #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
                         # TODO also make_denser, sparse rewards only at target
                     else:
                         new_relevant_state = np.array(state_considered, dtype=self.dtype)[-1 - delay, self.config["relevant_indices"]]
-                        if np.linalg.norm(new_relevant_state - self.config["target_point"]) < self.target_radius:
+                        if np.linalg.norm(new_relevant_state - self.target_point) < self.target_radius:
                             reward = 1.0 # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
                     reward -= self.action_loss_weight * np.linalg.norm(np.array(action, dtype=self.dtype))
@@ -1163,7 +1182,7 @@ class RLToyEnv(gym.Env):
                 state, action, state_irrelevant, action_irrelevant = self.curr_state[0], action[0], self.curr_state[1], action[1],
             else:
                 state, action = self.curr_state, action
-        else:
+        else: # cont. case
             state, action = self.curr_state, action
 
 
@@ -1233,37 +1252,6 @@ class RLToyEnv(gym.Env):
             augmented_state_dict = {"curr_state": self.curr_state, "curr_obs": self.curr_obs, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
         return augmented_state_dict
 
-    def discrete_to_multi_discrete(self, relevant_part, irrelevant_part=None):
-        '''Transforms relevant and irrelevant parts of state (NOT action) space from discrete to its multi-discrete representation which is the externally visible observation_space from the environment when multi-discrete environments are selected.
-
-        #TODO Generalise function to also be able to transform actions. Right now not a priority because actions are not returned in P, only the next state is.
-        '''
-
-        relevant_part = transform_discrete_to_multi_discrete(relevant_part, self.relevant_state_space_maxes)
-        combined_ = relevant_part
-        if self.config["irrelevant_state_space_size"] > 0:
-            irrelevant_part = transform_discrete_to_multi_discrete(irrelevant_part, self.irrelevant_state_space_maxes)
-
-            combined_ = np.zeros(shape=(len(self.config['state_space_size']),), dtype=int)
-            combined_[self.config["relevant_indices"]] = relevant_part
-            combined_[self.config["irrelevant_indices"]] = irrelevant_part
-
-        return list(combined_)
-
-    def multi_discrete_to_discrete(self, state, action, irrelevant_parts=False):
-        '''Transforms multi-discrete representations of state and action to their discrete equivalents. Needed at the beginnings of P and R to convert externally visible observation_space from the environment to the internally used observation space that is used inside P and R.
-        '''
-
-        relevant_part_state = transform_multi_discrete_to_discrete(np.array(state)[np.array(self.config['relevant_indices'])], self.relevant_state_space_maxes)
-        relevant_part_action = transform_multi_discrete_to_discrete(np.array(action)[np.array(self.config['action_space_relevant_indices'])], self.relevant_action_space_maxes)
-        irrelevant_part_state = None
-        irrelevant_part_action = None
-
-        if irrelevant_parts:
-            irrelevant_part_state = transform_multi_discrete_to_discrete(np.array(state)[np.array(self.config['irrelevant_indices'])], self.irrelevant_state_space_maxes)
-            irrelevant_part_action = transform_multi_discrete_to_discrete(np.array(action)[np.array(self.config['action_space_irrelevant_indices'])], self.irrelevant_action_space_maxes)
-
-        return relevant_part_state, relevant_part_action, irrelevant_part_state, irrelevant_part_action
 
     def reset(self):
         '''Resets the environment for the beginning of an episode and samples a start state from rho_0. For discrete environments uses the defined rho_0 directly. For continuous environments, samples a state and resamples until a non-terminal state is sampled.
@@ -1295,15 +1283,11 @@ class RLToyEnv(gym.Env):
             self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state_relevant)
             # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays which is not possible with np.array!
-            if self.image_representations:
-                self.curr_obs = self.observation_space.get_concatenated_image(self.curr_state)
-            else:
-                self.curr_obs = self.curr_state
         else: # if continuous space
             self.logger.debug("#TODO for cont. spaces: reset")
             while True: # Be careful about infinite loops
                 term_space_was_sampled = False
-                self.curr_state = self.observation_space.sample() #random
+                self.curr_state = self.feature_space.sample() #random
                 for i in range(len(self.term_spaces)): # Could this sampling be made more efficient? In general, the non-terminal space could have any shape and assiging equal sampling probability to each point in this space is pretty hard.
                     if self.is_terminal_state(self.curr_state):
                         self.logger.info("A state was sampled in term state subspace. Therefore, resampling. State was, subspace was:" + str(self.curr_state) + str(i)) ##TODO Move this logic into a new class in Gym spaces that can contain subspaces for term states! (with warning/error if term subspaces cover whole state space, or even a lot of it)
@@ -1317,10 +1301,15 @@ class RLToyEnv(gym.Env):
             zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype)
             self.state_derivatives = [zero_state.copy() for i in range(self.dynamics_order + 1)] #####IMP to have copy() otherwise it's the same array (in memory) at every position in the list
             self.state_derivatives[0] = self.curr_state
-            self.curr_obs = self.curr_state
 
             self.augmented_state = [[np.nan] * self.state_space_dim for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state.copy())
+
+
+        if self.image_representations:
+            self.curr_obs = self.observation_space.get_concatenated_image(self.curr_state)
+        else:
+            self.curr_obs = self.curr_state
 
         self.logger.info("RESET called. curr_state reset to: " + str(self.curr_state))
         self.reached_terminal = False
@@ -1354,19 +1343,6 @@ class RLToyEnv(gym.Env):
         self.np_random, self.seed_ = gym.utils.seeding.np_random(seed) #random
         print("Env SEED set to: " + str(seed) + ". Returned seed from Gym: " + str(self.seed_))
         return self.seed_
-
-
-def transform_multi_discrete_to_discrete(vector, vector_maxes):
-    '''
-    Transforms a multi-discrete vector drawn from a multi-discrete space with ranges for each dimension from 0 to vector_maxes to a discrete equivalent with the discrete number drawn from a 1-D space where the min is 0 and the max is np.prod(vector_maxes) - 1. The correspondence between "counting"/ordering in the multi-discrete space with the discrete space assumes that the rightmost element varies most frequently in the multi-discrete space.
-    '''
-    return np.arange(np.prod(vector_maxes)).reshape(vector_maxes)[tuple(vector)]
-
-def transform_discrete_to_multi_discrete(scalar, vector_maxes):
-    '''
-    Transforms a discrete scalar drawn from a 1-D space where the min is 0 and the max is np.prod(vector_maxes) - 1 to a multi-discrete equivalent with the multi-discrete vector drawn from a multi-discrete space with ranges for each dimension from 0 to vector_maxes
-    '''
-    return np.argwhere(np.arange(np.prod(vector_maxes)).reshape(vector_maxes) == scalar).flatten()
 
 
 def dist_of_pt_from_line(pt, ptA, ptB):

@@ -1,34 +1,17 @@
 num_seeds = 1
-timesteps_total = 20_000
-num_configs = 1000
+timesteps_total = 10_000_000
+num_configs = 100
 
 from collections import OrderedDict
-
-sobol_env_configs = OrderedDict({
-    'action_space_size': (8,),#, 10, 12, 14] # [2**i for i in range(1,6)]
-    # 'action_space_size': (64),#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': "cat, " + str([i for i in range(11)]), # + [2**i for i in range(4)],
-    'sequence_length': "cat, " + str([i for i in range(1, 4)]), #, 2, 3, 4],#i for i in range(1,4)]
-    'diameter': "cat, " + str([2**i for i in range(4)]), # + [2**i for i in range(4)],
-    'reward_density': "float, [0.03, 0.5]", # np.linspace(0.0, 1.0, num=5)
-    'make_denser': (False,),
-    'terminal_state_density': (0.25,), # np.linspace(0.1, 1.0, num=5)
-    'reward_dist': "float, [0.01, 0.8]",
-    'reward_scale': "float, log, [0.1, 100]",
-    'dummy_seed': (0,), # "cat, " + str([i for i in range(num_seeds)]), #seed
-})
-
-
-print(sobol_env_configs)
 
 random_agent_configs = OrderedDict({
 
     "lr": "float, log, [1e-5, 1e-3]", # 1e-4
-    "learning_starts": "int, [1, 2000]", # 500
-    "target_network_update_freq": "int, log, [1, 2000]", # 800,
+    "learning_starts": "int, [10, 20000]", # 500
+    "target_network_update_freq": "int, log, [10, 10000]", # 800,
     "exploration_fraction": "float, [0.01, 0.99]", # 0.1,
-    "n_step": "int, [1, 8]", # 1
-    "buffer_size": "int, log, [33, 20000]", # ?? 1000000, # Sizes up to 32 crashed with Ray 0.7.3 (but not always!), size 16 did not crash with Ray 0.9.0dev
+    "n_step": "int, [1, 16]", # 1
+    "buffer_size": "int, log, [333, 500000]", # ?? 1000000, # Sizes up to 32 crashed with Ray 0.7.3 (but not always!), size 16 did not crash with Ray 0.9.0dev
     "adam_epsilon": "float, log, [1e-12, 1e-1]", # ?? 1e-4,
     "train_batch_size": "cat, [4, 8, 16, 32, 64, 128]", # 32,
 
@@ -44,6 +27,15 @@ random_configs = OrderedDict({
 })
 
 
+# These are currently needed to write dummy_seed to stats CSV. A seed column is
+# needed for data loading
+
+sobol_env_configs = OrderedDict({
+    'dummy_seed': (0,), # "cat, " + str([i for i in range(num_seeds)]), #seed
+})
+
+# print(sobol_env_configs)
+
 sobol_configs = OrderedDict({
 "env": sobol_env_configs,
 
@@ -51,16 +43,22 @@ sobol_configs = OrderedDict({
 
 
 env_config = {
-    "env": "RLToy-v0",
-    "horizon": 100,
+    "env": "GymEnvWrapper-Atari",
     "env_config": {
-        'seed': 0, #seed
+        "AtariEnv": {
+            "game": 'qbert',
+            'obs_type': 'image',
+            'frameskip': 1,
+        },
+        # "GymEnvWrapper": {
+        "atari_preprocessing": True,
+        'frame_skip': 4,
+        'grayscale_obs': False,
         'state_space_type': 'discrete',
         'action_space_type': 'discrete',
-        'generate_random_mdp': True,
-        'repeats_in_sequences': False,
-        # 'reward_scale': 1.0,
-        'completely_connected': True,
+        'seed': 0,
+        # },
+        # 'seed': 0, #seed
     },
 }
 
@@ -73,7 +71,7 @@ agent_config = {
     # "lr": 1e-3,
     "exploration_final_eps": 0.01,
     # "exploration_fraction": 0.1,
-    "schedule_max_timesteps": 20000,
+    "schedule_max_timesteps": 10_000_000,
     # "learning_starts": 500,
     # "target_network_update_freq": 800,
     # "n_step": 4,
@@ -85,14 +83,15 @@ agent_config = {
     "final_prioritized_replay_beta": 1.0, #
     "beta_annealing_fraction": 1.0, #
     # "hiddens": None,
+    'hiddens': [512],
 
     "sample_batch_size": 4,
-    "timesteps_per_iteration": 1000,
+    "timesteps_per_iteration": 10000,
     # "train_batch_size": 32,
     "min_iter_time_s": 0,
 
-    # 'num_gpus': 0,
-    # "num_workers": 1, # extra workers I think
+    'num_gpus': 0,
+    "num_workers": 3, # extra workers I think
     # "num_cpus_for_driver": 2,
 
     "tf_session_args": {
@@ -117,21 +116,19 @@ agent_config = {
 }
 
 model_config = {
-    "model": {
-        "fcnet_hiddens": [256, 256],
-        "custom_preprocessor": "ohe",
-        "custom_options": {},  # extra options to pass to your preprocessor
-        "fcnet_activation": "tanh",
-        # "use_lstm": False,
-        "max_seq_len": 20,
-        "lstm_cell_size": 256,
-        "lstm_use_prev_action_reward": False,
-    },
+    # "model": {
+    #     "fcnet_hiddens": [256, 256],
+    #     "fcnet_activation": "tanh",
+    #     "use_lstm": False,
+    #     "max_seq_len": 20,
+    #     "lstm_cell_size": 256,
+    #     "lstm_use_prev_action_reward": False,
+    # },
 }
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": 1, # I think this means every x training_iterations
+    "evaluation_interval": None, # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,

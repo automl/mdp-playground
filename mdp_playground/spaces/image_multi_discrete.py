@@ -16,7 +16,7 @@ class ImageMultiDiscrete(Box):
         Gets an image representation for a given multi_discrete_state
     '''
 
-    def __init__(self, state_space_sizes, width=100, height=100, circle_radius=20, transforms='rotate,flip,scale,shift', sh_quant=1, scale_range=(0.5,1.5), ro_quant=1, seed=None, use_custom_images=None, cust_path=None): # , polygon_sides=4
+    def __init__(self, state_space_sizes, width=100, height=100, circle_radius=20, transforms='rotate,flip,scale,shift', sh_quant=1, scale_range=(0.5,1.5), ro_quant=1, seed=None, use_custom_images=None, cust_path=None, dtype=np.uint8): # , polygon_sides=4
         '''
         Parameters
         ----------
@@ -84,7 +84,7 @@ class ImageMultiDiscrete(Box):
 
 
         # self.shape = (width, height, 1)
-        super(ImageMultiDiscrete, self).__init__(shape=(width, height, 1), dtype=np.int64, low=0, high=255) #
+        super(ImageMultiDiscrete, self).__init__(shape=(width, height, 1), dtype=dtype, low=0, high=255) #
         super(ImageMultiDiscrete, self).seed(seed=seed) #
 
     # def seed(self, seed=None):
@@ -214,13 +214,13 @@ class ImageMultiDiscrete(Box):
         #     concatenated_image.append(self.disjoint_states[i][multi_discrete_state[i]])
         concatenated_image = np.concatenate(tuple(concatenated_image), axis=0)
 
-        return concatenated_image[..., np.newaxis] # because Ray expects an image to have >=3 dims
+        return np.atleast_3d(concatenated_image) # because Ray expects an image to have >=3 dims
 
     # def get_multi_discrete_state(self,
 
     def sample(self):
         sss = np.array(self.state_space_sizes)
-        sampled = (self.np_random.random_sample(sss.shape) * sss).astype(np.int64) # Based on Gym's MultiDiscrete sampling
+        sampled = (self.np_random.random_sample(sss.shape) * sss).astype(self.dtype) # Based on Gym's MultiDiscrete sampling
         # if type(sampled) == int:
         #     sampled = [sampled]
         sampled = list(sampled)
@@ -228,7 +228,10 @@ class ImageMultiDiscrete(Box):
         return self.get_concatenated_image(sampled)
 
     def __repr__(self):
-        return "ImageMultiDiscrete with multi-discrete space of shape: {} and images of resolution: {}".format(self.state_space_sizes, self.shape)
+        return "{} with multi-discrete space of shape: {} and "\
+                "images of resolution: {} and dtype: {}".format(self.__class__,\
+                self.state_space_sizes,\
+                self.shape, self.dtype)
 
     def contains(self, x):
         """

@@ -63,9 +63,13 @@ class GymEnvWrapper(gym.Env):
                 self.transition_noise = lambda a: 0.0
 
         if "reward_noise" in config:
-            self.reward_noise = config["reward_noise"]
+            if callable(config["reward_noise"]):
+                self.reward_noise = config["reward_noise"]
+            else:
+                reward_noise_std = config["reward_noise"]
+                self.reward_noise = lambda a: a.normal(0, reward_noise_std)
         else:
-            self.reward_noise = lambda a: 0.0
+            self.reward_noise = None
 
         if "wrap_deepmind_ray" in config and config["wrap_deepmind_ray"]: #hack ##TODO remove?
             self.env = wrap_deepmind(self.env, dim=42, framestack=True)
@@ -195,7 +199,7 @@ class GymEnvWrapper(gym.Env):
             # print("rewards:", self.reward_buffer, old_reward, reward)
             del self.reward_buffer[0]
 
-        noise_in_reward = self.reward_noise(self.np_random) #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
+        noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0 #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward

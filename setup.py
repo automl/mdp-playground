@@ -65,7 +65,7 @@ setup(
     # package_dir={"": "src"},
     packages=find_packages(),
     python_requires=">=3.6",
-    install_requires=['gym'],
+    install_requires=['gym<=0.14', 'dill'],
     extras_require={
       'extras_disc': extras_require,
       'extras_cont': extras_require_cont,
