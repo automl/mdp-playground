@@ -1,9 +1,8 @@
 name: Build and Publish
 
 on:
-  release:
-    types:
-      - created
+  push:
+    branches: [ dev/jan ]
 
 jobs:
   publish:

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mdp_playground"
-version = "0.0.3"
+version = "0.0.4"
 description = "A python package to design and debug RL agents"
 readme = "README.md"
 homepage = "https://automl.github.io/mdp-playground"
