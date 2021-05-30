@@ -73,6 +73,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test 3: that random actions lead to bad reward and then later a sequence of optimal actions leads to good reward. Also implicitly tests sequence lengths.
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        prev_reward = None
         for i in range(40):
             if i < 20:
                 action = env.action_space.sample()
@@ -97,6 +98,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["delay"] = 1
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        prev_reward = None
         for i in range(40):
             if i < 20:
                 action = env.action_space.sample()
