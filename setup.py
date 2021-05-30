@@ -5,6 +5,7 @@ packages = \
  'mdp_playground.analysis',
  'mdp_playground.config_processor',
  'mdp_playground.envs',
+ 'mdp_playground.scripts',
  'mdp_playground.spaces']
 
 package_data = \
@@ -82,7 +83,7 @@ setup(
 
     entry_points={
         'console_scripts': """
-            run-mdpp-experiments = run_experiments:main
+            run-mdpp-experiments = mdp_playground.scripts.run_experiments:main
         """
     }
 )
