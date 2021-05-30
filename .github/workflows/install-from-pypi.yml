@@ -28,4 +28,4 @@ jobs:
         pip install -i https://test.pypi.org/pypi/ --extra-index-url https://pypi.org/simple mdp-playground
     - name: Basic functionality test
       run: |
-        run-mdpp-experiment --help
+        run-mdpp-experiments --help
