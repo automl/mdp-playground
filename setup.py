@@ -1,4 +1,14 @@
-from setuptools import setup, find_packages
+from setuptools import setup
+
+packages = \
+['mdp_playground',
+ 'mdp_playground.analysis',
+ 'mdp_playground.config_processor',
+ 'mdp_playground.envs',
+ 'mdp_playground.spaces']
+
+package_data = \
+{'': ['*']}
 
 extras_require = [
     'ray[rllib,debug]==0.7.3',
@@ -46,9 +56,9 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     license=LICENSE,
-    url="https://github.com/RaghuSpaceRajan/mdp-playground",
+    url="https://github.com/automl/mdp-playground",
     project_urls={
-    "Bug Tracker": "https://github.com/RaghuSpaceRajan/mdp-playground/issues",
+    "Bug Tracker": "https://github.com/automl/mdp-playground/issues",
     },
     classifiers=[
     "Programming Language :: Python :: 3",
@@ -63,7 +73,6 @@ setup(
     # 'Topic :: Scientific/Engineering :: Reinforcement Learning', invalid classifiers on Pypi
     ],
     # package_dir={"": "src"},
-    packages=find_packages(),
     python_requires=">=3.6",
     install_requires=['gym<=0.14', 'dill'],
     extras_require={
