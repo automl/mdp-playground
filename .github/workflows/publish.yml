@@ -1,8 +1,6 @@
 name: Build and Publish
 
 on:
-  push:
-    branches: [ dev/jan ]
   release:
     types:
       - created  # see https://docs.github.com/en/rest/reference/repos#create-a-release and https://docs.github.com/en/actions/reference/events-that-trigger-workflows#release
