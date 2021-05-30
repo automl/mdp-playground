@@ -74,7 +74,7 @@ pip install ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl[rllib,debug]
 pip install mdp_playground[extras_disc]
 ```
 
-Instead of calling `$ python run_experiments.py` in the cloned repository, you would then use `$ run-mdpp-experiments` from anywhere.
+Instead of calling `$ python run_experiments.py` in the cloned repository, you can then use `$ run-mdpp-experiments` from anywhere. Note, that you still need to specify the path to to the experiment's configuration file. Thus, for reproducing the experiments from the paper, the manual installation is the easier option.
 
 ## Running experiments
 For reproducing experiments from the main paper, please see [below](#running-experiments-from-the-main-paper).
