@@ -61,7 +61,8 @@ class ImageContinuous(Box):
 
         self.goal_colour = (0, 255, 0)
         self.agent_colour = (0, 0, 255)
-        self.term_colour = (0, 0, 0)
+        self.term_colour = (255, 0, 0)
+        self.bg_colour = (0, 0, 0)
 
         assert len(feature_space.shape) == 1
         relevant_dims = len(relevant_indices)
@@ -88,7 +89,7 @@ class ImageContinuous(Box):
 
         '''
         # Use RGB
-        image_ = Image.new("RGB", (self.width, self.height), color=(255,255,255))
+        image_ = Image.new("RGB", (self.width, self.height), color=self.bg_colour)
         # Use L for black and white 8-bit pixels instead of RGB in case not
         # using custom images
         # image_ = Image.new("L", (self.width, self.height))

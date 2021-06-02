@@ -850,7 +850,7 @@ class RLToyEnv(gym.Env):
                             warnings.warn('0 rewardable sequences per independent set for given reward_density, sequence_length, diameter and terminal_state_density. Setting it to 1.')
                         sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_sel_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; This line also makes it not possible to have this function be portable as part of a library because it use the np_random member variable of this class
                         for i_s in range(diameter): # Allow sequences to begin in any of the independent sets and therefore this loop is over the no. of independent sets(= diameter)
-                            for i in range(num_rewardable_sequences):
+                            for i in range(num_sel_sequences):
                                 curr_sequence_num = sel_sequence_nums[i]
                                 specific_sequence = []
                                 while len(specific_sequence) != length:
