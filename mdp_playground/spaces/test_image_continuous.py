@@ -56,10 +56,16 @@ class TestImageContinuous(unittest.TestCase):
 
         # Random sample and __repr__
         imc = ImageContinuous(cs4, target_point=target, width=400, height=400,)
-        print(imc)
+        # print(imc)
         img1 = Image.fromarray(np.squeeze(imc.sample()), 'RGB')
         img1.show()
 
+
+        # Draw grid
+        imc = ImageContinuous(cs4, target_point=target, width=400, height=400,
+                                grid=(5,5))
+        img1 = Image.fromarray(np.squeeze(imc.sample()), 'RGB')
+        img1.show()
 
 
 
