@@ -12,7 +12,7 @@ package_data = \
 {'': ['*']}
 
 extras_require = [
-    'ray[rllib,debug]==0.7.3',
+    'ray[rllib,debug]==1.3.0',
     'tensorflow==2.2.0',
     'pillow==6.1.0',
     'pandas==0.25.0',
@@ -88,7 +88,8 @@ setup(
     python_requires=">=3.6",
     install_requires=['gym<=0.14', 'dill'],
     extras_require={
-      'extras_disc': extras_require,
+      'extras': extras_require,
+      'extras_disc': extras_require_disc,
       'extras_cont': extras_require_cont,
     },
 
