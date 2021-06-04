@@ -11,4 +11,4 @@ register(
     max_episode_steps=100,
 )
 
-__version__ = '0.0.7'
+__version__ = '0.0.2'
