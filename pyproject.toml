@@ -67,6 +67,8 @@ colorama = "^0.4.4"
 extras = ["pandas", "requests", "configspace", "scipy", "pillow", "tensorflow", "ray"]
 extras_disc = ["pandas", "requests", "configspace", "scipy", "pillow"]
 extras_cont = ["pandas", "requests", "configspace", "scipy", "tensorflow-probability", "mujoco-py"]
+extras_test = ["pandas", "requests", "configspace", "scipy", "tensorflow-probability"]
+
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
