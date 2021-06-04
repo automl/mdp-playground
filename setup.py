@@ -12,7 +12,7 @@ package_data = \
 {'': ['*']}
 
 extras_require = [
-    'ray[rllib,debug]==1.3.0',
+    'ray[default,rllib,debug]==1.3.0',
     'tensorflow==2.2.0',
     'pillow==6.1.0',
     'pandas==0.25.0',
