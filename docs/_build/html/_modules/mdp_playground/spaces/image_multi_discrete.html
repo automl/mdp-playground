@@ -1,0 +1,728 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdp_playground.spaces.image_multi_discrete &#8212; MDP Playground 0.0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">MDP Playground 0.0.1 documentation</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../_autosummary/mdp_playground.html">
+   mdp_playground
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.html">
+     mdp_playground.analysis
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.analysis.html">
+       mdp_playground.analysis.analysis
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+      <label for="toctree-checkbox-3">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.analysis.MDPP_Analysis.html">
+         mdp_playground.analysis.analysis.MDPP_Analysis
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.radar_chart.html">
+       mdp_playground.analysis.radar_chart
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+      <label for="toctree-checkbox-4">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.radar_chart.radar_factory.html">
+         mdp_playground.analysis.radar_chart.radar_factory
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.config_processor.html">
+     mdp_playground.config_processor
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.html">
+     mdp_playground.envs
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.html">
+       mdp_playground.envs.gym_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+      <label for="toctree-checkbox-6">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html">
+         mdp_playground.envs.gym_env_wrapper.GymEnvWrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.mujoco_env_wrapper.html">
+       mdp_playground.envs.mujoco_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+      <label for="toctree-checkbox-7">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper.html">
+         mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.html">
+       mdp_playground.envs.rl_toy_env
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+      <label for="toctree-checkbox-8">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.dist_of_pt_from_line.html">
+         mdp_playground.envs.rl_toy_env.dist_of_pt_from_line
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.list_to_float_np_array.html">
+         mdp_playground.envs.rl_toy_env.list_to_float_np_array
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.RLToyEnv.html">
+         mdp_playground.envs.rl_toy_env.RLToyEnv
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.html">
+     mdp_playground.scripts
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+    <label for="toctree-checkbox-9">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.html">
+       mdp_playground.scripts.run_experiments
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+      <label for="toctree-checkbox-10">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.cli.html">
+         mdp_playground.scripts.run_experiments.cli
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.main.html">
+         mdp_playground.scripts.run_experiments.main
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.html">
+     mdp_playground.spaces
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.box_extended.html">
+       mdp_playground.spaces.box_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+      <label for="toctree-checkbox-12">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.box_extended.BoxExtended.html">
+         mdp_playground.spaces.box_extended.BoxExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.discrete_extended.html">
+       mdp_playground.spaces.discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+      <label for="toctree-checkbox-13">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.discrete_extended.DiscreteExtended.html">
+         mdp_playground.spaces.discrete_extended.DiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_continuous.html">
+       mdp_playground.spaces.image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+      <label for="toctree-checkbox-14">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html">
+         mdp_playground.spaces.image_continuous.ImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.html">
+       mdp_playground.spaces.image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+      <label for="toctree-checkbox-15">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html">
+         mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.multi_discrete_extended.html">
+       mdp_playground.spaces.multi_discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+      <label for="toctree-checkbox-16">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended.html">
+         mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_continuous.html">
+       mdp_playground.spaces.test_image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+      <label for="toctree-checkbox-17">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_continuous.TestImageContinuous.html">
+         mdp_playground.spaces.test_image_continuous.TestImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_multi_discrete.html">
+       mdp_playground.spaces.test_image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+      <label for="toctree-checkbox-18">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.html">
+         mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.tuple_extended.html">
+       mdp_playground.spaces.tuple_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+      <label for="toctree-checkbox-19">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.tuple_extended.TupleExtended.html">
+         mdp_playground.spaces.tuple_extended.TupleExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <h1>Source code for mdp_playground.spaces.image_multi_discrete</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">gym</span>
+<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Discrete</span><span class="p">,</span> <span class="n">MultiDiscrete</span><span class="p">,</span> <span class="n">Space</span>
+<span class="kn">import</span> <span class="nn">PIL.ImageDraw</span> <span class="k">as</span> <span class="nn">ImageDraw</span>
+<span class="kn">import</span> <span class="nn">PIL.Image</span> <span class="k">as</span> <span class="nn">Image</span>
+<span class="kn">from</span> <span class="nn">PIL.Image</span> <span class="kn">import</span> <span class="n">FLIP_LEFT_RIGHT</span><span class="p">,</span> <span class="n">FLIP_TOP_BOTTOM</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="ImageMultiDiscrete"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete">[docs]</a><span class="k">class</span> <span class="nc">ImageMultiDiscrete</span><span class="p">(</span><span class="n">Box</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;A space that maps a (multi-)discrete space 1-to-1 to images so that the images may be used as representations for corresponding (multi-)discrete states. A MultiDiscrete space will have multiple dimensions. For each of these dimensions, there is a size that represents the number of categorical states that correspond to that dimension. For size = n, each of these categorical states is numbered from 0 to n-1. For each categorical state numbered n, we associate a polygon with n + 3 sides. This polygon is present in the image associated with this dimension. The images generated for all the dimensions are concatenated together by placing them side by side in the order of the dimensions in Space. Any of the transforms - rotate, flip, scale, shift - can be associated with an object of this class, to apply at random to polygons in the images whenever they are generated.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_concatenated_image(multi_discrete_state)</span>
+<span class="sd">        Gets an image representation for a given multi_discrete_state</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="ImageMultiDiscrete.__init__"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_space_sizes</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">circle_radius</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="s1">&#39;rotate,flip,scale,shift&#39;</span><span class="p">,</span> <span class="n">sh_quant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">),</span> <span class="n">ro_quant</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_custom_images</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cust_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">):</span> <span class="c1"># , polygon_sides=4</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        state_space_sizes : list</span>
+<span class="sd">            The underlying (multi-)discrete state space sizes to which this class associates images as external observations</span>
+<span class="sd">        width : int</span>
+<span class="sd">            The width of the image</span>
+<span class="sd">        height : int</span>
+<span class="sd">            The height of the image</span>
+<span class="sd">        circle_radius : int</span>
+<span class="sd">            The radius of the circle in which the associated polygons are inscribed</span>
+<span class="sd">        transforms : str</span>
+<span class="sd">            Comma separated string specifiying which transforms are applied to images. (Commas are not actually needed, but are recommended for readability, since it&#39;s only the presence of the string representing the corresponding transform that is checked for.)</span>
+<span class="sd">        sh_quant : int</span>
+<span class="sd">            An int to quantise the shift transforms.</span>
+<span class="sd">        scale_range: tuple of floats with length = 2</span>
+<span class="sd">            A tuple of real numbers to specify (min_scaling, max_scaling) for the scale transform.</span>
+<span class="sd">        ro_quant : int</span>
+<span class="sd">            An int to quantise the rotation transforms.</span>
+<span class="sd">        seed : int</span>
+<span class="sd">            seed for randomly applied transformations and NOT for the underlying state space</span>
+<span class="sd">        use_custom_images : str or None</span>
+<span class="sd">            If None, then default setting of no custom textures or images. If this value is &quot;textures&quot; or &quot;images&quot;, then all images in the cust_path directories are loaded in alphabetical order and correspond 1-to-1 with discrete states which are in numeric order. If this value is &quot;textures&quot;, the textures are applied to the polygons that would have been generated for the default setting (of no custom textures or images). If this value is &quot;images&quot;, then the custom images are drawn in a square (with side length = circle_radius * sqrt(2)) in the centre of the polygon when no transforms are applied. When the underlying state space sizes are multi-discrete, the 1-to-1 state number to image mapping is the same for all discrete sub-spaces.</span>
+<span class="sd">        cust_path : str or None</span>
+<span class="sd">            The directory containing the custom images to be loaded</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+        <span class="c1"># Warn if resolution is too low?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">circle_radius</span> <span class="o">=</span> <span class="n">circle_radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span> <span class="o">=</span> <span class="n">transforms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sh_quant</span> <span class="o">=</span> <span class="n">sh_quant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ro_quant</span> <span class="o">=</span> <span class="n">ro_quant</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_range</span> <span class="o">=</span> <span class="n">scale_range</span>
+
+        <span class="c1"># self.state_space = state_space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_custom_images</span> <span class="o">=</span> <span class="n">use_custom_images</span>
+
+        <span class="c1"># if isinstance(state_space, Discrete):</span>
+        <span class="c1">#     state_space_sizes = [state_space.n] # can be an int to map images to discrete spaces or it can be a list to map images (each image = multiple images, one for each discrete dimension, concatenated along the X-axis) to multi-discrete spaces</span>
+        <span class="c1"># elif isinstance(state_space, MultiDiscrete):</span>
+        <span class="c1">#     state_space_sizes = list(state_space.nvec)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     raise TypeError(&#39;ImageMultiDiscrete can only hold a Discrete or MultiDiscrete object from Gym. Provided object was of type: &#39; + str(type(state_space)))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_space_sizes</span> <span class="o">=</span> <span class="n">state_space_sizes</span>
+
+
+        <span class="k">if</span> <span class="n">use_custom_images</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1">###TODO test for textures, custom images</span>
+            <span class="n">cust_imgs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="c1"># cust_arrs = []</span>
+            <span class="k">for</span> <span class="n">img_file</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">cust_path</span><span class="p">)):</span>
+                <span class="n">img_</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">cust_path</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">img_file</span><span class="p">)</span>
+                <span class="n">cust_imgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">img_</span><span class="p">)</span>
+                <span class="c1"># The following code might be used to resize the texture to a canonical size here already or to tile the texture.</span>
+                <span class="c1"># sq_width = circle_radius * 2 # np.sqrt(2)</span>
+                <span class="c1"># self.sq_width = sq_width</span>
+                <span class="c1"># img_ = img_.resize((sq_width, sq_width))</span>
+                <span class="c1"># cust_imgs.append(img_)</span>
+                <span class="c1"># img_arr = np.array(img_)</span>
+                <span class="c1"># cust_arrs.append(img_arr)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">cust_imgs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">(</span><span class="n">state_space_sizes</span><span class="p">),</span> <span class="s2">&quot;cust_path should be a directory with at least as many as the larget Discrete sub-space in the MultiDiscrete space.&quot;</span>
+            <span class="c1">#&quot;The cust_path should be a directory with only texture images, at least as many as the larget Discrete sub-space in the MultiDiscrete space.&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cust_imgs</span> <span class="o">=</span> <span class="n">cust_imgs</span>
+
+
+        <span class="c1"># self.shape = (width, height, 1)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageMultiDiscrete</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span> <span class="c1">#</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageMultiDiscrete</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span> <span class="c1">#</span></div>
+
+    <span class="c1"># def seed(self, seed=None):</span>
+    <span class="c1">#     pass</span>
+
+    <span class="c1"># def generate_images(self, state_space_size): #, polygon_sides</span>
+    <span class="c1">#     states_ = np.ndarray(shape=(state_space_size, self.width, self.height), dtype=np.uint8) # can&#39;t use 1 for 4th dim of array as, for L grayscale colour space, converting to np.array() gives only 2-D which throws broadcast error when assigning to this array below</span>
+    <span class="c1">#     for curr_state in range(state_space_size):</span>
+    <span class="c1">#         states_[curr_state] = self.generate_image(curr_state) # , curr_state + 2 - At least 2 sides for a polygon (including a line as a polygon here), so + 2.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     return states_</span>
+
+    <span class="k">def</span> <span class="nf">generate_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discrete_state</span><span class="p">):</span> <span class="c1">#, state_space_size, polygon_sides</span>
+        <span class="n">polygon_sides</span> <span class="o">=</span> <span class="n">discrete_state</span> <span class="o">+</span> <span class="mi">3</span>
+        <span class="n">sh_quant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sh_quant</span>
+        <span class="n">ro_quant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ro_quant</span>
+        <span class="n">scale_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_range</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_custom_images</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># textures / custom images</span>
+            <span class="n">image_</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span> <span class="c1"># Use RGB for textures / custom images</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">image_</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;L&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span> <span class="c1"># Use L for black and white 8-bit pixels instead of RGB in case not using custom images</span>
+        <span class="n">draw</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">image_</span><span class="p">)</span>
+
+        <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">circle_radius</span>
+        <span class="n">shift_w</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">shift_h</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;scale&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
+            <span class="c1"># max_R = 0.6 * min(self.width, self.height) / 2 # Not sure whether to make this depend on provided R as well</span>
+            <span class="c1"># min_R = 0.1 * min(self.width, self.height) / 2 # /2 because it&#39;s R, 0.6 and 0.1 to allow some wiggle for shift below and not make too small</span>
+            <span class="n">max_R</span> <span class="o">=</span> <span class="n">scale_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">R</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_R</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Maximum possible size of polygon might be too big for the given resolution. It&#39;s set to: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">max_R</span><span class="p">))</span>
+            <span class="n">max_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">max_R</span><span class="p">)</span>
+            <span class="n">min_R</span> <span class="o">=</span> <span class="n">scale_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">R</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">min_R</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Minimum possible size of polygon might be too small and lead too much noise in image. It&#39;s set to: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">min_R</span><span class="p">))</span>
+            <span class="n">min_R</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">min_R</span><span class="p">)</span>
+            <span class="n">log_sample</span> <span class="o">=</span> <span class="n">min_R</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_R</span> <span class="o">-</span> <span class="n">min_R</span><span class="p">)</span>
+            <span class="n">sample_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_sample</span><span class="p">)</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_</span><span class="p">)</span>
+            <span class="c1"># print(&quot;R&quot;, min_R, max_R)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;shift&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
+            <span class="n">max_shift_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">R</span>
+            <span class="n">max_shift_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">R</span>
+            <span class="n">add_shift_w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="n">max_shift_w</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_shift_w</span><span class="p">)</span>
+            <span class="n">add_shift_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="n">max_shift_h</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">max_shift_h</span><span class="p">)</span>
+            <span class="n">add_shift_w</span> <span class="o">=</span> <span class="p">(</span><span class="n">add_shift_w</span> <span class="o">//</span> <span class="n">sh_quant</span><span class="p">)</span> <span class="o">*</span> <span class="n">sh_quant</span>
+            <span class="n">add_shift_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">add_shift_h</span> <span class="o">//</span> <span class="n">sh_quant</span><span class="p">)</span> <span class="o">*</span> <span class="n">sh_quant</span>
+            <span class="c1"># print(&quot;shift_w, shift_h&quot;, add_shift_w, add_shift_h)</span>
+            <span class="n">shift_w</span> <span class="o">+=</span> <span class="n">add_shift_w</span>
+            <span class="n">shift_h</span> <span class="o">+=</span> <span class="n">add_shift_h</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_custom_images</span> <span class="o">==</span> <span class="s2">&quot;images&quot;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Trace polygon</span>
+            <span class="n">points_</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">polygon_sides</span><span class="p">):</span>
+                <span class="n">angle</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="n">polygon_sides</span><span class="p">)</span> <span class="o">*</span> <span class="n">i</span>
+                <span class="n">point</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">shift_w</span> <span class="o">+</span> <span class="n">R</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)),</span>
+                            <span class="nb">int</span><span class="p">(</span><span class="n">shift_h</span> <span class="o">+</span> <span class="n">R</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)))</span>
+                <span class="n">points_</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
+
+        <span class="c1"># Render polygon if using default or textures, else use custom image</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_custom_images</span> <span class="o">==</span> <span class="s2">&quot;textures&quot;</span><span class="p">:</span>
+            <span class="n">draw</span><span class="o">.</span><span class="n">polygon</span><span class="p">(</span><span class="n">points_</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+            <span class="n">img_arr_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image_</span><span class="p">)</span>
+            <span class="n">tex_img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cust_imgs</span><span class="p">[</span><span class="n">discrete_state</span><span class="p">]</span>
+            <span class="n">tex_img</span> <span class="o">=</span> <span class="n">tex_img</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">R</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">R</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="n">tex_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tex_img</span><span class="p">)</span>
+            <span class="n">top_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">shift_h</span> <span class="o">-</span> <span class="n">tex_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">shift_w</span> <span class="o">-</span> <span class="n">tex_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">bottom_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">shift_h</span> <span class="o">+</span> <span class="n">tex_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">shift_w</span> <span class="o">+</span> <span class="n">tex_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">img_arr_</span><span class="p">[</span><span class="n">top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">//=</span> <span class="mi">255</span>
+            <span class="n">img_arr_</span><span class="p">[</span><span class="n">top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">*=</span> <span class="n">tex_arr</span> <span class="c1"># //255 to make white pixels be (1, 1, 1) - so when multiplied it&#39;s a mask; shift_h and shift_w interchanged as numpy is row major</span>
+            <span class="c1"># texed_img =</span>
+            <span class="n">image_</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">img_arr_</span><span class="p">,</span> <span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_custom_images</span> <span class="o">==</span> <span class="s2">&quot;images&quot;</span><span class="p">:</span>
+            <span class="n">img_arr_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image_</span><span class="p">)</span>
+            <span class="n">tex_img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cust_imgs</span><span class="p">[</span><span class="n">discrete_state</span><span class="p">]</span>
+            <span class="n">sq_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">R</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span> <span class="c1"># For textures it is not square root because polygons like a pentagon would go outside the sqrt(2) region.</span>
+            <span class="k">if</span> <span class="n">sq_width</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># If sq_width is not even, it causes errors with the //2 below.</span>
+                <span class="n">sq_width</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">tex_img</span> <span class="o">=</span> <span class="n">tex_img</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="n">sq_width</span><span class="p">,</span> <span class="n">sq_width</span><span class="p">))</span>
+            <span class="n">tex_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tex_img</span><span class="p">)</span>
+            <span class="n">top_left</span> <span class="o">=</span> <span class="p">(</span><span class="n">shift_h</span> <span class="o">-</span> <span class="n">tex_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">shift_w</span> <span class="o">-</span> <span class="n">tex_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">bottom_right</span> <span class="o">=</span> <span class="p">(</span><span class="n">shift_h</span> <span class="o">+</span> <span class="n">tex_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">,</span> <span class="n">shift_w</span> <span class="o">+</span> <span class="n">tex_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">img_arr_</span><span class="p">[</span><span class="n">top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">tex_arr</span>
+            <span class="n">image_</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">img_arr_</span><span class="p">,</span> <span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">draw</span><span class="o">.</span><span class="n">polygon</span><span class="p">(</span><span class="n">points_</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="s2">&quot;rotate&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span> <span class="c1">###TODO rotation can lead to image going out of bounds.</span>
+            <span class="c1"># rotation_ = (360 / polygon_sides) * (discrete_state / state_space_size) # Need to divide by polygon_sides because</span>
+            <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">360</span><span class="p">)</span>
+            <span class="n">rotation</span> <span class="o">=</span> <span class="p">(</span><span class="n">rotation</span> <span class="o">//</span> <span class="n">ro_quant</span><span class="p">)</span> <span class="o">*</span> <span class="n">ro_quant</span>
+            <span class="c1"># print(&quot;rotation&quot;, rotation)</span>
+            <span class="n">image_</span> <span class="o">=</span> <span class="n">image_</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span>
+            <span class="c1"># image_.rotate(</span>
+
+        <span class="k">if</span> <span class="s2">&quot;flip&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># Only flip half the times</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">image_</span> <span class="o">=</span> <span class="n">image_</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">FLIP_LEFT_RIGHT</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">image_</span> <span class="o">=</span> <span class="n">image_</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">FLIP_TOP_BOTTOM</span><span class="p">)</span>
+
+        <span class="c1"># Because numpy is row-major and Image is column major, need to transpose</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_custom_images</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ret_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image_</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ret_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image_</span><span class="p">),</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">ret_arr</span>
+
+<div class="viewcode-block" id="ImageMultiDiscrete.get_concatenated_image"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.get_concatenated_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_concatenated_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multi_discrete_state</span><span class="p">,):</span>
+        <span class="sd">&#39;&#39;&#39;Gets the &quot;stitched together&quot; image made from images corresponding to each discrete sub-space within the multidiscrete space, concatenated along the X-axis</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">multi_discrete_state</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="n">multi_discrete_state</span> <span class="o">=</span> <span class="p">[</span><span class="n">multi_discrete_state</span><span class="p">]</span>
+        <span class="n">concatenated_image</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_space_sizes</span><span class="p">)):</span> <span class="c1"># For each Discrete sub-space</span>
+            <span class="n">concatenated_image</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_image</span><span class="p">(</span><span class="n">multi_discrete_state</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="c1"># for i in range(len(self.disjoint_states)):</span>
+        <span class="c1">#     concatenated_image.append(self.disjoint_states[i][multi_discrete_state[i]])</span>
+        <span class="n">concatenated_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">concatenated_image</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_3d</span><span class="p">(</span><span class="n">concatenated_image</span><span class="p">)</span> <span class="c1"># because Ray expects an image to have &gt;=3 dims</span></div>
+
+    <span class="c1"># def get_multi_discrete_state(self,</span>
+
+<div class="viewcode-block" id="ImageMultiDiscrete.sample"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state_space_sizes</span><span class="p">)</span>
+        <span class="n">sampled</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="o">.</span><span class="n">random_sample</span><span class="p">(</span><span class="n">sss</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">sss</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="c1"># Based on Gym&#39;s MultiDiscrete sampling</span>
+        <span class="c1"># if type(sampled) == int:</span>
+        <span class="c1">#     sampled = [sampled]</span>
+        <span class="n">sampled</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_concatenated_image</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> with multi-discrete space of shape: </span><span class="si">{}</span><span class="s2"> and &quot;</span>\
+                <span class="s2">&quot;images of resolution: </span><span class="si">{}</span><span class="s2"> and dtype: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">state_space_sizes</span><span class="p">,</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageMultiDiscrete.contains"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.contains">[docs]</a>    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return boolean specifying if x is a valid</span>
+<span class="sd">        member of this space</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="c1">#TODO compare each pixel for all possible images?</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ImageMultiDiscrete.to_jsonable"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.to_jsonable">[docs]</a>    <span class="k">def</span> <span class="nf">to_jsonable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert a batch of samples from this space to a JSONable data type.&quot;&quot;&quot;</span>
+        <span class="c1"># By default, assume identity is JSONable</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ImageMultiDiscrete.from_jsonable"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.from_jsonable">[docs]</a>    <span class="k">def</span> <span class="nf">from_jsonable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert a JSONable data type to a batch of samples from this space.&quot;&quot;&quot;</span>
+        <span class="c1"># By default, assume identity is JSONable</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</pre></div>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By MDP Playground developers<br/>
+        
+            &copy; Copyright 2021, MDP Playground developers.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

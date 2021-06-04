@@ -17,6 +17,35 @@ from ray.rllib.models import ModelCatalog
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 
 
+# def init_ray(log_level=None, tmp_dir=None, include_webui=None,
+#              object_store_memory=int(2e9),
+#              redis_max_memory=int(1e9), local_mode=False):
+def init_ray(**kwargs):
+    import ray
+    if ray.__version__[0] == '1':  # new version 1.0 API
+        if "redis_max_memory" in kwargs:
+            value = kwargs["redis_max_memory"]
+            del kwargs["redis_max_memory"]
+            kwargs["_redis_max_memory"] = value
+        if "tmp_dir" in kwargs:
+            value = kwargs["tmp_dir"]
+            del kwargs["tmp_dir"]
+            kwargs["_temp_dir"] = value
+
+    else:
+        if "tmp_dir" in kwargs:
+            value = kwargs["tmp_dir"]
+            del kwargs["tmp_dir"]
+            kwargs["temp_dir"] = value
+
+    if "log_level" in kwargs:
+        value = kwargs["log_level"]
+        del kwargs["log_level"]
+        kwargs["logging_level"] = value
+
+    ray.init(**kwargs)
+
+
 def process_configs(config_file, stats_file_prefix, config_num, log_level,
                     framework='ray', framework_dir='/tmp/ray'):
     config_file_path = os.path.abspath('/'.join(config_file.split('/')[:-1]))
@@ -129,30 +158,34 @@ def process_configs(config_file, stats_file_prefix, config_num, log_level,
 
 
 def setup_ray(config, config_num, log_level, framework_dir):
-    import ray
     tmp_dir = framework_dir + '/tmp_' + str(config_num)
+    # import ray
     if config.algorithm == 'DQN': #hack
-        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-                 temp_dir=tmp_dir,
-                 logging_level=log_level,
-                 # local_mode=True,
-                 # webui_host='0.0.0.0'); logging_level=logging.INFO,
-                 )
+        init_ray(log_level=log_level, tmp_dir=tmp_dir)
+        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
+        #          temp_dir=tmp_dir,
+        #          logging_level=log_level,
+        #          # local_mode=True,
+        #          # webui_host='0.0.0.0'); logging_level=logging.INFO,
+        #          )
         # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp') #, memory=int(8e9), local_mode=True # local_mode (bool): If true, the code will be executed serially. This is useful for debugging. # when true on_train_result and on_episode_end operate in the same current directory as the script. A3C is crashing in local mode, so didn't use it and had to work around by giving full path + filename in stats_file_name.; also has argument driver_object_store_memory=, plasma_directory='/tmp'
     elif config.algorithm == 'A3C': #hack
-        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-                 temp_dir=tmp_dir,
-                 logging_level=log_level,
-                 # local_mode=True,
-                 # webui_host='0.0.0.0'); logging_level=logging.INFO,
-                 )        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
+        init_ray(log_level=log_level, tmp_dir=tmp_dir)
+        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
+        #          temp_dir=tmp_dir,
+        #          logging_level=log_level,
+        #          # local_mode=True,
+        #          # webui_host='0.0.0.0'); logging_level=logging.INFO,
+        #          )        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
     else:
-        ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-                 temp_dir=tmp_dir,
-                 logging_level=log_level,
-                 local_mode=True,
-                 # webui_host='0.0.0.0'); logging_level=logging.INFO,
-                 )
+        init_ray(log_level=log_level, tmp_dir=tmp_dir, local_mode=True)
+
+        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
+        #          temp_dir=tmp_dir,
+        #          logging_level=log_level,
+        #          local_mode=True,
+        #          # webui_host='0.0.0.0'); logging_level=logging.INFO,
+        #          )
 
 def init_stats_file(stats_file_name, columns_to_write):
     fout = open(stats_file_name, 'a') #hardcoded
@@ -326,7 +359,7 @@ def get_list_of_varying_configs(var_configs, mode='grid', num_configs=None):
                     agent_config["agent"][key] = current_config[num_configs_done + list(var_configs[config_type]).index(key)]
 
                 elif config_type == "model":
-                    num_configs_done = len(list(var_configs["env"])) + len(list(var_agent_configs))
+                    num_configs_done = len(list(var_configs["env"])) + len(list(var_configs["agent"]))
                     model_config["model"][key] = current_config[num_configs_done + list(var_configs[config_type]).index(key)]
 
         combined_config = {**agent_config, **model_config, **env_config}

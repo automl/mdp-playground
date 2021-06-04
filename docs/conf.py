@@ -20,8 +20,8 @@ sys.path.append(os.path.abspath('../mdp_playground'))
 
 # TODO: read automatically from setup
 project = 'MDP Playground'
-copyright = '2021, Raghu Rajan'
-author = 'Raghu Rajan'
+copyright = '2021, MDP Playground developers'
+author = 'MDP Playground developers'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
@@ -44,7 +44,7 @@ napoleon_google_docstring = False
 napoleon_numpy_docstring = True
 
 autosummary_generate = True
-autosummary_imported_members = True
+autosummary_imported_members = False
 autoclass_content = "both"  # Add __init__ doc (ie. params) to class summaries
 html_show_sourcelink = False  # Remove 'view source code' from top of page
 autodoc_inherit_docstrings = True  # If no docstring, inherit from base class
