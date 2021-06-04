@@ -1,3 +1,23 @@
+<p align="center">
+
+<a href="https://github.com/automl/mdp-playground/actions/workflows/gh-test.yml" target="_blank">
+    <img src="https://github.com/automl/mdp-playground/actions/workflows/gh-test.yml/badge.svg" alt="Test">
+</a>
+<a href="https://github.com/automl/mdp-playground/actions/workflows/publish.yml" target="_blank">
+    <img src="https://github.com/automl/mdp-playground/actions/workflows/publish.yml/badge.svg" alt="Publish">
+</a>
+<a href="https://codecov.io/gh/automl/mdp-playground" target="_blank">
+    <img src="https://img.shields.io/codecov/c/github/automl/mdp-playground?color=%2334D058" alt="Coverage">
+</a>
+<a href="https://pypi.org/project/mdp-playground/" target="_blank">
+    <img src="https://img.shields.io/pypi/v/mdp-playground?color=%2334D058&label=pypi%20package" alt="Package version">
+</a>
+<a href="https://pypi.org/project/mdp-playground/" target="_blank">
+    <img src="https://img.shields.io/pypi/pyversions/mdp-playground.svg" alt="Python Versions">
+</a>
+</p>
+
+
 # MDP Playground
 A python package to inject low-level dimensions of difficulties in RL environments. There are toy environments to design and debug RL agents. And complex environment wrappers for Atari and Mujoco to test robustness to these dimensions in complex environments.
 
@@ -12,10 +32,28 @@ There are 4 parts to the package:
 4) **Analysis**: [`plot_experiments.ipynb`](plot_experiments.ipynb) contains code to plot the standard plots from the paper.
 
 ## Installation
+
+### Production use
+We recommend using `conda` to manage environments. After setup of the environment, you can install MDP Playground in two ways:
+#### Manual
+To install MDP Playground manually, clone the repository and run:
+```bash
+pip install -e .[extras]
+```
+This might be the preferred way if you want easy access to the included experiments.
+
+#### From PyPI
+MDP Playground is also on PyPI. Just run:
+```bash
+pip install mdp_playground[extras]
+```
+
+
+### Reproducing results from the paper
 We recommend using `conda` environments to manage virtual `Python` environments to run the experiments. Unfortunately, you will have to maintain 2 environments - 1 for the "older" **discrete toy** experiments and 1 for the "newer" **continuous and complex** experiments from the paper. As mentioned in Appendix P in the paper, this is because of issues with Ray, the library that we used for our baseline agents.
 
 Please follow the following commands to install for the discrete toy experiments:
-```
+```bash
 conda create -n py36_toy_rl_disc_toy python=3.6
 conda activate py36_toy_rl_disc_toy
 cd mdp-playground
@@ -23,7 +61,7 @@ pip install -e .[extras_disc]
 ```
 
 Please follow the following commands to install for the continuous and complex experiments:
-```
+```bash
 conda create -n py36_toy_rl_cont_comp python=3.6
 conda activate py36_toy_rl_cont_comp
 cd mdp-playground
@@ -39,7 +77,7 @@ For general instructions, please continue reading.
 
 You can run experiments using:
 ```
-python run_experiments.py -c <config_file> -e <exp_name> -n <config_num>
+run-mdpp-experiments -c <config_file> -e <exp_name> -n <config_num>
 ```
 The `exp_name` is a prefix for the filenames of CSV files where stats for the experiments are recorded. The CSV stats files will be saved to the current directory.<br>
 Each of the command line arguments has defaults. Please refer to the documentation inside [`run_experiments.py`](run_experiments.py) for further details on the command line arguments. (Or run it with the `-h` flag to bring up help.)
@@ -53,7 +91,7 @@ For example, for algorithm **DQN** when varying dimensions **delay** and **seque
 
 ## Running experiments from the main paper
 We list here the commands for the experiments from the main paper:
-```
+```bash
 # Discrete toy environments:
 # Image representation experiments:
 conda activate py36_toy_rl_disc_toy
