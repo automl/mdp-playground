@@ -13,7 +13,7 @@ var_env_configs = OrderedDict({
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
     'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
     'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
-    'reward_dist_end_pts': [(0.01, 1)],
+    'reward_dist': [(0.01, 1)],
     'dummy_seed': [i for i in range(num_seeds)],
 })
 

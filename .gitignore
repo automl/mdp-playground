@@ -67,9 +67,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
-
 # PyBuilder
 target/
 
@@ -107,7 +104,6 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# Scripts to be kept in experimental
-run_experiments*.sh
-mdp_playground/scripts/run_experiments_*.py
+# Pickled files from me
+*pickle*dat
 

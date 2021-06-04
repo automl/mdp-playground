@@ -1,8 +1,9 @@
 name: Build and Publish
 
-on:  # TODO: should only trigger when intending to create a release (eg tag in commit)
-  push:
-    branches: [ dev/jan ]  # for testing only currently
+on:
+  release:
+    types:
+      - created  # see https://docs.github.com/en/rest/reference/repos#create-a-release and https://docs.github.com/en/actions/reference/events-that-trigger-workflows#release
 
 jobs:
   publish:
@@ -33,8 +34,7 @@ jobs:
         run: poetry install --no-interaction
       - name: Publish
         env:
-          PYPI_TOKEN: ${{ secrets.TestPYPI_TOKEN }}
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
         run: |
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry config pypi-token.testpypi $PYPI_TOKEN
-          poetry publish -r testpypi
+          poetry config pypi-token.pypi $PYPI_TOKEN
+          poetry publish --build -r pypi
