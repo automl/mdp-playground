@@ -20,8 +20,8 @@ sys.path.append(os.path.abspath('../mdp_playground'))
 
 # TODO: read automatically from setup
 project = 'MDP Playground'
-copyright = '2021, Raghu Rajan'
-author = 'Raghu Rajan'
+copyright = '2021, MDP Playground developers'
+author = 'MDP Playground developers'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
