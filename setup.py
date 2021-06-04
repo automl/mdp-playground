@@ -20,7 +20,7 @@ extras_require = [
     'configspace==0.4.10',
     'scipy>=1.3.0',
     'pandas==0.25.0',
-    'gym==0.18'
+    'gym[atari]==0.18'
 ]
 
 extras_require_disc = [
@@ -32,7 +32,7 @@ extras_require_disc = [
     'configspace==0.4.10',
     'scipy==1.3.0',
     'pandas==0.25.0',
-    'gym==0.14'
+    'gym[atari]==0.14'
 ]
 
 extras_require_cont = [
@@ -45,7 +45,7 @@ extras_require_cont = [
     'configspace>=0.4.10',
     'scipy>=1.3.0',
     'pandas==0.25.0',
-    'gym==0.14'
+    'gym[atari]==0.14'
 ]
 
 AUTHORS = ', '.join(["Raghu Rajan", "Jessica Borja",
