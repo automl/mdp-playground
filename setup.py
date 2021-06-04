@@ -83,7 +83,7 @@ setup(
 
     entry_points={
         'console_scripts': """
-            run-mdpp-experiments = mdp_playground.scripts.run_experiments:main
+            run-mdpp-experiments = mdp_playground.run_experiments:cli
         """
     }
 )
