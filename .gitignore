@@ -106,3 +106,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Scripts to be kept in experimental
+run_experiments*.sh
+mdp_playground/scripts/run_experiments_*.py
+
