@@ -32,6 +32,12 @@ def init_ray(**kwargs):
             del kwargs["tmp_dir"]
             kwargs["_temp_dir"] = value
 
+    else:
+        if "tmp_dir" in kwargs:
+            value = kwargs["tmp_dir"]
+            del kwargs["tmp_dir"]
+            kwargs["temp_dir"] = value
+
     if "log_level" in kwargs:
         value = kwargs["log_level"]
         del kwargs["log_level"]
