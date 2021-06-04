@@ -86,6 +86,7 @@ setup(
     ],
     # package_dir={"": "src"},
     python_requires=">=3.6",
+    setup_requires=['numpy'],
     install_requires=['gym<=0.14', 'dill', 'numpy'],
     extras_require={
       'extras': extras_require,
