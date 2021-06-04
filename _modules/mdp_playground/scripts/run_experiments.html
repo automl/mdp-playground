@@ -1,0 +1,698 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdp_playground.scripts.run_experiments &#8212; MDP Playground 0.0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">MDP Playground 0.0.1 documentation</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../_autosummary/mdp_playground.html">
+   mdp_playground
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.html">
+     mdp_playground.analysis
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.analysis.html">
+       mdp_playground.analysis.analysis
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+      <label for="toctree-checkbox-3">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.analysis.MDPP_Analysis.html">
+         mdp_playground.analysis.analysis.MDPP_Analysis
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.radar_chart.html">
+       mdp_playground.analysis.radar_chart
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+      <label for="toctree-checkbox-4">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.radar_chart.radar_factory.html">
+         mdp_playground.analysis.radar_chart.radar_factory
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.config_processor.html">
+     mdp_playground.config_processor
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.html">
+     mdp_playground.envs
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.html">
+       mdp_playground.envs.gym_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+      <label for="toctree-checkbox-6">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html">
+         mdp_playground.envs.gym_env_wrapper.GymEnvWrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.mujoco_env_wrapper.html">
+       mdp_playground.envs.mujoco_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+      <label for="toctree-checkbox-7">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper.html">
+         mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.html">
+       mdp_playground.envs.rl_toy_env
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+      <label for="toctree-checkbox-8">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.dist_of_pt_from_line.html">
+         mdp_playground.envs.rl_toy_env.dist_of_pt_from_line
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.list_to_float_np_array.html">
+         mdp_playground.envs.rl_toy_env.list_to_float_np_array
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.RLToyEnv.html">
+         mdp_playground.envs.rl_toy_env.RLToyEnv
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.html">
+     mdp_playground.scripts
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+    <label for="toctree-checkbox-9">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.html">
+       mdp_playground.scripts.run_experiments
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+      <label for="toctree-checkbox-10">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.cli.html">
+         mdp_playground.scripts.run_experiments.cli
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.main.html">
+         mdp_playground.scripts.run_experiments.main
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.html">
+     mdp_playground.spaces
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.box_extended.html">
+       mdp_playground.spaces.box_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+      <label for="toctree-checkbox-12">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.box_extended.BoxExtended.html">
+         mdp_playground.spaces.box_extended.BoxExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.discrete_extended.html">
+       mdp_playground.spaces.discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+      <label for="toctree-checkbox-13">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.discrete_extended.DiscreteExtended.html">
+         mdp_playground.spaces.discrete_extended.DiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_continuous.html">
+       mdp_playground.spaces.image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+      <label for="toctree-checkbox-14">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html">
+         mdp_playground.spaces.image_continuous.ImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.html">
+       mdp_playground.spaces.image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+      <label for="toctree-checkbox-15">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html">
+         mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.multi_discrete_extended.html">
+       mdp_playground.spaces.multi_discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+      <label for="toctree-checkbox-16">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended.html">
+         mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_continuous.html">
+       mdp_playground.spaces.test_image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+      <label for="toctree-checkbox-17">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_continuous.TestImageContinuous.html">
+         mdp_playground.spaces.test_image_continuous.TestImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_multi_discrete.html">
+       mdp_playground.spaces.test_image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+      <label for="toctree-checkbox-18">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.html">
+         mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.tuple_extended.html">
+       mdp_playground.spaces.tuple_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+      <label for="toctree-checkbox-19">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.tuple_extended.TupleExtended.html">
+         mdp_playground.spaces.tuple_extended.TupleExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <h1>Source code for mdp_playground.scripts.run_experiments</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;Script to run experiments on MDP Playground.</span>
+
+<span class="sd">Takes a configuration file, experiment name and config number to run as</span>
+<span class="sd">optional arguments.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">mdp_playground.config_processor</span> <span class="k">as</span> <span class="nn">config_processor</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">dill</span> <span class="k">as</span> <span class="nn">pickle</span>
+
+<span class="kn">from</span> <span class="nn">ray</span> <span class="kn">import</span> <span class="n">tune</span>
+
+<span class="c1"># import configparser</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="n">pp</span> <span class="o">=</span> <span class="n">pprint</span><span class="o">.</span><span class="n">PrettyPrinter</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.scripts.run_experiments.main.html#mdp_playground.scripts.run_experiments.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+    <span class="c1">#TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator</span>
+    <span class="c1"># docstring at beginning of the file is stored in __doc__</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--config-file&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;config_file&#39;</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;default_config&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Configuration file containing configuration to run &#39;</span>
+                        <span class="s1">&#39;experiments. It must be a Python file so config can be &#39;</span>
+                        <span class="s1">&#39;given programmatically. There are 2 types of configs - &#39;</span>
+                        <span class="s1">&#39;VARIABLE CONFIG across the experiments and STATIC CONFIG &#39;</span>
+                        <span class="s1">&#39;across the experiments. </span><span class="se">\n</span><span class="s1">VARIABLE CONFIGS: The &#39;</span>
+                        <span class="s1">&#39;OrderedDicts var_env_configs, var_agent_configs and &#39;</span>
+                        <span class="s1">&#39;var_model_configs hold configuration options that are &#39;</span>
+                        <span class="s1">&#39;variable for the environment, agent and model across the &#39;</span>
+                        <span class="s1">&#39;current experiment. For each configuration option, the &#39;</span>
+                        <span class="s1">&#39;option is the key in the dict and its value is a list of &#39;</span>
+                        <span class="s1">&#39;values it can take for the current experiment. A &#39;</span>
+                        <span class="s1">&#39;Cartesian product of these lists is taken to generate &#39;</span>
+                        <span class="s1">&#39;various possible configurations to be run. For example, &#39;</span>
+                        <span class="s1">&#39;you might want to vary &quot;delay&quot; for the current &#39;</span>
+                        <span class="s1">&#39;experiment. Then &quot;delay&quot; would be a key in &#39;</span>
+                        <span class="s1">&#39;var_env_configs dict and its value would be a list of &#39;</span>
+                        <span class="s1">&#39;values it can take. Because Ray does not have a common &#39;</span>
+                        <span class="s1">&#39;way to address this specification of configurations for &#39;</span>
+                        <span class="s1">&#39;its agents, there are a few hacky ways to set &#39;</span>
+                        <span class="s1">&#39;var_agent_configs and var_model_configs currently. &#39;</span>
+                        <span class="s1">&#39;Please see sample experiment config files in the &#39;</span>
+                        <span class="s1">&#39;experiments directory to see how to set the values for a &#39;</span>
+                        <span class="s1">&#39;given algorithm. </span><span class="se">\n</span><span class="s1"> STATIC CONFIGS: env_config, &#39;</span>
+                        <span class="s1">&#39;agent_config and model_config are dicts which hold the &#39;</span>
+                        <span class="s1">&#39;static configuration for the current experiment as a &#39;</span>
+                        <span class="s1">&#39;normal Python dict.&#39;</span><span class="p">)</span>
+    <span class="c1"># ####TODO Update docs regarding how to get configs to run: i.e., Cartesian</span>
+    <span class="c1"># product, or random, etc.</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--exp-name&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;exp_name&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;mdpp_default_experiment&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;The user-chosen name of the experiment. This is used&#39;</span>
+                        <span class="s1">&#39; as the prefix of the output files (the prefix also &#39;</span>
+                        <span class="s1">&#39;contains config_num if that is provided). It will save &#39;</span>
+                        <span class="s1">&#39;stats to 2 CSV files, with the filenames as the one given&#39;</span>
+                        <span class="s1">&#39; as argument&#39;</span>
+                        <span class="s1">&#39; and another file with an extra &quot;_eval&quot; in the filename &#39;</span>
+                        <span class="s1">&#39;that contains evaluation stats during the training. &#39;</span>
+                        <span class="s1">&#39;Appends to existing files or creates new ones if they &#39;</span>
+                        <span class="s1">&#39;don</span><span class="se">\&#39;</span><span class="s1">t exist.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;--config-num&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;config_num&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Used for running the configurations of experiments &#39;</span>
+                        <span class="s1">&#39;in parallel. This is appended to the prefix of the output&#39;</span>
+                        <span class="s1">&#39; files (after exp_name).&#39;</span>
+                        <span class="s1">&#39; A Cartesian product of different configuration values &#39;</span>
+                        <span class="s1">&#39;for the experiment will be taken and ordered as a list &#39;</span>
+                        <span class="s1">&#39;and this number corresponds to the configuration number &#39;</span>
+                        <span class="s1">&#39;in this list. Please look in to the code for details.&#39;</span><span class="p">)</span>
+    <span class="c1"># ###TODO Remove? #hack to run 1000 x 1000 env configs x agent configs.</span>
+    <span class="c1"># Storing all million of them in memory may be too inefficient?</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--agent-config-num&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;agent_config_num&#39;</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Used for running the configurations of experiments &#39;</span>
+                        <span class="s1">&#39;in parallel. This is appended to the prefix of the output&#39;</span>
+                        <span class="s1">&#39; files (after exp_name).&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--framework&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;framework&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="s1">&#39;ray&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Specify framework to run &#39;</span>
+                        <span class="s1">&#39;experiments (Current options: Ray Rllib, Stable Baselines&#39;</span>
+                        <span class="s1">&#39;).&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--save-model&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;save_model&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
+                        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Option to save trained NN model and framework </span><span class="se">\</span>
+<span class="s1">                        generated files at the end of &#39;</span>
+                        <span class="s1">&#39;training.&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--framework-dir&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;framework_dir&#39;</span><span class="p">,</span>
+                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;/tmp/&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Prefix of directory to be used by underlying &#39;</span>
+                        <span class="s1">&#39;framework (e.g. Ray Rllib, Stable Baselines 3). This &#39;</span>
+                        <span class="s1">&#39;name will be passed to the framework.&#39;</span><span class="p">)</span>
+    <span class="c1"># parser.add_argument(&#39;-t&#39;, &#39;--tune-hps&#39;, dest=&#39;tune_hps&#39;, action=&#39;store&#39;,</span>
+    <span class="c1">#                     default=False, type=bool,</span>
+    <span class="c1">#                     help=&#39;Used for tuning the hyperparameters that can be &#39;</span>
+    <span class="c1">#                     &#39;used for experiments later.&#39;</span>
+    <span class="c1">#                     &#39; A Cartesian product of different configuration values &#39;</span>
+    <span class="c1">#                     &#39;for the experiment will be taken and ordered as a list &#39;</span>
+    <span class="c1">#                     &#39;and this number corresponds to the configuration number&#39;</span>
+    <span class="c1">#                     &#39; in this list.&#39;</span>
+    <span class="c1">#                     &#39; Please look in to the code for details.&#39;)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="s1">&#39;--log-level&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;WARNING&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Set log level.&#39;</span><span class="p">)</span>
+
+
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Parsed arguments:&quot;</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+    <span class="n">log_levels</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;CRITICIAL&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span>
+        <span class="s1">&#39;ERROR&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+        <span class="s1">&#39;WARNING&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+        <span class="s1">&#39;INFO&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+        <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+        <span class="s1">&#39;NOTSET&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span>
+    <span class="p">}</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">log_level_</span> <span class="o">=</span> <span class="n">log_levels</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">log_level</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Log level </span><span class="si">{}</span><span class="s2"> not in </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">log_level</span><span class="p">,</span>
+                                                       <span class="n">log_levels</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+
+    <span class="n">config_file</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">config_file</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">config_file</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;.py&#39;</span><span class="p">:</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">config_file</span><span class="p">[:</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="c1"># print(&quot;config_file_path:&quot;, config_file_path)</span>
+
+    <span class="n">stats_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">exp_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">config_num</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">stats_file_name</span> <span class="o">+=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">config_num</span><span class="p">)</span>
+    <span class="c1"># elif args.agent_config_num is not None: ###IMP Commented out! If we append both these nums then, that can lead to 1M small files for 1000x1000 configs which doesn&#39;t play well with our Nemo cluster.</span>
+    <span class="c1">#     stats_file_name += &#39;_&#39; + str(args.agent_config_num)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Stats file being written to:&quot;</span><span class="p">,</span> <span class="n">stats_file_name</span><span class="p">)</span>
+
+    <span class="n">config</span><span class="p">,</span> <span class="n">final_configs</span> <span class="o">=</span>  <span class="n">config_processor</span><span class="o">.</span><span class="n">process_configs</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">stats_file_prefix</span><span class="o">=</span><span class="n">stats_file_name</span><span class="p">,</span> <span class="n">framework</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">framework</span><span class="p">,</span> <span class="n">config_num</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">config_num</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="n">log_level_</span><span class="p">,</span> <span class="n">framework_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">framework_dir</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Configuration number(s) that will be run:&quot;</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">config_num</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">args</span><span class="o">.</span><span class="n">config_num</span><span class="p">)</span>
+
+
+    <span class="c1"># import default_config</span>
+    <span class="c1"># print(&quot;default_config:&quot;, default_config)</span>
+    <span class="c1"># print(os.path.abspath(args.config_file)) # &#39;experiments/dqn_seq_del.py&#39;</span>
+
+
+    <span class="kn">import</span> <span class="nn">time</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+
+
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">config_num</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># final_configs = config.final_configs</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total number of configs to run:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">final_configs</span><span class="p">))</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">final_configs</span> <span class="o">=</span> <span class="p">[</span><span class="n">final_configs</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">config_num</span><span class="p">]]</span>
+
+
+
+
+    <span class="k">for</span> <span class="n">enum_conf_1</span><span class="p">,</span> <span class="n">current_config_</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">final_configs</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;current_config of agent to be run:&quot;</span><span class="p">,</span> <span class="n">current_config_</span><span class="p">,</span> <span class="n">enum_conf_1</span><span class="p">)</span>
+
+        <span class="n">algorithm</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">algorithm</span>
+
+
+        <span class="n">tune_config</span> <span class="o">=</span> <span class="n">current_config_</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;tune_config:&quot;</span><span class="p">,)</span>
+        <span class="n">pp</span><span class="o">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">tune_config</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="s1">&#39;timesteps_total&#39;</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+            <span class="n">timesteps_total</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">timesteps_total</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timesteps_total</span> <span class="o">=</span> <span class="n">tune_config</span><span class="p">[</span><span class="s2">&quot;timesteps_total&quot;</span><span class="p">]</span>
+
+        <span class="k">del</span> <span class="n">tune_config</span><span class="p">[</span><span class="s2">&quot;timesteps_total&quot;</span><span class="p">]</span> <span class="c1">#hack Ray doesn&#39;t allow unknown configs</span>
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\033</span><span class="s2">[1;32m======== Running on environment: &quot;</span> <span class="o">+</span> <span class="n">tune_config</span><span class="p">[</span><span class="s2">&quot;env&quot;</span><span class="p">]</span> \
+        <span class="o">+</span> <span class="s2">&quot; =========</span><span class="se">\033</span><span class="s2">[0;0m</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\033</span><span class="s2">[1;32m======== for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">timesteps_total</span><span class="p">)</span> \
+        <span class="o">+</span> <span class="s2">&quot; steps =========</span><span class="se">\033</span><span class="s2">[0;0m</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">analysis</span> <span class="o">=</span> <span class="n">tune</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">algorithm</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">algorithm</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">stats_file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> \
+            <span class="p">,</span> <span class="c1">####IMP &quot;name&quot; has to be specified, otherwise,</span>
+            <span class="c1"># it may lead to clashing for temp file in ~/ray_results/... directory.</span>
+            <span class="n">stop</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;timesteps_total&quot;</span><span class="p">:</span> <span class="n">timesteps_total</span><span class="p">,</span>
+                  <span class="p">},</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">tune_config</span><span class="p">,</span>
+            <span class="n">checkpoint_at_end</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">save_model</span><span class="p">,</span>
+            <span class="n">local_dir</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">framework_dir</span> <span class="o">+</span> <span class="s1">&#39;/_ray_results_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">config_num</span><span class="p">),</span>
+            <span class="c1">#return_trials=True # add trials = tune.run( above</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">save_model</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">analysis</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_analysis.pickle&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">exp_name</span><span class="p">),</span>
+                        <span class="s2">&quot;wb&quot;</span><span class="p">))</span>
+
+    <span class="n">config_processor</span><span class="o">.</span><span class="n">post_processing</span><span class="p">(</span><span class="n">framework</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">framework</span><span class="p">)</span>
+
+    <span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No. of seconds to run:&quot;</span><span class="p">,</span> <span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="cli"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.scripts.run_experiments.cli.html#mdp_playground.scripts.run_experiments.cli">[docs]</a><span class="k">def</span> <span class="nf">cli</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">cli</span><span class="p">()</span>
+</pre></div>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By MDP Playground developers<br/>
+        
+            &copy; Copyright 2021, MDP Playground developers.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
