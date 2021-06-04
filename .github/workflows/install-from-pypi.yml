@@ -2,9 +2,9 @@ name: Test PyPI Installation
 
 on:
   push:
-    branches: [ dev/jan ]
+    branches: [ master, dev/jan ]
   pull_request:
-    branches: [ dev/jan ]
+    branches: [ master, dev/jan ]
 
 jobs:
   build:

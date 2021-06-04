@@ -326,7 +326,7 @@ def get_list_of_varying_configs(var_configs, mode='grid', num_configs=None):
                     agent_config["agent"][key] = current_config[num_configs_done + list(var_configs[config_type]).index(key)]
 
                 elif config_type == "model":
-                    num_configs_done = len(list(var_configs["env"])) + len(list(var_agent_configs))
+                    num_configs_done = len(list(var_configs["env"])) + len(list(var_configs["agent"]))
                     model_config["model"][key] = current_config[num_configs_done + list(var_configs[config_type]).index(key)]
 
         combined_config = {**agent_config, **model_config, **env_config}
