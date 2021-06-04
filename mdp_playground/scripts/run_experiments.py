@@ -216,10 +216,6 @@ def main(args):
     print("No. of seconds to run:", end - start)
 
 
-def cli():
+if __name__ == '__main__':
     import sys
     main(sys.argv[1:])
-
-
-if __name__ == '__main__':
-    cli()
