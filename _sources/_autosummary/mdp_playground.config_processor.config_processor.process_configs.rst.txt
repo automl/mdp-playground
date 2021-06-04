@@ -1,4 +1,4 @@
-mdp\_playground.config\_processor.config\_processor.process\_configs
+﻿mdp\_playground.config\_processor.config\_processor.process\_configs
 ====================================================================
 
 .. currentmodule:: mdp_playground.config_processor.config_processor

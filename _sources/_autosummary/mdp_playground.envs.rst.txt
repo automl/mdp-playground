@@ -1,4 +1,4 @@
-mdp\_playground.envs
+﻿mdp\_playground.envs
 ====================
 
 .. automodule:: mdp_playground.envs

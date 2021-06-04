@@ -15,8 +15,7 @@ mdp\_playground.envs.rl\_toy\_env
       :toctree:
    
       dist_of_pt_from_line
-      transform_discrete_to_multi_discrete
-      transform_multi_discrete_to_discrete
+      list_to_float_np_array
    
    
 

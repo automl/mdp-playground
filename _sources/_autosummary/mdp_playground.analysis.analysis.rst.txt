@@ -1,4 +1,4 @@
-mdp\_playground.analysis.analysis
+﻿mdp\_playground.analysis.analysis
 =================================
 
 .. automodule:: mdp_playground.analysis.analysis

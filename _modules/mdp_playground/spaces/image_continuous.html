@@ -1,0 +1,708 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdp_playground.spaces.image_continuous &#8212; MDP Playground 0.0.1 documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">MDP Playground 0.0.1 documentation</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../_autosummary/mdp_playground.html">
+   mdp_playground
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.html">
+     mdp_playground.analysis
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.analysis.html">
+       mdp_playground.analysis.analysis
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+      <label for="toctree-checkbox-3">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.analysis.MDPP_Analysis.html">
+         mdp_playground.analysis.analysis.MDPP_Analysis
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.radar_chart.html">
+       mdp_playground.analysis.radar_chart
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+      <label for="toctree-checkbox-4">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.analysis.radar_chart.radar_factory.html">
+         mdp_playground.analysis.radar_chart.radar_factory
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.config_processor.html">
+     mdp_playground.config_processor
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.html">
+     mdp_playground.envs
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.html">
+       mdp_playground.envs.gym_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+      <label for="toctree-checkbox-6">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html">
+         mdp_playground.envs.gym_env_wrapper.GymEnvWrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.mujoco_env_wrapper.html">
+       mdp_playground.envs.mujoco_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+      <label for="toctree-checkbox-7">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper.html">
+         mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.html">
+       mdp_playground.envs.rl_toy_env
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+      <label for="toctree-checkbox-8">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.dist_of_pt_from_line.html">
+         mdp_playground.envs.rl_toy_env.dist_of_pt_from_line
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.list_to_float_np_array.html">
+         mdp_playground.envs.rl_toy_env.list_to_float_np_array
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.envs.rl_toy_env.RLToyEnv.html">
+         mdp_playground.envs.rl_toy_env.RLToyEnv
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.html">
+     mdp_playground.scripts
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+    <label for="toctree-checkbox-9">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.html">
+       mdp_playground.scripts.run_experiments
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+      <label for="toctree-checkbox-10">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.cli.html">
+         mdp_playground.scripts.run_experiments.cli
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.scripts.run_experiments.main.html">
+         mdp_playground.scripts.run_experiments.main
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.html">
+     mdp_playground.spaces
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.box_extended.html">
+       mdp_playground.spaces.box_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+      <label for="toctree-checkbox-12">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.box_extended.BoxExtended.html">
+         mdp_playground.spaces.box_extended.BoxExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.discrete_extended.html">
+       mdp_playground.spaces.discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+      <label for="toctree-checkbox-13">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.discrete_extended.DiscreteExtended.html">
+         mdp_playground.spaces.discrete_extended.DiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_continuous.html">
+       mdp_playground.spaces.image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+      <label for="toctree-checkbox-14">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html">
+         mdp_playground.spaces.image_continuous.ImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.html">
+       mdp_playground.spaces.image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+      <label for="toctree-checkbox-15">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html">
+         mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.multi_discrete_extended.html">
+       mdp_playground.spaces.multi_discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+      <label for="toctree-checkbox-16">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended.html">
+         mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_continuous.html">
+       mdp_playground.spaces.test_image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+      <label for="toctree-checkbox-17">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_continuous.TestImageContinuous.html">
+         mdp_playground.spaces.test_image_continuous.TestImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_multi_discrete.html">
+       mdp_playground.spaces.test_image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+      <label for="toctree-checkbox-18">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.html">
+         mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.tuple_extended.html">
+       mdp_playground.spaces.tuple_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+      <label for="toctree-checkbox-19">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="../../../_autosummary/mdp_playground.spaces.tuple_extended.TupleExtended.html">
+         mdp_playground.spaces.tuple_extended.TupleExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <h1>Source code for mdp_playground.spaces.image_continuous</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">gym</span>
+<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Space</span>
+<span class="kn">import</span> <span class="nn">PIL.ImageDraw</span> <span class="k">as</span> <span class="nn">ImageDraw</span>
+<span class="kn">import</span> <span class="nn">PIL.Image</span> <span class="k">as</span> <span class="nn">Image</span>
+<span class="kn">from</span> <span class="nn">PIL.Image</span> <span class="kn">import</span> <span class="n">FLIP_LEFT_RIGHT</span><span class="p">,</span> <span class="n">FLIP_TOP_BOTTOM</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="ImageContinuous"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous">[docs]</a><span class="k">class</span> <span class="nc">ImageContinuous</span><span class="p">(</span><span class="n">Box</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;A space that maps a continuous 1- or 2-D space 1-to-1 to images so that the</span>
+<span class="sd">    images may be used as representations for corresponding continuous environments.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    get_concatenated_image(continuous_obs)</span>
+<span class="sd">        Gets an image representation for a given feature space observation</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="ImageContinuous.__init__"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature_space</span><span class="p">,</span> <span class="n">term_spaces</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>\
+                <span class="n">circle_radius</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">target_point</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">relevant_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span>\
+                <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">grid_shape</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        feature_space : Gym.spaces.Box</span>
+<span class="sd">            The feature space to which this class associates images as external</span>
+<span class="sd">            observations</span>
+<span class="sd">        term_spaces : list of Gym.spaces.Box</span>
+<span class="sd">            Sub-spaces of the feature space which are terminal</span>
+<span class="sd">        width : int</span>
+<span class="sd">            The width of the image</span>
+<span class="sd">        height : int</span>
+<span class="sd">            The height of the image</span>
+<span class="sd">        circle_radius : int</span>
+<span class="sd">            The radius of the circle which represents the agent and target point</span>
+<span class="sd">        target_point : np.array</span>
+
+<span class="sd">        relevant_indices : list</span>
+
+<span class="sd">        grid_shape : tuple of length 2</span>
+
+<span class="sd">        seed : int</span>
+<span class="sd">            Seed for this space</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># ##TODO Define a common superclass for this and ImageMultiDiscrete</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feature_space</span> <span class="o">=</span> <span class="n">feature_space</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_space</span><span class="o">.</span><span class="n">high</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_space</span><span class="o">.</span><span class="n">low</span> <span class="o">!=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">height</span>
+        <span class="c1"># Warn if resolution is too low?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">circle_radius</span> <span class="o">=</span> <span class="n">circle_radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_point</span> <span class="o">=</span> <span class="n">target_point</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">term_spaces</span> <span class="o">=</span> <span class="n">term_spaces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relevant_indices</span> <span class="o">=</span> <span class="n">relevant_indices</span>
+        <span class="n">all_indices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">irrelevant_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">all_indices</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">relevant_indices</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">irrelevant_indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irrelevant_features</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">irrelevant_features</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">grid_shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_grid</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">grid_shape</span> <span class="o">==</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">and</span> \
+                        <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">grid_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">grid_shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="c1"># Could also assert that self.width is divisible by grid_shape[0], etc.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">grid_shape</span> <span class="o">=</span> <span class="n">grid_shape</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">draw_grid</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">goal_colour</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_colour</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">term_colour</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bg_colour</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_colour</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_space</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="n">relevant_dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">relevant_indices</span><span class="p">)</span>
+        <span class="n">irr_dims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">irrelevant_indices</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">relevant_dims</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">irr_dims</span> <span class="o">&lt;=</span><span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Image observations are &quot;</span>\
+                <span class="s2">&quot;supported only &quot;</span>\
+                <span class="s2">&quot;for 1- or 2-D feature spaces.&quot;</span>
+
+
+        <span class="c1"># Shape has 1 appended for Ray Rllib to be compatible IIRC</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageContinuous</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> \
+                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageContinuous</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_grid</span><span class="p">:</span>
+                <span class="n">target_point</span> <span class="o">+=</span> <span class="mf">0.5</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_point_pixel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_pixel</span><span class="p">(</span><span class="n">target_point</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ImageContinuous.generate_image"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous.generate_image">[docs]</a>    <span class="k">def</span> <span class="nf">generate_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">relevant</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        position : np.array</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># Use RGB</span>
+        <span class="n">image_</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bg_colour</span><span class="p">)</span>
+        <span class="c1"># Use L for black and white 8-bit pixels instead of RGB in case not</span>
+        <span class="c1"># using custom images</span>
+        <span class="c1"># image_ = Image.new(&quot;L&quot;, (self.width, self.height))</span>
+        <span class="n">draw</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">image_</span><span class="p">)</span>
+
+        <span class="c1"># Draw in decreasing order of importance:</span>
+        <span class="c1"># grid lines, term_spaces, etc. first, so that others are drawn over them</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_grid</span><span class="p">:</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="n">position</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">position</span> <span class="o">+=</span> <span class="mf">0.5</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">relevant</span> <span class="k">else</span> <span class="mi">2</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_shape</span><span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">offset</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span> <span class="c1"># +1 because this is along</span>
+            <span class="c1"># concatentation dimension when stitching together images below in</span>
+            <span class="c1"># get_concatenated_image</span>
+                <span class="n">x_</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_shape</span><span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">offset</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1"># -1 to not go outside</span>
+                <span class="c1"># image size for the last line drawn</span>
+                <span class="n">y_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span>
+                <span class="n">start_pt</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">)</span>
+                <span class="n">y_</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">end_pt</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">)</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">line</span><span class="p">([</span><span class="n">start_pt</span><span class="p">,</span> <span class="n">end_pt</span><span class="p">],</span> <span class="n">fill</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">line_colour</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_shape</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="n">offset</span><span class="p">]):</span>
+                <span class="n">x_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+                <span class="n">y_</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid_shape</span><span class="p">[</span><span class="mi">0</span> <span class="o">+</span> <span class="n">offset</span><span class="p">]</span>
+                <span class="n">start_pt</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">)</span>
+                <span class="n">x_</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">end_pt</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_</span><span class="p">,</span> <span class="n">y_</span><span class="p">)</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">line</span><span class="p">([</span><span class="n">start_pt</span><span class="p">,</span> <span class="n">end_pt</span><span class="p">],</span> <span class="n">fill</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">line_colour</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">term_spaces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">relevant</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">term_space</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">term_spaces</span><span class="p">:</span>
+                <span class="n">low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_pixel</span><span class="p">(</span><span class="n">term_space</span><span class="o">.</span><span class="n">low</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_grid</span><span class="p">:</span>
+                    <span class="n">high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_pixel</span><span class="p">(</span><span class="n">term_space</span><span class="o">.</span><span class="n">high</span> <span class="o">+</span> <span class="mf">1.</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_pixel</span><span class="p">(</span><span class="n">term_space</span><span class="o">.</span><span class="n">high</span><span class="p">)</span>
+
+                <span class="n">leftUpPoint</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">low</span><span class="p">))</span>
+                <span class="n">rightDownPoint</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="n">high</span><span class="p">))</span>
+                <span class="n">twoPointList</span> <span class="o">=</span> <span class="p">[</span><span class="n">leftUpPoint</span><span class="p">,</span> <span class="n">rightDownPoint</span><span class="p">]</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span><span class="n">twoPointList</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">term_colour</span><span class="p">)</span>
+
+        <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">circle_radius</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_point</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">relevant</span><span class="p">:</span>
+            <span class="c1"># print(&quot;draw2&quot;, self.target_point_pixel)</span>
+            <span class="n">leftUpPoint</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_point_pixel</span> <span class="o">-</span> <span class="n">R</span><span class="p">))</span>
+            <span class="n">rightDownPoint</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">target_point_pixel</span> <span class="o">+</span> <span class="n">R</span><span class="p">))</span>
+            <span class="n">twoPointList</span> <span class="o">=</span> <span class="p">[</span><span class="n">leftUpPoint</span><span class="p">,</span> <span class="n">rightDownPoint</span><span class="p">]</span>
+            <span class="n">draw</span><span class="o">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">twoPointList</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">goal_colour</span><span class="p">)</span>
+
+        <span class="n">pos_pixel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_to_pixel</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+        <span class="c1"># print(&quot;draw1&quot;, pos_pixel)</span>
+        <span class="c1"># Draw circle https://stackoverflow.com/a/2980931/11063709</span>
+        <span class="n">leftUpPoint</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pos_pixel</span> <span class="o">-</span> <span class="n">R</span><span class="p">)</span>
+        <span class="n">rightDownPoint</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">pos_pixel</span> <span class="o">+</span> <span class="n">R</span><span class="p">)</span>
+        <span class="n">twoPointList</span> <span class="o">=</span> <span class="p">[</span><span class="n">leftUpPoint</span><span class="p">,</span> <span class="n">rightDownPoint</span><span class="p">]</span>
+        <span class="n">draw</span><span class="o">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">twoPointList</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_colour</span><span class="p">)</span>
+
+
+
+
+        <span class="c1"># Because numpy is row-major and Image is column major, need to transpose</span>
+        <span class="c1"># ret_arr = np.array(image_).T # For 2-D</span>
+        <span class="n">ret_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">image_</span><span class="p">),</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">ret_arr</span></div>
+
+<div class="viewcode-block" id="ImageContinuous.get_concatenated_image"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous.get_concatenated_image">[docs]</a>    <span class="k">def</span> <span class="nf">get_concatenated_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Gets the &quot;stitched together&quot; image made from images corresponding to</span>
+<span class="sd">        each continuous sub-space within the continuous space, concatenated</span>
+<span class="sd">        along the X-axis.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">concatenated_image</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># For relevant/irrelevant sub-spaces:</span>
+        <span class="n">concatenated_image</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_image</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">relevant_indices</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">irrelevant_features</span><span class="p">:</span>
+            <span class="n">irr_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_image</span><span class="p">(</span><span class="n">obs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">irrelevant_indices</span><span class="p">],</span> <span class="n">relevant</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">concatenated_image</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">irr_image</span><span class="p">)</span>
+
+        <span class="n">concatenated_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">concatenated_image</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_3d</span><span class="p">(</span><span class="n">concatenated_image</span><span class="p">)</span> <span class="c1"># because Ray expects an</span></div>
+        <span class="c1"># image to have &gt;=3 dims</span>
+
+<div class="viewcode-block" id="ImageContinuous.convert_to_pixel"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous.convert_to_pixel">[docs]</a>    <span class="k">def</span> <span class="nf">convert_to_pixel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="c1"># It&#39;s implicit that both relevant and irrelevant sub-spaces have the</span>
+        <span class="c1"># same max and min here:</span>
+        <span class="nb">max</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_space</span><span class="o">.</span><span class="n">high</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">relevant_indices</span><span class="p">]</span>
+        <span class="nb">min</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_space</span><span class="o">.</span><span class="n">low</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">relevant_indices</span><span class="p">]</span>
+        <span class="n">pos_pixel</span> <span class="o">=</span> <span class="p">((</span><span class="n">position</span> <span class="o">-</span> <span class="nb">min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">max</span> <span class="o">-</span> <span class="nb">min</span><span class="p">))</span>
+        <span class="n">pos_pixel</span> <span class="o">=</span> <span class="p">(</span><span class="n">pos_pixel</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">pos_pixel</span></div>
+
+
+<div class="viewcode-block" id="ImageContinuous.sample"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">sampled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_space</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_concatenated_image</span><span class="p">(</span><span class="n">sampled</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> with continuous underlying space of shape: </span><span class="si">{}</span><span class="s2"> and &quot;</span>\
+                <span class="s2">&quot;images of resolution: </span><span class="si">{}</span><span class="s2"> and dtype: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">feature_space</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageContinuous.contains"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous.contains">[docs]</a>    <span class="k">def</span> <span class="nf">contains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return boolean specifying if x is a valid</span>
+<span class="sd">        member of this space</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span> <span class="c1">#TODO compare each pixel for all possible images?</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ImageContinuous.to_jsonable"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous.to_jsonable">[docs]</a>    <span class="k">def</span> <span class="nf">to_jsonable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert a batch of samples from this space to a JSONable data type.&quot;&quot;&quot;</span>
+        <span class="c1"># By default, assume identity is JSONable</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="ImageContinuous.from_jsonable"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.spaces.image_continuous.ImageContinuous.html#mdp_playground.spaces.image_continuous.ImageContinuous.from_jsonable">[docs]</a>    <span class="k">def</span> <span class="nf">from_jsonable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sample_n</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert a JSONable data type to a batch of samples from this space.&quot;&quot;&quot;</span>
+        <span class="c1"># By default, assume identity is JSONable</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+</pre></div>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By MDP Playground developers<br/>
+        
+            &copy; Copyright 2021, MDP Playground developers.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
