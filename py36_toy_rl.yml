@@ -275,7 +275,7 @@ dependencies:
     - funcsigs==1.0.2
     - future==0.17.1
     - gast==0.2.2
-    - gcc7==0.0.2
+    - gcc7==0.0.7
     - geomloss==0.2.3
     - google-pasta==0.1.7
     - gputil==1.4.0

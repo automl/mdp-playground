@@ -18,7 +18,7 @@ extras_require = [
     'pandas==0.25.0',
     'requests==2.22.0',
     'configspace==0.4.10',
-    'scipy==1.3.0',
+    'scipy>=1.3.0',
     'pandas==0.25.0',
 ]
 
@@ -86,7 +86,7 @@ setup(
     ],
     # package_dir={"": "src"},
     python_requires=">=3.6",
-    install_requires=['gym<=0.14', 'dill'],
+    install_requires=['gym<=0.14', 'dill', 'numpy'],
     extras_require={
       'extras': extras_require,
       'extras_disc': extras_require_disc,
