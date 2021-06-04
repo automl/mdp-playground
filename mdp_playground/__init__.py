@@ -1,7 +1,5 @@
 from gym.envs.registration import register
 
-import mdp_playground.scripts.run_experiments
-
 register(
     id='RLToy-v0',
     entry_point='mdp_playground.envs:RLToyEnv',
