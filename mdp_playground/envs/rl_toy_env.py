@@ -10,6 +10,7 @@ from datetime import datetime
 import numpy as np
 import scipy
 from scipy import stats
+from scipy.spatial import distance
 import gym
 from mdp_playground.spaces import BoxExtended, DiscreteExtended, TupleExtended,\
         ImageMultiDiscrete, ImageContinuous
@@ -24,6 +25,8 @@ class RLToyEnv(gym.Env):
     Instead of implementing a new class for every type of MDP, the intent is to capture as many common dimensions across different types of environments as possible and to be able to control the difficulty of an environment by allowing fine-grained control over each of these dimensions. The focus is to be as flexible as possible.
 
     The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated environment will emulate. We recommend looking at the examples in example.py to begin using the environment since the dimensions and config options are mostly self-explanatory. If you want to specify custom MDPs, please see the use_custom_mdp config option below. For more details, we list here the dimensions and config options (their names here correspond to the keys to be passed in the config dict):
+        state_space_type : str
+            Specifies what the environment type is. Options are "continuous", "discrete" and "grid". The "grid" environment is, basically, a discretised version of the continuous environment.
         delay : int >= 0
             Delays each reward by this number of timesteps.
         sequence_length : int >= 1
@@ -46,14 +49,26 @@ class RLToyEnv(gym.Env):
             For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states when we consider them to be ordered by their numerical value. This is w.l.o.g. because discrete states are categorical. For continuous environments, please see terminal_states and term_state_edge for how to control terminal states.
         term_state_reward : float
             Adds this to the reward if a terminal state was reached at the current time step.
+        image_representations : boolean
+            Boolean to associate an image as the external observation with every discrete categorical state.
+            For discrete envs, this is handled by an mdp_playground.spaces.ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n. More details can be found in the documentation for the ImageMultiDiscrete class.
+            For continuous and grid envs, this is handled by an mdp_playground.spaces.ImageContinuous object. More details can be found in the documentation for the ImageContinuous class.
         irrelevant_features : boolean
-            If True, an additional irrelevant sub-space (irrelevant to achieving rewards) is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space. For discrete environments, additionally, state_space_size must be specified as a list. For continuous environments, the option relevant_indices must be specified. This option specifies the dimensions relevant to achieving rewards.
+            If True, an additional irrelevant sub-space (irrelevant to achieving rewards) is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space.
+            For discrete environments, additionally, state_space_size must be specified as a list.
+            For continuous environments, the option relevant_indices must be specified. This option specifies the dimensions relevant to achieving rewards.
+            For grid environments, nothing additional needs to be done as relevant grid shape is also used as the irrelevant grid shape.
         use_custom_mdp : boolean
             If true, users specify their own transition and reward functions using the config options transition_function and reward_function (see below). Optionally, they can also use init_state_dist and terminal_states for discrete spaces (see below).
         transition_function : Python function(state, action) or a 2-D numpy.ndarray
             A Python function emulating P(s, a). For discrete envs it's also possible to specify an |S|x|A| transition matrix.
         reward_function : Python function(state_sequence, action_sequence) or a 2-D numpy.ndarray
-            A Python function emulating R(state_sequence, action_sequence). The state_sequence is recorded by the environment and transition_function is called before reward_function, so the "current" state (when step() was called) and next state are the last 2 states in the sequence. For discrete environments, it's also possible to specify an |S|x|A| transition matrix where reward is assumed to be a function over the "current" state and action. If use_custom_mdp = false and the environment is continuous, this is a string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
+            A Python function emulating R(state_sequence, action_sequence). The state_sequence is recorded by the environment and transition_function is called before reward_function, so the "current" state (when step() was called) and next state are the last 2 states in the sequence.
+            For discrete environments, it's also possible to specify an |S|x|A| transition matrix where reward is assumed to be a function over the "current" state and action.
+            If use_custom_mdp = false and the environment is continuous, this is a string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
+            If use_custom_mdp = false and the environment is grid, this is a string that chooses one of the following predefined reward functions: move_to_a_point. Support for sequences is planned.
+
+            Also see make_denser documentation.
 
 
         Specific to discrete environments:
@@ -69,10 +84,8 @@ class RLToyEnv(gym.Env):
                 Specifies an array of initialisation probabilities for the discrete state space.
             terminal_states : Python function(state) or 1-D numpy.ndarray
                 A Python function with the state as argument that returns whether the state is terminal. If this is specified as an array, the array lists the discrete states that are terminal.
-            image_representations : boolean
-                Boolean to associate an image as the external observation with every discrete categorical state. This is handled by an mdp_playground.spaces.ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n. More details can be found in the documentation for the ImageMultiDiscrete class.
 
-            Specific to image_representations:
+            Specific to image_representations for discrete envs:
                 image_transforms : str
                     String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever an observation is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.
                 sh_quant : int
@@ -108,6 +121,14 @@ class RLToyEnv(gym.Env):
             action_loss_weight : float
                 A coefficient to multiply the norm of the action and subtract it from the reward to penalise the action magnitude.
 
+        Specific to grid environments:
+            grid_shape : tuple
+                Shape of the grid environment. If irrelevant_features is True, this is replicated to add a grid which is irrelevant to the reward.
+            target_point : numpy.ndarray
+                The target point in case move_to_a_point is the reward_function. If make_denser is false, reward is only handed out when the target point is reached.
+            terminal_states : Python function(state) or 1-D numpy.ndarray
+                Same description as for terminal_states under discrete envs
+
     Other important config:
         Specific to discrete environments:
             repeats_in_sequences : boolean
@@ -115,16 +136,19 @@ class RLToyEnv(gym.Env):
             maximally_connected : boolean
                 If true, sets the transition function such that every state in independent set i can transition to every state in independent set i + 1. If false, then sets the transition function such that a state in independent set i may have any state in independent set i + 1 as the next state for a transition.
             reward_every_n_steps : boolean
-                Hand out rewards only at multiples of sequence_length steps. This makes the probability that an agent is executing overlapping rewarding sequences 0. This makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either the make_denser = true case or for continuous environments.
+                Hand out rewards only at multiples of sequence_length steps. This makes the probability that an agent is executing overlapping rewarding sequences 0. This makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either the make_denser = true case or for continuous and grid environments.
             generate_random_mdp : boolean
                 If true, automatically generate MDPs when use_custom_mdp = false. Currently, this option doesn't need to be specified because random MDPs are always generated when use_custom_mdp = false.
 
         Specific to continuous environments:
             none as of now
 
-        For both, continuous and discrete environments:
+        For all, continuous, discrete and grid environments:
         make_denser : boolean
-            If true, makes the reward denser in environments. For discrete environments, hands out a partial reward for completing partial sequences. For continuous environments, for reward function move_to_a_point, the base reward handed out is equal to the distance moved towards the target point in the current timestep.
+            If true, makes the reward denser in environments.
+            For discrete environments, hands out a partial reward for completing partial sequences.
+            For continuous environments, for reward function move_to_a_point, the base reward handed out is equal to the distance moved towards the target point in the current timestep.
+            For grid envs, the base reward handed out is equal to the Manhattan distance moved towards the target point in the current timestep.
         seed : int or dict
             Recommended to be passed as an int which generates seeds to be used for the various components of the environment. It is, however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for seeds below to see how to do that.
         log_filename : str
@@ -192,13 +216,11 @@ class RLToyEnv(gym.Env):
 
             # Discrete spaces configs:
             config["state_space_type"] = "discrete" # TODO if states are assumed categorical in discrete setting, need to have an embedding for their OHE when using NNs; do the encoding on the training end!
-            config["action_space_type"] = "discrete"
             config["state_space_size"] = 8 # To be given as an integer for simple Discrete environment like Gym's. To be given as a list of integers for a MultiDiscrete environment like Gym's #TODO Rename state_space_size and action_space_size to be relevant_... wherever irrelevant dimensions are not used.
             config["action_space_size"] = 8
 
             # Continuous spaces configs:
             # config["state_space_type"] = "continuous"
-            # config["action_space_type"] = "continuous"
             # config["state_space_dim"] = 2
             # config["action_space_dim"] = 2
             # config["transition_dynamics_order"] = 1
@@ -302,6 +324,8 @@ class RLToyEnv(gym.Env):
         self.logger.warning('Seeds set to:' + str(self.seed_dict))
         # print(f'Seeds set to {self.seed_dict=}') # Available from Python 3.8
 
+        config["state_space_type"] = config["state_space_type"].lower()
+
         #defaults ###TODO throw warning in case unknown config option is passed
         if "use_custom_mdp" not in config:
             self.use_custom_mdp = False
@@ -391,8 +415,8 @@ class RLToyEnv(gym.Env):
         else:
             self.image_representations = config["image_representations"]
             if "image_transforms" in config:
-                assert config["state_space_type"].lower() == "discrete", "Image\
-                        transforms are only applicable to discrete envs."
+                assert config["state_space_type"] == "discrete", "Image "\
+                        "transforms are only applicable to discrete envs."
                 self.image_transforms = config["image_transforms"]
             else:
                 self.image_transforms = "none"
@@ -450,7 +474,7 @@ class RLToyEnv(gym.Env):
             else:
                 self.diameter = config["diameter"]
 
-        else: # cont. spaces
+        elif config["state_space_type"] == "continuous":
             # if not self.use_custom_mdp:
             self.state_space_dim = config["state_space_dim"]
 
@@ -474,6 +498,13 @@ class RLToyEnv(gym.Env):
             else:
                 self.target_radius = config["target_radius"]
 
+        elif config["state_space_type"] == "grid":
+            assert "grid_shape" in config
+            self.grid_shape = config["grid_shape"]
+        else:
+            raise ValueError("Unknown state_space_type")
+
+
 
         if "action_loss_weight" not in config:
             self.action_loss_weight = 0.0
@@ -493,10 +524,6 @@ class RLToyEnv(gym.Env):
 
         self.dtype = np.float32 if "dtype" not in config else config["dtype"]
 
-        #TODO Make below code more compact by reusing parts for state and action spaces?
-        config["state_space_type"] = config["state_space_type"].lower()
-        config["action_space_type"] = config["state_space_type"]
-        # config["action_space_type"] = config["action_space_type"].lower()
 
         if config["state_space_type"] == "discrete":
             if self.irrelevant_features:
@@ -511,7 +538,7 @@ class RLToyEnv(gym.Env):
             else:
                 self.state_space_size = np.array(self.action_space_size) * np.array(self.diameter)
                 # assert (np.array(self.state_space_size) % np.array(self.diameter) == 0).all(), "state_space_size should be a multiple of the diameter to allow for the generation of regularly connected MDPs."
-        else: # cont. space
+        elif config["state_space_type"] == "continuous":
             self.action_space_dim = self.state_space_dim
             if self.irrelevant_features:
                 assert "relevant_indices" in config, "Please provide dimensions\
@@ -519,12 +546,18 @@ class RLToyEnv(gym.Env):
             if "relevant_indices" not in config:
                 config["relevant_indices"] = range(self.state_space_dim)
             # config["irrelevant_indices"] = list(set(range(len(config["state_space_dim"]))) - set(config["relevant_indices"]))
+        elif config["state_space_type"] == "grid":
+            # Repeat the grid for the irrelevant part as well
+            if self.irrelevant_features:
+                self.grid_shape = self.grid_shape * 2
+
+
+
 
         if ("init_state_dist" in config) and ("relevant_init_state_dist" not in config):
             config["relevant_init_state_dist"] = config["init_state_dist"]
 
 
-        # assert config["action_space_type"] == config["state_space_type"], 'config["state_space_type"] != config["action_space_type"]. Currently mixed space types are not supported.'
         assert self.sequence_length > 0, "config[\"sequence_length\"] <= 0. Set to: " + str(self.sequence_length) # also should be int
         if "maximally_connected" in config and config["maximally_connected"]: ###TODO remove
             pass
@@ -534,8 +567,12 @@ class RLToyEnv(gym.Env):
         if config["state_space_type"] == 'continuous':
             # assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
             if config["reward_function"] == "move_to_a_point":
+                assert self.sequence_length == 1
                 self.target_point = np.array(config["target_point"], dtype=self.dtype)
                 assert self.target_point.shape == (len(config["relevant_indices"]),), "target_point should have dimensionality = relevant_state_space dimensionality"
+        elif config["state_space_type"] == "grid":
+            if config["reward_function"] == "move_to_a_point":
+                self.target_point = config["target_point"]
 
         self.config = config
         self.augmented_state_length = self.sequence_length + self.delay + 1
@@ -577,7 +614,7 @@ class RLToyEnv(gym.Env):
                     self.action_space = self.action_spaces[0]
 
 
-        else: # cont. spaces
+        elif config["state_space_type"] == 'continuous':
             self.state_space_max = config["state_space_max"] \
                     if 'state_space_max' in config else np.inf # should we
                     # select a random max? #test?
@@ -593,7 +630,7 @@ class RLToyEnv(gym.Env):
             # num_to_list(config["action_space_max"]) * config["action_space_dim"]
             self.action_space = BoxExtended(-self.action_space_max,\
                     self.action_space_max, shape=(self.action_space_dim,),\
-                    seed=self.seed_dict["action_space"], dtype=self.dtype) #seed
+                    seed=self.seed_dict["action_space"], dtype=self.dtype) # #seed
                     # hack #TODO
 
 
@@ -601,9 +638,35 @@ class RLToyEnv(gym.Env):
                 self.observation_space = ImageContinuous(self.feature_space,\
                     width=self.image_width, height=self.image_height, \
                     term_spaces=self.term_spaces, target_point=self.target_point,\
-                    circle_radius=5, seed=self.seed_dict["image_representations"]) #seed
+                    circle_radius=5, seed=self.seed_dict["image_representations"]) # #seed
             else:
                 self.observation_space = self.feature_space
+
+        elif config["state_space_type"] == "grid":
+            underlying_space_maxes = list_to_float_np_array(self.grid_shape)
+
+
+            # The min for grid envs is 0, 0, 0, ...
+            self.feature_space = BoxExtended(0 * underlying_space_maxes,\
+                    underlying_space_maxes,\
+                    seed=self.seed_dict["state_space"], dtype=self.dtype) # #seed
+
+            lows = np.array([-1] * len(self.grid_shape))
+            highs = np.array([1] * len(self.grid_shape))
+            self.action_space = BoxExtended(lows, highs, seed=self.seed_dict["action_space"],\
+                                    dtype=np.int64) # #seed
+
+
+            if self.image_representations:
+                target_pt = list_to_float_np_array(self.target_point)
+                self.observation_space = ImageContinuous(self.feature_space,\
+                    width=self.image_width, height=self.image_height, \
+                    term_spaces=self.term_spaces, target_point=target_pt,\
+                    circle_radius=5, grid_shape=self.grid_shape,\
+                    seed=self.seed_dict["image_representations"]) # #seed
+            else:
+                self.observation_space = self.feature_space
+
 
 
         # if config["action_space_type"] == "discrete":
@@ -615,6 +678,7 @@ class RLToyEnv(gym.Env):
             # else:
         ##TODO Support imaginary rollouts for continuous envs. and user-defined P and R? Will do it depending on demand for it. In fact, for imagined rollouts, let our code handle storing augmented_state, curr_state, etc. in separate variables, so that it's easy for user to perform imagined rollouts instead of having to maintain their own state and action sequences.
         #TODO Generate state and action space sizes also randomly?
+
         ###IMP The order in which the following inits are called is important, so don't change!!
         self.init_init_state_dist() #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; After looking into Gym code, I can say that for continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (and is done for the defined limits for the respective dimension).
         self.init_transition_function()
@@ -645,7 +709,7 @@ class RLToyEnv(gym.Env):
                 self.logger.warning("Inited terminal states to self.config['terminal_states']: " + str(self.config["terminal_states"]) + ". Total " + str(self.num_terminal_states))
                 self.is_terminal_state = lambda s: s in self.config["terminal_states"]
 
-        else: # if continuous space
+        elif self.config["state_space_type"] == "continuous":
             # print("# TODO for cont. spaces: term states")
             self.term_spaces = []
 
@@ -665,6 +729,33 @@ class RLToyEnv(gym.Env):
 
             else: # no custom/user-defined terminal states
                 self.is_terminal_state = lambda s: False
+
+        elif self.config["state_space_type"] == "grid":
+            self.term_spaces = []
+
+            if 'terminal_states' in self.config:
+                if callable(self.config["terminal_states"]):
+                    self.is_terminal_state = self.config["terminal_states"]
+                else:
+                    for i in range(len(self.config["terminal_states"])): # List of
+                    # terminal states on the grid
+                        term_state = list_to_float_np_array(self.config["terminal_states"][i])
+                        lows = term_state
+                        highs = term_state # #hardcoded
+                        self.term_spaces.append(BoxExtended(low=lows, high=highs,\
+                            seed=self.seed_, dtype=np.int64)) #seed #hack #TODO
+
+                    def is_term(s):
+                        cont_state = list_to_float_np_array(s)
+                        return np.any([self.term_spaces[i].contains(cont_state) \
+                            for i in range(len(self.term_spaces))])
+
+
+                    self.is_terminal_state = is_term
+
+            else: # no custom/user-defined terminal states
+                self.is_terminal_state = lambda s: False
+
 
     def init_init_state_dist(self):
         """Initialises initial state distrbution, rho_0, to be uniform over the non-terminal states for discrete environments. For both discrete and continuous environments, the uniform sampling over non-terminal states is taken care of in reset() when setting the initial state for an episode.
@@ -690,7 +781,7 @@ class RLToyEnv(gym.Env):
                     self.config["irrelevant_init_state_dist"] = np.array(self.config["irrelevant_init_state_dist"])
                     self.logger.warning("self.irrelevant_init_state_dist:" + str(self.config["irrelevant_init_state_dist"]))
 
-        else: # if continuous space
+        else: # if continuous or grid space
             pass # this is handled in reset where we resample if we sample a term. state
 
 
@@ -801,7 +892,7 @@ class RLToyEnv(gym.Env):
                 self.config["transition_function"] = lambda s, a: self.transition_matrix[s, a]
                 print("transition_matrix inited to:\n" + str(self.transition_matrix) + "\nPython type of state: " + str(type(self.config["transition_function"](0, 0)))) # The Python type of the state can lead to hard to catch bugs
 
-        else: # if continuous space
+        else: # if continuous or grid space
             # self.logger.debug("# TODO for cont. spaces") # transition function is a fixed parameterisation for cont. envs. right now.
             pass
 
@@ -850,7 +941,7 @@ class RLToyEnv(gym.Env):
                             warnings.warn('0 rewardable sequences per independent set for given reward_density, sequence_length, diameter and terminal_state_density. Setting it to 1.')
                         sel_sequence_nums = self.np_random.choice(num_possible_sequences, size=num_sel_sequences, replace=False) #random # This assumes that all sequences have an equal likelihood of being selected for being a reward sequence; This line also makes it not possible to have this function be portable as part of a library because it use the np_random member variable of this class
                         for i_s in range(diameter): # Allow sequences to begin in any of the independent sets and therefore this loop is over the no. of independent sets(= diameter)
-                            for i in range(num_rewardable_sequences):
+                            for i in range(num_sel_sequences):
                                 curr_sequence_num = sel_sequence_nums[i]
                                 specific_sequence = []
                                 while len(specific_sequence) != length:
@@ -954,9 +1045,11 @@ class RLToyEnv(gym.Env):
                 #     pass
 
                 print("rewardable_sequences: " + str(self.rewardable_sequences)) #debug print
-        else: # if continuous space
+        elif self.config["state_space_type"] == "continuous":
             # self.logger.debug("# TODO for cont. spaces?: init_reward_function") # reward functions are fixed for cont. right now with a few available choices.
             pass
+        elif self.config["state_space_type"] == "grid":
+            ... # ###TODO Make sequences compatible with grid
 
         self.R = lambda s, a: self.reward_function(s, a)
 
@@ -995,7 +1088,7 @@ class RLToyEnv(gym.Env):
                 next_state = new_next_state
                 # assert np.sum(probs) == 1, str(np.sum(probs)) + " is not equal to " + str(1)
 
-        else: # if continuous space
+        elif self.config["state_space_type"] == "continuous":
             ##TODO implement imagined transitions also for cont. spaces
             if self.use_custom_mdp:
                 next_state = self.config["transition_function"](state, action)
@@ -1039,6 +1132,49 @@ class RLToyEnv(gym.Env):
             if self.config["reward_function"] == "move_to_a_point":
                 if np.linalg.norm(np.array(next_state, dtype=self.dtype)[self.config["relevant_indices"]] - self.target_point) < self.target_radius:
                     self.reached_terminal = True
+
+        elif self.config["state_space_type"] == "grid":
+            # state passed and returned is an np.array
+            # Need to check that dtype is int because Gym doesn't
+            if self.action_space.contains(action) and \
+                            np.array(action).dtype == np.int64:
+                if self.transition_noise:
+                    # self.np_random.choice only works for 1-D arrays
+                    if self.np_random.uniform() < self.transition_noise: # #random
+                        while True: # Be careful of infinite loops
+                            new_action = list(self.action_space.sample()) # #random
+                            if new_action != action:
+                                self.logger.info("NOISE inserted! old action, new_action" +\
+                                        str(action) + str(new_action))
+                                # print(str(action) + str(new_action))
+                                self.total_noisy_transitions_episode += 1
+                                action = new_action
+                                break
+
+                next_state = []
+                for i in range(len(self.grid_shape)):
+                    # actions -1, 0, 1 represent back, noop, forward respt.
+                    next_state.append(state[i] + action[i])
+                    if next_state[i] < 0:
+                        self.logger.info("Underflow in grid next state. Bouncing back.")
+                        next_state[i] = 0
+
+                    if next_state[i] >= self.grid_shape[i]:
+                        self.logger.info("Overflow in grid next state. Bouncing back.")
+                        next_state[i] = self.grid_shape[i] - 1
+
+            else: # if action is from outside allowed action_space
+                next_state = list(state)
+                warnings.warn("WARNING: Action " + str(action) + " out of range"\
+                " of action space. Applying noop action!!")
+
+
+            if self.config["reward_function"] == "move_to_a_point":
+                if self.target_point == next_state:
+                    self.reached_terminal = True
+
+            next_state = np.array(next_state)
+
 
         return next_state
 
@@ -1100,8 +1236,8 @@ class RLToyEnv(gym.Env):
 
                     self.logger.info("rew" + str(reward))
 
-        else: # if continuous space
-            ###TODO Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0. Since the principal component is always taken to be the direction of travel, this would mean a larger distance covered in that direction and hence would lead to +ve reward always and would mean larger random actions give a larger reward! Should penalise actions in proportion that scale then?
+        elif self.config["state_space_type"] == "continuous":
+            ##TODO Make reward for along a line case to be length of line travelled - sqrt(Sum of Squared distances from the line)? This should help with keeping the mean reward near 0. Since the principal component is always taken to be the direction of travel, this would mean a larger distance covered in that direction and hence would lead to +ve reward always and would mean larger random actions give a larger reward! Should penalise actions in proportion that scale then?
             if np.isnan(state_considered[0][0]): # Instead of below commented out check, this is more robust for imaginary transitions
             # if self.total_transitions_episode + 1 < self.augmented_state_length: # + 1 because augmented_state_length is always 1 greater than seq_len + del
                 pass #TODO
@@ -1124,7 +1260,6 @@ class RLToyEnv(gym.Env):
                     reward += ( - total_deviation / self.sequence_length )
 
                 elif self.config["reward_function"] == "move_to_a_point": # Could generate target points randomly but leaving it to the user to do that. #TODO Generate it randomly to have random Rs?
-                    assert self.sequence_length == 1
                     if self.make_denser == True:
                         old_relevant_state = np.array(state_considered, dtype=self.dtype)[-2 - delay, self.config["relevant_indices"]]
                         new_relevant_state = np.array(state_considered, dtype=self.dtype)[-1 - delay, self.config["relevant_indices"]]
@@ -1134,12 +1269,30 @@ class RLToyEnv(gym.Env):
                         # It's true that giving the total -ve distance from target as the loss at every step gives a stronger signal to algorithm to make it move faster towards target but this seems more natural (as in the other case loss/reward go up quadratically with distance from target point while in this case it's linear). The value function is in both cases higher for states further from target. But isn't that okay? Since the greater the challenge (i.e. distance from target), the greater is the achieved overall reward at the end.
                         #TODO To enable seq_len, we can hand out reward if distance to target point is reduced (or increased - since that also gives a better signal than giving 0 in that case!!) for seq_len consecutive steps, otherwise 0 reward - however we need to hand out fixed reward for every "sequence" achieved otherwise, if we do it by adding the distance moved towards target in the sequence, it leads to much bigger rewards for larger seq_lens because of overlapping consecutive sequences.
                         # TODO also make_denser, sparse rewards only at target
-                    else:
+                    else: # sparse reward
                         new_relevant_state = np.array(state_considered, dtype=self.dtype)[-1 - delay, self.config["relevant_indices"]]
                         if np.linalg.norm(new_relevant_state - self.target_point) < self.target_radius:
                             reward = 1.0 # Make the episode terminate as well? Don't need to. If algorithm is smart enough, it will stay in the radius and earn more reward.
 
                     reward -= self.action_loss_weight * np.linalg.norm(np.array(action, dtype=self.dtype))
+
+        elif self.config["state_space_type"] == "grid":
+            if self.config["reward_function"] == "move_to_a_point":
+                if self.make_denser == True:
+                    old_relevant_state = np.array(state_considered)[-2 - delay]
+                    new_relevant_state = np.array(state_considered)[-1 - delay]
+
+                    manhat_dist_old = distance.cityblock(old_relevant_state,\
+                                            np.array(self.target_point))
+                    manhat_dist_new = distance.cityblock(new_relevant_state,\
+                                            np.array(self.target_point))
+
+                    reward += manhat_dist_old - manhat_dist_new
+
+                else: # sparse reward
+                    new_relevant_state = np.array(state_considered)[-1 - delay]
+                    if list(new_relevant_state) == self.target_point:
+                        reward += 1.0
 
         reward *= self.reward_scale
         noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0 #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
@@ -1182,7 +1335,7 @@ class RLToyEnv(gym.Env):
                 state, action, state_irrelevant, action_irrelevant = self.curr_state[0], action[0], self.curr_state[1], action[1],
             else:
                 state, action = self.curr_state, action
-        else: # cont. case
+        else: # cont. or grid case
             state, action = self.curr_state, action
 
 
@@ -1195,7 +1348,13 @@ class RLToyEnv(gym.Env):
         #     # print("imaginary_rollout") # Since transition_function currently depends only on current state and action, we don't need to do anything here!
         # else:
         del self.augmented_state[0]
-        self.augmented_state.append(next_state.copy() if isinstance(next_state, np.ndarray) else next_state)
+        if self.config["state_space_type"] == "discrete":
+            self.augmented_state.append(next_state)
+        elif self.config["state_space_type"] == "continuous":
+            self.augmented_state.append(next_state.copy())
+        elif self.config["state_space_type"] == "grid":
+            self.augmented_state.append([next_state[i] for i in range(2)])
+
         self.total_transitions_episode += 1
 
         self.reward = self.R(self.augmented_state, action)
@@ -1220,7 +1379,7 @@ class RLToyEnv(gym.Env):
                 next_obs = next_state = (next_state, next_state_irrelevant)
             else:
                 next_obs = next_state
-        else: # cont. space
+        else: # cont. or grid space
             next_obs = next_state
 
         if self.image_representations:
@@ -1234,6 +1393,7 @@ class RLToyEnv(gym.Env):
         if self.done:
             self.reward += self.term_state_reward * self.reward_scale # Scale before or after?
         self.logger.info('sas\'r:   ' + str(self.augmented_state[-2]) + '   ' + str(action) + '   ' + str(self.augmented_state[-1]) + '   ' + str(self.reward))
+
         return self.curr_obs, self.reward, self.done, self.get_augmented_state()
 
     def get_augmented_state(self):
@@ -1248,8 +1408,13 @@ class RLToyEnv(gym.Env):
         '''
         if self.config["state_space_type"] == "discrete":
             augmented_state_dict = {"curr_state": self.curr_state, "curr_obs": self.curr_obs, "augmented_state": self.augmented_state}
-        else:
+        elif self.config["state_space_type"] == "continuous":
             augmented_state_dict = {"curr_state": self.curr_state, "curr_obs": self.curr_obs, "augmented_state": self.augmented_state, "state_derivatives": self.state_derivatives}
+        elif self.config["state_space_type"] == "grid":
+            augmented_state_dict = {"curr_state": self.curr_state, \
+                                    "curr_obs": self.curr_obs, \
+                                    "augmented_state": self.augmented_state}
+
         return augmented_state_dict
 
 
@@ -1283,16 +1448,19 @@ class RLToyEnv(gym.Env):
             self.augmented_state = [np.nan for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state_relevant)
             # self.augmented_state = np.array(self.augmented_state) # Do NOT make an np.array out of it because we want to test existence of the array in an array of arrays which is not possible with np.array!
-        else: # if continuous space
-            self.logger.debug("#TODO for cont. spaces: reset")
+        elif self.config["state_space_type"] == "continuous":
+            # self.logger.debug("#TODO for cont. spaces: reset")
             while True: # Be careful about infinite loops
                 term_space_was_sampled = False
                 self.curr_state = self.feature_space.sample() #random
-                for i in range(len(self.term_spaces)): # Could this sampling be made more efficient? In general, the non-terminal space could have any shape and assiging equal sampling probability to each point in this space is pretty hard.
-                    if self.is_terminal_state(self.curr_state):
-                        self.logger.info("A state was sampled in term state subspace. Therefore, resampling. State was, subspace was:" + str(self.curr_state) + str(i)) ##TODO Move this logic into a new class in Gym spaces that can contain subspaces for term states! (with warning/error if term subspaces cover whole state space, or even a lot of it)
-                        term_space_was_sampled = True
-                        break
+                if self.is_terminal_state(self.curr_state):
+                    j = None
+                    for i in range(len(self.term_spaces)): # Could this sampling be made more efficient? In general, the non-terminal space could have any shape and assiging equal sampling probability to each point in this space is pretty hard.
+                        if self.term_spaces[i].contains(self.curr_state):
+                            j = i
+                    self.logger.info("A state was sampled in term state subspace. Therefore, resampling. State was, subspace was:" + str(self.curr_state) + str(j)) ##TODO Move this logic into a new class in Gym spaces that can contain subspaces for term states! (with warning/error if term subspaces cover whole state space, or even a lot of it)
+                    term_space_was_sampled = True
+                    # break
                 if not term_space_was_sampled:
                     break
 
@@ -1304,6 +1472,26 @@ class RLToyEnv(gym.Env):
 
             self.augmented_state = [[np.nan] * self.state_space_dim for i in range(self.augmented_state_length - 1)]
             self.augmented_state.append(self.curr_state.copy())
+
+        elif self.config["state_space_type"] == "grid":
+            # Need to set self.curr_state, self.augmented_state
+            while True: # Be careful about infinite loops
+                term_space_was_sampled = False
+                # curr_state is an np.array while curr_state_relevant is a list
+                self.curr_state = self.feature_space.sample().astype(int) # #random
+                self.curr_state_relevant = list(self.curr_state[[0, 1]]) # #hardcoded
+                if self.is_terminal_state(self.curr_state_relevant):
+                    self.logger.info("A terminal state was sampled. Therefore,"\
+                    " resampling. State was:" + str(self.curr_state))
+                    term_space_was_sampled = True
+                    break
+                if not term_space_was_sampled:
+                    break
+
+            self.augmented_state = [np.nan for i in range(\
+                                        self.augmented_state_length - 1)]
+            self.augmented_state.append(self.curr_state_relevant)
+
 
 
         if self.image_representations:
@@ -1367,6 +1555,12 @@ def dist_of_pt_from_line(pt, ptA, ptB):
     #     print('pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist:', pt, ptA, ptB, lineAB, lineApt, dot_product, proj, dist)
         return dist
 
+def list_to_float_np_array(lis):
+    '''Converts list to numpy float array
+    '''
+    return np.array(list(float(i) for i in lis))
+
+
 if __name__ == "__main__":
 
     config = {}
@@ -1374,7 +1568,6 @@ if __name__ == "__main__":
 
     # Simple discrete environment usage example
     # config["state_space_type"] = "discrete"
-    # config["action_space_type"] = "discrete"
     # config["state_space_size"] = 6
     # config["action_space_size"] = 6
     # config["reward_density"] = 0.25 # Number between 0 and 1
@@ -1390,7 +1583,6 @@ if __name__ == "__main__":
 
     # Simple continuous environment usage example
     # config["state_space_type"] = "continuous"
-    # config["action_space_type"] = "continuous"
     # config["state_space_dim"] = 2
     # config["action_space_dim"] = 2
     # config["transition_dynamics_order"] = 1

@@ -19,7 +19,7 @@ class ImageContinuous(Box):
 
     def __init__(self, feature_space, term_spaces=None, width=100, height=100,\
                 circle_radius=5, target_point=None, relevant_indices=[0,1],\
-                seed=None, use_custom_images=None, cust_path=None, dtype=np.uint8):
+                seed=None, grid_shape=None, dtype=np.uint8):
         '''
         Parameters
         ----------
@@ -37,6 +37,8 @@ class ImageContinuous(Box):
         target_point : np.array
 
         relevant_indices : list
+
+        grid_shape : tuple of length 2
 
         seed : int
             Seed for this space
@@ -58,10 +60,20 @@ class ImageContinuous(Box):
             self.irrelevant_features = False
         else:
             self.irrelevant_features = True
+        if grid_shape is not None:
+            self.draw_grid = True
+            assert type(grid_shape == tuple) and \
+                        (len(grid_shape) == 2 or len(grid_shape) == 4)
+            # Could also assert that self.width is divisible by grid_shape[0], etc.
+            self.grid_shape = grid_shape
+        else:
+            self.draw_grid = False
 
         self.goal_colour = (0, 255, 0)
         self.agent_colour = (0, 0, 255)
-        self.term_colour = (0, 0, 0)
+        self.term_colour = (255, 0, 0)
+        self.bg_colour = (0, 0, 0)
+        self.line_colour = (255, 255, 255)
 
         assert len(feature_space.shape) == 1
         relevant_dims = len(relevant_indices)
@@ -77,6 +89,8 @@ class ImageContinuous(Box):
         super(ImageContinuous, self).seed(seed=seed)
 
         if self.target_point is not None:
+            if self.draw_grid:
+                target_point += 0.5
             self.target_point_pixel = self.convert_to_pixel(target_point)
 
 
@@ -88,17 +102,44 @@ class ImageContinuous(Box):
 
         '''
         # Use RGB
-        image_ = Image.new("RGB", (self.width, self.height), color=(255,255,255))
+        image_ = Image.new("RGB", (self.width, self.height), color=self.bg_colour)
         # Use L for black and white 8-bit pixels instead of RGB in case not
         # using custom images
         # image_ = Image.new("L", (self.width, self.height))
         draw = ImageDraw.Draw(image_)
 
-        # Draw term_spaces first, so that others are drawn over it
+        # Draw in decreasing order of importance:
+        # grid lines, term_spaces, etc. first, so that others are drawn over them
+        if self.draw_grid:
+            position = position.astype(float)
+            position += 0.5
+            offset = 0 if relevant else 2
+            for i in range(1, self.grid_shape[0 + offset] + 1): # +1 because this is along
+            # concatentation dimension when stitching together images below in
+            # get_concatenated_image
+                x_ = i * self.width // self.grid_shape[0 + offset] - 1 # -1 to not go outside
+                # image size for the last line drawn
+                y_ = self.height
+                start_pt = (x_, y_)
+                y_ = 0
+                end_pt = (x_, y_)
+                draw.line([start_pt, end_pt], fill=self.line_colour)
+
+            for j in range(1, self.grid_shape[1 + offset]):
+                x_ = self.width
+                y_ = j * self.height // self.grid_shape[0 + offset]
+                start_pt = (x_, y_)
+                x_ = 0
+                end_pt = (x_, y_)
+                draw.line([start_pt, end_pt], fill=self.line_colour)
+
         if self.term_spaces is not None and relevant:
             for term_space in self.term_spaces:
                 low = self.convert_to_pixel(term_space.low)
-                high = self.convert_to_pixel(term_space.high)
+                if self.draw_grid:
+                    high = self.convert_to_pixel(term_space.high + 1.)
+                else:
+                    high = self.convert_to_pixel(term_space.high)
 
                 leftUpPoint = tuple((low))
                 rightDownPoint = tuple((high))

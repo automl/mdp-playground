@@ -4,6 +4,7 @@ from mdp_playground.spaces.image_continuous import ImageContinuous
 from gym.spaces import Box
 # import PIL.ImageDraw as ImageDraw
 import PIL.Image as Image
+# import PIL.ImageOps as ImageOps
 
 
 class TestImageContinuous(unittest.TestCase):
@@ -14,15 +15,18 @@ class TestImageContinuous(unittest.TestCase):
         cs2 = Box(shape=(2,), low=lows, high=highs,)
         cs4 = Box(shape=(4,), low=lows, high=highs,)
 
-        imc = ImageContinuous(cs2, width=400, height=400,)
+        imc = ImageContinuous(cs2, width=100, height=100,)
         pos = np.array([5.0, 7.0])
         img1 = Image.fromarray(np.squeeze(imc.generate_image(pos)), 'RGB')
+        # img1 = ImageOps.invert(img1)
         img1.show()
+        # img1.save("cont_state_no_target.pdf")
 
         target = np.array([10, 10])
-        imc = ImageContinuous(cs2, target_point=target, width=400, height=400,)
+        imc = ImageContinuous(cs2, target_point=target, width=100, height=100,)
         img1 = Image.fromarray(np.squeeze(imc.generate_image(pos)), 'RGB')
         img1.show()
+        # img1.save("cont_state_target.pdf")
 
         # Terminal sub-spaces
         lows = np.array([2., 4.])
@@ -35,10 +39,11 @@ class TestImageContinuous(unittest.TestCase):
 
         target = np.array([10, 10])
         imc = ImageContinuous(cs2, target_point=target, term_spaces=term_spaces,\
-                        width=400, height=400,)
+                        width=100, height=100,)
         pos = np.array([5.0, 7.0])
         img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), 'RGB')
         img1.show()
+        # img1.save("cont_state_target_terminal_states.pdf")
 
 
         # Irrelevant features
@@ -51,10 +56,16 @@ class TestImageContinuous(unittest.TestCase):
 
         # Random sample and __repr__
         imc = ImageContinuous(cs4, target_point=target, width=400, height=400,)
-        print(imc)
+        # print(imc)
         img1 = Image.fromarray(np.squeeze(imc.sample()), 'RGB')
         img1.show()
 
+
+        # Draw grid
+        imc = ImageContinuous(cs4, target_point=target, width=400, height=400,
+                                grid=(5,5))
+        img1 = Image.fromarray(np.squeeze(imc.sample()), 'RGB')
+        img1.show()
 
 
 
