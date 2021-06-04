@@ -1,4 +1,4 @@
-mdp\_playground.analysis.radar\_chart
+﻿mdp\_playground.analysis.radar\_chart
 =====================================
 
 .. automodule:: mdp_playground.analysis.radar_chart

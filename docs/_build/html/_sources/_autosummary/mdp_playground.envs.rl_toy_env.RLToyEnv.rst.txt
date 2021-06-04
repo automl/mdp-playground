@@ -18,13 +18,11 @@ mdp\_playground.envs.rl\_toy\_env.RLToyEnv
    
       ~RLToyEnv.__init__
       ~RLToyEnv.close
-      ~RLToyEnv.discrete_to_multi_discrete
       ~RLToyEnv.get_augmented_state
       ~RLToyEnv.init_init_state_dist
       ~RLToyEnv.init_reward_function
       ~RLToyEnv.init_terminal_states
       ~RLToyEnv.init_transition_function
-      ~RLToyEnv.multi_discrete_to_discrete
       ~RLToyEnv.render
       ~RLToyEnv.reset
       ~RLToyEnv.reward_function

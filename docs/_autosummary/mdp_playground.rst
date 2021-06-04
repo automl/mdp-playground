@@ -31,5 +31,6 @@
    mdp_playground.analysis
    mdp_playground.config_processor
    mdp_playground.envs
+   mdp_playground.scripts
    mdp_playground.spaces
 

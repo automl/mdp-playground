@@ -1,4 +1,4 @@
-mdp\_playground.analysis.analysis.MDPP\_Analysis
+﻿mdp\_playground.analysis.analysis.MDPP\_Analysis
 ================================================
 
 .. currentmodule:: mdp_playground.analysis.analysis
