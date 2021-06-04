@@ -20,6 +20,7 @@ extras_require = [
     'configspace==0.4.10',
     'scipy>=1.3.0',
     'pandas==0.25.0',
+    'gym==0.18'
 ]
 
 extras_require_disc = [
@@ -31,6 +32,7 @@ extras_require_disc = [
     'configspace==0.4.10',
     'scipy==1.3.0',
     'pandas==0.25.0',
+    'gym==0.14'
 ]
 
 extras_require_cont = [
@@ -43,6 +45,7 @@ extras_require_cont = [
     'configspace>=0.4.10',
     'scipy>=1.3.0',
     'pandas==0.25.0',
+    'gym==0.14'
 ]
 
 AUTHORS = ', '.join(["Raghu Rajan", "Jessica Borja",
@@ -87,7 +90,7 @@ setup(
     # package_dir={"": "src"},
     python_requires=">=3.6",
     setup_requires=['numpy'],
-    install_requires=['gym<=0.14', 'dill', 'numpy'],
+    install_requires=['dill', 'numpy'],
     extras_require={
       'extras': extras_require,
       'extras_disc': extras_require_disc,

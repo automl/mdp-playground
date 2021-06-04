@@ -34,7 +34,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
-gym = "0.14.0"
+gym = "0.18.0"
 numpy = "^1.19.5"
 
 pandas = { version = "0.25.0", optional = true }
