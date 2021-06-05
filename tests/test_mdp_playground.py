@@ -754,7 +754,7 @@ class TestRLToyEnv(unittest.TestCase):
         env = RLToyEnv(**config)
 
         state = env.get_augmented_state()['augmented_state'][-1]
-        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+        actions = [[0, -1], [-1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1], [0, 1], [-1, 0]]
 
         tot_rew = 0
         for i in range(len(actions)):
@@ -765,7 +765,7 @@ class TestRLToyEnv(unittest.TestCase):
             state = next_state.copy()
             tot_rew += reward
 
-        assert tot_rew == 7.5, str(tot_rew)
+        assert tot_rew == 8.25, str(tot_rew)
 
         env.reset()
         env.close()
@@ -773,21 +773,30 @@ class TestRLToyEnv(unittest.TestCase):
 
         # Test 2: Almost the same as 1, but with irrelevant features
         config["irrelevant_features"] = True
+        config["term_state_reward"] = 0.
 
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['augmented_state'][-1]
-        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+        actions = [[0, -1], [-1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1], [0, 1], [-1, 0]]
 
         tot_rew = 0
         for i in range(len(actions)):
-            action = actions[i] + [-1, 0]
+            action = actions[i] + [0, 0]
             next_obs, reward, done, info = env.step(action)
             next_state = env.get_augmented_state()['augmented_state'][-1]
-            print("sars'o', done =", state, action, reward, next_state, next_obs, done)
+            print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
             tot_rew += reward
 
-        assert tot_rew == 7.5, str(tot_rew)
+        for i in range(len(actions)):
+            action = [0, 0] + actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 9, str(tot_rew)
 
         env.reset()
         env.close()

@@ -22,7 +22,8 @@ pp = pprint.PrettyPrinter(indent=4)
 
 
 def main(args):
-    #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env), Environment (it has multiple sources of randomness too), Ray Evaluator
+    # #TODO Different seeds for Ray Trainer (TF, numpy, Python; Torch, Env),
+    # Environment (it has multiple sources of randomness too), Ray Evaluator
     # docstring at beginning of the file is stored in __doc__
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-c', '--config-file', dest='config_file',
@@ -138,14 +139,20 @@ def main(args):
 
     if args.config_num is not None:
         stats_file_name += '_' + str(args.config_num)
-    # elif args.agent_config_num is not None: ###IMP Commented out! If we append both these nums then, that can lead to 1M small files for 1000x1000 configs which doesn't play well with our Nemo cluster.
+    # elif args.agent_config_num is not None: ###IMP Commented out! If we append
+    # both these nums then, that can lead to 1M small files for 1000x1000 configs
+    # which doesn't play well with our Nemo cluster.
     #     stats_file_name += '_' + str(args.agent_config_num)
 
     print("Stats file being written to:", stats_file_name)
 
-    config, final_configs =  config_processor.process_configs(config_file, stats_file_prefix=stats_file_name, framework=args.framework, config_num=args.config_num, log_level=log_level_, framework_dir=args.framework_dir)
+    config, final_configs =  config_processor.process_configs(config_file,\
+            stats_file_prefix=stats_file_name, framework=args.framework,\
+            config_num=args.config_num, log_level=log_level_,\
+            framework_dir=args.framework_dir)
 
-    print("Configuration number(s) that will be run:", "all" if args.config_num is None else args.config_num)
+    print("Configuration number(s) that will be run:", "all" if args.config_num is\
+                None else args.config_num)
 
 
     # import default_config
