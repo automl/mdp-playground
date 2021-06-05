@@ -563,7 +563,7 @@ class TestRLToyEnv(unittest.TestCase):
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['augmented_state'][-1]
         # init state: [ 1.9652315 -2.4397445]
-        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+        actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2], [1, 0], [0, 1]]
         expected_image_sums = [1156170, 1152345, 1156170, 1152345, 1152345]
 
         # obs = env.curr_obs
@@ -593,14 +593,15 @@ class TestRLToyEnv(unittest.TestCase):
         # To check bouncing back behaviour of grid walls
         for i in range(4):
             # action = env.action_space.sample()
-            action = [1, 1]
+            action = [0, 1]
             next_obs, reward, done, info = env.step(action)
             next_state = env.get_augmented_state()['augmented_state'][-1]
             print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
+            tot_rew += reward
 
         assert tot_rew == 2.0, str(tot_rew)
-        assert state == [7, 7], str(state)
+        assert state == [5, 7], str(state)
         # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
         # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
         env.reset()
@@ -610,7 +611,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["make_denser"] = True
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['augmented_state'][-1]
-        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+        actions = [[0, 1], [-1, 0], [0, 0], [1, 0], [0.5, -0.5], [1, 2], [1, 1], [0, 1], [0, 1]]
 
         tot_rew = 0
         for i in range(len(actions)):
@@ -632,7 +633,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['augmented_state'][-1]
-        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+        actions = [[0, -1], [-1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1], [0, 1], [-1, 0]]
 
         # obs = env.curr_obs
         # import PIL.Image as Image
@@ -648,7 +649,7 @@ class TestRLToyEnv(unittest.TestCase):
             state = next_state.copy()
             tot_rew += reward
 
-        assert tot_rew == 5.0, str(tot_rew)
+        assert tot_rew == 5.5, str(tot_rew)
 
         env.reset()
         env.close()
@@ -658,8 +659,8 @@ class TestRLToyEnv(unittest.TestCase):
 
         env = RLToyEnv(**config)
         state = env.curr_state
-        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
-        expected_image_sums = [2353905, 2353905]
+        actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2], [0, 1], [0, 1], [1, 0]]
+        expected_image_sums = [2357730, 2353905]
 
         # obs = env.curr_obs
         # import PIL.Image as Image
@@ -668,7 +669,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         tot_rew = 0
         for i in range(len(actions)):
-            action = actions[i] + [1, 0]
+            action = actions[i] + [0, 0]
             next_obs, reward, done, info = env.step(action)
             next_state = env.curr_state
             print("sars', done =", state, action, reward, next_state, done)
@@ -683,7 +684,15 @@ class TestRLToyEnv(unittest.TestCase):
             if i < len(expected_image_sums):
                 assert next_obs.sum() == expected_image_sums[i], "Expected sum over image pixels: " + str(expected_image_sums[i]) + ". Was: " + str(next_obs.sum())
 
-        assert tot_rew == 5.0, str(tot_rew)
+        for i in range(len(actions)):
+            action = [0, 0] + actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.curr_state
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 0.5, str(tot_rew)
 
         env.reset()
         env.close()
@@ -703,7 +712,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         tot_rew = 0
         for i in range(len(actions)):
-            action = actions[i] + [1, 0]
+            action = actions[i] + [0, 0]
             next_obs, reward, done, info = env.step(action)
             next_state = env.curr_state
             print("sars', done =", state, action, reward, next_state, done)
@@ -715,10 +724,7 @@ class TestRLToyEnv(unittest.TestCase):
             # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
             # img1.show()
 
-            if i < len(expected_image_sums):
-                assert next_obs.sum() == expected_image_sums[i], "Expected sum over image pixels: " + str(expected_image_sums[i]) + ". Was: " + str(next_obs.sum())
-
-        assert tot_rew == 2.5, str(tot_rew)
+        assert tot_rew == 2.75, str(tot_rew)
 
         env.reset()
         env.close()

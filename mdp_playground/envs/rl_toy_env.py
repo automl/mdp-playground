@@ -13,7 +13,7 @@ from scipy import stats
 from scipy.spatial import distance
 import gym
 from mdp_playground.spaces import BoxExtended, DiscreteExtended, TupleExtended,\
-        ImageMultiDiscrete, ImageContinuous
+        ImageMultiDiscrete, ImageContinuous, GridActionSpace
 
 
 class RLToyEnv(gym.Env):
@@ -653,8 +653,8 @@ class RLToyEnv(gym.Env):
 
             lows = np.array([-1] * len(self.grid_shape))
             highs = np.array([1] * len(self.grid_shape))
-            self.action_space = BoxExtended(lows, highs, seed=self.seed_dict["action_space"],\
-                                    dtype=np.int64) # #seed
+            self.action_space = GridActionSpace(lows, highs,\
+                        seed=self.seed_dict["action_space"],) # #seed
 
 
             if self.image_representations:
