@@ -20,7 +20,7 @@ extras_require = [
     'configspace==0.4.10',
     'scipy>=1.3.0',
     'pandas==0.25.0',
-    'gym[atari]==0.18'
+    'gym[atari]==0.18',
 ]
 
 extras_require_disc = [
@@ -92,7 +92,7 @@ setup(
     # package_dir={"": "src"},
     python_requires=">=3.6",
     setup_requires=['numpy'],
-    install_requires=['dill', 'numpy'],
+    install_requires=['dill', 'numpy', 'matplotlib'],
     extras_require={
       'extras': extras_require,
       'extras_disc': extras_require_disc,
