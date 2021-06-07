@@ -86,8 +86,57 @@ def process_configs(
         *variable_configs, overwrite=False
     )
 
+    varying_configs = []
+    separate_var_configs = []
+    # ###IMP Currently num_configs has to be equal for all 3 cases below:
+    # grid (i.e. var), random and sobol #TODO Not sure how to solve this #config
+    # setup problem. Could take Cartesian product of all 3 but that may lead to
+    # too many configs and Cartesian product of dicts is a pain.
+    if "var_configs" in dir(config):
+        separate_var_configs.append(
+            get_list_of_varying_configs(config.var_configs, mode="grid")
+        )
+    if "sobol_configs" in dir(config):
+        separate_var_configs.append(
+            get_list_of_varying_configs(
+                config.sobol_configs, mode="sobol", num_configs=config.num_configs
+            )
+        )
+    if "random_configs" in dir(config):
+        separate_var_configs.append(
+            get_list_of_varying_configs(
+                config.random_configs, mode="random", num_configs=config.num_configs
+            )
+        )
+    # print("VARYING_CONFIGS:", varying_configs)
+
+    num_configs_ = max(
+        [len(separate_var_configs[i]) for i in range(len(separate_var_configs))]
+    )
+    for i in range(num_configs_):
+        to_combine = [
+            separate_var_configs[j][i] for j in range(len(separate_var_configs))
+        ]
+        # overwrite = False because the keys in different modes of
+        # config generation need to be disjoint
+        varying_configs.append(deepmerge_multiple_dicts(*to_combine, overwrite=False))
+
+    # #hack ####TODO Remove extra pre-processing done here and again below:
+    pre_final_configs = combined_processing(
+        config.env_config,
+        config.agent_config,
+        config.model_config,
+        config.eval_config,
+        varying_configs=copy.deepcopy(varying_configs),
+        framework=framework,
+        algorithm=config.algorithm,
+    )
+
+
     if "timesteps_total" in dir(config):
         hacky_timesteps_total = config.timesteps_total  # hack
+    else:
+        hacky_timesteps_total = pre_final_configs[-1]["timesteps_total"]
 
     config_algorithm = config.algorithm  # hack
     # sys.exit(0)
@@ -137,40 +186,6 @@ def process_configs(
             + ". Available options are: ray and stable_baselines."
         )
 
-    varying_configs = []
-    separate_var_configs = []
-    # ###IMP Currently num_configs has to be equal for all 3 cases below:
-    # grid (i.e. var), random and sobol #TODO Not sure how to solve this #config
-    # setup problem. Could take Cartesian product of all 3 but that may lead to
-    # too many configs and Cartesian product of dicts is a pain.
-    if "var_configs" in dir(config):
-        separate_var_configs.append(
-            get_list_of_varying_configs(config.var_configs, mode="grid")
-        )
-    if "sobol_configs" in dir(config):
-        separate_var_configs.append(
-            get_list_of_varying_configs(
-                config.sobol_configs, mode="sobol", num_configs=config.num_configs
-            )
-        )
-    if "random_configs" in dir(config):
-        separate_var_configs.append(
-            get_list_of_varying_configs(
-                config.random_configs, mode="random", num_configs=config.num_configs
-            )
-        )
-    # print("VARYING_CONFIGS:", varying_configs)
-
-    num_configs_ = max(
-        [len(separate_var_configs[i]) for i in range(len(separate_var_configs))]
-    )
-    for i in range(num_configs_):
-        to_combine = [
-            separate_var_configs[j][i] for j in range(len(separate_var_configs))
-        ]
-        # overwrite = False because the keys in different modes of
-        # config generation need to be disjoint
-        varying_configs.append(deepmerge_multiple_dicts(*to_combine, overwrite=False))
 
     # varying_configs is a list of dict of dicts with a specific structure.
     final_configs = combined_processing(
@@ -876,28 +891,28 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                             "fcnet_activation": "relu",
                         }
 
-                    # TODO Find a better way to enforce these?? Especially problematic for TD3
-                    # because then more values for target_noise_clip are witten to CSVs than
-                    # actually used during HPO but for normal (non-HPO) runs this needs to be
-                    # not done.
-                    if (algorithm == "DDPG"):
-                        if key == "critic_lr":
-                            final_configs[i]["actor_lr"] = value
-                        if key == "critic_hiddens":
-                            final_configs[i]["actor_hiddens"] = value
-                    if algorithm == "TD3":
-                        if key == "target_noise_clip_relative":
-                            final_configs[i]["target_noise_clip"] = (
-                                final_configs[i]["target_noise_clip_relative"]
-                                * final_configs[i]["target_noise"]
-                            )
-                            del final_configs[i][
-                                "target_noise_clip_relative"
-                            ]  # hack have to delete it otherwise Ray will crash for unknown config param.
+                # TODO Find a better way to enforce these?? Especially problematic for TD3
+                # because then more values for target_noise_clip are witten to CSVs than
+                # actually used during HPO but for normal (non-HPO) runs this needs to be
+                # not done.
+                if (algorithm == "DDPG"):
+                    if key == "critic_lr":
+                        final_configs[i]["actor_lr"] = value
+                    if key == "critic_hiddens":
+                        final_configs[i]["actor_hiddens"] = value
+                if algorithm == "TD3":
+                    if key == "target_noise_clip_relative":
+                        final_configs[i]["target_noise_clip"] = (
+                            final_configs[i]["target_noise_clip_relative"]
+                            * final_configs[i]["target_noise"]
+                        )
+                        del final_configs[i][
+                            "target_noise_clip_relative"
+                        ]  # hack have to delete it otherwise Ray will crash for unknown config param.
 
-                elif key == "model":
+                if key == "model":
                     for key_2 in final_configs[i][key]:
-                        if key_2 == "use_lstm":
+                        if key_2 == "use_lstm" and final_configs[i][key][key_2]:
                             final_configs[i][key]["max_seq_len"] = (
                                 final_configs[i]["env_config"]["delay"]
                                 + final_configs[i]["env_config"]["sequence_length"]
