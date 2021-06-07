@@ -73,6 +73,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test 3: that random actions lead to bad reward and then later a sequence of optimal actions leads to good reward. Also implicitly tests sequence lengths.
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        prev_reward = None
         for i in range(40):
             if i < 20:
                 action = env.action_space.sample()
@@ -97,6 +98,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["delay"] = 1
         env = RLToyEnv(**config)
         state = env.get_augmented_state()['curr_state'].copy() #env.reset()
+        prev_reward = None
         for i in range(40):
             if i < 20:
                 action = env.action_space.sample()
@@ -475,6 +477,329 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
+
+    def test_continuous_image_representations(self):
+        ''''''
+        print('\033[32;1;4mTEST_CONTINUOUS_IMAGE_REPRESENTATIONS\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = 0
+
+        config["state_space_type"] = "continuous"
+        config["action_space_type"] = "continuous"
+        config["state_space_dim"] = 2
+        config["action_space_dim"] = 2
+        config["delay"] = 0
+        config["sequence_length"] = 1 # seq_len is always going to be 1 for move_to_a_point R. assert for this?
+        config["transition_dynamics_order"] = 1
+        config["inertia"] = 1.0
+        config["time_unit"] = 1
+
+        config["reward_function"] = "move_to_a_point"
+        # config["make_denser"] = False
+        config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
+        config["target_point"] = [-0.29792, 1.71012]
+        config["target_radius"] = 0.172 # to give reward in 3rd last step. At each step, the distance reduces by ~0.035355 to the final point of this trajectory which is also the target point by design for this test.
+        config["reward_scale"] = 2.0
+
+
+        config["image_representations"] = True
+        config["image_width"] = 100
+        config["image_height"] = 100
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['augmented_state'][-1]
+        # init state: [ 1.9652315 -2.4397445]
+        expected_image_sums = [51510, 51510, 51510, 51255, 31365]
+
+        # obs = env.curr_obs
+        # import PIL.Image as Image
+        # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+        # img1.show()
+
+        for i in range(5):
+            # action = env.action_space.sample()
+            action = np.array([-0.45, 0.8]) # just to test if acting "in a line" works
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+
+            # obs = env.curr_obs
+            # import PIL.Image as Image
+            # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+            # img1.show()
+
+            if i < len(expected_image_sums):
+                assert next_obs.sum() == expected_image_sums[i], "Expected sum over image pixels: " + str(expected_image_sums[i]) + ". Was: " + str(next_obs.sum())
+
+        final_dist = np.linalg.norm(state - np.array(config["target_point"]))
+        assert final_dist < config["target_radius"]
+
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+    def test_grid_image_representations(self):
+        ''''''
+        print('\033[32;1;4mTEST_GRID_IMAGE_REPRESENTATIONS\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = 0
+
+        config["state_space_type"] = "grid"
+        config["grid_shape"] = (8, 8)
+        config["delay"] = 0
+        config["sequence_length"] = 1
+
+        config["reward_function"] = "move_to_a_point"
+        config["target_point"] = [5, 5]
+        config["reward_scale"] = 2.0
+
+
+        config["image_representations"] = True
+
+        # Test 1: Sparse reward case
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['augmented_state'][-1]
+        # init state: [ 1.9652315 -2.4397445]
+        actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2], [1, 0], [0, 1]]
+        expected_image_sums = [1156170, 1152345, 1156170, 1152345, 1152345]
+
+        # obs = env.curr_obs
+        # import PIL.Image as Image
+        # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+        # img1.show()
+
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            # action = env.action_space.sample()
+            action = actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+            # obs = env.curr_obs
+            # import PIL.Image as Image
+            # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+            # img1.show()
+
+            if i < len(expected_image_sums):
+                assert next_obs.sum() == expected_image_sums[i], "Expected sum over image pixels: " + str(expected_image_sums[i]) + ". Was: " + str(next_obs.sum())
+
+        # To check bouncing back behaviour of grid walls
+        for i in range(4):
+            # action = env.action_space.sample()
+            action = [0, 1]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 2.0, str(tot_rew)
+        assert state == [5, 7], str(state)
+        # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
+        # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
+        env.reset()
+        env.close()
+
+        # Test 2: Almost the same as above, but with make_denser
+        config["make_denser"] = True
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['augmented_state'][-1]
+        actions = [[0, 1], [-1, 0], [0, 0], [1, 0], [0.5, -0.5], [1, 2], [1, 1], [0, 1], [0, 1]]
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            action = actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 6.0, str(tot_rew)
+
+        env.reset()
+        env.close()
+
+        # Test 3: Almost the same as 2, but with terminal states
+        config["terminal_states"] = [[5, 5], [2, 3], [2, 4], [3, 3], [3, 4]]
+        config["term_state_reward"] = -0.25
+
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['augmented_state'][-1]
+        actions = [[0, -1], [-1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1], [0, 1], [-1, 0]]
+
+        # obs = env.curr_obs
+        # import PIL.Image as Image
+        # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+        # img1.show()
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            action = actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 5.5, str(tot_rew)
+
+        env.reset()
+        env.close()
+
+        # Test 4: Almost the same as 3, but with irrelevant features
+        config["irrelevant_features"] = True
+
+        env = RLToyEnv(**config)
+        state = env.curr_state
+        actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2], [0, 1], [0, 1], [1, 0]]
+        expected_image_sums = [2357730, 2353905]
+
+        # obs = env.curr_obs
+        # import PIL.Image as Image
+        # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+        # img1.show()
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            action = actions[i] + [0, 0]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.curr_state
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+            # obs = env.curr_obs
+            # import PIL.Image as Image
+            # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+            # img1.show()
+
+            if i < len(expected_image_sums):
+                assert next_obs.sum() == expected_image_sums[i], "Expected sum over image pixels: " + str(expected_image_sums[i]) + ". Was: " + str(next_obs.sum())
+
+        for i in range(len(actions)):
+            action = [0, 0] + actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.curr_state
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 0.5, str(tot_rew)
+
+        env.reset()
+        env.close()
+
+        # Test 5: With transition noise
+        config["transition_noise"] = 0.5
+        config["reward_scale"] = 1.0
+
+        env = RLToyEnv(**config)
+        state = env.curr_state
+        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1], [0, 1], [0, 1]]
+
+        # obs = env.curr_obs
+        # import PIL.Image as Image
+        # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+        # img1.show()
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            action = actions[i] + [0, 0]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.curr_state
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+            # obs = env.curr_obs
+            # import PIL.Image as Image
+            # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
+            # img1.show()
+
+        assert tot_rew == 2.75, str(tot_rew)
+
+        env.reset()
+        env.close()
+
+
+    def test_grid_env(self):
+        ''''''
+        print('\033[32;1;4mTEST_GRID_ENV\033[0m')
+        config = {}
+        config["log_filename"] = log_filename
+        config["seed"] = 0
+
+        config["state_space_type"] = "grid"
+        config["grid_shape"] = (8, 8)
+        config["delay"] = 0
+        config["sequence_length"] = 1
+
+        config["reward_function"] = "move_to_a_point"
+        config["make_denser"] = True
+        config["target_point"] = [5, 5]
+        config["reward_scale"] = 3.0
+
+
+        # Test 1: Copied from test 3 in test_grid_image_representations
+        config["terminal_states"] = [[5, 5], [2, 3], [2, 4], [3, 3], [3, 4]]
+        config["term_state_reward"] = -0.25
+        env = RLToyEnv(**config)
+
+        state = env.get_augmented_state()['augmented_state'][-1]
+        actions = [[0, -1], [-1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1], [0, 1], [-1, 0]]
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            action = actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 8.25, str(tot_rew)
+
+        env.reset()
+        env.close()
+
+
+        # Test 2: Almost the same as 1, but with irrelevant features
+        config["irrelevant_features"] = True
+        config["term_state_reward"] = 0.
+
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['augmented_state'][-1]
+        actions = [[0, -1], [-1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1], [0, 1], [-1, 0]]
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            action = actions[i] + [0, 0]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        for i in range(len(actions)):
+            action = [0, 0] + actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 9, str(tot_rew)
+
+        env.reset()
+        env.close()
 
     def test_discrete_dynamics(self):
         '''Tests the P dynamics. Tests whether actions taken in terminal states lead back to the same terminal state. Tests if state in discrete environments is an int.
@@ -1214,7 +1539,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["state_space_type"] = "discrete"
         config["action_space_type"] = "discrete"
         config["state_space_size"] = 24
-        config["action_space_size"] = 24
+        config["action_space_size"] = 8
         config["reward_density"] = 0.05
         config["make_denser"] = False
         config["terminal_state_density"] = 0.25

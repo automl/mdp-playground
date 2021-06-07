@@ -17,6 +17,7 @@ env_config = {
     "horizon": 1000,
     "soft_horizon": False,
     "env_config": {
+        'seed': 0, #seed
         'state_space_type': 'continuous',
         'action_space_type': 'continuous',
         "MujocoEnv": {

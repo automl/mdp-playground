@@ -1,0 +1,1200 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete &#8212; MDP Playground 0.0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mdp_playground.spaces.tuple_extended" href="mdp_playground.spaces.tuple_extended.html" />
+    <link rel="prev" title="mdp_playground.spaces.test_image_multi_discrete" href="mdp_playground.spaces.test_image_multi_discrete.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">MDP Playground 0.0.1 documentation</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="mdp_playground.html">
+   mdp_playground
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="mdp_playground.analysis.html">
+     mdp_playground.analysis
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.analysis.analysis.html">
+       mdp_playground.analysis.analysis
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+      <label for="toctree-checkbox-3">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.analysis.analysis.MDPP_Analysis.html">
+         mdp_playground.analysis.analysis.MDPP_Analysis
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.analysis.radar_chart.html">
+       mdp_playground.analysis.radar_chart
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+      <label for="toctree-checkbox-4">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.analysis.radar_chart.radar_factory.html">
+         mdp_playground.analysis.radar_chart.radar_factory
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mdp_playground.config_processor.html">
+     mdp_playground.config_processor
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="mdp_playground.envs.html">
+     mdp_playground.envs
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.envs.gym_env_wrapper.html">
+       mdp_playground.envs.gym_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+      <label for="toctree-checkbox-6">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html">
+         mdp_playground.envs.gym_env_wrapper.GymEnvWrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.envs.mujoco_env_wrapper.html">
+       mdp_playground.envs.mujoco_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+      <label for="toctree-checkbox-7">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper.html">
+         mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.envs.rl_toy_env.html">
+       mdp_playground.envs.rl_toy_env
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+      <label for="toctree-checkbox-8">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.rl_toy_env.dist_of_pt_from_line.html">
+         mdp_playground.envs.rl_toy_env.dist_of_pt_from_line
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.rl_toy_env.list_to_float_np_array.html">
+         mdp_playground.envs.rl_toy_env.list_to_float_np_array
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.rl_toy_env.RLToyEnv.html">
+         mdp_playground.envs.rl_toy_env.RLToyEnv
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="mdp_playground.scripts.html">
+     mdp_playground.scripts
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+    <label for="toctree-checkbox-9">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.scripts.run_experiments.html">
+       mdp_playground.scripts.run_experiments
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+      <label for="toctree-checkbox-10">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.scripts.run_experiments.cli.html">
+         mdp_playground.scripts.run_experiments.cli
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.scripts.run_experiments.main.html">
+         mdp_playground.scripts.run_experiments.main
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 current active has-children">
+    <a class="reference internal" href="mdp_playground.spaces.html">
+     mdp_playground.spaces
+    </a>
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul class="current">
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.box_extended.html">
+       mdp_playground.spaces.box_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+      <label for="toctree-checkbox-12">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.box_extended.BoxExtended.html">
+         mdp_playground.spaces.box_extended.BoxExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.discrete_extended.html">
+       mdp_playground.spaces.discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+      <label for="toctree-checkbox-13">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.discrete_extended.DiscreteExtended.html">
+         mdp_playground.spaces.discrete_extended.DiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.image_continuous.html">
+       mdp_playground.spaces.image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+      <label for="toctree-checkbox-14">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.image_continuous.ImageContinuous.html">
+         mdp_playground.spaces.image_continuous.ImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.image_multi_discrete.html">
+       mdp_playground.spaces.image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+      <label for="toctree-checkbox-15">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html">
+         mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.multi_discrete_extended.html">
+       mdp_playground.spaces.multi_discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+      <label for="toctree-checkbox-16">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended.html">
+         mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.test_image_continuous.html">
+       mdp_playground.spaces.test_image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+      <label for="toctree-checkbox-17">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.test_image_continuous.TestImageContinuous.html">
+         mdp_playground.spaces.test_image_continuous.TestImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 current active has-children">
+      <a class="reference internal" href="mdp_playground.spaces.test_image_multi_discrete.html">
+       mdp_playground.spaces.test_image_multi_discrete
+      </a>
+      <input checked="" class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+      <label for="toctree-checkbox-18">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul class="current">
+       <li class="toctree-l4 current active">
+        <a class="current reference internal" href="#">
+         mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.tuple_extended.html">
+       mdp_playground.spaces.tuple_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+      <label for="toctree-checkbox-19">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.tuple_extended.TupleExtended.html">
+         mdp_playground.spaces.tuple_extended.TupleExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/_autosummary/mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="mdp-playground-spaces-test-image-multi-discrete-testimagemultidiscrete">
+<h1>mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete<a class="headerlink" href="#mdp-playground-spaces-test-image-multi-discrete-testimagemultidiscrete" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mdp_playground.spaces.test_image_multi_discrete.</span></code><code class="sig-name descname"><span class="pre">TestImageMultiDiscrete</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/spaces/test_image_multi_discrete.html#TestImageMultiDiscrete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.case.TestCase</span></code></p>
+<p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p>
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">methodName</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'runTest'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of the class that will use the named test
+method when executed. Raises a ValueError if the instance does
+not have a method with the specified name.</p>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.__init__" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([methodName])</p></td>
+<td><p>Create an instance of the class that will use the named test method when executed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.addCleanup" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.addCleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addCleanup</span></code></a>(function, *args, **kwargs)</p></td>
+<td><p>Add a function, with arguments, to be called when the test is completed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.addTypeEqualityFunc" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.addTypeEqualityFunc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addTypeEqualityFunc</span></code></a>(typeobj, function)</p></td>
+<td><p>Add a type specific assertEqual style function to compare a type.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertAlmostEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertAlmostEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertAlmostEqual</span></code></a>(first, second[, places, …])</p></td>
+<td><p>Fail if the two objects are unequal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero, or by comparing that the difference between the two objects is more than the given delta.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertAlmostEquals</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertCountEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertCountEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertCountEqual</span></code></a>(first, second[, msg])</p></td>
+<td><p>An unordered sequence comparison asserting that the same elements, regardless of order.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertDictContainsSubset" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertDictContainsSubset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertDictContainsSubset</span></code></a>(subset, dictionary)</p></td>
+<td><p>Checks whether dictionary is a superset of subset.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertDictEqual</span></code>(d1, d2[, msg])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertEqual</span></code></a>(first, second[, msg])</p></td>
+<td><p>Fail if the two objects are unequal as determined by the ‘==’ operator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertEquals</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertFalse" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertFalse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertFalse</span></code></a>(expr[, msg])</p></td>
+<td><p>Check that the expression is false.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertGreater" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertGreater"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertGreater</span></code></a>(a, b[, msg])</p></td>
+<td><p>Just like self.assertTrue(a &gt; b), but with a nicer default message.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertGreaterEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertGreaterEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertGreaterEqual</span></code></a>(a, b[, msg])</p></td>
+<td><p>Just like self.assertTrue(a &gt;= b), but with a nicer default message.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIn" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertIn</span></code></a>(member, container[, msg])</p></td>
+<td><p>Just like self.assertTrue(a in b), but with a nicer default message.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIs" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertIs</span></code></a>(expr1, expr2[, msg])</p></td>
+<td><p>Just like self.assertTrue(a is b), but with a nicer default message.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsInstance" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsInstance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertIsInstance</span></code></a>(obj, cls[, msg])</p></td>
+<td><p>Same as self.assertTrue(isinstance(obj, cls)), with a nicer default message.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNone" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertIsNone</span></code></a>(obj[, msg])</p></td>
+<td><p>Same as self.assertTrue(obj is None), with a nicer default message.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNot" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNot"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertIsNot</span></code></a>(expr1, expr2[, msg])</p></td>
+<td><p>Just like self.assertTrue(a is not b), but with a nicer default message.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNotNone" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNotNone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertIsNotNone</span></code></a>(obj[, msg])</p></td>
+<td><p>Included for symmetry with assertIsNone.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLess" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLess"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertLess</span></code></a>(a, b[, msg])</p></td>
+<td><p>Just like self.assertTrue(a &lt; b), but with a nicer default message.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLessEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLessEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertLessEqual</span></code></a>(a, b[, msg])</p></td>
+<td><p>Just like self.assertTrue(a &lt;= b), but with a nicer default message.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertListEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertListEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertListEqual</span></code></a>(list1, list2[, msg])</p></td>
+<td><p>A list-specific equality assertion.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLogs" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLogs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertLogs</span></code></a>([logger, level])</p></td>
+<td><p>Fail unless a log message of level <em>level</em> or higher is emitted on <em>logger_name</em> or its children.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertMultiLineEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertMultiLineEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertMultiLineEqual</span></code></a>(first, second[, msg])</p></td>
+<td><p>Assert that two multi-line strings are equal.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotAlmostEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotAlmostEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotAlmostEqual</span></code></a>(first, second[, …])</p></td>
+<td><p>Fail if the two objects are equal as determined by their difference rounded to the given number of decimal places (default 7) and comparing to zero, or by comparing that the difference between the two objects is less than the given delta.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotAlmostEquals</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotEqual</span></code></a>(first, second[, msg])</p></td>
+<td><p>Fail if the two objects are equal as determined by the ‘!=’ operator.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotEquals</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotIn" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotIn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotIn</span></code></a>(member, container[, msg])</p></td>
+<td><p>Just like self.assertTrue(a not in b), but with a nicer default message.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotIsInstance" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotIsInstance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotIsInstance</span></code></a>(obj, cls[, msg])</p></td>
+<td><p>Included for symmetry with assertIsInstance.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotRegex" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotRegex</span></code></a>(text, unexpected_regex[, msg])</p></td>
+<td><p>Fail the test if the text matches the regular expression.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertNotRegexpMatches</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRaises" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRaises"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaises</span></code></a>(expected_exception, *args, **kwargs)</p></td>
+<td><p>Fail unless an exception of class expected_exception is raised by the callable when invoked with specified positional and keyword arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRaisesRegex" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRaisesRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaisesRegex</span></code></a>(expected_exception, …)</p></td>
+<td><p>Asserts that the message in a raised exception matches a regex.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRaisesRegexp</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRegex" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRegex</span></code></a>(text, expected_regex[, msg])</p></td>
+<td><p>Fail the test unless the text matches the regular expression.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertRegexpMatches</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertSequenceEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertSequenceEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertSequenceEqual</span></code></a>(seq1, seq2[, msg, seq_type])</p></td>
+<td><p>An equality assertion for ordered sequences (like lists and tuples).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertSetEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertSetEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertSetEqual</span></code></a>(set1, set2[, msg])</p></td>
+<td><p>A set-specific equality assertion.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertTrue" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertTrue"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTrue</span></code></a>(expr[, msg])</p></td>
+<td><p>Check that the expression is true.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertTupleEqual" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertTupleEqual"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertTupleEqual</span></code></a>(tuple1, tuple2[, msg])</p></td>
+<td><p>A tuple-specific equality assertion.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertWarns" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertWarns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertWarns</span></code></a>(expected_warning, *args, **kwargs)</p></td>
+<td><p>Fail unless a warning of class warnClass is triggered by the callable when invoked with specified positional and keyword arguments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertWarnsRegex" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertWarnsRegex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">assertWarnsRegex</span></code></a>(expected_warning, …)</p></td>
+<td><p>Asserts that the message in a triggered warning matches a regexp.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">assert_</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">countTestCases</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.debug" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.debug"><code class="xref py py-obj docutils literal notranslate"><span class="pre">debug</span></code></a>()</p></td>
+<td><p>Run the test without collecting errors in a TestResult</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">defaultTestResult</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.doCleanups" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.doCleanups"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doCleanups</span></code></a>()</p></td>
+<td><p>Execute all cleanup functions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.fail" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.fail"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fail</span></code></a>([msg])</p></td>
+<td><p>Fail immediately, with the given message.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIf</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfAlmostEqual</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failIfEqual</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnless</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessAlmostEqual</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessEqual</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">failUnlessRaises</span></code>(**kwargs)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">id</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code>([result])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.setUp" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.setUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUp</span></code></a>()</p></td>
+<td><p>Hook method for setting up the test fixture before exercising it.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.setUpClass" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.setUpClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUpClass</span></code></a>()</p></td>
+<td><p>Hook method for setting up class fixture before running tests in the class.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.shortDescription" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.shortDescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">shortDescription</span></code></a>()</p></td>
+<td><p>Returns a one-line description of the test, or None if no description has been provided.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.skipTest" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.skipTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">skipTest</span></code></a>(reason)</p></td>
+<td><p>Skip this test.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.subTest" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.subTest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">subTest</span></code></a>([msg])</p></td>
+<td><p>Return a context manager that will return the enclosed block of code in a subtest identified by the optional message and keyword parameters.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.tearDown" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.tearDown"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDown</span></code></a>()</p></td>
+<td><p>Hook method for deconstructing the test fixture after testing it.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.tearDownClass" title="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.tearDownClass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tearDownClass</span></code></a>()</p></td>
+<td><p>Hook method for deconstructing the class fixture after running all tests in the class.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">test_image_multi_discrete</span></code>()</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">longMessage</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">maxDiff</span></code></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.addCleanup">
+<code class="sig-name descname"><span class="pre">addCleanup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.addCleanup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a function, with arguments, to be called when the test is
+completed. Functions added are called on a LIFO basis and are
+called after tearDown on test failure or success.</p>
+<p>Cleanup items are called even if setUp fails (unlike tearDown).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.addTypeEqualityFunc">
+<code class="sig-name descname"><span class="pre">addTypeEqualityFunc</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">typeobj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.addTypeEqualityFunc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a type specific assertEqual style function to compare a type.</p>
+<p>This method is for use by TestCase subclasses that need to register
+their own type equality functions to provide nicer error messages.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><dl class="simple">
+<dt>typeobj: The data type to call this function on when both values</dt><dd><p>are of the same type in assertEqual().</p>
+</dd>
+<dt>function: The callable taking two arguments and an optional</dt><dd><p>msg= argument that raises self.failureException with a
+useful error message when the two arguments are not equal.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertAlmostEqual">
+<code class="sig-name descname"><span class="pre">assertAlmostEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">places</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+difference between the two objects is more than the given
+delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>If the two objects compare equal then they will automatically
+compare almost equal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertCountEqual">
+<code class="sig-name descname"><span class="pre">assertCountEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertCountEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An unordered sequence comparison asserting that the same elements,
+regardless of order.  If the same element occurs more than once,
+it verifies that the elements occur the same number of times.</p>
+<blockquote>
+<div><blockquote>
+<div><dl class="simple">
+<dt>self.assertEqual(Counter(list(first)),</dt><dd><p>Counter(list(second)))</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="simple">
+<dt>Example:</dt><dd><ul class="simple">
+<li><p>[0, 1, 1] and [1, 0, 1] compare equal.</p></li>
+<li><p>[0, 0, 1] and [0, 1] compare unequal.</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertDictContainsSubset">
+<code class="sig-name descname"><span class="pre">assertDictContainsSubset</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertDictContainsSubset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether dictionary is a superset of subset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertEqual">
+<code class="sig-name descname"><span class="pre">assertEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are unequal as determined by the ‘==’
+operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertFalse">
+<code class="sig-name descname"><span class="pre">assertFalse</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertFalse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is false.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertGreater">
+<code class="sig-name descname"><span class="pre">assertGreater</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertGreater" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertGreaterEqual">
+<code class="sig-name descname"><span class="pre">assertGreaterEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertGreaterEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &gt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIn">
+<code class="sig-name descname"><span class="pre">assertIn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">member</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIs">
+<code class="sig-name descname"><span class="pre">assertIs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsInstance">
+<code class="sig-name descname"><span class="pre">assertIsInstance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(isinstance(obj, cls)), with a nicer
+default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNone">
+<code class="sig-name descname"><span class="pre">assertIsNone</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as self.assertTrue(obj is None), with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNot">
+<code class="sig-name descname"><span class="pre">assertIsNot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a is not b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNotNone">
+<code class="sig-name descname"><span class="pre">assertIsNotNone</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertIsNotNone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsNone.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLess">
+<code class="sig-name descname"><span class="pre">assertLess</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt; b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLessEqual">
+<code class="sig-name descname"><span class="pre">assertLessEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLessEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a &lt;= b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertListEqual">
+<code class="sig-name descname"><span class="pre">assertListEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertListEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list-specific equality assertion.</p>
+<dl>
+<dt>Args:</dt><dd><p>list1: The first list to compare.
+list2: The second list to compare.
+msg: Optional message to use on failure instead of a list of</p>
+<blockquote>
+<div><p>differences.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLogs">
+<code class="sig-name descname"><span class="pre">assertLogs</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertLogs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a log message of level <em>level</em> or higher is emitted
+on <em>logger_name</em> or its children.  If omitted, <em>level</em> defaults to
+INFO and <em>logger</em> defaults to the root logger.</p>
+<p>This method must be used as a context manager, and will yield
+a recording object with two attributes: <cite>output</cite> and <cite>records</cite>.
+At the end of the context manager, the <cite>output</cite> attribute will
+be a list of the matching formatted log messages and the
+<cite>records</cite> attribute will be a list of the corresponding LogRecord
+objects.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertLogs</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s1">&#39;INFO&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;first message&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;foo.bar&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;second message&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;INFO:foo:first message&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;ERROR:foo.bar:second message&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertMultiLineEqual">
+<code class="sig-name descname"><span class="pre">assertMultiLineEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertMultiLineEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assert that two multi-line strings are equal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotAlmostEqual">
+<code class="sig-name descname"><span class="pre">assertNotAlmostEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">places</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotAlmostEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by their
+difference rounded to the given number of decimal places
+(default 7) and comparing to zero, or by comparing that the
+difference between the two objects is less than the given delta.</p>
+<p>Note that decimal places (from zero) are usually not the same
+as significant digits (measured from the most significant digit).</p>
+<p>Objects that are equal automatically fail.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotEqual">
+<code class="sig-name descname"><span class="pre">assertNotEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">second</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail if the two objects are equal as determined by the ‘!=’
+operator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotIn">
+<code class="sig-name descname"><span class="pre">assertNotIn</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">member</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Just like self.assertTrue(a not in b), but with a nicer default message.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotIsInstance">
+<code class="sig-name descname"><span class="pre">assertNotIsInstance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cls</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotIsInstance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Included for symmetry with assertIsInstance.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotRegex">
+<code class="sig-name descname"><span class="pre">assertNotRegex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unexpected_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertNotRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test if the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRaises">
+<code class="sig-name descname"><span class="pre">assertRaises</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_exception</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRaises" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless an exception of class expected_exception is raised
+by the callable when invoked with specified positional and
+keyword arguments. If a different type of exception is
+raised, it will not be caught, and the test case will be
+deemed to have suffered an error, exactly as for an
+unexpected exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument ‘msg’ can be provided when assertRaises
+is used as a context object.</p>
+<p>The context manager keeps a reference to the exception as
+the ‘exception’ attribute. This allows you to inspect the
+exception after the assertion:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">SomeException</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_exception</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">exception</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_exception</span><span class="o">.</span><span class="n">error_code</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRaisesRegex">
+<code class="sig-name descname"><span class="pre">assertRaisesRegex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_regex</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRaisesRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a raised exception matches a regex.</p>
+<dl>
+<dt>Args:</dt><dd><p>expected_exception: Exception class expected to be raised.
+expected_regex: Regex (re pattern object or string) expected</p>
+<blockquote>
+<div><p>to be found in error message.</p>
+</div></blockquote>
+<p>args: Function to be called and extra positional args.
+kwargs: Extra kwargs.
+msg: Optional message used in case of failure. Can only be used</p>
+<blockquote>
+<div><p>when assertRaisesRegex is used as a context manager.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRegex">
+<code class="sig-name descname"><span class="pre">assertRegex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_regex</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail the test unless the text matches the regular expression.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertSequenceEqual">
+<code class="sig-name descname"><span class="pre">assertSequenceEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertSequenceEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>An equality assertion for ordered sequences (like lists and tuples).</p>
+<p>For the purposes of this function, a valid ordered sequence type is one
+which can be indexed, has a length, and has an equality operator.</p>
+<dl>
+<dt>Args:</dt><dd><p>seq1: The first sequence to compare.
+seq2: The second sequence to compare.
+seq_type: The expected datatype of the sequences, or None if no</p>
+<blockquote>
+<div><p>datatype should be enforced.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>msg: Optional message to use on failure instead of a list of</dt><dd><p>differences.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertSetEqual">
+<code class="sig-name descname"><span class="pre">assertSetEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">set1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertSetEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A set-specific equality assertion.</p>
+<dl>
+<dt>Args:</dt><dd><p>set1: The first set to compare.
+set2: The second set to compare.
+msg: Optional message to use on failure instead of a list of</p>
+<blockquote>
+<div><p>differences.</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>assertSetEqual uses ducktyping to support different types of sets, and
+is optimized for sets specifically (parameters must support a
+difference method).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertTrue">
+<code class="sig-name descname"><span class="pre">assertTrue</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertTrue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the expression is true.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertTupleEqual">
+<code class="sig-name descname"><span class="pre">assertTupleEqual</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tuple1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tuple2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertTupleEqual" title="Permalink to this definition">¶</a></dt>
+<dd><p>A tuple-specific equality assertion.</p>
+<dl>
+<dt>Args:</dt><dd><p>tuple1: The first tuple to compare.
+tuple2: The second tuple to compare.
+msg: Optional message to use on failure instead of a list of</p>
+<blockquote>
+<div><p>differences.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertWarns">
+<code class="sig-name descname"><span class="pre">assertWarns</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_warning</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertWarns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail unless a warning of class warnClass is triggered
+by the callable when invoked with specified positional and
+keyword arguments.  If a different type of warning is
+triggered, it will not be handled: depending on the other
+warning filtering rules in effect, it might be silenced, printed
+out, or raised as an exception.</p>
+<p>If called with the callable and arguments omitted, will return a
+context object used like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">):</span>
+    <span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>An optional keyword argument ‘msg’ can be provided when assertWarns
+is used as a context object.</p>
+<p>The context manager keeps a reference to the first matching
+warning as the ‘warning’ attribute; similarly, the ‘filename’
+and ‘lineno’ attributes give you information about the line
+of Python code from which the warning was triggered.
+This allows you to inspect the warning after the assertion:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertWarns</span><span class="p">(</span><span class="n">SomeWarning</span><span class="p">)</span> <span class="k">as</span> <span class="n">cm</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="n">the_warning</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">warning</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">the_warning</span><span class="o">.</span><span class="n">some_attribute</span><span class="p">,</span> <span class="mi">147</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertWarnsRegex">
+<code class="sig-name descname"><span class="pre">assertWarnsRegex</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_warning</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_regex</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.assertWarnsRegex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Asserts that the message in a triggered warning matches a regexp.
+Basic functioning is similar to assertWarns() with the addition
+that only warnings whose messages also match the regular expression
+are considered successful matches.</p>
+<dl>
+<dt>Args:</dt><dd><p>expected_warning: Warning class expected to be triggered.
+expected_regex: Regex (re pattern object or string) expected</p>
+<blockquote>
+<div><p>to be found in error message.</p>
+</div></blockquote>
+<p>args: Function to be called and extra positional args.
+kwargs: Extra kwargs.
+msg: Optional message used in case of failure. Can only be used</p>
+<blockquote>
+<div><p>when assertWarnsRegex is used as a context manager.</p>
+</div></blockquote>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.debug">
+<code class="sig-name descname"><span class="pre">debug</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the test without collecting errors in a TestResult</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.doCleanups">
+<code class="sig-name descname"><span class="pre">doCleanups</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.doCleanups" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute all cleanup functions. Normally called for you after
+tearDown.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.fail">
+<code class="sig-name descname"><span class="pre">fail</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.fail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fail immediately, with the given message.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.failureException">
+<code class="sig-name descname"><span class="pre">failureException</span></code><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.failureException" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">AssertionError</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.setUp">
+<code class="sig-name descname"><span class="pre">setUp</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.setUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up the test fixture before exercising it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.setUpClass">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">setUpClass</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.setUpClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for setting up class fixture before running tests in the class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.shortDescription">
+<code class="sig-name descname"><span class="pre">shortDescription</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.shortDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a one-line description of the test, or None if no
+description has been provided.</p>
+<p>The default implementation of this method returns the first line of
+the specified test method’s docstring.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.skipTest">
+<code class="sig-name descname"><span class="pre">skipTest</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reason</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.skipTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Skip this test.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.subTest">
+<code class="sig-name descname"><span class="pre">subTest</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">msg=&lt;object</span> <span class="pre">object&gt;</span></em>, <em class="sig-param"><span class="pre">**params</span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.subTest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a context manager that will return the enclosed block
+of code in a subtest identified by the optional message and
+keyword parameters.  A failure in the subtest marks the test
+case as failed but resumes execution at the end of the enclosed
+block, allowing further test code to be executed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.tearDown">
+<code class="sig-name descname"><span class="pre">tearDown</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.tearDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the test fixture after testing it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.tearDownClass">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">tearDownClass</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.tearDownClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hook method for deconstructing the class fixture after running all tests in the class.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="mdp_playground.spaces.test_image_multi_discrete.html" title="previous page">mdp_playground.spaces.test_image_multi_discrete</a>
+    <a class='right-next' id="next-link" href="mdp_playground.spaces.tuple_extended.html" title="next page">mdp_playground.spaces.tuple_extended</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By MDP Playground developers<br/>
+        
+            &copy; Copyright 2021, MDP Playground developers.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

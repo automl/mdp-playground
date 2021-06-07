@@ -17,7 +17,7 @@ def get_mujoco_wrapper(base_class):
     #TODO This makes a subclass and not a wrapper. Change name. Or make it a wrapper by using composition? Some frameworks might need an instance of this class to also be an instance of base_class?
 
     class MujocoEnvWrapper(base_class):
-        def __init__(self, **config):
+        def __init__(self, **config): # Gets passed env_config from run_experiments.py
             self.config = copy.deepcopy(config)
             self.base_class = base_class
             if "dummy_eval" in config: #hack We need to delete these from config because either Gym or Ray complains when extraneous configs present

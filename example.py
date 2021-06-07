@@ -4,7 +4,8 @@ Calling this file as a script, invokes the following examples:
     one for basic discrete environments
     one for discrete environments with image representations
     one for continuous environments with reward function move to a target point
-    one for continuous environments with reward function move along a line, where movement over the last seq_len steps, that is closer to being linear is rewarded more
+    one for basic grid environments
+    one for grid environments with image representations
     one for wrapping Atari env qbert
     one for wrapping Mujoco env HalfCheetah
     two examples at the end showing how to create toy envs using gym.make()
@@ -25,12 +26,12 @@ def discrete_environment_example():
     config["seed"] = 0
 
     config["state_space_type"] = "discrete"
-    config["state_space_size"] = 8
+    config["action_space_size"] = 8
     config["delay"] = 1
     config["sequence_length"] = 3
     config["reward_scale"] = 2.5
     config["reward_shift"] = -1.75
-    config["reward_noise"] = lambda a: a.normal(0, 0.5) # a will the env's random number generator
+    config["reward_noise"] = 0.5 # std dev of a Gaussian dist.
     config["transition_noise"] = 0.1
     config["reward_density"] = 0.25
     config["make_denser"] = False
@@ -39,13 +40,17 @@ def discrete_environment_example():
     config["repeats_in_sequences"] = False
 
     config["generate_random_mdp"] = True
-    env = RLToyEnv(**config) # Calls env.reset() automatically. So, in general, there is no need to call it after this.
+    env = RLToyEnv(**config) # Calls env.reset() automatically. So, in general,
+    # there is no need to call it after this.
 
-    # The environment maintains an augmented state which contains the underlying state used by the MDP to perform transitions and hand out rewards. We can fetch a dict containing the augmented state and current state like this:
+    # The environment maintains an augmented state which contains the underlying
+    # state used by the MDP to perform transitions and hand out rewards. We can
+    # fetch a dict containing the augmented state and current state like this:
     augmented_state_dict = env.get_augmented_state()
     state = augmented_state_dict['curr_state']
 
-    print("Taking a step in the environment with a random action and printing the transition:")
+    print("Taking a step in the environment with a random action and printing "\
+            "the transition:")
     action = env.action_space.sample()
     next_state, reward, done, info = env.step(action)
     print("sars', done =", state, action, reward, next_state, done)
@@ -59,13 +64,13 @@ def discrete_environment_image_representations_example():
     config["seed"] = 0
 
     config["state_space_type"] = "discrete"
-    config["state_space_size"] = 8
+    config["action_space_size"] = 8
     config["image_representations"] = True
     config["delay"] = 1
     config["sequence_length"] = 3
     config["reward_scale"] = 2.5
     config["reward_shift"] = -1.75
-    config["reward_noise"] = lambda a: a.normal(0, 0.5)
+    config["reward_noise"] = 0.5 # std dev of a Gaussian dist.
     config["transition_noise"] = 0.1
     config["reward_density"] = 0.25
     config["make_denser"] = False
@@ -76,19 +81,27 @@ def discrete_environment_image_representations_example():
     config["generate_random_mdp"] = True
     env = RLToyEnv(**config)
 
-    # The environment maintains an augmented state which contains the underlying state used by the MDP to perform transitions and hand out rewards. We can fetch a dict containing the augmented state and current state like this:
+    # The environment maintains an augmented state which contains the underlying
+    # state used by the MDP to perform transitions and hand out rewards. We can
+    # fetch a dict containing the augmented state and current state like this:
     augmented_state_dict = env.get_augmented_state()
     state = augmented_state_dict['curr_state']
 
-    print("Taking a step in the environment with a random action and printing the transition:")
+    print("Taking a step in the environment with a random action and printing "\
+        "the transition:")
     action = env.action_space.sample()
     next_state_image, reward, done, info = env.step(action)
-    next_state = augmented_state_dict['curr_state'] # Underlying MDP state holds the current discrete state.
+    next_state = augmented_state_dict['curr_state'] # Underlying MDP state holds
+    # the current discrete state.
     print("sars', done =", state, action, reward, next_state, done)
 
     # Display the image observation associated with the next state
     from PIL import Image
-    img1 = Image.fromarray(np.squeeze(next_state_image), 'L') # 'L' is used for black and white. squeeze() is used because the image is 3-D because frameworks like Ray expect the image to be 3-D.
+    # Because numpy is row-major and Image is column major, need to transpose
+    next_state_image = next_state_image.transpose(1, 0, 2)
+    img1 = Image.fromarray(np.squeeze(next_state_image), 'L') # 'L' is used for
+    # black and white. squeeze() is used because the image is 3-D because
+    # frameworks like Ray expect the image to be 3-D.
     img1.show()
 
     env.close()
@@ -102,20 +115,23 @@ def continuous_environment_example_move_along_a_line():
     config["state_space_type"] = "continuous"
     config["state_space_dim"] = 4
     config["transition_dynamics_order"] = 1
-    config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
-    config["time_unit"] = 1 # Discretization of time domain and the time duration over which action is applied
+    config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of
+    # inertia.
+    config["time_unit"] = 1 # Discretization of time domain and the time
+    # duration over which action is applied
 
     config["delay"] = 0
     config["sequence_length"] = 10
     config["reward_scale"] = 1.0
-    config["reward_noise"] = lambda a: a.normal(0, 0.1)
-    config["transition_noise"] = lambda a: a.normal(0, 0.1)
+    config["reward_noise"] = 0.1 # std dev of a Gaussian dist.
+    config["transition_noise"] = 0.1 # std dev of a Gaussian dist.
     config["reward_function"] = "move_along_a_line"
 
     env = RLToyEnv(**config)
     state = env.reset()
 
-    print("Taking a step in the environment with a random action and printing the transition:")
+    print("Taking a step in the environment with a random action and printing "\
+        "the transition:")
     action = env.action_space.sample()
     next_state, reward, done, info = env.step(action)
     print("sars', done =", state, action, reward, next_state, done)
@@ -130,8 +146,10 @@ def continuous_environment_example_move_to_a_point():
     config["state_space_type"] = "continuous"
     config["state_space_dim"] = 2
     config["transition_dynamics_order"] = 1
-    config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
-    config["time_unit"] = 1 # Discretization of time domain and the time duration over which action is applied
+    config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of
+    # inertia.
+    config["time_unit"] = 1 # Discretization of time domain and the time
+    # duration over which action is applied
 
     config['make_denser'] = True
     config['target_point'] = [0, 0]
@@ -145,12 +163,78 @@ def continuous_environment_example_move_to_a_point():
     env = RLToyEnv(**config)
     state = env.reset()
 
-    print("Taking a step in the environment with a random action and printing the transition:")
+    print("Taking a step in the environment with a random action and printing "\
+        "the transition:")
     action = env.action_space.sample()
     next_state, reward, done, info = env.step(action)
     print("sars', done =", state, action, reward, next_state, done)
 
     env.close()
+
+
+def grid_environment_example():
+    config = {}
+    config["seed"] = 0
+
+    config["state_space_type"] = "grid"
+    config["grid_shape"] = (8, 8)
+
+    config["reward_function"] = "move_to_a_point"
+    config["make_denser"] = True
+    config["target_point"] = [5, 5]
+
+    env = RLToyEnv(**config)
+
+    state = env.get_augmented_state()['augmented_state'][-1]
+    actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+
+    for i in range(len(actions)):
+        action = actions[i]
+        next_obs, reward, done, info = env.step(action)
+        next_state = env.get_augmented_state()['augmented_state'][-1]
+        print("sars', done =", state, action, reward, next_state, done)
+
+
+    env.reset()
+    env.close()
+
+
+def grid_environment_image_representations_example():
+    config = {}
+    config["seed"] = 0
+
+    config["state_space_type"] = "grid"
+    config["grid_shape"] = (8, 8)
+
+    config["reward_function"] = "move_to_a_point"
+    config["make_denser"] = True
+    config["target_point"] = [5, 5]
+
+    config["image_representations"] = True
+    config["terminal_states"] = [[5, 5], [2, 3], [2, 4], [3, 3], [3, 4]]
+    env = RLToyEnv(**config)
+
+    state = env.get_augmented_state()['augmented_state'][-1]
+    actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2]]
+
+    for i in range(len(actions)):
+        action = actions[i]
+        next_obs, reward, done, info = env.step(action)
+        next_state = env.get_augmented_state()['augmented_state'][-1]
+        print("sars', done =", state, action, reward, next_state, done)
+
+
+    env.reset()
+    env.close()
+
+    # Display the image observation associated with the next state
+    from PIL import Image
+    # Because numpy is row-major and Image is column major, need to transpose
+    next_obs = next_obs.transpose(1, 0, 2)
+    img1 = Image.fromarray(np.squeeze(next_obs), 'RGB') # squeeze() is
+    # used because the image is 3-D because frameworks like Ray expect the image
+    # to be 3-D.
+    img1.show()
 
 
 def atari_wrapper_example():
@@ -172,7 +256,7 @@ def atari_wrapper_example():
     print("Taking a step in the environment with a random action and printing the transition:")
     action = env.action_space.sample()
     next_state, reward, done, info = env.step(action)
-    print("sars', done =", state, action, reward, next_state, done)
+    print("s.shape ar s'.shape, done =", state.shape, action, reward, next_state.shape, done)
 
     env.close()
 
@@ -216,8 +300,13 @@ if __name__ == "__main__":
     print(set_ansi_escape + "\nRunning continuous environment: move_to_a_point\n" + reset_ansi_escape)
     continuous_environment_example_move_to_a_point()
 
-    print(set_ansi_escape + "\nRunning continuous environment: move_along_a_line\n" + reset_ansi_escape)
-    continuous_environment_example_move_along_a_line()
+    print(set_ansi_escape + "\nRunning grid environment: move_to_a_point\n" \
+            + reset_ansi_escape)
+    grid_environment_example()
+
+    print(set_ansi_escape + "\nRunning grid environment: move_to_a_point "\
+            "with image representations\n" + reset_ansi_escape)
+    grid_environment_image_representations_example()
 
     print(set_ansi_escape + "\nRunning Atari wrapper example:\n" + reset_ansi_escape)
     atari_wrapper_example()
@@ -225,8 +314,13 @@ if __name__ == "__main__":
     print(set_ansi_escape + "\nRunning Mujoco wrapper example:\n" + reset_ansi_escape)
     mujoco_wrapper_example()
 
-    # Using gym.make()
+    # Using gym.make() example 1
     import mdp_playground
     import gym
     gym.make('RLToy-v0')
-    gym.make('RLToy-v0', **{'state_space_size':8, 'action_space_size':8, 'state_space_type':'discrete', 'action_space_type':'discrete', 'terminal_state_density':0.25, 'maximally_connected': True})
+
+
+    env = gym.make('RLToyFiniteHorizon-v0', **{'state_space_size':8, 'action_space_size':8, 'state_space_type':'discrete', 'action_space_type':'discrete', 'terminal_state_density':0.25, 'maximally_connected': True})
+    env.reset()
+    for i in range(10):
+        print(env.step(env.action_space.sample()))
