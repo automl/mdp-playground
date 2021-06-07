@@ -1,6 +1,6 @@
 # based on https://stackoverflow.com/a/40178818/11051330
 
-STATUS="$(git status)"
+STATUS="$(LC_ALL=C git status)"
 DOCSDIR="docs/_build/"
 
 if [[ $STATUS == *"nothing to commit, working tree clean"* ]]
