@@ -48,6 +48,8 @@ extras_require_cont = [
     "scipy>=1.3.0",
     "pandas==0.25.0",
     "gym[atari]==0.14",
+    "atari-py==0.2.5",  # https://github.com/openai/atari-py/issues/81 #TODO Remove
+    "matplotlib",  # #TODO Remove?
 ]
 
 AUTHORS = (
