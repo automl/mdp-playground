@@ -3,7 +3,7 @@
 STATUS="$(git status)"
 DOCSDIR="docs/_build/"
 
-if [[ $STATUS == *"nothing to commit, working directory clean"* ]]
+if [[ $STATUS == *"nothing to commit, working tree clean"* ]]
 then
     sed -i "" '$DOCSDIR' ./.gitignore
     git add .
