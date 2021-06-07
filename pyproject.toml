@@ -36,6 +36,7 @@ classifiers = [
 python = "^3.6"
 numpy = "^1.19.5"
 matplotlib = "^3.3.4"
+atari-py = "0.2.5"
 
 gym = { version = "^0.18.0", extras = ["atari"] }
 
