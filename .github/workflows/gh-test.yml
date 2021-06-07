@@ -27,12 +27,6 @@ jobs:
         pip install -e .[extras_disc]
         pip install ray[rllib,debug]==0.7.3
         pip install tensorflow==1.13.0rc1
-    - name: Fix missing ROMs
-      run: |
-        sudo apt-get install unrar
-        wget http://www.atarimania.com/roms/Roms.rar
-        unrar e Roms.rar ./atari_roms
-        python -m atari_py.import_roms ./atari_roms
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
