@@ -1,6 +1,8 @@
 name: Test PyPI Installation
 
 on:
+  workflow_dispatch:
+
   push:
     branches: [ master, dev/jan ]
   pull_request:
