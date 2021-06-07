@@ -754,7 +754,11 @@ class TestRLToyEnv(unittest.TestCase):
         env = RLToyEnv(**config)
 
         state = env.get_augmented_state()['augmented_state'][-1]
+<<<<<<< HEAD:tests/test_mdp_playground.py
         actions = [[0, -1], [-1, 0], [1, 0], [1, 0], [0, 1], [0, 1], [0, 1], [0, 1], [-1, 0]]
+=======
+        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+>>>>>>> 336ac424130a85f36149141498b1ea6c6ed11472:tests/test_mdp_playground.py
 
         tot_rew = 0
         for i in range(len(actions)):
@@ -765,7 +769,11 @@ class TestRLToyEnv(unittest.TestCase):
             state = next_state.copy()
             tot_rew += reward
 
+<<<<<<< HEAD:tests/test_mdp_playground.py
         assert tot_rew == 8.25, str(tot_rew)
+=======
+        assert tot_rew == 7.5, str(tot_rew)
+>>>>>>> 336ac424130a85f36149141498b1ea6c6ed11472:tests/test_mdp_playground.py
 
         env.reset()
         env.close()
@@ -773,6 +781,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         # Test 2: Almost the same as 1, but with irrelevant features
         config["irrelevant_features"] = True
+<<<<<<< HEAD:tests/test_mdp_playground.py
         config["term_state_reward"] = 0.
 
         env = RLToyEnv(**config)
@@ -797,6 +806,23 @@ class TestRLToyEnv(unittest.TestCase):
             tot_rew += reward
 
         assert tot_rew == 9, str(tot_rew)
+=======
+
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()['augmented_state'][-1]
+        actions = [[0, 1], [-1, 1], [-1, 0], [1, -1], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            action = actions[i] + [-1, 0]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()['augmented_state'][-1]
+            print("sars'o', done =", state, action, reward, next_state, next_obs, done)
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 7.5, str(tot_rew)
+>>>>>>> 336ac424130a85f36149141498b1ea6c6ed11472:tests/test_mdp_playground.py
 
         env.reset()
         env.close()
