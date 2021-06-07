@@ -92,7 +92,7 @@ setup(
     # package_dir={"": "src"},
     python_requires=">=3.6",
     setup_requires=['numpy'],
-    install_requires=['dill', 'numpy', 'matplotlib'],
+    install_requires=['dill', 'numpy'],
     extras_require={
       'extras': extras_require,
       'extras_disc': extras_require_disc,
