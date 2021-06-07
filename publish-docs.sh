@@ -5,7 +5,7 @@ DOCSDIR="docs/_build/"
 
 if [[ $STATUS == *"nothing to commit, working tree clean"* ]]
 then
-    sed -i "" '$DOCSDIR' ./.gitignore
+    awk -vLine="$DOCSDIR" '!index($0,Line)' ./.gitignore
     git add .
     git commit -m "Edit .gitignore to publish docs"
     git subtree push --prefix $DOCSDIR/html/ origin gh-pages
