@@ -210,57 +210,8 @@ class RLToyEnv(gym.Env):
 
         print("Passed config:", config, "\n")
 
-        # Set default settings for config to be able to use class without any config being passed
-        if len(config) == 0:
-            # config = {}
-
-            # Discrete spaces configs:
-            config["state_space_type"] = "discrete"  # TODO if states are assumed categorical in discrete setting, need to have an embedding for their OHE when using NNs; do the encoding on the training end!
-            config["state_space_size"] = 8  # To be given as an integer for simple Discrete environment like Gym's. To be given as a list of integers for a MultiDiscrete environment like Gym's #TODO Rename state_space_size and action_space_size to be relevant_... wherever irrelevant dimensions are not used.
-            config["action_space_size"] = 8
-
-            # Continuous spaces configs:
-            # config["state_space_type"] = "continuous"
-            # config["state_space_dim"] = 2
-            # config["action_space_dim"] = 2
-            # config["transition_dynamics_order"] = 1
-            # config["inertia"] = 1 # 1 unit, e.g. kg for mass, or kg * m^2 for moment of inertia.
-            # config["state_space_max"] = 5 # Will be a Box in the range [-max, max]
-            # config["action_space_max"] = 5 # Will be a Box in the range [-max, max]
-            # config["time_unit"] = 0.01 # Discretization of time domain
-            # config["terminal_states"] = [[0.0, 1.0], [1.0, 0.0]]
-            # config["term_state_edge"] =  1.0 # Terminal states will be in a hypercube centred around the terminal states given above with the edge of the hypercube of this length.
-
-            # config for user specified P, R, rho_0, T. Examples here are for discrete spaces
-            # config["transition_function"] = np.array([[4 - i for \
-            # i in range(config["state_space_size"])] for j in\
-            # range(config["action_space_size"])]) #TODO ###IMP For all these
-            # prob. dist., there's currently a difference in what is returned for discrete vs continuous!
-            # config["reward_function"] = np.array([[4 - i for i in range(config["state_space_size"])] for j in range(config["action_space_size"])])
-            # config["init_state_dist"] = np.array([i/10 for i in range(config["state_space_size"])])
-            # config["terminal_states"] = np.array([config["state_space_size"] - 1]) # Can be discrete array or function to test terminal or not (e.g. for discrete and continuous spaces we may prefer 1 of the 2) #TODO currently always the same terminal state for a given environment state space size; have another variable named terminal_states to make semantic sense of variable name.
-
-
-            config["generate_random_mdp"] = True # ###IMP # This supersedes previous settings and generates a random transition function, a random reward function (for random specific sequences)
-            config["delay"] = 0
-            config["sequence_length"] = 1
-            config["repeats_in_sequences"] = False
-            config["reward_scale"] = 1.0
-            config["reward_density"] = 0.25 # Number between 0 and 1
-#            config["transition_noise"] = 0.2 # Currently the fractional chance of transitioning to one of the remaining states when given the deterministic transition function - in future allow this to be given as function; keep in mind that the transition function itself could be made a stochastic function - does that qualify as noise though?
-#            config["reward_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to reward function
-            # config["transition_noise"] = lambda a: a.normal(0, 0.1) #random #hack # a probability function added to transition function in cont. spaces
-            config["make_denser"] = False
-            config["terminal_state_density"] = 0.25 # Number between 0 and 1
-            config["maximally_connected"] = True # Make every state reachable from every state; If maximally_connected, then no. of actions has to be at least equal to no. of states( - 1 if without self-loop); if repeating sequences allowed, then we have to have self-loops. Self-loops are ok even in non-repeating sequences - we just have a harder search problem then! Or make it maximally connected by having transitions to as many different states as possible - the row for P would have as many different transitions as possible!
-            # print(config)
-            # #TODO asserts for the rest of the config settings
-            # next: To implement delay, we can keep the previous observations to make state Markovian or keep an info bit in the state to denote that; Buffer length increase by fixed delay and fixed sequence length; current reward is incremented when any of the satisfying conditions (based on previous states) matches
-
-            config["seed"] = 0
-
         # Print initial "banner"
-        screen_output_width = 132 # #hardcoded #TODO get from system
+        screen_output_width = 132  # #hardcoded #TODO get from system
         repeat_equal_sign = (screen_output_width - 20) // 2
         set_ansi_escape = "\033[32;1m"
         reset_ansi_escape = "\033[0m"
