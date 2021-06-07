@@ -31,7 +31,7 @@ jobs:
       run: |
         sudo apt-get install unrar
         wget http://www.atarimania.com/roms/Roms.rar
-        unrar e tecmint.rar ./atari_roms
+        unrar e Roms.rar ./atari_roms
         python -m atari_py.import_roms ./atari_roms
     - name: Lint with flake8
       run: |
