@@ -34,7 +34,8 @@ extras_require_disc = [
     "pandas==0.25.0",
     "gym[atari]==0.14",
     "atari-py==0.2.5",  # https://github.com/openai/atari-py/issues/81 #TODO Remove
-    "matplotlib",  # #TODO Remove?
+    "matplotlib==3.2.1",  # #TODO Remove?
+    "pillow==6.1.0",
 ]
 
 extras_require_cont = [
@@ -49,7 +50,8 @@ extras_require_cont = [
     "pandas==0.25.0",
     "gym[atari]==0.14",
     "atari-py==0.2.5",  # https://github.com/openai/atari-py/issues/81 #TODO Remove
-    "matplotlib",  # #TODO Remove?
+    "matplotlib==3.2.1",  # #TODO Remove?
+    "pillow==6.1.0",
 ]
 
 AUTHORS = (
