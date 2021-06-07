@@ -13,18 +13,18 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath('..'))
-sys.path.append(os.path.abspath('../mdp_playground'))
+sys.path.insert(0, os.path.abspath(".."))
+sys.path.append(os.path.abspath("../mdp_playground"))
 
 # -- Project information -----------------------------------------------------
 
 # TODO: read automatically from setup
-project = 'MDP Playground'
-copyright = '2021, MDP Playground developers'
-author = 'MDP Playground developers'
+project = "MDP Playground"
+copyright = "2021, MDP Playground developers"
+author = "MDP Playground developers"
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = "0.0.1"
 
 
 # -- General configuration ---------------------------------------------------
@@ -33,11 +33,11 @@ release = '0.0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.coverage',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.coverage",
     "sphinx.ext.viewcode",
-    'sphinx.ext.autosummary',
+    "sphinx.ext.autosummary",
 ]
 
 napoleon_google_docstring = False
@@ -50,12 +50,12 @@ html_show_sourcelink = False  # Remove 'view source code' from top of page
 autodoc_inherit_docstrings = True  # If no docstring, inherit from base class
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', '_templates', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "_templates", "Thumbs.db", ".DS_Store"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -68,4 +68,4 @@ html_theme = "sphinx_book_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]

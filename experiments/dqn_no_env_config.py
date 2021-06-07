@@ -1,17 +1,16 @@
-num_seeds = 10
+import itertools
+from ray import tune
 from collections import OrderedDict
-var_env_configs = OrderedDict({
-})
+num_seeds = 10
 
-var_configs = OrderedDict({
-"env": var_env_configs
-})
+var_env_configs = OrderedDict({})
+
+var_configs = OrderedDict({"env": var_env_configs})
 
 env_config = {
     "env": "RLToy-v0",
     "horizon": 100,
-    "env_config": {
-    },
+    "env_config": {},
 }
 
 algorithm = "DQN"
@@ -26,7 +25,7 @@ agent_config = {
     "final_prioritized_replay_beta": 1.0,
     "hiddens": None,
     "learning_starts": 1000,
-    "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    "lr": 1e-4,  # "lr": grid_search([1e-2, 1e-4, 1e-6]),
     "n_step": 1,
     "noisy": False,
     "num_atoms": 1,
@@ -53,25 +52,26 @@ model_config = {
     },
 }
 
-from ray import tune
+
 eval_config = {
-    "evaluation_interval": 1, # I think this means every x training_iterations
+    "evaluation_interval": 1,  # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
         "exploration_final_eps": 0,
         "evaluation_num_episodes": 10,
         "horizon": 100,
-        "env_config": {
-        }
+        "env_config": {},
     },
 }
 value_tuples = []
 for config_type, config_dict in var_configs.items():
     for key in config_dict:
-        assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
+        assert (
+            isinstance(var_configs[config_type][key], list)
+        ), "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
         value_tuples.append(var_configs[config_type][key])
 
-import itertools
+
 cartesian_product_configs = list(itertools.product(*value_tuples))
 print("Total number of configs. to run:", len(cartesian_product_configs))

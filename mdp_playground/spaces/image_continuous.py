@@ -7,20 +7,31 @@ import PIL.Image as Image
 from PIL.Image import FLIP_LEFT_RIGHT, FLIP_TOP_BOTTOM
 import os
 
+
 class ImageContinuous(Box):
-    '''A space that maps a continuous 1- or 2-D space 1-to-1 to images so that the
+    """A space that maps a continuous 1- or 2-D space 1-to-1 to images so that the
     images may be used as representations for corresponding continuous environments.
 
     Methods
     -------
     get_concatenated_image(continuous_obs)
         Gets an image representation for a given feature space observation
-    '''
+    """
 
-    def __init__(self, feature_space, term_spaces=None, width=100, height=100,\
-                circle_radius=5, target_point=None, relevant_indices=[0,1],\
-                seed=None, grid_shape=None, dtype=np.uint8):
-        '''
+    def __init__(
+        self,
+        feature_space,
+        term_spaces=None,
+        width=100,
+        height=100,
+        circle_radius=5,
+        target_point=None,
+        relevant_indices=[0, 1],
+        seed=None,
+        grid_shape=None,
+        dtype=np.uint8,
+    ):
+        """
         Parameters
         ----------
         feature_space : Gym.spaces.Box
@@ -42,7 +53,7 @@ class ImageContinuous(Box):
 
         seed : int
             Seed for this space
-        '''
+        """
         # ##TODO Define a common superclass for this and ImageMultiDiscrete
         self.feature_space = feature_space
         assert (self.feature_space.high != np.inf).any()
@@ -62,8 +73,9 @@ class ImageContinuous(Box):
             self.irrelevant_features = True
         if grid_shape is not None:
             self.draw_grid = True
-            assert type(grid_shape == tuple) and \
-                        (len(grid_shape) == 2 or len(grid_shape) == 4)
+            assert type(grid_shape == tuple) and (
+                len(grid_shape) == 2 or len(grid_shape) == 4
+            )
             # Could also assert that self.width is divisible by grid_shape[0], etc.
             self.grid_shape = grid_shape
         else:
@@ -78,14 +90,14 @@ class ImageContinuous(Box):
         assert len(feature_space.shape) == 1
         relevant_dims = len(relevant_indices)
         irr_dims = len(self.irrelevant_indices)
-        assert relevant_dims <= 2 and irr_dims <=2, "Image observations are "\
-                "supported only "\
-                "for 1- or 2-D feature spaces."
-
+        assert relevant_dims <= 2 and irr_dims <= 2, (
+            "Image observations are " "supported only " "for 1- or 2-D feature spaces."
+        )
 
         # Shape has 1 appended for Ray Rllib to be compatible IIRC
-        super(ImageContinuous, self).__init__(shape=(width, height, 1), \
-                dtype=dtype, low=0, high=255)
+        super(ImageContinuous, self).__init__(
+            shape=(width, height, 1), dtype=dtype, low=0, high=255
+        )
         super(ImageContinuous, self).seed(seed=seed)
 
         if self.target_point is not None:
@@ -93,14 +105,13 @@ class ImageContinuous(Box):
                 target_point += 0.5
             self.target_point_pixel = self.convert_to_pixel(target_point)
 
-
     def generate_image(self, position, relevant=True):
-        '''
+        """
         Parameters
         ----------
         position : np.array
 
-        '''
+        """
         # Use RGB
         image_ = Image.new("RGB", (self.width, self.height), color=self.bg_colour)
         # Use L for black and white 8-bit pixels instead of RGB in case not
@@ -114,10 +125,14 @@ class ImageContinuous(Box):
             position = position.astype(float)
             position += 0.5
             offset = 0 if relevant else 2
-            for i in range(1, self.grid_shape[0 + offset] + 1): # +1 because this is along
-            # concatentation dimension when stitching together images below in
-            # get_concatenated_image
-                x_ = i * self.width // self.grid_shape[0 + offset] - 1 # -1 to not go outside
+            for i in range(
+                1, self.grid_shape[0 + offset] + 1
+            ):  # +1 because this is along
+                # concatentation dimension when stitching together images below in
+                # get_concatenated_image
+                x_ = (
+                    i * self.width // self.grid_shape[0 + offset] - 1
+                )  # -1 to not go outside
                 # image size for the last line drawn
                 y_ = self.height
                 start_pt = (x_, y_)
@@ -137,7 +152,7 @@ class ImageContinuous(Box):
             for term_space in self.term_spaces:
                 low = self.convert_to_pixel(term_space.low)
                 if self.draw_grid:
-                    high = self.convert_to_pixel(term_space.high + 1.)
+                    high = self.convert_to_pixel(term_space.high + 1.0)
                 else:
                     high = self.convert_to_pixel(term_space.high)
 
@@ -163,9 +178,6 @@ class ImageContinuous(Box):
         twoPointList = [leftUpPoint, rightDownPoint]
         draw.ellipse(twoPointList, fill=self.agent_colour)
 
-
-
-
         # Because numpy is row-major and Image is column major, need to transpose
         # ret_arr = np.array(image_).T # For 2-D
         ret_arr = np.transpose(np.array(image_), axes=(1, 0, 2))
@@ -173,34 +185,34 @@ class ImageContinuous(Box):
         return ret_arr
 
     def get_concatenated_image(self, obs):
-        '''Gets the "stitched together" image made from images corresponding to
+        """Gets the "stitched together" image made from images corresponding to
         each continuous sub-space within the continuous space, concatenated
         along the X-axis.
-        '''
+        """
         concatenated_image = []
         # For relevant/irrelevant sub-spaces:
         concatenated_image.append(self.generate_image(obs[self.relevant_indices]))
         if self.irrelevant_features:
-            irr_image = self.generate_image(obs[self.irrelevant_indices], relevant=False)
+            irr_image = self.generate_image(
+                obs[self.irrelevant_indices], relevant=False
+            )
             concatenated_image.append(irr_image)
 
         concatenated_image = np.concatenate(tuple(concatenated_image), axis=0)
 
-        return np.atleast_3d(concatenated_image) # because Ray expects an
+        return np.atleast_3d(concatenated_image)  # because Ray expects an
         # image to have >=3 dims
 
     def convert_to_pixel(self, position):
-        '''
-        '''
+        """ """
         # It's implicit that both relevant and irrelevant sub-spaces have the
         # same max and min here:
         max = self.feature_space.high[self.relevant_indices]
         min = self.feature_space.low[self.relevant_indices]
-        pos_pixel = ((position - min) / (max - min))
+        pos_pixel = (position - min) / (max - min)
         pos_pixel = (pos_pixel * self.shape[:2]).astype(int)
 
         return pos_pixel
-
 
     def sample(self):
 
@@ -208,17 +220,23 @@ class ImageContinuous(Box):
         return self.get_concatenated_image(sampled)
 
     def __repr__(self):
-        return "{} with continuous underlying space of shape: {} and "\
-                "images of resolution: {} and dtype: {}".format(self.__class__,\
-                self.feature_space.shape,\
-                self.shape, self.dtype)
+        return (
+            "{} with continuous underlying space of shape: {} and "
+            "images of resolution: {} and dtype: {}".format(
+                self.__class__, self.feature_space.shape, self.shape, self.dtype
+            )
+        )
 
     def contains(self, x):
         """
         Return boolean specifying if x is a valid
         member of this space
         """
-        if x.shape == (self.width, self.height, 1): #TODO compare each pixel for all possible images?
+        if x.shape == (
+            self.width,
+            self.height,
+            1,
+        ):  # TODO compare each pixel for all possible images?
             return True
 
     def to_jsonable(self, sample_n):

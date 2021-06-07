@@ -6,6 +6,12 @@ from mdp_playground.spaces.image_multi_discrete import ImageMultiDiscrete
 from mdp_playground.spaces.image_continuous import ImageContinuous
 from mdp_playground.spaces.tuple_extended import TupleExtended
 
-__all__ = ["BoxExtended", "DiscreteExtended", "GridActionSpace",\
-            "MultiDiscreteExtended", "ImageMultiDiscrete", "ImageContinuous",\
-            "TupleExtended"]
+__all__ = [
+    "BoxExtended",
+    "DiscreteExtended",
+    "GridActionSpace",
+    "MultiDiscreteExtended",
+    "ImageMultiDiscrete",
+    "ImageContinuous",
+    "TupleExtended",
+]
