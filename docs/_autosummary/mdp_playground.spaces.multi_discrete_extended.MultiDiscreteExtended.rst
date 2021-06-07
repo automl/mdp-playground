@@ -1,4 +1,4 @@
-mdp\_playground.spaces.multi\_discrete\_extended.MultiDiscreteExtended
+﻿mdp\_playground.spaces.multi\_discrete\_extended.MultiDiscreteExtended
 ======================================================================
 
 .. currentmodule:: mdp_playground.spaces.multi_discrete_extended
@@ -26,5 +26,11 @@ mdp\_playground.spaces.multi\_discrete\_extended.MultiDiscreteExtended
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MultiDiscreteExtended.np_random
    
    

@@ -1,4 +1,4 @@
-mdp\_playground.spaces.image\_multi\_discrete.ImageMultiDiscrete
+﻿mdp\_playground.spaces.image\_multi\_discrete.ImageMultiDiscrete
 ================================================================
 
 .. currentmodule:: mdp_playground.spaces.image_multi_discrete
@@ -29,5 +29,11 @@ mdp\_playground.spaces.image\_multi\_discrete.ImageMultiDiscrete
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ImageMultiDiscrete.np_random
    
    

@@ -1,4 +1,4 @@
-mdp\_playground.spaces.tuple\_extended.TupleExtended
+﻿mdp\_playground.spaces.tuple\_extended.TupleExtended
 ====================================================
 
 .. currentmodule:: mdp_playground.spaces.tuple_extended
@@ -26,5 +26,11 @@ mdp\_playground.spaces.tuple\_extended.TupleExtended
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~TupleExtended.np_random
    
    

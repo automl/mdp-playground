@@ -1,4 +1,4 @@
-mdp\_playground.spaces.box\_extended.BoxExtended
+﻿mdp\_playground.spaces.box\_extended.BoxExtended
 ================================================
 
 .. currentmodule:: mdp_playground.spaces.box_extended
@@ -27,5 +27,11 @@ mdp\_playground.spaces.box\_extended.BoxExtended
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BoxExtended.np_random
    
    

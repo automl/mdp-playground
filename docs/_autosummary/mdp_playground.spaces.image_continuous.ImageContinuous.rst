@@ -1,4 +1,4 @@
-mdp\_playground.spaces.image\_continuous.ImageContinuous
+﻿mdp\_playground.spaces.image\_continuous.ImageContinuous
 ========================================================
 
 .. currentmodule:: mdp_playground.spaces.image_continuous
@@ -30,5 +30,11 @@ mdp\_playground.spaces.image\_continuous.ImageContinuous
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ImageContinuous.np_random
    
    
