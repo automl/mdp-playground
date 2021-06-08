@@ -133,6 +133,8 @@ The CSV stats files will be saved to the current directory and can be analysed i
 ## Plotting
 To plot results from experiments, run `jupyter-notebook` and open [`plot_experiments.ipynb`](plot_experiments.ipynb) in Jupyter. There are instructions within each of the cells on how to generate and save plots.
 
+We have provided a sample set of CSVs you could use in the supplementary material. There correspond to experiments from the main paper used for the spider plots for continuous environments (Figure 3b).
+
 ## Citing
 If you use MDP Playground in your work, please cite the following paper:
 
