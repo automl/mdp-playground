@@ -313,11 +313,11 @@ class MDPP_Analysis():
     def gather_stats(self, list_exp_data, train, metric_num, plot_type):
         stats_data = dict()
 
-        if plot_type is "agent":
+        if plot_type == "agent":
             #groupby agent
             groupby = 'algorithm'
             sub_groupby = 'axis_labels'
-        elif plot_type is "metric":
+        elif plot_type == "metric":
             #groupby metric
             groupby = 'axis_labels'
             sub_groupby = 'algorithm'
