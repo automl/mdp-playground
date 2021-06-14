@@ -1,33 +1,36 @@
-num_seeds = 10
+import itertools
+from ray import tune
 from collections import OrderedDict
-var_env_configs = OrderedDict({
-    'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
-    'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0] + [2**i for i in range(4)],
-    'sequence_length': [1, 2, 3, 4],#i for i in range(1,4)]
-    'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
-    'make_denser': [False],
-    'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
-    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
-    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
-    'dummy_seed': [i for i in range(num_seeds)],
-})
+num_seeds = 10
 
-var_configs = OrderedDict({
-"env": var_env_configs
-})
+var_env_configs = OrderedDict(
+    {
+        "state_space_size": [8],  # , 10, 12, 14] # [2**i for i in range(1,6)]
+        "action_space_size": [8],  # 2, 4, 8, 16] # [2**i for i in range(1,6)]
+        "delay": [0] + [2 ** i for i in range(4)],
+        "sequence_length": [1, 2, 3, 4],  # i for i in range(1,4)]
+        "reward_density": [0.25],  # np.linspace(0.0, 1.0, num=5)
+        "make_denser": [False],
+        "terminal_state_density": [0.25],  # np.linspace(0.1, 1.0, num=5)
+        "transition_noise": [0],  # , 0.01, 0.02, 0.10, 0.25]
+        "reward_noise": [0],  # , 1, 5, 10, 25] # Std dev. of normal dist.
+        "dummy_seed": [i for i in range(num_seeds)],
+    }
+)
+
+var_configs = OrderedDict({"env": var_env_configs})
 
 env_config = {
     "env": "RLToy-v0",
     "horizon": 100,
     "env_config": {
-        'seed': 0, #seed
-        'state_space_type': 'discrete',
-        'action_space_type': 'discrete',
-        'generate_random_mdp': True,
-        'repeats_in_sequences': False,
-        'reward_scale': 1.0,
-        'completely_connected': True,
+        "seed": 0,  # seed
+        "state_space_type": "discrete",
+        "action_space_type": "discrete",
+        "generate_random_mdp": True,
+        "repeats_in_sequences": False,
+        "reward_scale": 1.0,
+        "completely_connected": True,
     },
 }
 
@@ -43,7 +46,7 @@ agent_config = {
     "final_prioritized_replay_beta": 1.0,
     "hiddens": None,
     "learning_starts": 1000,
-    "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    "lr": 1e-4,  # "lr": grid_search([1e-2, 1e-4, 1e-6]),
     "n_step": 1,
     "noisy": False,
     "num_atoms": 1,
@@ -70,9 +73,9 @@ model_config = {
     },
 }
 
-from ray import tune
+
 eval_config = {
-    "evaluation_interval": 1, # I think this means every x training_iterations
+    "evaluation_interval": 1,  # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
@@ -80,19 +83,24 @@ eval_config = {
         "evaluation_num_episodes": 10,
         "horizon": 100,
         "env_config": {
-            "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-            'transition_noise': 0 if "state_space_type" in env_config["env_config"] and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
-            'reward_noise': tune.function(lambda a: a.normal(0, 0)),
-            'action_loss_weight': 0.0,
-        }
+            "dummy_eval": True,  # hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+            "transition_noise": 0
+            if "state_space_type" in env_config["env_config"]
+            and env_config["env_config"]["state_space_type"] == "discrete"
+            else tune.function(lambda a: a.normal(0, 0)),
+            "reward_noise": tune.function(lambda a: a.normal(0, 0)),
+            "action_loss_weight": 0.0,
+        },
     },
 }
 value_tuples = []
 for config_type, config_dict in var_configs.items():
     for key in config_dict:
-        assert type(var_configs[config_type][key]) == list, "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
+        assert (
+            isinstance(var_configs[config_type][key], list)
+        ), "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
         value_tuples.append(var_configs[config_type][key])
 
-import itertools
+
 cartesian_product_configs = list(itertools.product(*value_tuples))
 print("Total number of configs. to run:", len(cartesian_product_configs))

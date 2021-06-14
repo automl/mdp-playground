@@ -1,0 +1,6 @@
+numpy
+keyring>=15.1
+tqdm>=4.14
+bleach>=2.1.0
+docutils>=0.13.1
+requests>=2.20
