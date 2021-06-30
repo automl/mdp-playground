@@ -139,10 +139,10 @@ We have provided a sample set of CSVs you could use in the supplementary materia
 If you use MDP Playground in your work, please cite the following paper:
 
 ```bibtex
-@article{rajan2020mdp,
-      title={MDP Playground: Controlling Dimensions of Hardness in Reinforcement Learning},
-      author={Raghu Rajan and Jessica Lizeth Borja Diaz and Suresh Guttikonda and Fabio Ferreira and André Biedenkapp and Frank Hutter},
-      year={2020},
+@article{rajan2021mdp,
+      title={MDP Playground: A Design and Debug Testbed for Reinforcement Learning}, 
+      author={Raghu Rajan and Jessica Lizeth Borja Diaz and Suresh Guttikonda and Fabio Ferreira and André Biedenkapp and Jan Ole von Hartz and Frank Hutter},
+      year={2021},
       eprint={1909.07750},
       archivePrefix={arXiv},
       primaryClass={cs.LG}
