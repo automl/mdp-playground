@@ -135,6 +135,17 @@ To plot results from experiments, run `jupyter-notebook` and open [`plot_experim
 
 We have provided a sample set of CSVs you could use in the supplementary material. There correspond to experiments from the main paper used for the spider plots for continuous environments (Figure 3b).
 
+## Documentation
+The documentation can be found at: https://automl.github.io/mdp-playground/
+
+[Toy Environments](https://automl.github.io/mdp-playground/_autosummary/mdp_playground.envs.rl_toy_env.RLToyEnv.html#mdp_playground.envs.rl_toy_env.RLToyEnv)
+
+Complex Environment Wrappers:
+
+[Gym](https://automl.github.io/mdp-playground/_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html#mdp_playground.envs.gym_env_wrapper.GymEnvWrapper)
+
+[Mujoco](https://automl.github.io/mdp-playground/_autosummary/mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper.html#mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper)
+
 ## Citing
 If you use MDP Playground in your work, please cite the following paper:
 
