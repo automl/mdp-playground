@@ -11,14 +11,16 @@ from mdp_playground.envs.rl_toy_env import RLToyEnv
 
 
 class GymEnvWrapper(gym.Env):
-    """Wraps an OpenAI Gym environment to be able to modify its dimensions corresponding to MDP Playground. The documentation for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.
+    """Wraps an OpenAI Gym environment to be able to modify its dimensions corresponding to MDP Playground. Please see [`example.py`](example.py) for some simple examples of how to use this class. The values for these dimensions are passed in a config dict as for mdp_playground.envs.RLToyEnv. The description for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.
 
     Currently supported dimensions:
-        transition noise (discrete)
+        transition noise (for discrete environments)
         reward delay
         reward noise
 
-    Also supports wrapping with AtariPreprocessing from OpenAI Gym or wrap_deepmind from Ray Rllib.
+    The wrapper is pretty general and can be applied to any Gym Environment. The environment should be instantiated and passed as the 1st argument to the __init__ method of this class. If using this wrapper with Atari, additional keys may be added specifying either atari_preprocessing = True or wrap_deepmind_ray = True. These would use the AtariPreprocessing wrapper from OpenAI Gym or wrap_deepmind() wrapper from Ray Rllib.
+
+    For AtariPreprocessing, additional key-value pairs specifying grayscale_obs and frame_skip may be provided. These have the same meaning as in AtariPreprocessing.
 
     """
 

@@ -146,12 +146,14 @@ Complex Environment Wrappers:
 
 [Mujoco](https://automl.github.io/mdp-playground/_autosummary/mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper.html#mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper)
 
+Please see [`example.py`](example.py) for some simple examples of how to use all of these.
+
 ## Citing
 If you use MDP Playground in your work, please cite the following paper:
 
 ```bibtex
 @article{rajan2021mdp,
-      title={MDP Playground: A Design and Debug Testbed for Reinforcement Learning}, 
+      title={MDP Playground: A Design and Debug Testbed for Reinforcement Learning},
       author={Raghu Rajan and Jessica Lizeth Borja Diaz and Suresh Guttikonda and Fabio Ferreira and André Biedenkapp and Jan Ole von Hartz and Frank Hutter},
       year={2021},
       eprint={1909.07750},

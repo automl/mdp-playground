@@ -35,27 +35,27 @@ class RLToyEnv(gym.Env):
         state_space_type : str
             Specifies what the environment type is. Options are "continuous", "discrete" and "grid". The "grid" environment is, basically, a discretised version of the continuous environment.
         delay : int >= 0
-            Delays each reward by this number of timesteps.
+            Delays each reward by this number of timesteps. Default value: 0.
         sequence_length : int >= 1
-            Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length are set to be rewardable at initialisation if use_custom_mdp = false and generate_random_mdp = true.
+            Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length are set to be rewardable at initialisation if use_custom_mdp = false and generate_random_mdp = true. Default value: 1.
         transition_noise : float in range [0, 1] or Python function(rng)
             For discrete environments, it is a float that specifies the fraction of times the environment transitions to a noisy next state at each timestep, independently and uniformly at random.
-            For continuous environments, if it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise. If it is a Python function with one argument, it is added to next state. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.
+            For continuous environments, if it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise. If it is a Python function with one argument, it is added to next state. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility. Default value: 0.
         reward_noise : float or Python function(rng)
             If it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise.
-            If it's a Python function with one argument, it is added to the reward given at every time step. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.
+            If it's a Python function with one argument, it is added to the reward given at every time step. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility. Default value: 0.
         reward_density : float in range [0, 1]
-            The fraction of possible sequences of a given length that will be selected to be rewardable at initialisation time.
+            The fraction of possible sequences of a given length that will be selected to be rewardable at initialisation time. Default value: 0.25.
         reward_scale : float
-            Multiplies the rewards by this value at every time step.
+            Multiplies the rewards by this value at every time step. Default value: 1.
         reward_shift : float
-            This value is added to the reward at every time step.
+            This value is added to the reward at every time step. Default value: 0.
         diameter : int > 0
-            For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will, thus, be = (number of states) / (d).
+            For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will, thus, be = (number of states) / (d). Default value: 1 for discrete environments. For continuous environments, this dimension is set automatically based on the state_space_max value.
         terminal_state_density : float in range [0, 1]
             For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states when we consider them to be ordered by their numerical value. This is w.l.o.g. because discrete states are categorical. For continuous environments, please see terminal_states and term_state_edge for how to control terminal states.
         term_state_reward : float
-            Adds this to the reward if a terminal state was reached at the current time step.
+            Adds this to the reward if a terminal state was reached at the current time step. Default value: 0.
         image_representations : boolean
             Boolean to associate an image as the external observation with every discrete categorical state.
             For discrete envs, this is handled by an mdp_playground.spaces.ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n. More details can be found in the documentation for the ImageMultiDiscrete class.
@@ -110,23 +110,23 @@ class RLToyEnv(gym.Env):
             relevant_indices : list
                 A list that provides the dimensions relevant to achieving rewards for continuous environments. The dynamics for these dimensions are independent of the dynamics for the remaining (irrelevant) dimensions.
             state_space_max : float
-                Max absolute value that a dimension of the space can take. A Gym Box will be instantiated with range [-state_space_max, state_space_max]. Sampling will be done as for Gym Box spaces.
+                Max absolute value that a dimension of the space can take. A Gym Box will be instantiated with range [-state_space_max, state_space_max]. Sampling will be done as for Gym Box spaces. Default value: Infinity.
             action_space_max : float
-                Similar description as for state_space_max.
+                Similar description as for state_space_max. Default value: Infinity.
             terminal_states : numpy.ndarray
                 The centres of hypercube sub-spaces which are terminal.
             term_state_edge : float
                 The edge of the hypercube sub-spaces which are terminal.
             transition_dynamics_order : int
-                An order of n implies that the n-th state derivative is set equal to the action/inertia.
+                An order of n implies that the n-th state derivative is set equal to the action/inertia. Default value: 1.
             inertia : float or numpy.ndarray
-                inertia of the rigid body or point object that is being simulated. If numpy.ndarray, it specifies independent inertiae for the dimensions and the shape should be (state_space_dim,).
+                inertia of the rigid body or point object that is being simulated. If numpy.ndarray, it specifies independent inertiae for the dimensions and the shape should be (state_space_dim,). Default value: 1.
             time_unit : float
-                time duration over which the action is applied to the system.
+                time duration over which the action is applied to the system. Default value: 1.
             target_point : numpy.ndarray
                 The target point in case move_to_a_point is the reward_function. If make_denser is false, target_radius determines distance from the target point at which the sparse reward is handed out.
             action_loss_weight : float
-                A coefficient to multiply the norm of the action and subtract it from the reward to penalise the action magnitude.
+                A coefficient to multiply the norm of the action and subtract it from the reward to penalise the action magnitude. Default value: 0.
 
         Specific to grid environments:
             grid_shape : tuple
