@@ -124,7 +124,7 @@ class RLToyEnv(gym.Env):
             time_unit : float
                 time duration over which the action is applied to the system. Default value: 1.
             target_point : numpy.ndarray
-                The target point in case move_to_a_point is the reward_function. If make_denser is false, target_radius determines distance from the target point at which the sparse reward is handed out.
+                The target point in case move_to_a_point is the reward_function. If make_denser is false, target_radius determines distance from the target point at which the sparse reward is handed out. Default value: array of 0s.
             action_loss_weight : float
                 A coefficient to multiply the norm of the action and subtract it from the reward to penalise the action magnitude. Default value: 0.
 
@@ -584,10 +584,14 @@ class RLToyEnv(gym.Env):
             # assert config["state_space_dim"] == config["action_space_dim"], "For continuous spaces, state_space_dim has to be = action_space_dim. state_space_dim was: " + str(config["state_space_dim"]) + " action_space_dim was: " + str(config["action_space_dim"])
             if config["reward_function"] == "move_to_a_point":
                 assert self.sequence_length == 1
-                self.target_point = np.array(config["target_point"], dtype=self.dtype)
-                assert self.target_point.shape == (
-                    len(config["relevant_indices"]),
-                ), "target_point should have dimensionality = relevant_state_space dimensionality"
+                if "target_point" in config:
+                    self.target_point = np.array(config["target_point"], dtype=self.dtype)
+                    assert self.target_point.shape == (
+                        len(config["relevant_indices"]),
+                    ), "target_point should have dimensionality = relevant_state_space dimensionality"
+                else:
+                    # Sets default
+                    self.target_point = np.zeros(shape=(config["state_space_dim"],))
         elif config["state_space_type"] == "grid":
             if config["reward_function"] == "move_to_a_point":
                 self.target_point = config["target_point"]
