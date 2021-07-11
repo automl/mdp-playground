@@ -2,7 +2,7 @@
 #MOAB -N mdpp
 #MOAB -t 0-124 # specifies array job indices
 #MOAB -l nodes=1:ppn=5
-#MOAB -l walltime=0:00:30:00
+#MOAB -l walltime=0:70:00:00
 #MOAB -l pmem=8GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 
