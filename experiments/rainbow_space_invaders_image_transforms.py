@@ -43,7 +43,7 @@ env_config = {
 algorithm = "DQN"
 agent_config = {  # Taken from Ray tuned_examples
     "adam_epsilon": 0.00015,
-    "buffer_size": 500000,
+    "buffer_size": 200000,
     "double_q": True,
     "dueling": True,
     "exploration_config": {"epsilon_timesteps": 200000, "final_epsilon": 0.01},
@@ -59,7 +59,7 @@ agent_config = {  # Taken from Ray tuned_examples
     "noisy": False,
     "num_atoms": 51,
     "num_gpus": 0,
-    "num_workers": 4,
+    "num_workers": 3,
     # "num_cpus_for_driver": 2,
     # 'gpu': False, #deprecated
     "prioritized_replay": True,
