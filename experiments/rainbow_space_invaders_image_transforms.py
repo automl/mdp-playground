@@ -59,7 +59,7 @@ agent_config = {  # Taken from Ray tuned_examples
     "noisy": False,
     "num_atoms": 51,
     "num_gpus": 0,
-    "num_workers": 3,
+    "num_workers": 4,
     # "num_cpus_for_driver": 2,
     # 'gpu': False, #deprecated
     "prioritized_replay": True,
