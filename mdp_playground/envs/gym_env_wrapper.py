@@ -160,11 +160,16 @@ class GymEnvWrapper(gym.Env):
             if "grayscale_obs" in config:
                 self.grayscale_obs = config["grayscale_obs"]
 
+            if "image_width" in config:
+                self.image_width = config["image_width"]
+            else:
+                self.image_width = 84  # Atari default
+
             # Use AtariPreprocessing with frame_skip
             # noop_max set to 1 because we want to keep the vanilla env as
             # deterministic as possible and setting it 0 was not allowed. ##TODO
             # noop_max=0 is poosible in new Gym version, so update Gym version.
-            self.env = AtariPreprocessing(self.env, frame_skip=self.frame_skip, grayscale_obs=self.grayscale_obs, noop_max=1, )
+            self.env = AtariPreprocessing(self.env, frame_skip=self.frame_skip, grayscale_obs=self.grayscale_obs, noop_max=1, screen_size=self.image_width)
             print("self.env.noop_max set to: ", self.env.noop_max)
 
         if "irrelevant_features" in config:
@@ -499,7 +504,7 @@ class GymEnvWrapper(gym.Env):
             add_shift_h = self.np_random.randint(-max_shift_h + 1, max_shift_h)
             add_shift_w = (add_shift_w // sh_quant) * sh_quant
             add_shift_h = (add_shift_h // sh_quant) * sh_quant
-            print("add_shift_w, add_shift_h", add_shift_w, add_shift_h)
+            # print("add_shift_w, add_shift_h", add_shift_w, add_shift_h)
             shift_w += add_shift_w
             shift_h += add_shift_h
 
