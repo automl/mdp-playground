@@ -502,8 +502,9 @@ class GymEnvWrapper(gym.Env):
             max_shift_h = (tot_height - R) // 2
             add_shift_w = self.np_random.randint(-max_shift_w + 1, max_shift_w)
             add_shift_h = self.np_random.randint(-max_shift_h + 1, max_shift_h)
-            add_shift_w = (add_shift_w // sh_quant) * sh_quant
-            add_shift_h = (add_shift_h // sh_quant) * sh_quant
+            # print("add_shift_w, add_shift_h", add_shift_w, add_shift_h)
+            add_shift_w = int(add_shift_w / sh_quant) * sh_quant
+            add_shift_h = int(add_shift_h / sh_quant) * sh_quant
             # print("add_shift_w, add_shift_h", add_shift_w, add_shift_h)
             shift_w += add_shift_w
             shift_h += add_shift_h
