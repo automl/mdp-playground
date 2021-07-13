@@ -2,7 +2,7 @@
 #MOAB -N mdpp
 #MOAB -t 0-19 # specifies array job indices
 #MOAB -l nodes=1:ppn=5
-#MOAB -l walltime=0:50:00:00
+#MOAB -l walltime=0:90:00:00
 #MOAB -l pmem=8GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 
@@ -23,7 +23,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='a3c_breakout_image_transforms_42_sh_quant' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='rainbow_space_invaders_image_transforms_42_sh_quant' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
