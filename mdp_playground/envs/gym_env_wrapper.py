@@ -11,14 +11,16 @@ from mdp_playground.envs.rl_toy_env import RLToyEnv
 
 
 class GymEnvWrapper(gym.Env):
-    """Wraps an OpenAI Gym environment to be able to modify its dimensions corresponding to MDP Playground. The documentation for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.
+    """Wraps an OpenAI Gym environment to be able to modify its dimensions corresponding to MDP Playground. Please see [`example.py`](example.py) for some simple examples of how to use this class. The values for these dimensions are passed in a config dict as for mdp_playground.envs.RLToyEnv. The description for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.
 
     Currently supported dimensions:
-        transition noise (discrete)
+        transition noise (for discrete environments)
         reward delay
         reward noise
 
-    Also supports wrapping with AtariPreprocessing from OpenAI Gym or wrap_deepmind from Ray Rllib.
+    The wrapper is pretty general and can be applied to any Gym Environment. The environment should be instantiated and passed as the 1st argument to the __init__ method of this class. If using this wrapper with Atari, additional keys may be added specifying either atari_preprocessing = True or wrap_deepmind_ray = True. These would use the AtariPreprocessing wrapper from OpenAI Gym or wrap_deepmind() wrapper from Ray Rllib.
+
+    For AtariPreprocessing, additional key-value pairs specifying grayscale_obs and frame_skip may be provided. These have the same meaning as in AtariPreprocessing.
 
     """
 
@@ -109,7 +111,16 @@ class GymEnvWrapper(gym.Env):
             # self.irrelevant_features =  config["irrelevant_features"]
             irr_toy_env_conf = config["irrelevant_features"]
             if "seed" not in irr_toy_env_conf:
-                irr_toy_env_conf["seed"] = self.np_random.randint(sys.maxsize)  # random
+                irr_toy_env_conf["seed"] = self.np_random.randint(sys.maxsize)  #random
+
+            if config["state_space_type"] == "discrete":
+                pass
+            else:  # cont. env
+                # This is a bit hacky because we need to define the state_space_dim
+                # of the irrelevant toy env in the "base" config and not the nested irrelevant_features
+                # dict inside the base config to be compatible with the config_processor of MDPP
+                irr_toy_env_conf["state_space_dim"] = \
+                    config["irr_state_space_dim"]  # #hack
 
             self.irr_toy_env = RLToyEnv(**irr_toy_env_conf)
 
@@ -229,6 +240,9 @@ class GymEnvWrapper(gym.Env):
                 next_state_irr, _, done_irr, _ = self.irr_toy_env.step(action[1])
                 next_state = tuple([next_state, next_state_irr])
             else:
+                # env_act_shape is the shape of the underlying env's action space and we
+                # sub-select those dimensions from the total action space next and apply
+                # to the underlying env:
                 next_state, reward, done, info = self.env.step(
                     action[: self.env_act_shape[0]]
                 )
