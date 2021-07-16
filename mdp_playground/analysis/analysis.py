@@ -505,15 +505,6 @@ class MDPP_Analysis:
         stats_data = dict()
 
         if plot_type == "agent":
-<<<<<<< HEAD
-            #groupby agent
-            groupby = 'algorithm'
-            sub_groupby = 'axis_labels'
-        elif plot_type == "metric":
-            #groupby metric
-            groupby = 'axis_labels'
-            sub_groupby = 'algorithm'
-=======
             # groupby agent
             groupby = "algorithm"
             sub_groupby = "axis_labels"
@@ -521,7 +512,6 @@ class MDPP_Analysis:
             # groupby metric
             groupby = "axis_labels"
             sub_groupby = "algorithm"
->>>>>>> master
 
         # iterate and group data based on the their values eg. ['SAC', 'TD3'] or ['action_space_max', 'time_unit']
         """
