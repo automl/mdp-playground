@@ -38,7 +38,7 @@ numpy = "^1.19.5"
 matplotlib = "^3.3.4"
 atari-py = "0.2.5"
 
-gym = { version = "0.14.0", extras = ["atari"] }
+gym = { version = "^0.18.0", extras = ["atari"] }
 
 
 pandas = { version = "0.25.0", optional = true }
