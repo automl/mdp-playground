@@ -38,7 +38,7 @@ make clean
 rm -rf _autosummary  # optional
 ```
 
-To publish:
+To publish ensure that the working directoy is clean and run:
 ```bash
-git subtree push --prefix docs/_build/html/ origin gh-pages
+./publish-docs.sh
 ```
