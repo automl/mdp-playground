@@ -10,6 +10,9 @@ from __future__ import print_function
 
 import argparse
 import mdp_playground.config_processor as config_processor
+from ray.tune.registry import register_env
+
+import create_gym_env_wrapper_generic
 import os
 import logging
 import dill as pickle
@@ -148,7 +151,8 @@ def main(args):
     #                     'and this number corresponds to the configuration number'
     #                     ' in this list.'
     #                     ' Please look in to the code for details.')
-    parser.add_argument("-l", "--log-level", default="WARNING", help="Set log level.")
+    parser.add_argument("-l", "--log-level",
+                        default="WARNING", help="Set log level.")
 
     args = parser.parse_args(args)
     print("Parsed arguments:", args)
@@ -217,7 +221,8 @@ def main(args):
         final_configs = [final_configs[args.config_num]]
 
     for enum_conf_1, current_config_ in enumerate(final_configs):
-        print("current_config of agent to be run:", current_config_, enum_conf_1)
+        print("current_config of agent to be run:",
+              current_config_, enum_conf_1)
 
         algorithm = config.algorithm
 
@@ -232,7 +237,8 @@ def main(args):
         else:
             timesteps_total = tune_config["timesteps_total"]
 
-        del tune_config["timesteps_total"]  # hack Ray doesn't allow unknown configs
+        # hack Ray doesn't allow unknown configs
+        del tune_config["timesteps_total"]
 
         print(
             "\n\033[1;32m======== Running on environment: "
@@ -257,13 +263,15 @@ def main(args):
             },
             config=tune_config,
             checkpoint_at_end=args.save_model,
-            local_dir=args.framework_dir + "/_ray_results_" + str(args.config_num),
+            local_dir=args.framework_dir + \
+            "/_ray_results_" + str(args.config_num),
             # return_trials=True # add trials = tune.run( above
         )
 
         if args.save_model:
             pickle.dump(
-                analysis, open("{}_analysis.pickle".format(args.exp_name), "wb")
+                analysis, open(
+                    "{}_analysis.pickle".format(args.exp_name), "wb")
             )
 
     config_processor.post_processing(framework=args.framework)

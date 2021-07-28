@@ -111,7 +111,8 @@ def process_configs(
     # print("VARYING_CONFIGS:", varying_configs)
 
     num_configs_ = max(
-        [len(separate_var_configs[i]) for i in range(len(separate_var_configs))]
+        [len(separate_var_configs[i])
+         for i in range(len(separate_var_configs))]
     )
     for i in range(num_configs_):
         to_combine = [
@@ -119,7 +120,8 @@ def process_configs(
         ]
         # overwrite = False because the keys in different modes of
         # config generation need to be disjoint
-        varying_configs.append(deepmerge_multiple_dicts(*to_combine, overwrite=False))
+        varying_configs.append(deepmerge_multiple_dicts(
+            *to_combine, overwrite=False))
 
     # #hack ####TODO Remove extra pre-processing done here and again below:
     pre_final_configs = combined_processing(
@@ -131,7 +133,6 @@ def process_configs(
         framework=framework,
         algorithm=config.algorithm,
     )
-
 
     if "timesteps_total" in dir(config):
         hacky_timesteps_total = config.timesteps_total  # hack
@@ -185,7 +186,6 @@ def process_configs(
             + framework
             + ". Available options are: ray and stable_baselines."
         )
-
 
     # varying_configs is a list of dict of dicts with a specific structure.
     final_configs = combined_processing(
@@ -292,7 +292,8 @@ def setup_ray_callbacks(
                         for elem in field_val:
                             # print(key)
                             str_to_write += (
-                                "%.2e" % elem if isinstance(elem, float) else str(elem)
+                                "%.2e" % elem if isinstance(
+                                    elem, float) else str(elem)
                             )
                             str_to_write += ","
                         str_to_write += "]"
@@ -346,7 +347,8 @@ def setup_ray_callbacks(
                 elif config_type == "model":
                     # if key == 'conv_filters':
                     fout.write(
-                        str(info["result"]["config"]["model"][key]).replace(" ", "")
+                        str(info["result"]["config"]
+                            ["model"][key]).replace(" ", "")
                         + " "
                     )
 
@@ -404,7 +406,8 @@ def setup_ray_callbacks(
             stats_file_eval = stats_file_prefix + "_eval.csv"
             fout = open(stats_file_eval, "a")  # hardcoded
             fout.write(
-                "%.2e" % reward_this_episode + " " + str(length_this_episode) + "\n"
+                "%.2e" % reward_this_episode + " "
+                + str(length_this_episode) + "\n"
             )
             fout.close()
 
@@ -417,7 +420,8 @@ def setup_ray_callbacks(
             step_reward = episode.total_reward - np.sum(
                 episode.custom_metrics["step_reward"]
             )
-            episode.custom_metrics["step_reward"].append(step_reward)  # This line
+            episode.custom_metrics["step_reward"].append(
+                step_reward)  # This line
             # should not be executed the 1st time this function is called because
             # no step has actually taken place then (Ray 0.9.0)!!
         # episode.custom_metrics = {}
@@ -444,7 +448,8 @@ def get_list_of_varying_configs(var_configs, mode="grid", num_configs=None):
         varying_configs = get_grid_of_configs(var_configs)
 
     elif mode == "random":
-        varying_configs = get_random_configs(var_configs, num_configs=num_configs)
+        varying_configs = get_random_configs(
+            var_configs, num_configs=num_configs)
     elif mode == "sobol":
         varying_configs = sobol_configs_from_config_dict(
             var_configs, num_configs=num_configs
@@ -473,7 +478,8 @@ def get_list_of_varying_configs(var_configs, mode="grid", num_configs=None):
                 ):  # hack All these are hacks to get around different limitations
                     num_configs_done = len(list(var_configs["env"]))
                     agent_config["agent"][key] = current_config[
-                        num_configs_done + list(var_configs[config_type]).index(key)
+                        num_configs_done
+                        + list(var_configs[config_type]).index(key)
                     ]
 
                 elif config_type == "model":
@@ -481,7 +487,8 @@ def get_list_of_varying_configs(var_configs, mode="grid", num_configs=None):
                         list(var_configs["agent"])
                     )
                     model_config["model"][key] = current_config[
-                        num_configs_done + list(var_configs[config_type]).index(key)
+                        num_configs_done
+                        + list(var_configs[config_type]).index(key)
                     ]
 
         combined_config = {**agent_config, **model_config, **env_config}
@@ -661,7 +668,8 @@ def sobol_configs_from_config_dict(var_configs, num_configs):
                 elif "cat" in val:
                     # Seems faster than ast.literal_eval (See
                     # https://stackoverflow.com/questions/1894269/how-to-convert-string-representation-of-list-to-a-list)
-                    choices = json.loads("[" + val.split("[")[1].split("]")[0] + "]")
+                    choices = json.loads(
+                        "[" + val.split("[")[1].split("]")[0] + "]")
                     len_c = len(choices)
                     if (
                         sample[j] == 1.0
@@ -728,7 +736,8 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
     final_configs = []
     for i in range(len(varying_configs)):
         static_configs_copy = copy.deepcopy(static_configs)
-        merged_conf = deepmerge_multiple_dicts(*static_configs_copy, varying_configs[i])
+        merged_conf = deepmerge_multiple_dicts(
+            *static_configs_copy, varying_configs[i])
         final_configs.append(merged_conf)
 
     # Post-processing common to frameworks:
@@ -943,7 +952,8 @@ def deepmerge_multiple_dicts(*configs, overwrite=True):
     merged_configs = {}
     for i in range(len(configs)):
         # print(i)
-        merged_configs = deepmerge(merged_configs, configs[i], overwrite=overwrite)
+        merged_configs = deepmerge(
+            merged_configs, configs[i], overwrite=overwrite)
 
     return merged_configs
 
@@ -1024,9 +1034,24 @@ def create_gym_env_wrapper_frame_stack_atari(config):  # hack ###TODO remove?
     return gew
 
 
+def create_gym_env_wrapper_generic(config):
+    print("&"*300)
+    print(config)
+    exit()
+    import gym
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+
+    ae = gym.make(**config["GymEnv"])
+    gew = GymEnvWrapper(ae, **config)
+    return gew
+
+
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
-register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
+register_env("GymEnvWrapper-Atari",
+             lambda config: create_gym_env_wrapper_atari(config))
 register_env(
     "GymEnvWrapperFrameStack-Atari",
     lambda config: create_gym_env_wrapper_frame_stack_atari(config),
 )
+register_env("GymEnvWrapper",
+             lambda config: create_gym_env_wrapper_generic(**config))
