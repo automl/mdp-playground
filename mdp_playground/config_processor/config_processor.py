@@ -1038,7 +1038,7 @@ def create_gym_env_wrapper_generic(config):
     import gym
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
 
-    ae = gym.make(**config["GymEnv"])
+    ae = gym.make(config["GymEnv"]["game"])
     gew = GymEnvWrapper(ae, **config)
     return gew
 
