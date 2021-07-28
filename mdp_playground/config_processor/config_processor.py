@@ -1054,4 +1054,4 @@ register_env(
     lambda config: create_gym_env_wrapper_frame_stack_atari(config),
 )
 register_env("GymEnvWrapper",
-             lambda config: create_gym_env_wrapper_generic(**config))
+             lambda config: create_gym_env_wrapper_generic(config))

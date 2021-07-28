@@ -10,9 +10,7 @@ from __future__ import print_function
 
 import argparse
 import mdp_playground.config_processor as config_processor
-from ray.tune.registry import register_env
 
-import create_gym_env_wrapper_generic
 import os
 import logging
 import dill as pickle
