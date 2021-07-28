@@ -1035,9 +1035,6 @@ def create_gym_env_wrapper_frame_stack_atari(config):  # hack ###TODO remove?
 
 
 def create_gym_env_wrapper_generic(config):
-    print("&"*300)
-    print(config)
-    exit()
     import gym
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
 
