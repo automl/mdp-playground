@@ -855,6 +855,30 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                 ),
             )
 
+        elif final_configs[i]["env"] in ["Walker2dWrapper-v3",
+                                         "HumanoidWrapper-v3"]:
+            timesteps_total = 500000  # TODO: how many to use?
+
+            from mdp_playground.envs.mujoco_env_wrapper import (
+                get_mujoco_wrapper,
+            )  # hack
+            from gym.envs.mujoco.reacher import Walker2dEnv, HumanoidEnv
+
+            env_assoc = {
+                "Walker2dWrapper-v3": Walker2dEnv,
+                "HumanoidWrapper-v3": HumanoidEnv
+            }
+
+            GymEnv = env_assoc[final_configs[i]["env"]]
+
+            wrapped_mujoco_env = get_mujoco_wrapper(GymEnv)
+            register_env(
+                final_configs[i]["env"],
+                lambda config: create_gym_env_wrapper_mujoco_wrapper(
+                    config, wrapped_mujoco_env
+                ),
+            )
+
         elif final_configs[i]["env"] in ["GymEnvWrapper-Atari"]:  # hack
             if "AtariEnv" in final_configs[i]["env_config"]:
                 timesteps_total = 10_000_000
