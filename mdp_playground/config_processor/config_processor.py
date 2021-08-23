@@ -1,6 +1,7 @@
 from functools import reduce
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.preprocessors import OneHotPreprocessor
+import logging
 import warnings
 import numpy as np
 from mdp_playground.envs import RLToyEnv
@@ -47,6 +48,8 @@ def init_ray(**kwargs):
         value = kwargs["log_level"]
         del kwargs["log_level"]
         kwargs["logging_level"] = value
+
+    logging.info("Init ray with args {}".format(str(kwargs)))
 
     ray.init(**kwargs)
 
