@@ -917,6 +917,10 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                 if key == "model":
                     for key_2 in final_configs[i][key]:
                         if key_2 == "use_lstm" and final_configs[i][key][key_2]:
+                            if "sequence_length" not in final_configs[i]["env_config"]:
+                                from ray.rllib.models.catalog import MODEL_DEFAULTS
+                                final_configs[i]["env_config"]["sequence_length"] = \
+                                    MODEL_DEFAULTS["max_seq_len"]
                             final_configs[i][key]["max_seq_len"] = (
                                 final_configs[i]["env_config"]["delay"]
                                 + final_configs[i]["env_config"]["sequence_length"]
