@@ -862,7 +862,8 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
             from mdp_playground.envs.mujoco_env_wrapper import (
                 get_mujoco_wrapper,
             )  # hack
-            from gym.envs.mujoco.reacher import Walker2dEnv, HumanoidEnv
+            from gym.envs.mujoco.walker2d import Walker2dEnv
+            from gym.envs.mujoco.humanoid import HumanoidEnv
 
             env_assoc = {
                 "Walker2dWrapper-v3": Walker2dEnv,
