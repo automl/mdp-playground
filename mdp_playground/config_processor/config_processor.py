@@ -876,16 +876,6 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
     # Post-processing for Ray:
     if framework.lower() == "ray":
         for i in range(len(final_configs)):
-            # patch for potentially missing sequence_length key in conf
-            # would be supplied by RLLIB's MODEL_DEFAULTS later on, but already
-            # needed as this point for setting MDPP's sequence_length.
-            # Patching it here as it might be also be provided in the var confs.
-            if ("use_lstm" in final_configs[i]["model"]
-                    and "sequence_length" not in final_configs[i]["env_config"]):
-                from ray.rllib.models.catalog import MODEL_DEFAULTS
-                final_configs[i]["env_config"]["sequence_length"] = \
-                    MODEL_DEFAULTS["max_seq_len"]
-
             # for config_type in varying_config:
             for key in final_configs[i]:
                 value = final_configs[i][key]
@@ -926,14 +916,24 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                             "target_noise_clip_relative"
                         ]  # hack have to delete it otherwise Ray will crash for unknown config param.
 
-                if key == "model":
-                    for key_2 in final_configs[i][key]:
-                        if key_2 == "use_lstm" and final_configs[i][key][key_2]:
-                            final_configs[i][key]["max_seq_len"] = (
-                                final_configs[i]["env_config"]["delay"]
-                                + final_configs[i]["env_config"]["sequence_length"]
-                                + 1
-                            )
+
+            if "model" in final_configs[i]:
+                # patch for potentially missing sequence_length key in conf
+                # would be supplied by RLLIB's MODEL_DEFAULTS later on, but already
+                # needed as this point for setting MDPP's sequence_length.
+                # Patching it here as it might be also be provided in the var confs.
+                if ("use_lstm" in final_configs[i]["model"]
+                        and "sequence_length" not in final_configs[i]["env_config"]):
+                    from ray.rllib.models.catalog import MODEL_DEFAULTS
+                    final_configs[i]["env_config"]["sequence_length"] = \
+                        MODEL_DEFAULTS["max_seq_len"]
+                # setting of sequence length
+                if "use_lstm" in final_configs[i]["model"] and final_configs[i]["model"]["use_lstm"]:
+                        final_configs[i]["model"]["max_seq_len"] = (
+                            final_configs[i]["env_config"]["delay"]
+                            + final_configs[i]["env_config"]["sequence_length"]
+                            + 1
+                        )
 
     # Post-processing for Stable Baselines:
     elif framework.lower() == "stable_baselines":
