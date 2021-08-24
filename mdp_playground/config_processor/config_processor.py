@@ -16,6 +16,8 @@ mujoco_envs = [
     "HopperWrapper-v3",
     "PusherWrapper-v2",
     "ReacherWrapper-v2",
+    "Walker2dWrapper-v3",
+    "HumanoidWrapper-v3"
 ]
 
 
@@ -915,12 +917,13 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                         ]  # hack have to delete it otherwise Ray will crash for unknown config param.
 
                 if key == "model":
+                    if ("use_lstm" in final_configs[i]["model"]
+                            and "sequence_length" not in final_configs[i]["env_config"]):
+                        from ray.rllib.models.catalog import MODEL_DEFAULTS
+                        final_configs[i]["env_config"]["sequence_length"] = \
+                            MODEL_DEFAULTS["max_seq_len"]
                     for key_2 in final_configs[i][key]:
                         if key_2 == "use_lstm" and final_configs[i][key][key_2]:
-                            if "sequence_length" not in final_configs[i]["env_config"]:
-                                from ray.rllib.models.catalog import MODEL_DEFAULTS
-                                final_configs[i]["env_config"]["sequence_length"] = \
-                                    MODEL_DEFAULTS["max_seq_len"]
                             final_configs[i][key]["max_seq_len"] = (
                                 final_configs[i]["env_config"]["delay"]
                                 + final_configs[i]["env_config"]["sequence_length"]
