@@ -256,7 +256,7 @@ def atari_wrapper_example():
         "state_space_type": "discrete",
     }
 
-    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    from mdp_playground.envs import GymEnvWrapper
     import gym
 
     ae = gym.make("QbertNoFrameskip-v4")
@@ -298,7 +298,7 @@ def mujoco_wrapper_example():
     # This actually makes a subclass and not a wrapper. Because, some
     # frameworks might need an instance of this class to also be an instance
     # of the Mujoco base_class.
-    from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper
+    from mdp_playground.envs import get_mujoco_wrapper
     from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
 
     wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)

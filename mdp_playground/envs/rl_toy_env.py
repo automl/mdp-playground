@@ -217,6 +217,16 @@ class RLToyEnv(gym.Env):
 
         print("Passed config:", config, "\n")
 
+        if config == {}:
+            config = {
+                "state_space_size": 8,
+                "action_space_size": 8,
+                "state_space_type": "discrete",
+                "action_space_type": "discrete",
+                "terminal_state_density": 0.25,
+                "maximally_connected": True,
+            }
+
         # Print initial "banner"
         screen_output_width = 132  # #hardcoded #TODO get from system
         repeat_equal_sign = (screen_output_width - 20) // 2
