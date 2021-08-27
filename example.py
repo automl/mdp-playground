@@ -298,8 +298,12 @@ def mujoco_wrapper_example():
     # This actually makes a subclass and not a wrapper. Because, some
     # frameworks might need an instance of this class to also be an instance
     # of the Mujoco base_class.
-    from mdp_playground.envs import get_mujoco_wrapper
-    from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+    try:
+        from mdp_playground.envs import get_mujoco_wrapper
+        from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+    except Exception as e:
+        print("Exception:", e, "caught. You may need to install mujoco-py. NOT running mujoco_wrapper_example.")
+        return
 
     wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
 
