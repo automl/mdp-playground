@@ -375,7 +375,6 @@ if __name__ == "__main__":
             "action_space_size": 8,
             "state_space_type": "discrete",
             "action_space_type": "discrete",
-            "terminal_state_density": 0.25,
             "maximally_connected": True,
         }
     )

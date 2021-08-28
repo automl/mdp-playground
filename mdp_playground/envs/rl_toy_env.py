@@ -53,7 +53,7 @@ class RLToyEnv(gym.Env):
         diameter : int > 0
             For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will, thus, be = (number of states) / (d). Default value: 1 for discrete environments. For continuous environments, this dimension is set automatically based on the state_space_max value.
         terminal_state_density : float in range [0, 1]
-            For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states when we consider them to be ordered by their numerical value. This is w.l.o.g. because discrete states are categorical. For continuous environments, please see terminal_states and term_state_edge for how to control terminal states.
+            For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states when we consider them to be ordered by their numerical value. This is w.l.o.g. because discrete states are categorical. For continuous environments, please see terminal_states and term_state_edge for how to control terminal states. Default value: 0.25.
         term_state_reward : float
             Adds this to the reward if a terminal state was reached at the current time step. Default value: 0.
         image_representations : boolean
@@ -338,6 +338,11 @@ class RLToyEnv(gym.Env):
                 assert "reward_function" in config
                 # if config["state_space_type"] == "discrete":
                 #     assert "init_state_dist" in config
+
+        if "terminal_state_density" not in config:
+            self.terminal_state_density = 0.25
+        else:
+            self.terminal_state_density = config["terminal_state_density"]
 
         if not self.use_custom_mdp:
             if "generate_random_mdp" not in config:
@@ -796,7 +801,7 @@ class RLToyEnv(gym.Env):
         """Initialises terminal state set to be the 'last' states for discrete environments. For continuous environments, terminal states will be in a hypercube centred around config['terminal_states'] with the edge of the hypercube of length config['term_state_edge']."""
         if self.config["state_space_type"] == "discrete":
             if (
-                self.use_custom_mdp and "terminal_state_density" not in self.config
+                self.use_custom_mdp and "terminal_states" in self.config
             ):  # custom/user-defined terminal states
                 self.is_terminal_state = (
                     self.config["terminal_states"]
@@ -806,7 +811,7 @@ class RLToyEnv(gym.Env):
             else:
                 # Define the no. of terminal states per independent set of the state space
                 self.num_terminal_states = int(
-                    self.config["terminal_state_density"] * self.action_space_size[0]
+                    self.terminal_state_density * self.action_space_size[0]
                 )  # #hardcoded ####IMP Using action_space_size
                 # since it contains state_space_size // diameter
                 # if self.num_terminal_states == 0: # Have at least 1 terminal state?
