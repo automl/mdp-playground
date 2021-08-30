@@ -151,6 +151,9 @@ def main(args):
     #                     ' Please look in to the code for details.')
     parser.add_argument("-l", "--log-level",
                         default="WARNING", help="Set log level.")
+    parser.add_argument("-m", "--local-mode", action='store_true',
+                        default=False,
+                        help='Initialize ray in local mode.')
 
     args = parser.parse_args(args)
     print("Parsed arguments:", args)
@@ -196,6 +199,7 @@ def main(args):
         config_num=args.config_num,
         log_level=log_level_,
         framework_dir=args.framework_dir,
+        local_mode=args.local_mode
     )
 
     print(

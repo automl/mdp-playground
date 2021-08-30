@@ -63,6 +63,7 @@ def process_configs(
     log_level,
     framework="ray",
     framework_dir="/tmp/ray",
+    local_mode=True
 ):
     config_file_path = os.path.abspath("/".join(config_file.split("/")[:-1]))
 
@@ -160,7 +161,8 @@ def process_configs(
     if framework.lower() == "ray":
         from ray import tune
 
-        setup_ray(config, config_num, log_level, framework_dir)
+        setup_ray(config, config_num, log_level,
+                  framework_dir, local_mode)
         on_train_result, on_episode_end = setup_ray_callbacks(
             stats_file_prefix,
             variable_configs_deepcopy,
@@ -207,9 +209,9 @@ def process_configs(
     return config, final_configs
 
 
-def setup_ray(config, config_num, log_level, framework_dir):
+def setup_ray(config, config_num, log_level, framework_dir, local_mode):
     tmp_dir = framework_dir + "/tmp_" + str(config_num)
-    init_ray(log_level=log_level, tmp_dir=tmp_dir, local_mode=True)
+    init_ray(log_level=log_level, tmp_dir=tmp_dir, local_mode=local_mode)
 
 
 def init_stats_file(stats_file_name, columns_to_write):
@@ -915,7 +917,6 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                         del final_configs[i][
                             "target_noise_clip_relative"
                         ]  # hack have to delete it otherwise Ray will crash for unknown config param.
-
 
             if "model" in final_configs[i]:
                 # patch for potentially missing sequence_length key in conf
