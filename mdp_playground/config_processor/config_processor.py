@@ -1,6 +1,8 @@
 from functools import reduce
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.preprocessors import OneHotPreprocessor
+from copy import deepcopy
+import itertools
 import logging
 import warnings
 import numpy as np
@@ -22,6 +24,45 @@ mujoco_envs = [
 
 
 ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
+
+
+class Options(list):
+    """Class to explicitely state which elements of a meta-configuration should
+    be varied. Needed as some config values might be lists."""
+    pass
+
+
+def recursive_cartesian_product(dic):
+    """
+    Given a configuration dict including Options, yields all configuration
+    dicts that can be constructed from taking the the cartesian product of all
+    Options.
+    If the conf dict includes no Options, only the single config is yielded.
+
+    Based on `this snippet. <https://stackoverflow.com/a/50606871/11051330>`_
+
+    Added differentiation between Options and entries - protection of iterables
+    (like lists and strings). The yielded dict is deepcopied (as using the dict
+    can otherwise mess up the generator.
+
+    Parameters
+    ----------
+    dic : dict
+        The dictionary to expand.
+
+    Yields
+    -------
+    dict
+        The next configuration yielded from expanding the conf dict.
+    """
+    keys, values = dic.keys(), dic.values()
+
+    vals = (recursive_cartesian_product(v) if isinstance(v, dict)
+            else v if isinstance(v, Options) else (v,) for v in
+            values)
+
+    for conf in itertools.product(*vals):
+        yield deepcopy(dict(zip(keys, conf)))
 
 
 # def init_ray(log_level=None, tmp_dir=None, include_webui=None,
@@ -166,6 +207,144 @@ def process_configs(
         on_train_result, on_episode_end = setup_ray_callbacks(
             stats_file_prefix,
             variable_configs_deepcopy,
+            hacky_timesteps_total,
+            config_algorithm,
+        )
+
+        # default Define default config which gets overwritten with config in config.py file if present.
+        default_config = {
+            "callbacks": {
+                #                 "on_episode_start": tune.function(on_episode_start),
+                # "on_episode_step": tune.function(on_episode_step),
+                "on_episode_end": tune.function(on_episode_end),
+                #                 "on_sample_end": tune.function(on_sample_end),
+                "on_train_result": tune.function(on_train_result),
+                #                 "on_postprocess_traj": tune.function(on_postprocess_traj),
+            },
+            # "log_level": 'WARN',
+        }
+
+    # Stable Baselines specific setup:
+    elif framework.lower() == "stable_baselines":
+        ...
+
+    else:
+        raise ValueError(
+            "Framework passed was not a valid option. It was: "
+            + framework
+            + ". Available options are: ray and stable_baselines."
+        )
+
+    # varying_configs is a list of dict of dicts with a specific structure.
+    final_configs = combined_processing(
+        default_config,
+        config.env_config,
+        config.agent_config,
+        config.model_config,
+        config.eval_config,
+        varying_configs=varying_configs,
+        framework=framework,
+        algorithm=config.algorithm,
+    )
+
+    return config, final_configs
+
+
+def find_option_keys_recursive(dic):
+    option_keys = []
+    option_dict = {}
+    for k, v in dic.items():
+        if isinstance(v, dict):
+            # TODO: check for name collisions and extend name by k?
+            sk, sd = find_option_keys_recursive(v)
+            option_keys.extend(sk)
+            option_dict[k] = sd
+        elif isinstance(v, Options):
+            option_keys.append(k)
+            option_dict[k] = v
+
+    return option_keys, option_dict
+
+
+def get_option_keys(config):
+    option_keys = []
+    # for d in [config.env_config, config.agent_config, config.model_config,
+    #           config.eval_config]:
+    #    option_keys.extend(find_option_keys_recursive(d))
+    option_dict = {}
+    k, d = find_option_keys_recursive(config.env_config["env_config"])
+    option_dict['env'] = d
+    option_keys.extend(k)
+    k, d = find_option_keys_recursive(config.model_config)
+    option_dict['model'] = d
+    option_keys.extend(k)
+    k, d = find_option_keys_recursive(config.agent_config)
+    option_dict['agent'] = d
+    option_keys.extend(k)
+
+    return option_keys, option_dict
+
+
+def new_process_configs(
+        config_file,
+        stats_file_prefix,
+        config_num,
+        log_level,
+        framework="ray",
+        framework_dir="/tmp/ray",
+        local_mode=True):
+
+    config_file_path = os.path.abspath("/".join(config_file.split("/")[:-1]))
+
+    sys.path.insert(1, config_file_path)  # #hack
+    import importlib
+
+    config = importlib.import_module(config_file.split("/")[-1], package=None)
+    print("Number of seeds for environment:", config.num_seeds)
+
+    # TODO: handle random and sobol configs as before?
+    # variable_configs = []
+
+    # if "random_configs" in dir(config):
+    #     variable_configs.append(copy.deepcopy(config.random_configs))
+    # if "sobol_configs" in dir(config):
+    #     variable_configs.append(copy.deepcopy(config.sobol_configs))
+
+    # #hack ####TODO Remove extra pre-processing done here and again below:
+    pre_final_configs = combined_processing(
+        config.env_config,
+        config.agent_config,
+        config.model_config,
+        config.eval_config,
+        # varying_configs=copy.deepcopy([{"env": {}, "agent": {}, "model": {}}]),
+        varying_configs=[],
+        framework=framework,
+        algorithm=config.algorithm,
+    )
+
+    if "timesteps_total" in dir(config):
+        hacky_timesteps_total = config.timesteps_total  # hack
+    else:
+        hacky_timesteps_total = pre_final_configs[-1]["timesteps_total"]
+
+    config_algorithm = config.algorithm  # hack
+    # sys.exit(0)
+
+    columns_to_write, options_dict = get_option_keys(config)
+
+    stats_file_name = stats_file_prefix + ".csv"
+
+    init_stats_file(stats_file_name, columns_to_write)
+
+    # Ray specific setup:
+    if framework.lower() == "ray":
+        from ray import tune
+
+        setup_ray(config, config_num, log_level,
+                  framework_dir, local_mode)
+        on_train_result, on_episode_end = setup_ray_callbacks(
+            stats_file_prefix,
+            options_dict,
             hacky_timesteps_total,
             config_algorithm,
         )
