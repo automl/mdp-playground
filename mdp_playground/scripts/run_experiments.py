@@ -13,7 +13,7 @@ import mdp_playground.config_processor as config_processor
 
 import os
 import logging
-import dill as pickle
+import cloudpickle
 
 from ray import tune
 
@@ -271,7 +271,7 @@ def main(args):
         )
 
         if args.save_model:
-            pickle.dump(
+            cloudpickle.dump(
                 analysis, open(
                     "{}_analysis.pickle".format(args.exp_name), "wb")
             )
