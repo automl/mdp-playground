@@ -53,7 +53,9 @@ def init_ray(**kwargs):
 
     logging.info("Init ray with args {}".format(str(kwargs)))
 
-    ray.init(**kwargs)
+    session_info = ray.init(**kwargs)
+
+    return session_info
 
 
 def process_configs(
@@ -211,7 +213,9 @@ def process_configs(
 
 def setup_ray(config, config_num, log_level, framework_dir, local_mode):
     tmp_dir = framework_dir + "/tmp_" + str(config_num)
-    init_ray(log_level=log_level, tmp_dir=tmp_dir, local_mode=local_mode)
+    session_info = init_ray(log_level=log_level,
+                            tmp_dir=tmp_dir, local_mode=local_mode)
+    logging.info("Ray session info: {}".format(str(session_info)))
 
 
 def init_stats_file(stats_file_name, columns_to_write):
