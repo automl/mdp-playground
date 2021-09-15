@@ -154,6 +154,10 @@ def main(args):
     parser.add_argument("-r", "--local-mode", action='store_true',
                         default=False,
                         help='Initialize ray in local mode.')
+    parser.add_argument('-k', '--num_cpus', default=1,
+                        help="Num CPU cores for Ray to use.")
+    parser.add_argument('-o', '--object_store_memory`', default=8e9,
+                        help="Size (in bytes) to use for Ray's object store.")
 
     args = parser.parse_args(args)
     print("Parsed arguments:", args)
@@ -192,6 +196,12 @@ def main(args):
 
     print("Stats file being written to:", stats_file_name)
 
+    ray_kwargs = {
+        'local_mode': args.local_mode,
+        'num_cpus': args.num_cpus,
+        'object_store_memory': int(float(args.object_store_memory)),
+    }
+
     config, final_configs = config_processor.process_configs(
         config_file,
         stats_file_prefix=stats_file_name,
@@ -199,7 +209,7 @@ def main(args):
         config_num=args.config_num,
         log_level=log_level_,
         framework_dir=args.framework_dir,
-        local_mode=args.local_mode
+        **ray_kwargs
     )
 
     print(

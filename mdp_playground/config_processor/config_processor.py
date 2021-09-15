@@ -53,7 +53,7 @@ def init_ray(**kwargs):
 
     logging.info("Init ray with args {}".format(str(kwargs)))
 
-    session_info = ray.init(**kwargs, num_cpus=2, object_store_memory=8e9)
+    session_info = ray.init(**kwargs)
 
     return session_info
 
@@ -65,7 +65,7 @@ def process_configs(
     log_level,
     framework="ray",
     framework_dir="/tmp/ray",
-    local_mode=True
+    **ray_kwargs
 ):
     config_file_path = os.path.abspath("/".join(config_file.split("/")[:-1]))
 
@@ -164,7 +164,7 @@ def process_configs(
         from ray import tune
 
         setup_ray(config, config_num, log_level,
-                  framework_dir, local_mode)
+                  framework_dir, **ray_kwargs)
         on_train_result, on_episode_end = setup_ray_callbacks(
             stats_file_prefix,
             variable_configs_deepcopy,
@@ -211,10 +211,10 @@ def process_configs(
     return config, final_configs
 
 
-def setup_ray(config, config_num, log_level, framework_dir, local_mode):
+def setup_ray(config, config_num, log_level, framework_dir, **ray_kwargs):
     tmp_dir = framework_dir + "/tmp_" + str(config_num)
     session_info = init_ray(log_level=log_level,
-                            tmp_dir=tmp_dir, local_mode=local_mode)
+                            tmp_dir=tmp_dir, **ray_kwargs)
     logging.info("Ray session info: {}".format(str(session_info)))
 
 
