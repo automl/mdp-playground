@@ -156,7 +156,7 @@ def main(args):
                         help='Initialize ray in local mode.')
     parser.add_argument('-k', '--num_cpus', default=1,
                         help="Num CPU cores for Ray to use.")
-    parser.add_argument('-o', '--object_store_memory`', default=8e9,
+    parser.add_argument('-o', '--object_store_memory', default=8e9,
                         help="Size (in bytes) to use for Ray's object store.")
 
     args = parser.parse_args(args)
@@ -198,7 +198,7 @@ def main(args):
 
     ray_kwargs = {
         'local_mode': args.local_mode,
-        'num_cpus': args.num_cpus,
+        'num_cpus': int(args.num_cpus),
         'object_store_memory': int(float(args.object_store_memory)),
     }
 
