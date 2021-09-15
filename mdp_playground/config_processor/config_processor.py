@@ -53,7 +53,7 @@ def init_ray(**kwargs):
 
     logging.info("Init ray with args {}".format(str(kwargs)))
 
-    session_info = ray.init(**kwargs)
+    session_info = ray.init(**kwargs, num_cpus=2, object_store_memory=8e9)
 
     return session_info
 
