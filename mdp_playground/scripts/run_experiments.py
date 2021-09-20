@@ -263,6 +263,9 @@ def main(args):
             + " steps =========\033[0;0m\n"
         )
 
+        res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
+        print("## Results dir: {}".format(res_dir))
+
         analysis = tune.run(
             algorithm,
             name=algorithm
@@ -275,11 +278,11 @@ def main(args):
             },
             config=tune_config,
             checkpoint_at_end=args.save_model,
-            local_dir=args.framework_dir + \
-            "/_ray_results_" + str(args.config_num),
+            local_dir=res_dir,
             # return_trials=True # add trials = tune.run( above
         )
 
+        # TODO: extract results of multiple runs!
         if args.save_model:
             cloudpickle.dump(
                 analysis, open(
