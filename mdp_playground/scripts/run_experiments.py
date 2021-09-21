@@ -299,7 +299,7 @@ def main(args):
     end = time.time()
     print("No. of seconds to run:", end - start)
 
-    return analysis_files
+    return analysis_files, stats_file_name
 
 
 def cli():
