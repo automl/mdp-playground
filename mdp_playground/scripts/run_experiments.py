@@ -232,6 +232,8 @@ def main(args):
     else:
         final_configs = [final_configs[args.config_num]]
 
+    analysis_files = []
+
     for enum_conf_1, current_config_ in enumerate(final_configs):
         print("current_config of agent to be run:",
               current_config_, enum_conf_1)
@@ -282,17 +284,22 @@ def main(args):
             # return_trials=True # add trials = tune.run( above
         )
 
-        # TODO: extract results of multiple runs!
         if args.save_model:
+            analysis_file_name = "{}/{}_analysis.pickle".format(
+                args.exp_name, enum_conf_1)
             cloudpickle.dump(
                 analysis, open(
-                    "{}_analysis.pickle".format(args.exp_name), "wb")
+                    analysis_file_name,
+                    "wb")
             )
+            analysis_files.append(analysis_file_name)
 
     config_processor.post_processing(framework=args.framework)
 
     end = time.time()
     print("No. of seconds to run:", end - start)
+
+    return analysis_files
 
 
 def cli():
