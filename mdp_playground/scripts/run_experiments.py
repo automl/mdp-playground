@@ -285,7 +285,7 @@ def main(args):
         )
 
         if args.save_model:
-            analysis_file_name = "{}/{}_analysis.pickle".format(
+            analysis_file_name = "{}_{}_analysis.pickle".format(
                 args.exp_name, enum_conf_1)
             cloudpickle.dump(
                 analysis, open(
