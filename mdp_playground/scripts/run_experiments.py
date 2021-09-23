@@ -270,7 +270,7 @@ def main(args):
 
         if True:
             from ray.tune.integration.wandb import WandbLoggerCallback
-            API_KEY_FILE = "../../wandb_api_key.txt"
+            API_KEY_FILE = "~/wandb_api_key.txt"
             callbacks = [WandbLoggerCallback(
                 project="HiWi_AutoRL_eval",
                 # TODO: make also work on cluster!
