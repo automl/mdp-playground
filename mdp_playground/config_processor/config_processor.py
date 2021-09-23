@@ -53,7 +53,8 @@ def init_ray(**kwargs):
 
     logging.info("Init ray with args {}".format(str(kwargs)))
 
-    session_info = ray.init(**kwargs)
+    session_info = ray.init(**kwargs, include_dashboard=True,
+                            dashboard_host="0.0.0.0")
 
     return session_info
 
