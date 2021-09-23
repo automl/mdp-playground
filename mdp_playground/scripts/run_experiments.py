@@ -268,6 +268,17 @@ def main(args):
         res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
         print("## Results dir: {}".format(res_dir))
 
+        if True:
+            from ray.tune.integration.wandb import WandbLoggerCallback
+            API_KEY_FILE = "../../wandb_api_key.txt"
+            callbacks = [WandbLoggerCallback(
+                project="HiWi_AutoRL_eval",
+                # TODO: make also work on cluster!
+                api_key_file=API_KEY_FILE,
+                log_config=True)]
+        else:
+            callbacks = []
+
         analysis = tune.run(
             algorithm,
             name=algorithm
@@ -279,6 +290,7 @@ def main(args):
                 "timesteps_total": timesteps_total,
             },
             config=tune_config,
+            callbacks=callbacks,
             checkpoint_at_end=args.save_model,
             local_dir=res_dir,
             # return_trials=True # add trials = tune.run( above
