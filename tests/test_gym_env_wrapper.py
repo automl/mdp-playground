@@ -246,6 +246,55 @@ class TestGymEnvWrapper(unittest.TestCase):
         print("total_reward:", total_reward)
         aew.reset()
 
+    def test_image_transforms(self):
+        """ """
+        print("\033[32;1;4mTEST_IMAGE_TRANSFORMS\033[0m")
+        config = {
+            "AtariEnv": {
+                "game": "beam_rider",  # "breakout",
+                "obs_type": "image",
+                "frameskip": 1,
+            },
+            "image_transforms": "shift",
+            "image_sh_quant": 2,
+            "image_width": 40,
+            "image_padding": 30,
+              # "GymEnvWrapper": {
+            "atari_preprocessing": True,
+            "frame_skip": 4,
+            "grayscale_obs": False,
+            "state_space_type": "discrete",
+            "action_space_type": "discrete",
+            "seed": 0,
+            # },
+            # 'seed': 0, #seed
+        }
+
+        # config["log_filename"] = log_filename
+
+        from gym.envs.atari import AtariEnv
+
+        ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+        aew = GymEnvWrapper(ae, **config)
+        ob = aew.reset()
+        print("observation_space.shape:", ob.shape)
+        # print(ob)
+        total_reward = 0.0
+        for i in range(200):
+            act = aew.action_space.sample()
+            next_state, reward, done, info = aew.step(act)
+            print("step, reward, done, act:", i, reward, done, act)
+            if i == 153 or i == 158:
+                assert reward == 44.0, (
+                    "Reward in step: "
+                    + str(i)
+                    + " should have been 44.0."
+                )
+            total_reward += reward
+        print("total_reward:", total_reward)
+        aew.reset()
+
+
     @pytest.mark.skip(reason="Cannot run mojoco in CI/CD currently.")
     def test_cont_irr_features(self):
         """ """
