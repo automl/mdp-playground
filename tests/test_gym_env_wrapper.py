@@ -256,7 +256,7 @@ class TestGymEnvWrapper(unittest.TestCase):
                 "frameskip": 1,
             },
             "image_transforms": "shift",
-            "image_sh_quant": 2,
+            # "image_sh_quant": 2,
             "image_width": 40,
             "image_padding": 30,
               # "GymEnvWrapper": {
@@ -278,6 +278,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         aew = GymEnvWrapper(ae, **config)
         ob = aew.reset()
         print("observation_space.shape:", ob.shape)
+        assert ob.shape == (100, 100, 3), "Observation shape of the env was unexpected."
         # print(ob)
         total_reward = 0.0
         for i in range(200):
