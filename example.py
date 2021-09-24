@@ -8,7 +8,8 @@ Calling this file as a script, invokes the following examples:
     one for grid environments with image representations
     one for wrapping Atari env qbert
     one for wrapping Mujoco env HalfCheetah
-    one for wrapping Minigrid env
+    one for wrapping MiniGrid env
+    one for wrapping ProcGen env
     two examples at the end showing how to create toy envs using gym.make()
 
 Many further examples can be found in test_mdp_playground.py.
@@ -21,6 +22,17 @@ For an example with multiple use cases of how to use the continuous environments
 from mdp_playground.envs import RLToyEnv
 import numpy as np
 
+
+def display_image(obs, mode="RGB"):
+    # Display the image observation associated with the next state
+    from PIL import Image
+
+    # Because numpy is row-major and Image is column major, need to transpose
+    obs = obs.transpose(1, 0, 2)
+    img1 = Image.fromarray(np.squeeze(obs), mode)  # squeeze() is
+    # used because the image is 3-D because frameworks like Ray expect the image
+    # to be 3-D.
+    img1.show()
 
 def discrete_environment_example():
 
@@ -101,17 +113,9 @@ def discrete_environment_image_representations_example():
     # the current discrete state.
     print("sars', done =", state, action, reward, next_state, done)
 
-    # Display the image observation associated with the next state
-    from PIL import Image
-
-    # Because numpy is row-major and Image is column major, need to transpose
-    next_state_image = next_state_image.transpose(1, 0, 2)
-    img1 = Image.fromarray(np.squeeze(next_state_image), "L")  # 'L' is used for
-    # black and white. squeeze() is used because the image is 3-D because
-    # frameworks like Ray expect the image to be 3-D.
-    img1.show()
-
     env.close()
+
+    display_image(next_state_image, mode="L")
 
 
 def continuous_environment_example_move_along_a_line():
@@ -236,15 +240,8 @@ def grid_environment_image_representations_example():
     env.reset()
     env.close()
 
-    # Display the image observation associated with the next state
-    from PIL import Image
+    display_image(next_obs)
 
-    # Because numpy is row-major and Image is column major, need to transpose
-    next_obs = next_obs.transpose(1, 0, 2)
-    img1 = Image.fromarray(np.squeeze(next_obs), "RGB")  # squeeze() is
-    # used because the image is 3-D because frameworks like Ray expect the image
-    # to be 3-D.
-    img1.show()
 
 
 def atari_wrapper_example():
@@ -265,20 +262,23 @@ def atari_wrapper_example():
     state = env.reset()
 
     print(
-        "Taking a step in the environment with a random action and printing the transition:"
+        "Taking 10 steps in the environment with a random action and printing the transition:"
     )
-    action = env.action_space.sample()
-    next_state, reward, done, info = env.step(action)
-    print(
-        "s.shape ar s'.shape, done =",
-        state.shape,
-        action,
-        reward,
-        next_state.shape,
-        done,
-    )
+    for i in range(10):
+        action = env.action_space.sample()
+        next_state, reward, done, info = env.step(action)
+        print(
+            "s.shape ar s'.shape, done =",
+            state.shape,
+            action,
+            reward,
+            next_state.shape,
+            done,
+        )
 
     env.close()
+
+    display_image(next_state)
 
 
 def mujoco_wrapper_example():
@@ -302,23 +302,23 @@ def mujoco_wrapper_example():
     try:
         from mdp_playground.envs import get_mujoco_wrapper
         from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
-    except Exception as e:
-        print("Exception:", e, "caught. You may need to install mujoco-py. NOT running mujoco_wrapper_example.")
+        wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
+
+        env = wrapped_mujoco_env(**config)
+        state = env.reset()
+
+        print(
+            "Taking a step in the environment with a random action and printing the transition:"
+        )
+        action = env.action_space.sample()
+        next_state, reward, done, info = env.step(action)
+        print("sars', done =", state, action, reward, next_state, done)
+
+        env.close()
+
+    except ImportError as e:
+        print("Exception:", type(e), e, "caught. You may need to install mujoco-py. NOT running mujoco_wrapper_example.")
         return
-
-    wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
-
-    env = wrapped_mujoco_env(**config)
-    state = env.reset()
-
-    print(
-        "Taking a step in the environment with a random action and printing the transition:"
-    )
-    action = env.action_space.sample()
-    next_state, reward, done, info = env.step(action)
-    print("sars', done =", state, action, reward, next_state, done)
-
-    env.close()
 
 
 def minigrid_wrapper_example():
@@ -357,6 +357,44 @@ def minigrid_wrapper_example():
     )
 
     env.close()
+
+    display_image(next_obs)
+
+
+def procgen_wrapper_example():
+
+    config = {
+        "seed": 0,
+        "delay": 1,
+        "transition_noise": 0.25,
+        "reward_noise": lambda a: a.normal(0, 0.1),
+        "state_space_type": "discrete",
+    }
+
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    import gym
+
+    env = gym.make("procgen:procgen-coinrun-v0")
+    env = GymEnvWrapper(env, **config)
+    obs = env.reset()
+
+    print(
+        "Taking a step in the environment with a random action and printing the transition:"
+    )
+    action = env.action_space.sample()
+    next_obs, reward, done, info = env.step(action)
+    print(
+        "s.shape ar s'.shape, done =",
+        obs.shape,
+        action,
+        reward,
+        next_obs.shape,
+        done,
+    )
+
+    env.close()
+
+    display_image(next_obs)
 
 
 if __name__ == "__main__":
@@ -403,6 +441,9 @@ if __name__ == "__main__":
 
     print(set_ansi_escape + "\nRunning MiniGrid wrapper example:\n" + reset_ansi_escape)
     minigrid_wrapper_example()
+
+    # print(set_ansi_escape + "\nRunning ProcGen wrapper example:\n" + reset_ansi_escape)
+    # procgen_wrapper_example()
 
     # Using gym.make() example 1
     import mdp_playground

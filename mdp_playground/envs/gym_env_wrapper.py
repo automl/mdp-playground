@@ -4,7 +4,6 @@ import numpy as np
 import sys
 from gym.spaces import Box, Tuple
 from gym.wrappers import AtariPreprocessing
-from ray.rllib.env.atari_wrappers import wrap_deepmind, is_atari
 from mdp_playground.envs.rl_toy_env import RLToyEnv
 import warnings
 import PIL.ImageDraw as ImageDraw
@@ -151,6 +150,7 @@ class GymEnvWrapper(gym.Env):
         if (
             "wrap_deepmind_ray" in config and config["wrap_deepmind_ray"]
         ):  # hack ##TODO remove?
+            from ray.rllib.env.atari_wrappers import wrap_deepmind, is_atari
             self.env = wrap_deepmind(self.env, dim=42, framestack=True)
         elif "atari_preprocessing" in config and config["atari_preprocessing"]:
             self.frame_skip = 4  # default for AtariPreprocessing

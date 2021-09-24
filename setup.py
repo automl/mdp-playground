@@ -12,10 +12,9 @@ packages = [
 package_data = {"": ["*"]}
 
 extras_require = [
-    "ray[default,rllib,debug]==1.3.0",
+    "ray[default,rllib]==1.3.0",
     "tensorflow==2.2.0",
     "pillow>=6.1.0",
-    "pandas==0.25.0",
     "requests==2.22.0",
     "configspace==0.4.10",
     "scipy>=1.3.0",
@@ -27,7 +26,6 @@ extras_require_disc = [
     "ray[rllib,debug]==0.7.3",
     "tensorflow==1.13.0rc1",
     "pillow>=6.1.0",
-    "pandas==0.25.0",
     "requests==2.22.0",
     "configspace==0.4.10",
     "scipy==1.3.0",
@@ -42,7 +40,6 @@ extras_require_cont = [
     # 'ray[rllib,debug]==0.9.0',
     "tensorflow==2.2.0",
     "tensorflow-probability==0.9.0",
-    "pandas==0.25.0",
     "requests==2.22.0",
     "mujoco-py==2.0.2.13",  # with mujoco 2.0
     "configspace>=0.4.10",
