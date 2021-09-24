@@ -8,6 +8,7 @@ Calling this file as a script, invokes the following examples:
     one for grid environments with image representations
     one for wrapping Atari env qbert
     one for wrapping Mujoco env HalfCheetah
+    one for wrapping Minigrid env
     two examples at the end showing how to create toy envs using gym.make()
 
 Many further examples can be found in test_mdp_playground.py.
@@ -316,6 +317,44 @@ def mujoco_wrapper_example():
     env.close()
 
 
+def minigrid_wrapper_example():
+
+    config = {
+        "seed": 0,
+        "delay": 1,
+        "transition_noise": 0.25,
+        "reward_noise": lambda a: a.normal(0, 0.1),
+        "state_space_type": "discrete",
+    }
+
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    import gym
+
+    from gym_minigrid.wrappers import RGBImgPartialObsWrapper, ImgObsWrapper
+    env = gym.make('MiniGrid-Empty-8x8-v0')
+    env = RGBImgPartialObsWrapper(env) # Get pixel observations
+    env = ImgObsWrapper(env) # Get rid of the 'mission' field
+
+    env = GymEnvWrapper(env, **config)
+    obs = env.reset() # This now produces an RGB tensor only
+
+    print(
+        "Taking a step in the environment with a random action and printing the transition:"
+    )
+    action = env.action_space.sample()
+    next_obs, reward, done, info = env.step(action)
+    print(
+        "s.shape ar s'.shape, done =",
+        obs.shape,
+        action,
+        reward,
+        next_obs.shape,
+        done,
+    )
+
+    env.close()
+
+
 if __name__ == "__main__":
 
     # Colour print
@@ -357,6 +396,9 @@ if __name__ == "__main__":
 
     print(set_ansi_escape + "\nRunning Mujoco wrapper example:\n" + reset_ansi_escape)
     mujoco_wrapper_example()
+
+    print(set_ansi_escape + "\nRunning MiniGrid wrapper example:\n" + reset_ansi_escape)
+    minigrid_wrapper_example()
 
     # Using gym.make() example 1
     import mdp_playground
