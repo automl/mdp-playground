@@ -255,7 +255,7 @@ class TestGymEnvWrapper(unittest.TestCase):
                 "obs_type": "image",
                 "frameskip": 1,
             },
-            "image_transforms": "shift",
+            "image_transforms": "shift,scale,rotate",
             # "image_sh_quant": 2,
             "image_width": 40,
             "image_padding": 30,
