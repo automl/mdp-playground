@@ -2,10 +2,11 @@ import numpy as np
 import gym
 from gym.spaces import Tuple
 
+
 class TupleExtended(Tuple):
-    '''
+    """
     Currently, this class doesn't do anything special except allowing to seed from __init__().
-    '''
+    """
 
     def __init__(self, spaces, seed=None):
         super(TupleExtended, self).__init__(spaces)

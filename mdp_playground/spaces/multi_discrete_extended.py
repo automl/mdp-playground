@@ -2,10 +2,11 @@ import numpy as np
 import gym
 from gym.spaces import MultiDiscrete
 
+
 class MultiDiscreteExtended(MultiDiscrete):
-    '''
+    """
     Currently, this class doesn't do anything special except allowing to seed from __init__().
-    '''
+    """
 
     def __init__(self, nvec, seed=None):
         super(MultiDiscreteExtended, self).__init__(nvec)

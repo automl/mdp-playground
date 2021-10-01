@@ -67,9 +67,6 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
-
 # PyBuilder
 target/
 
@@ -107,6 +104,7 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# Pickled files from me
+*pickle*dat
+
 .vscode/
-*.pdf
-..mdpp_to_cave/dqn_seq_del/output/.OLD.zip

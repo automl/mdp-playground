@@ -1,0 +1,1069 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mdp_playground.envs.rl_toy_env.RLToyEnv &#8212; MDP Playground 0.0.1 documentation</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="mdp_playground.scripts" href="mdp_playground.scripts.html" />
+    <link rel="prev" title="mdp_playground.envs.rl_toy_env.list_to_float_np_array" href="mdp_playground.envs.rl_toy_env.list_to_float_np_array.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">MDP Playground 0.0.1 documentation</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="mdp_playground.html">
+   mdp_playground
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="mdp_playground.analysis.html">
+     mdp_playground.analysis
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.analysis.analysis.html">
+       mdp_playground.analysis.analysis
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+      <label for="toctree-checkbox-3">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.analysis.analysis.MDPP_Analysis.html">
+         mdp_playground.analysis.analysis.MDPP_Analysis
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.analysis.radar_chart.html">
+       mdp_playground.analysis.radar_chart
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+      <label for="toctree-checkbox-4">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.analysis.radar_chart.radar_factory.html">
+         mdp_playground.analysis.radar_chart.radar_factory
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="mdp_playground.config_processor.html">
+     mdp_playground.config_processor
+    </a>
+   </li>
+   <li class="toctree-l2 current active has-children">
+    <a class="reference internal" href="mdp_playground.envs.html">
+     mdp_playground.envs
+    </a>
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul class="current">
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.envs.gym_env_wrapper.html">
+       mdp_playground.envs.gym_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
+      <label for="toctree-checkbox-6">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html">
+         mdp_playground.envs.gym_env_wrapper.GymEnvWrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.envs.mujoco_env_wrapper.html">
+       mdp_playground.envs.mujoco_env_wrapper
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/>
+      <label for="toctree-checkbox-7">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper.html">
+         mdp_playground.envs.mujoco_env_wrapper.get_mujoco_wrapper
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 current active has-children">
+      <a class="reference internal" href="mdp_playground.envs.rl_toy_env.html">
+       mdp_playground.envs.rl_toy_env
+      </a>
+      <input checked="" class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/>
+      <label for="toctree-checkbox-8">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul class="current">
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.rl_toy_env.dist_of_pt_from_line.html">
+         mdp_playground.envs.rl_toy_env.dist_of_pt_from_line
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.envs.rl_toy_env.list_to_float_np_array.html">
+         mdp_playground.envs.rl_toy_env.list_to_float_np_array
+        </a>
+       </li>
+       <li class="toctree-l4 current active">
+        <a class="current reference internal" href="#">
+         mdp_playground.envs.rl_toy_env.RLToyEnv
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="mdp_playground.scripts.html">
+     mdp_playground.scripts
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/>
+    <label for="toctree-checkbox-9">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.scripts.run_experiments.html">
+       mdp_playground.scripts.run_experiments
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/>
+      <label for="toctree-checkbox-10">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.scripts.run_experiments.cli.html">
+         mdp_playground.scripts.run_experiments.cli
+        </a>
+       </li>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.scripts.run_experiments.main.html">
+         mdp_playground.scripts.run_experiments.main
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="mdp_playground.spaces.html">
+     mdp_playground.spaces
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/>
+    <label for="toctree-checkbox-11">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.box_extended.html">
+       mdp_playground.spaces.box_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/>
+      <label for="toctree-checkbox-12">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.box_extended.BoxExtended.html">
+         mdp_playground.spaces.box_extended.BoxExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.discrete_extended.html">
+       mdp_playground.spaces.discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" type="checkbox"/>
+      <label for="toctree-checkbox-13">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.discrete_extended.DiscreteExtended.html">
+         mdp_playground.spaces.discrete_extended.DiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.image_continuous.html">
+       mdp_playground.spaces.image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" type="checkbox"/>
+      <label for="toctree-checkbox-14">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.image_continuous.ImageContinuous.html">
+         mdp_playground.spaces.image_continuous.ImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.image_multi_discrete.html">
+       mdp_playground.spaces.image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" type="checkbox"/>
+      <label for="toctree-checkbox-15">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.html">
+         mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.multi_discrete_extended.html">
+       mdp_playground.spaces.multi_discrete_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/>
+      <label for="toctree-checkbox-16">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended.html">
+         mdp_playground.spaces.multi_discrete_extended.MultiDiscreteExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.test_image_continuous.html">
+       mdp_playground.spaces.test_image_continuous
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" type="checkbox"/>
+      <label for="toctree-checkbox-17">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.test_image_continuous.TestImageContinuous.html">
+         mdp_playground.spaces.test_image_continuous.TestImageContinuous
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.test_image_multi_discrete.html">
+       mdp_playground.spaces.test_image_multi_discrete
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" type="checkbox"/>
+      <label for="toctree-checkbox-18">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete.html">
+         mdp_playground.spaces.test_image_multi_discrete.TestImageMultiDiscrete
+        </a>
+       </li>
+      </ul>
+     </li>
+     <li class="toctree-l3 has-children">
+      <a class="reference internal" href="mdp_playground.spaces.tuple_extended.html">
+       mdp_playground.spaces.tuple_extended
+      </a>
+      <input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/>
+      <label for="toctree-checkbox-19">
+       <i class="fas fa-chevron-down">
+       </i>
+      </label>
+      <ul>
+       <li class="toctree-l4">
+        <a class="reference internal" href="mdp_playground.spaces.tuple_extended.TupleExtended.html">
+         mdp_playground.spaces.tuple_extended.TupleExtended
+        </a>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+<div class="navbar_extra_footer">
+  Theme by the <a href="https://ebp.jupyterbook.org">Executable Book Project</a>
+</div>
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/_autosummary/mdp_playground.envs.rl_toy_env.RLToyEnv.rst.txt"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.rst</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="mdp-playground-envs-rl-toy-env-rltoyenv">
+<h1>mdp_playground.envs.rl_toy_env.RLToyEnv<a class="headerlink" href="#mdp-playground-envs-rl-toy-env-rltoyenv" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">mdp_playground.envs.rl_toy_env.</span></code><code class="sig-name descname"><span class="pre">RLToyEnv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.core.Env</span></code></p>
+<p>The base toy environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible dimensions from the accompanying research paper. The class extends OpenAI Gym’s environment gym.Env.</p>
+<p>The accompanying paper is available at: <a class="reference external" href="https://arxiv.org/abs/1909.07750">https://arxiv.org/abs/1909.07750</a>.</p>
+<p>Instead of implementing a new class for every type of MDP, the intent is to capture as many common dimensions across different types of environments as possible and to be able to control the difficulty of an environment by allowing fine-grained control over each of these dimensions. The focus is to be as flexible as possible.</p>
+<dl>
+<dt>The configuration for the environment is passed as a dict at initialisation and contains all the information needed to determine the dynamics of the MDP that the instantiated environment will emulate. We recommend looking at the examples in example.py to begin using the environment since the dimensions and config options are mostly self-explanatory. If you want to specify custom MDPs, please see the use_custom_mdp config option below. For more details, we list here the dimensions and config options (their names here correspond to the keys to be passed in the config dict):</dt><dd><dl>
+<dt>state_space_type<span class="classifier">str</span></dt><dd><p>Specifies what the environment type is. Options are “continuous”, “discrete” and “grid”. The “grid” environment is, basically, a discretised version of the continuous environment.</p>
+</dd>
+<dt>delay<span class="classifier">int &gt;= 0</span></dt><dd><p>Delays each reward by this number of timesteps.</p>
+</dd>
+<dt>sequence_length<span class="classifier">int &gt;= 1</span></dt><dd><p>Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length are set to be rewardable at initialisation if use_custom_mdp = false and generate_random_mdp = true.</p>
+</dd>
+<dt>transition_noise<span class="classifier">float in range [0, 1] or Python function(rng)</span></dt><dd><p>For discrete environments, it is a float that specifies the fraction of times the environment transitions to a noisy next state at each timestep, independently and uniformly at random.
+For continuous environments, if it’s a float, it’s used as the standard deviation of an i.i.d. normal distribution of noise. If it is a Python function with one argument, it is added to next state. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.</p>
+</dd>
+<dt>reward_noise<span class="classifier">float or Python function(rng)</span></dt><dd><p>If it’s a float, it’s used as the standard deviation of an i.i.d. normal distribution of noise.
+If it’s a Python function with one argument, it is added to the reward given at every time step. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility.</p>
+</dd>
+<dt>reward_density<span class="classifier">float in range [0, 1]</span></dt><dd><p>The fraction of possible sequences of a given length that will be selected to be rewardable at initialisation time.</p>
+</dd>
+<dt>reward_scale<span class="classifier">float</span></dt><dd><p>Multiplies the rewards by this value at every time step.</p>
+</dd>
+<dt>reward_shift<span class="classifier">float</span></dt><dd><p>This value is added to the reward at every time step.</p>
+</dd>
+<dt>diameter<span class="classifier">int &gt; 0</span></dt><dd><p>For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will, thus, be = (number of states) / (d).</p>
+</dd>
+<dt>terminal_state_density<span class="classifier">float in range [0, 1]</span></dt><dd><p>For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the “last” states when we consider them to be ordered by their numerical value. This is w.l.o.g. because discrete states are categorical. For continuous environments, please see terminal_states and term_state_edge for how to control terminal states.</p>
+</dd>
+<dt>term_state_reward<span class="classifier">float</span></dt><dd><p>Adds this to the reward if a terminal state was reached at the current time step.</p>
+</dd>
+<dt>image_representations<span class="classifier">boolean</span></dt><dd><p>Boolean to associate an image as the external observation with every discrete categorical state.
+For discrete envs, this is handled by an mdp_playground.spaces.ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n. More details can be found in the documentation for the ImageMultiDiscrete class.
+For continuous and grid envs, this is handled by an mdp_playground.spaces.ImageContinuous object. More details can be found in the documentation for the ImageContinuous class.</p>
+</dd>
+<dt>irrelevant_features<span class="classifier">boolean</span></dt><dd><p>If True, an additional irrelevant sub-space (irrelevant to achieving rewards) is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space.
+For discrete environments, additionally, state_space_size must be specified as a list.
+For continuous environments, the option relevant_indices must be specified. This option specifies the dimensions relevant to achieving rewards.
+For grid environments, nothing additional needs to be done as relevant grid shape is also used as the irrelevant grid shape.</p>
+</dd>
+<dt>use_custom_mdp<span class="classifier">boolean</span></dt><dd><p>If true, users specify their own transition and reward functions using the config options transition_function and reward_function (see below). Optionally, they can also use init_state_dist and terminal_states for discrete spaces (see below).</p>
+</dd>
+<dt>transition_function<span class="classifier">Python function(state, action) or a 2-D numpy.ndarray</span></dt><dd><p>A Python function emulating P(s, a). For discrete envs it’s also possible to specify an <a href="#id11"><span class="problematic" id="id12">|S|x|A|</span></a> transition matrix.</p>
+</dd>
+<dt>reward_function<span class="classifier">Python function(state_sequence, action_sequence) or a 2-D numpy.ndarray</span></dt><dd><p>A Python function emulating R(state_sequence, action_sequence). The state_sequence is recorded by the environment and transition_function is called before reward_function, so the “current” state (when step() was called) and next state are the last 2 states in the sequence.
+For discrete environments, it’s also possible to specify an <a href="#id13"><span class="problematic" id="id14">|S|x|A|</span></a> transition matrix where reward is assumed to be a function over the “current” state and action.
+If use_custom_mdp = false and the environment is continuous, this is a string that chooses one of the following predefined reward functions: move_along_a_line or move_to_a_point.
+If use_custom_mdp = false and the environment is grid, this is a string that chooses one of the following predefined reward functions: move_to_a_point. Support for sequences is planned.</p>
+<p>Also see make_denser documentation.</p>
+</dd>
+<dt>Specific to discrete environments:</dt><dd><dl class="simple">
+<dt>state_space_size<span class="classifier">int &gt; 0 or list of length 2</span></dt><dd><p>A number specifying size of the state space for normal discrete environments and a list of len = 2 when irrelevant_features is True (The list contains sizes of relevant and irrelevant sub-spaces where the 1st sub-space is assumed relevant and the 2nd sub-space is assumed irrelevant).
+NOTE: When automatically generating MDPs, do not specify this value as its value depends on the action_space_size and the diameter as state_space_size = action_space_size * diameter.</p>
+</dd>
+<dt>action_space_size<span class="classifier">int &gt; 0</span></dt><dd><p>Similar description as state_space_size. When automatically generating MDPs, however, its value determines the state_space_size.</p>
+</dd>
+<dt>reward_dist<span class="classifier">list with 2 floats or a Python function(env_rng, reward_sequence_dict)</span></dt><dd><p>If it’s a list with 2 floats, then these 2 values are interpreted as a closed interval and taken as the end points of a categorical distribution which points equally spaced along the interval.
+If it’s a Python function, it samples rewards for the rewardable_sequences dict of the environment. The rewardable_sequences dict of the environment holds the rewardable_sequences with the key as a tuple holding the sequence and value as the reward handed out. The 1st argument for the reward_dist function is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used to sample rewards to ensure reproducibility. The 2nd argument is the rewardable_sequences dict of the environment. This is available because one may need access to the already created reward sequences in the reward_dist function.</p>
+</dd>
+<dt>init_state_dist<span class="classifier">1-D numpy.ndarray</span></dt><dd><p>Specifies an array of initialisation probabilities for the discrete state space.</p>
+</dd>
+<dt>terminal_states<span class="classifier">Python function(state) or 1-D numpy.ndarray</span></dt><dd><p>A Python function with the state as argument that returns whether the state is terminal. If this is specified as an array, the array lists the discrete states that are terminal.</p>
+</dd>
+<dt>Specific to image_representations for discrete envs:</dt><dd><dl class="simple">
+<dt>image_transforms<span class="classifier">str</span></dt><dd><p>String containing the transforms that must be applied to the image representations. As long as one of the following words is present in the string - shift, scale, rotate, flip - the corresponding transform will be applied at random to the polygon in the image representation whenever an observation is generated. Care is either explicitly taken that the polygon remains inside the image region or a warning is generated.</p>
+</dd>
+<dt>sh_quant<span class="classifier">int</span></dt><dd><p>An int to quantise the shift transforms.</p>
+</dd>
+<dt>scale_range<span class="classifier">(float, float)</span></dt><dd><p>A tuple of real numbers to specify (min_scaling, max_scaling).</p>
+</dd>
+<dt>ro_quant<span class="classifier">int</span></dt><dd><p>An int to quantise the rotation transforms.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>Specific to continuous environments:</dt><dd><dl class="simple">
+<dt>state_space_dim<span class="classifier">int</span></dt><dd><p>A number specifying state space dimensionality. A Gym Box space of this dimensionality will be instantiated.</p>
+</dd>
+<dt>action_space_dim<span class="classifier">int</span></dt><dd><p>Same description as state_space_dim. This is currently set equal to the state_space_dim and doesn’t need to specified.</p>
+</dd>
+<dt>relevant_indices<span class="classifier">list</span></dt><dd><p>A list that provides the dimensions relevant to achieving rewards for continuous environments. The dynamics for these dimensions are independent of the dynamics for the remaining (irrelevant) dimensions.</p>
+</dd>
+<dt>state_space_max<span class="classifier">float</span></dt><dd><p>Max absolute value that a dimension of the space can take. A Gym Box will be instantiated with range [-state_space_max, state_space_max]. Sampling will be done as for Gym Box spaces.</p>
+</dd>
+<dt>action_space_max<span class="classifier">float</span></dt><dd><p>Similar description as for state_space_max.</p>
+</dd>
+<dt>terminal_states<span class="classifier">numpy.ndarray</span></dt><dd><p>The centres of hypercube sub-spaces which are terminal.</p>
+</dd>
+<dt>term_state_edge<span class="classifier">float</span></dt><dd><p>The edge of the hypercube sub-spaces which are terminal.</p>
+</dd>
+<dt>transition_dynamics_order<span class="classifier">int</span></dt><dd><p>An order of n implies that the n-th state derivative is set equal to the action/inertia.</p>
+</dd>
+<dt>inertia<span class="classifier">float or numpy.ndarray</span></dt><dd><p>inertia of the rigid body or point object that is being simulated. If numpy.ndarray, it specifies independent inertiae for the dimensions and the shape should be (state_space_dim,).</p>
+</dd>
+<dt>time_unit<span class="classifier">float</span></dt><dd><p>time duration over which the action is applied to the system.</p>
+</dd>
+<dt>target_point<span class="classifier">numpy.ndarray</span></dt><dd><p>The target point in case move_to_a_point is the reward_function. If make_denser is false, target_radius determines distance from the target point at which the sparse reward is handed out.</p>
+</dd>
+<dt>action_loss_weight<span class="classifier">float</span></dt><dd><p>A coefficient to multiply the norm of the action and subtract it from the reward to penalise the action magnitude.</p>
+</dd>
+</dl>
+</dd>
+<dt>Specific to grid environments:</dt><dd><dl class="simple">
+<dt>grid_shape<span class="classifier">tuple</span></dt><dd><p>Shape of the grid environment. If irrelevant_features is True, this is replicated to add a grid which is irrelevant to the reward.</p>
+</dd>
+<dt>target_point<span class="classifier">numpy.ndarray</span></dt><dd><p>The target point in case move_to_a_point is the reward_function. If make_denser is false, reward is only handed out when the target point is reached.</p>
+</dd>
+<dt>terminal_states<span class="classifier">Python function(state) or 1-D numpy.ndarray</span></dt><dd><p>Same description as for terminal_states under discrete envs</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+<dt>Other important config:</dt><dd><dl class="simple">
+<dt>Specific to discrete environments:</dt><dd><dl class="simple">
+<dt>repeats_in_sequences<span class="classifier">boolean</span></dt><dd><p>If true, allows rewardable sequences to have repeating states in them.</p>
+</dd>
+<dt>maximally_connected<span class="classifier">boolean</span></dt><dd><p>If true, sets the transition function such that every state in independent set i can transition to every state in independent set i + 1. If false, then sets the transition function such that a state in independent set i may have any state in independent set i + 1 as the next state for a transition.</p>
+</dd>
+<dt>reward_every_n_steps<span class="classifier">boolean</span></dt><dd><p>Hand out rewards only at multiples of sequence_length steps. This makes the probability that an agent is executing overlapping rewarding sequences 0. This makes it simpler to evaluate HRL algorithms and whether they can “discretise” time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either the make_denser = true case or for continuous and grid environments.</p>
+</dd>
+<dt>generate_random_mdp<span class="classifier">boolean</span></dt><dd><p>If true, automatically generate MDPs when use_custom_mdp = false. Currently, this option doesn’t need to be specified because random MDPs are always generated when use_custom_mdp = false.</p>
+</dd>
+</dl>
+</dd>
+<dt>Specific to continuous environments:</dt><dd><p>none as of now</p>
+</dd>
+</dl>
+<p>For all, continuous, discrete and grid environments:
+make_denser : boolean</p>
+<blockquote>
+<div><p>If true, makes the reward denser in environments.
+For discrete environments, hands out a partial reward for completing partial sequences.
+For continuous environments, for reward function move_to_a_point, the base reward handed out is equal to the distance moved towards the target point in the current timestep.
+For grid envs, the base reward handed out is equal to the Manhattan distance moved towards the target point in the current timestep.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>seed<span class="classifier">int or dict</span></dt><dd><p>Recommended to be passed as an int which generates seeds to be used for the various components of the environment. It is, however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for seeds below to see how to do that.</p>
+</dd>
+<dt>log_filename<span class="classifier">str</span></dt><dd><p>The name of the log file to which logs are written.</p>
+</dd>
+<dt>log_level<span class="classifier">logging.LOG_LEVEL option</span></dt><dd><p>Python log level for logging</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>Below, we list the important attributes and methods for this class.</p>
+<dl class="py attribute">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.config">
+<code class="sig-name descname"><span class="pre">config</span></code><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>the config contains all the details required to generate an environment</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.seed">
+<code class="sig-name descname"><span class="pre">seed</span></code><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>recommended to set to an int, which would set seeds for the env, relevant and irrelevant and externally visible observation and action spaces automatically. If fine-grained control over the seeds is necessary, a dict, with key values as in the source code further below, can be passed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int or dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.observation_space">
+<code class="sig-name descname"><span class="pre">observation_space</span></code><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.observation_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>The externally visible observation space for the enviroment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Gym.Space</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.action_space">
+<code class="sig-name descname"><span class="pre">action_space</span></code><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.action_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>The externally visible action space for the enviroment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>Gym.Space</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.rewardable_sequences">
+<code class="sig-name descname"><span class="pre">rewardable_sequences</span></code><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.rewardable_sequences" title="Permalink to this definition">¶</a></dt>
+<dd><p>holds the rewardable sequences. The keys are tuples of rewardable sequences and values are the rewards handed out. When make_denser is True for discrete environments, this dict also holds the rewardable partial sequences.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.init_terminal_states">
+<code class="sig-name descname"><span class="pre">init_terminal_states</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.init_terminal_states"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.init_terminal_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises terminal states, T</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.init_init_state_dist">
+<code class="sig-name descname"><span class="pre">init_init_state_dist</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.init_init_state_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.init_init_state_dist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises initial state distribution, rho_0</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.init_transition_function">
+<code class="sig-name descname"><span class="pre">init_transition_function</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.init_transition_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.init_transition_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises transition function, P</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.init_reward_function">
+<code class="sig-name descname"><span class="pre">init_reward_function</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.init_reward_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.init_reward_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises reward function, R</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.transition_function">
+<code class="sig-name descname"><span class="pre">transition_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.transition_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.transition_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>the transition function of the MDP, P</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.P">
+<code class="sig-name descname"><span class="pre">P</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.P" title="Permalink to this definition">¶</a></dt>
+<dd><p>defined as a lambda function in the call to init_transition_function() and is equivalent to calling transition_function()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.reward_function">
+<code class="sig-name descname"><span class="pre">reward_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.reward_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.reward_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>the reward function of the MDP, R</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.R">
+<code class="sig-name descname"><span class="pre">R</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.R" title="Permalink to this definition">¶</a></dt>
+<dd><p>defined as a lambda function in the call to init_reward_function() and is equivalent to calling reward_function()</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.get_augmented_state">
+<code class="sig-name descname"><span class="pre">get_augmented_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.get_augmented_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.get_augmented_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets underlying Markovian state of the MDP</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.reset">
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets environment state</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id0">
+<code class="sig-name descname"><span class="pre">seed</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the seed for the numpy RNG used by the environment (state and action spaces have their own seeds as well)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.step">
+<code class="sig-name descname"><span class="pre">step</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_rollout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs 1 transition of the MDP</p>
+</dd></dl>
+
+<p>Initialises the MDP to be emulated using the settings provided in config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – the member variable config is initialised to this value after inserting defaults</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.__init__">
+<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises the MDP to be emulated using the settings provided in config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<em>dict</em>) – the member variable config is initialised to this value after inserting defaults</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.__init__" title="mdp_playground.envs.rl_toy_env.RLToyEnv.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(**config)</p></td>
+<td><p>Initialises the MDP to be emulated using the settings provided in config.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.close" title="mdp_playground.envs.rl_toy_env.RLToyEnv.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a>()</p></td>
+<td><p>Override close in your subclass to perform any necessary cleanup.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id1" title="mdp_playground.envs.rl_toy_env.RLToyEnv.get_augmented_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_augmented_state</span></code></a>()</p></td>
+<td><p>Intended to return the full augmented state which would be Markovian.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id2" title="mdp_playground.envs.rl_toy_env.RLToyEnv.init_init_state_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_init_state_dist</span></code></a>()</p></td>
+<td><p>Initialises initial state distrbution, rho_0, to be uniform over the non-terminal states for discrete environments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id3" title="mdp_playground.envs.rl_toy_env.RLToyEnv.init_reward_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_reward_function</span></code></a>()</p></td>
+<td><p>Initialises reward function, R by selecting random sequences to be rewardable for discrete environments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id4" title="mdp_playground.envs.rl_toy_env.RLToyEnv.init_terminal_states"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_terminal_states</span></code></a>()</p></td>
+<td><p>Initialises terminal state set to be the ‘last’ states for discrete environments.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id5" title="mdp_playground.envs.rl_toy_env.RLToyEnv.init_transition_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_transition_function</span></code></a>()</p></td>
+<td><p>Initialises transition function, P by selecting random next states for every (state, action) tuple for discrete environments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.render" title="mdp_playground.envs.rl_toy_env.RLToyEnv.render"><code class="xref py py-obj docutils literal notranslate"><span class="pre">render</span></code></a>([mode])</p></td>
+<td><p>Renders the environment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id6" title="mdp_playground.envs.rl_toy_env.RLToyEnv.reset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reset</span></code></a>()</p></td>
+<td><p>Resets the environment for the beginning of an episode and samples a start state from rho_0.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id7" title="mdp_playground.envs.rl_toy_env.RLToyEnv.reward_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reward_function</span></code></a>(state, action)</p></td>
+<td><p>The reward function, R.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id8" title="mdp_playground.envs.rl_toy_env.RLToyEnv.seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">seed</span></code></a>([seed])</p></td>
+<td><p>Initialises the Numpy RNG for the environment by calling a utility for this in Gym.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#id9" title="mdp_playground.envs.rl_toy_env.RLToyEnv.step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">step</span></code></a>(action[, imaginary_rollout])</p></td>
+<td><p>The step function for the environment.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id10" title="mdp_playground.envs.rl_toy_env.RLToyEnv.transition_function"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transition_function</span></code></a>(state, action)</p></td>
+<td><p>The transition function, P.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table class="longtable table autosummary">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.action_space" title="mdp_playground.envs.rl_toy_env.RLToyEnv.action_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">action_space</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">metadata</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.observation_space" title="mdp_playground.envs.rl_toy_env.RLToyEnv.observation_space"><code class="xref py py-obj docutils literal notranslate"><span class="pre">observation_space</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">reward_range</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">spec</span></code></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.unwrapped" title="mdp_playground.envs.rl_toy_env.RLToyEnv.unwrapped"><code class="xref py py-obj docutils literal notranslate"><span class="pre">unwrapped</span></code></a></p></td>
+<td><p>Completely unwrap this env.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.close">
+<code class="sig-name descname"><span class="pre">close</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override close in your subclass to perform any necessary cleanup.</p>
+<p>Environments will automatically close() themselves when
+garbage collected or when the program exits.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id1">
+<code class="sig-name descname"><span class="pre">get_augmented_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.get_augmented_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intended to return the full augmented state which would be Markovian. (However, it’s not Markovian wrt the noise in P and R because we’re not returning the underlying RNG.) Currently, returns the augmented state which is the sequence of length “delay + sequence_length + 1” of past states for both discrete and continuous environments. Additonally, the current state derivatives are also returned for continuous environments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><em>dict</em> – Contains at the end of the current transition</p></li>
+<li><p><em>#TODO For noisy processes, this would need the noise distribution and random seed too. Also add the irrelevant state parts, etc.? We don’t need the irrelevant parts for the state to be Markovian.</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id2">
+<code class="sig-name descname"><span class="pre">init_init_state_dist</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.init_init_state_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises initial state distrbution, rho_0, to be uniform over the non-terminal states for discrete environments. For both discrete and continuous environments, the uniform sampling over non-terminal states is taken care of in reset() when setting the initial state for an episode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id3">
+<code class="sig-name descname"><span class="pre">init_reward_function</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.init_reward_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises reward function, R by selecting random sequences to be rewardable for discrete environments. For continuous environments, we have fixed available options for the reward function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id4">
+<code class="sig-name descname"><span class="pre">init_terminal_states</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.init_terminal_states"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id4" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises terminal state set to be the ‘last’ states for discrete environments. For continuous environments, terminal states will be in a hypercube centred around config[‘terminal_states’] with the edge of the hypercube of length config[‘term_state_edge’].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id5">
+<code class="sig-name descname"><span class="pre">init_transition_function</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.init_transition_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises transition function, P by selecting random next states for every (state, action) tuple for discrete environments. For continuous environments, we have 1 option for the transition function which varies depending on dynamics order and inertia and time_unit for a point object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.render">
+<code class="sig-name descname"><span class="pre">render</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'human'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.render" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders the environment.</p>
+<p>The set of supported modes varies per environment. (And some
+environments do not support rendering at all.) By convention,
+if mode is:</p>
+<ul class="simple">
+<li><p>human: render to the current display or terminal and
+return nothing. Usually for human consumption.</p></li>
+<li><p>rgb_array: Return an numpy.ndarray with shape (x, y, 3),
+representing RGB values for an x-by-y pixel image, suitable
+for turning into a video.</p></li>
+<li><p>ansi: Return a string (str) or StringIO.StringIO containing a
+terminal-style text representation. The text can include newlines
+and ANSI escape sequences (e.g. for colors).</p></li>
+</ul>
+<dl class="simple">
+<dt>Note:</dt><dd><dl class="simple">
+<dt>Make sure that your class’s metadata ‘render.modes’ key includes</dt><dd><p>the list of supported modes. It’s recommended to call super()
+in implementations to use the functionality of this method.</p>
+</dd>
+</dl>
+</dd>
+<dt>Args:</dt><dd><p>mode (str): the mode to render with</p>
+</dd>
+</dl>
+<p>Example:</p>
+<dl>
+<dt>class MyEnv(Env):</dt><dd><p>metadata = {‘render.modes’: [‘human’, ‘rgb_array’]}</p>
+<dl class="simple">
+<dt>def render(self, mode=’human’):</dt><dd><dl class="simple">
+<dt>if mode == ‘rgb_array’:</dt><dd><p>return np.array(…) # return RGB frame suitable for video</p>
+</dd>
+<dt>elif mode == ‘human’:</dt><dd><p>… # pop up a window and render</p>
+</dd>
+<dt>else:</dt><dd><p>super(MyEnv, self).render(mode=mode) # just raise an exception</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id6">
+<code class="sig-name descname"><span class="pre">reset</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id6" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the environment for the beginning of an episode and samples a start state from rho_0. For discrete environments uses the defined rho_0 directly. For continuous environments, samples a state and resamples until a non-terminal state is sampled.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The start state for a new episode.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int or np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id7">
+<code class="sig-name descname"><span class="pre">reward_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.reward_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id7" title="Permalink to this definition">¶</a></dt>
+<dd><p>The reward function, R.</p>
+<dl class="simple">
+<dt>Rewards the sequences selected to be rewardable at initialisation for discrete environments. For continuous environments, we have fixed available options for the reward function:</dt><dd><p>move_to_a_point rewards for moving to a predefined location. It has sparse and dense settings.
+move_along_a_line rewards moving along ANY direction in space as long as it’s a fixed direction for sequence_length consecutive steps.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>list</em>) – The underlying MDP state (also called augmented state in this code) that the environment uses to calculate its reward. Normally, just the sequence of past states of length delay + sequence_length + 1.</p></li>
+<li><p><strong>action</strong> (<em>single action dependent on action space</em>) – Action magnitudes are penalised immediately in the case of continuous spaces and, in effect, play no role for discrete spaces as the reward in that case only depends on sequences of states. We say “in effect” because it _is_ used in case of a custom R to calculate R(s, a) but that is equivalent to using the “next” state s’ as the reward determining criterion in case of deterministic transitions. _Sequences_ of _actions_ are currently NOT used to calculate the reward. Since the underlying MDP dynamics are deterministic, a state and action map 1-to-1 with the next state and so, just a sequence of _states_ should be enough to calculate the reward.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>double</em> – The reward at the end of the current transition</p></li>
+<li><p><em>#TODO Make reward depend on the action sequence too instead of just state sequence, as it is currently?</em></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id8">
+<code class="sig-name descname"><span class="pre">seed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.seed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id8" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialises the Numpy RNG for the environment by calling a utility for this in Gym.</p>
+<p>The environment has its own RNG and so do the state and action spaces held by the environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>int</em>) – seed to initialise the np_random instance held by the environment. Cannot use numpy.int64 or similar because Gym doesn’t accept it.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The seed returned by Gym</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id9">
+<code class="sig-name descname"><span class="pre">step</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imaginary_rollout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id9" title="Permalink to this definition">¶</a></dt>
+<dd><p>The step function for the environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>action</strong> (<em>int</em><em> or </em><em>np.array</em>) – The action that the environment will use to perform a transition.</p></li>
+<li><p><strong>imaginary_rollout</strong> (<em>boolean</em>) – Option for the user to perform “imaginary” transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide a list of states to this function to be able to perform a rollout.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The next state, reward, whether the episode terminated and additional info dict at the end of the current transition</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int or np.array, double, boolean, dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="id10">
+<code class="sig-name descname"><span class="pre">transition_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.transition_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id10" title="Permalink to this definition">¶</a></dt>
+<dd><p>The transition function, P.</p>
+<p>Performs a transition according to the initialised P for discrete environments (with dynamics independent for relevant vs irrelevant dimension sub-spaces). For continuous environments, we have a fixed available option for the dynamics (which is the same for relevant or irrelevant dimensions):
+The order of the system decides the dynamics. For an nth order system, the nth order derivative of the state is set to the action value / inertia for time_unit seconds. And then the dynamics are integrated over the time_unit to obtain the next state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state</strong> (<em>list</em>) – The state that the environment will use to perform a transition.</p></li>
+<li><p><strong>action</strong> (<em>list</em>) – The action that the environment will use to perform a transition.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The state at the end of the current transition</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int or np.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.unwrapped">
+<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">unwrapped</span></code><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.unwrapped" title="Permalink to this definition">¶</a></dt>
+<dd><p>Completely unwrap this env.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>gym.Env: The base non-wrapped gym.Env instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="mdp_playground.envs.rl_toy_env.list_to_float_np_array.html" title="previous page">mdp_playground.envs.rl_toy_env.list_to_float_np_array</a>
+    <a class='right-next' id="next-link" href="mdp_playground.scripts.html" title="next page">mdp_playground.scripts</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By MDP Playground developers<br/>
+        
+            &copy; Copyright 2021, MDP Playground developers.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

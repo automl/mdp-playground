@@ -2,8 +2,8 @@ import numpy as np
 import gym
 from gym.spaces import Box
 
-class BoxExtended(Box):
 
+class BoxExtended(Box):
     def __init__(self, low, high, shape=None, dtype=np.float32, seed=None):
         super(BoxExtended, self).__init__(low, high, shape=shape, dtype=dtype)
         super(BoxExtended, self).seed(seed=seed)

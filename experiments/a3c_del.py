@@ -35,13 +35,13 @@ env_config = {
     "env": "RLToy-v0",
     "horizon": 100,
     "env_config": {
-        'seed': 0, #seed
-        'state_space_type': 'discrete',
-        'action_space_type': 'discrete',
-        'generate_random_mdp': True,
-        'repeats_in_sequences': False,
-        'reward_scale': 1.0,
-        'completely_connected': True,
+        "seed": 0,  # seed
+        "state_space_type": "discrete",
+        "action_space_type": "discrete",
+        "generate_random_mdp": True,
+        "repeats_in_sequences": False,
+        "reward_scale": 1.0,
+        "completely_connected": True,
     },
 }
 
@@ -91,9 +91,9 @@ model_config = {
     },
 }
 
-from ray import tune
+
 eval_config = {
-    "evaluation_interval": 1, # I think this means every x training_iterations
+    "evaluation_interval": 1,  # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
@@ -101,10 +101,13 @@ eval_config = {
         "evaluation_num_episodes": 10,
         "horizon": 100,
         "env_config": {
-            "dummy_eval": True, #hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
-            'transition_noise': 0 if "state_space_type" in env_config["env_config"] and env_config["env_config"]["state_space_type"] == "discrete" else tune.function(lambda a: a.normal(0, 0)),
-            'reward_noise': tune.function(lambda a: a.normal(0, 0)),
-            'action_loss_weight': 0.0,
-        }
+            "dummy_eval": True,  # hack Used to check if we are in evaluation mode or training mode inside Ray callback on_episode_end() to be able to write eval stats
+            "transition_noise": 0
+            if "state_space_type" in env_config["env_config"]
+            and env_config["env_config"]["state_space_type"] == "discrete"
+            else tune.function(lambda a: a.normal(0, 0)),
+            "reward_noise": tune.function(lambda a: a.normal(0, 0)),
+            "action_loss_weight": 0.0,
+        },
     },
 }
