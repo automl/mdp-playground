@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd 
+import pandas as pd
 import argparse, os
 import json
 
@@ -15,7 +15,7 @@ class MDPPToCave():
                         "json_format_version": 0.1}
         for param in var_configs:
             param_config = {"name": param}
-            var_type = str( type(stats_pd[param].iloc[0]) )    
+            var_type = str( type(stats_pd[param].iloc[0]) )
             if("int" in var_type or "bool" in var_type):
                 param_config["lower"] = int( stats_pd[param].min() )
                 param_config["upper"] = int( stats_pd[param].max() )
@@ -31,7 +31,7 @@ class MDPPToCave():
                 param_config["upper"] = float( stats_pd[param].max() )
                 param_config["default"] = (param_config["lower"] + param_config["upper"])/2
                 param_config["type"] = "uniform_float"
-            
+
             if "lr" in param:
                 param_config["log"] = True
             else:
@@ -65,7 +65,7 @@ class MDPPToCave():
         with open(file_prefix + file_suffix, 'ab') as combined_file:
             i = 0
             num_diff_lines = []
-            while True: 
+            while True:
                 if os.path.isfile(file_prefix + '_' + str(i) + file_suffix):
                     with open(file_prefix + '_' + str(i) + file_suffix, 'rb') as curr_file:
                         byte_string = curr_file.read()
@@ -106,7 +106,7 @@ class MDPPToCave():
         stats_pd = pd.read_csv(stats_file + '.csv', skip_blank_lines=True,\
                                     header=None, names = col_names, comment='#', sep=' ')
         remove_names = ["training_iteration", "algorithm", "seed"]
-        
+
         parameters = col_names[:-3].copy()#All paramaters tracked in run
         for x in col_names:
             for name in remove_names:
@@ -127,7 +127,7 @@ class MDPPToCave():
         output_configspace = os.path.join(output_folder,'configspace.json')
         with open(output_configspace, 'w') as fp:
             json.dump(configspace, fp, indent=2)
-        
+
         scenario_str = "paramfile = ./configspace.json\nrun_obj = quality"
         output_configspace = os.path.join(output_folder,'scenario.txt')
         with open(output_configspace, 'w') as fp:
@@ -137,21 +137,31 @@ class MDPPToCave():
         runhistory_df = self._create_run_history(stats_pd, seed_idx, col_names, output_folder, var_configs)
         runhistory_df.to_csv( os.path.join(output_folder,'runhistory.csv'), header=True, index=False)
 
-    ## Creates the bohb file from the mdpp output in the output_folder directory
-    ## this file can be fed into cave for analysis
-    def to_bohb_results(self, dir_name, exp_name, output_dir="../cave_output/"):
-        self.output_folder = output_dir
-        if not os.path.exists(self.output_folder):
-            print("Writing bohb to cave output to %s"%(os.path.abspath(output_dir)))
-            os.makedirs(self.output_folder)
+    def to_bohb_results(self, input_dir, exp_name, output_dir="../cave_output/",
+            overwrite=False):
+        '''Converts MDP Playground stats CSVs to BOHB format stats files:
+        configs.json, results.json, configspace.json, in output_dir/exp_name.
+        This file can be fed into cave for further analysis.
+
+        exp_name : str
+            Should be the expt name from MDPP, i.e., the "prefix" of the CSV stats files. A sub-directory of output_dir is created with this name to store BOHB format stats files.
+
+        Returns "<output_dir>/<exp_name>"
+        '''
+
+        print("Writing BOHB to cave output to %s"%(os.path.abspath(output_dir)))
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
         # file_path = args.file_path
-        output_folder = os.path.join(self.output_folder, exp_name)
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
+        output_dir_final = os.path.join(output_dir, exp_name)
+        if not os.path.exists(output_dir_final):
+            os.makedirs(output_dir_final)
+
+
 
         # Read current csvs ##
-        stats_file = os.path.join(dir_name, exp_name)
+        stats_file = os.path.join(input_dir, exp_name)
         stats_file = os.path.abspath(stats_file)
         self._read_stats(stats_file)
         with open(stats_file + '.csv') as file_:
@@ -191,7 +201,7 @@ class MDPPToCave():
         ##------------- Start converting csv ----------------##
         #configspace and scenario file
         configspace = self._create_configspace_json(stats_pd, var_configs)
-        output_configspace = os.path.join(output_folder,'configspace.json')
+        output_configspace = os.path.join(output_dir_final,'configspace.json')
         with open(output_configspace, 'w') as fp:
             json.dump(configspace, fp, indent=2)
 
@@ -199,7 +209,7 @@ class MDPPToCave():
         #Finding end configuration training
         diff_configs = stats_pd.iloc[final_rows_for_a_config]
         diff_configs = diff_configs.groupby(var_configs)
-        configs_mean = diff_configs.mean() 
+        configs_mean = diff_configs.mean()
         diff_configs_results = [] #results.json
         diff_configs_lst = []
         budget = stats_pd["timesteps_total"].iloc[final_rows_for_a_config[0]]#all have the same budget
@@ -226,43 +236,43 @@ class MDPPToCave():
                                                     "started": float("%.2f"%(aux + 0.1)),
                                                     "finished": float("%.2f"%(aux + 1)),} ]
             aux += 1.1
-            results_dict = {"loss": -mean_reward.item(), 
+            results_dict = {"loss": -mean_reward.item(),
                             "info": {}}
             results_lst.append(results_dict)
             results_lst.append(None)
             diff_configs_results.append(results_lst)
 
         #configs.json
-        output_configs = os.path.join(output_folder,'configs.json')
+        output_configs = os.path.join(output_dir_final,'configs.json')
         with open(output_configs, 'w') as fout:
             for d in diff_configs_lst:
                 json.dump(d, fout)
                 fout.write('\n')
 
         #results.json
-        output_configs = os.path.join(output_folder,'results.json')
+        output_configs = os.path.join(output_dir_final,'results.json')
         with open(output_configs, 'w') as fout:
             for d in diff_configs_results:
                 json.dump(d, fout)
                 fout.write('\n')
-        return output_folder
+        return output_dir_final
 
 
 if __name__ == "__main__":
-    dir_name = '../mdp_files/'
+    input_dir = '../mdp_files/'
     exp_name = 'dqn_seq_del'
-    
+
     from cave.cavefacade import CAVE
     import os
     # The converted mdpp csvs will be stored in output_dir
     output_dir = "../mdpp_to_cave"
-    mdpp_file =  os.path.join(dir_name, exp_name)
+    mdpp_file =  os.path.join(input_dir, exp_name)
     mdpp_cave = MDPPToCave()
-    cave_input_file = mdpp_cave.to_bohb_results(dir_name, exp_name, output_dir)
+    cave_input_file = mdpp_cave.to_bohb_results(input_dir, exp_name, output_dir)
 
     # cave_input_file = "../../../mdpp_to_cave/dqn_seq_del"
 
-    # Similarly, as an example, cave will ouput it's results 
+    # Similarly, as an example, cave will ouput it's results
     # to the same directory as cave's input files
 
     cave_results = os.path.join(cave_input_file, "output")
@@ -273,7 +283,7 @@ if __name__ == "__main__":
                 file_format = "BOHB",
                 show_jupyter=True,
     )
-    
+
     # Common analysis
     cave.performance_table()
     cave.local_parameter_importance()
