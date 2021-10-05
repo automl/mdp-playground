@@ -3,6 +3,7 @@ import pandas as pd
 import argparse, os
 import json
 from mdp_playground.analysis import MDPP_Analysis
+from cave.cavefacade import CAVE
 
 class MDPPToCave():
     def __init__(self):
@@ -149,6 +150,9 @@ class MDPPToCave():
         exp_name : str
             Should be the expt name from MDPP, i.e., the "prefix" of the CSV stats files. A sub-directory of output_dir is created with this name to store BOHB format stats files.
 
+        overwrite : bool
+            If existing files should be overwritten.
+
         Returns "<output_dir>/<exp_name>"
         '''
 
@@ -224,8 +228,8 @@ class MDPPToCave():
 
         # print("var_configs:", var_configs)
 
-        #Trajectory and runhistory files
-        #Finding end configuration training
+        # Trajectory and runhistory files
+        # Finding end configuration training
         diff_configs = stats_pd.iloc[final_rows_for_a_config]
         # print("diff_configs:", diff_configs)
         diff_configs = diff_configs.groupby(var_configs)
@@ -235,7 +239,7 @@ class MDPPToCave():
         # print("diff_configs.groups:", diff_configs.groups)
         diff_configs_results = [] #results.json
         diff_configs_lst = []
-        budget = stats_pd["timesteps_total"].iloc[final_rows_for_a_config[0]]#all have the same budget
+        budget = stats_pd["timesteps_total"].iloc[final_rows_for_a_config[0]] # all have the same budget
         aux = 0
         for i, group_name in enumerate(diff_configs.groups):
             group_labels = diff_configs.groups[group_name]
@@ -284,7 +288,29 @@ class MDPPToCave():
             for d in diff_configs_results:
                 json.dump(d, fout)
                 fout.write('\n')
+
         return output_dir_final
+
+
+    def to_CAVE_object(self, input_dir, exp_name, output_dir="../cave_output/",
+            overwrite=False):
+        '''Converts MDP Playground stats CSVs to BOHB format stats files and creates
+        a CAVE object from them.
+
+        Please see to_bohb_results() for details about some of the parameters.
+        '''
+
+        cave_input_file = self.to_bohb_results(input_dir, exp_name, output_dir, overwrite=overwrite)
+
+        cave_results = os.path.join(cave_input_file, "out")
+        cave = CAVE(folders = [cave_input_file],
+                    output_dir = cave_results,
+                    ta_exec_dir = [cave_input_file],
+                    file_format = "BOHB",
+                    show_jupyter=True,
+                   )
+
+        return cave
 
 
 if __name__ == "__main__":

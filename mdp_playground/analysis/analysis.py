@@ -236,7 +236,7 @@ class MDPP_Analysis:
         for i in range(stats_pd.shape[0] - 1):
             if (
                 stats_pd["timesteps_total"].iloc[i]
-                > stats_pd["timesteps_total"].iloc[i + 1]
+                >= stats_pd["timesteps_total"].iloc[i + 1]
             ):
                 final_rows_for_a_config.append(i)
 
