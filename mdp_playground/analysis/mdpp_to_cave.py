@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import argparse, os
 import json
+from mdp_playground.analysis import MDPP_Analysis
 
 class MDPPToCave():
     def __init__(self):
@@ -143,6 +144,8 @@ class MDPPToCave():
         configs.json, results.json, configspace.json, in output_dir/exp_name.
         This file can be fed into cave for further analysis.
 
+        Currently only compatible with the MDPP expt. of type: grid of configs
+
         exp_name : str
             Should be the expt name from MDPP, i.e., the "prefix" of the CSV stats files. A sub-directory of output_dir is created with this name to store BOHB format stats files.
 
@@ -159,8 +162,18 @@ class MDPPToCave():
             os.makedirs(output_dir_final)
 
 
+        # Read current CSVs
 
-        # Read current csvs ##
+        ##TODO Re-use code from analyis.py to load data instead of processing it again here:
+        # mdpp_analysis = MDPP_Analysis()
+        # self.exp_data = mdpp_analysis.get_exp_data(dir_name=input_dir,
+        #                             exp_name=exp_name,
+        #                             )
+        # print("exp_data:\n", self.exp_data)
+
+        # exp_data["dims_varied"]
+        # exp_data["dims_values"]
+
         stats_file = os.path.join(input_dir, exp_name)
         stats_file = os.path.abspath(stats_file)
         self._read_stats(stats_file)
@@ -176,7 +189,7 @@ class MDPPToCave():
                                sep=' ')
         remove_names = ["training_iteration", "algorithm", "seed"]
 
-        parameters = col_names[:-3].copy()#All paramaters tracked in run
+        parameters = col_names[:-3].copy()  # All parameters tracked in run
         for x in col_names:
             for name in remove_names:
                 if(name in x):
@@ -201,15 +214,25 @@ class MDPPToCave():
         ##------------- Start converting csv ----------------##
         #configspace and scenario file
         configspace = self._create_configspace_json(stats_pd, var_configs)
-        output_configspace = os.path.join(output_dir_final,'configspace.json')
-        with open(output_configspace, 'w') as fp:
+        cs_json_file = os.path.join(output_dir_final, 'configspace.json')
+        if os.path.exists(cs_json_file):
+            if not overwrite:
+                raise FileExistsError()
+
+        with open(cs_json_file, 'w') as fp:
             json.dump(configspace, fp, indent=2)
+
+        # print("var_configs:", var_configs)
 
         #Trajectory and runhistory files
         #Finding end configuration training
         diff_configs = stats_pd.iloc[final_rows_for_a_config]
+        # print("diff_configs:", diff_configs)
         diff_configs = diff_configs.groupby(var_configs)
+        # print("grouped by", diff_configs)
         configs_mean = diff_configs.mean()
+        # print("mean:", configs_mean)
+        # print("diff_configs.groups:", diff_configs.groups)
         diff_configs_results = [] #results.json
         diff_configs_lst = []
         budget = stats_pd["timesteps_total"].iloc[final_rows_for_a_config[0]]#all have the same budget
@@ -244,14 +267,20 @@ class MDPPToCave():
 
         #configs.json
         output_configs = os.path.join(output_dir_final,'configs.json')
+        if os.path.exists(output_configs):
+            if not overwrite:
+                raise FileExistsError()
         with open(output_configs, 'w') as fout:
             for d in diff_configs_lst:
                 json.dump(d, fout)
                 fout.write('\n')
 
         #results.json
-        output_configs = os.path.join(output_dir_final,'results.json')
-        with open(output_configs, 'w') as fout:
+        output_results = os.path.join(output_dir_final,'results.json')
+        if os.path.exists(output_results):
+            if not overwrite:
+                raise FileExistsError()
+        with open(output_results, 'w') as fout:
             for d in diff_configs_results:
                 json.dump(d, fout)
                 fout.write('\n')
