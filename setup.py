@@ -51,6 +51,10 @@ extras_require_cont = [
     "pillow==6.1.0",
 ]
 
+hpo_analysis_require = [
+    'cave>=1.4.0',
+]
+
 AUTHORS = (
     ", ".join(
         [
@@ -106,6 +110,7 @@ setup(
         "extras": extras_require,
         "extras_disc": extras_require_disc,
         "extras_cont": extras_require_cont,
+        "hpo_analysis": hpo_analysis_require,
     },
     entry_points={
         "console_scripts": """
