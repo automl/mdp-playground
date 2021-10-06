@@ -8,7 +8,7 @@ import logging
 from datetime import datetime
 
 log_filename = (
-    "/tmp/test_mdp_playground_"
+    "/tmp/test_run_experiments_"
     + datetime.today().strftime("%m.%d.%Y_%I:%M:%S_%f")
     + ".log"
 )

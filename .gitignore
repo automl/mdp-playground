@@ -108,3 +108,6 @@ venv.bak/
 *pickle*dat
 
 .vscode/
+
+#whitelist
+!tests/files/mdpp_12744267_SAC_target_radius/*.csv
