@@ -51,10 +51,10 @@ def init_ray(**kwargs):
         del kwargs["log_level"]
         kwargs["logging_level"] = value
 
-    kwargs = {**kwargs,
-              "_memory": 2e8,
-              "include_dashboard": True,
-              "dashboard_host": "0.0.0.0"}
+    # kwargs = {**kwargs,
+    #           "_memory": 2e8,
+    #           "include_dashboard": True,
+    #           "dashboard_host": "0.0.0.0"}
 
     logging.info("Init ray with args {}".format(str(kwargs)))
 
