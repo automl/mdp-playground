@@ -158,6 +158,13 @@ def main(args):
                         help="Num CPU cores for Ray to use.")
     parser.add_argument('-o', '--object_store_memory', default=8e9,
                         help="Size (in bytes) to use for Ray's object store.")
+    parser.add_argument("-w", "--wandb", action='store_true',
+                        default=False,
+                        help="Use Tune's wandb callback for tracking the exp.")
+    parser.add_argument("-i", "--init_ray", action='store_false',
+                        default=True,
+                        help="Flag to DEACTIVATE Ray initialization in case of"
+                        " initialization of Ray outside MDPP.")
 
     args = parser.parse_args(args)
     print("Parsed arguments:", args)
@@ -209,6 +216,7 @@ def main(args):
         config_num=args.config_num,
         log_level=log_level_,
         framework_dir=args.framework_dir,
+        init_ray=args.init_ray,
         **ray_kwargs
     )
 
@@ -268,7 +276,7 @@ def main(args):
         res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
         print("## Results dir: {}".format(res_dir))
 
-        if True:
+        if args.wandb:
             from ray.tune.integration.wandb import WandbLoggerCallback
             API_KEY_FILE = "~/wandb_api_key.txt"
             callbacks = [WandbLoggerCallback(

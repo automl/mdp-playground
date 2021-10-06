@@ -51,10 +51,19 @@ def init_ray(**kwargs):
         del kwargs["log_level"]
         kwargs["logging_level"] = value
 
+    kwargs = {**kwargs,
+              "_memory": 2e8,
+              "include_dashboard": True,
+              "dashboard_host": "0.0.0.0"}
+
     logging.info("Init ray with args {}".format(str(kwargs)))
 
-    session_info = ray.init(**kwargs, include_dashboard=True,
-                            dashboard_host="0.0.0.0")
+    session_info = ray.init(**kwargs)
+
+    # resources = ray.cluster_resources()
+    # print(resources)
+    # ava_reso = ray.available_resources()
+    # print(ava_reso)
 
     return session_info
 
@@ -66,6 +75,7 @@ def process_configs(
     log_level,
     framework="ray",
     framework_dir="/tmp/ray",
+    init_ray=True,
     **ray_kwargs
 ):
     config_file_path = os.path.abspath("/".join(config_file.split("/")[:-1]))
@@ -164,8 +174,9 @@ def process_configs(
     if framework.lower() == "ray":
         from ray import tune
 
-        setup_ray(config, config_num, log_level,
-                  framework_dir, **ray_kwargs)
+        if init_ray:
+            setup_ray(config, config_num, log_level,
+                      framework_dir, **ray_kwargs)
         on_train_result, on_episode_end = setup_ray_callbacks(
             stats_file_prefix,
             variable_configs_deepcopy,
