@@ -110,6 +110,7 @@ setup(
         "extras": extras_require,
         "extras_disc": extras_require_disc,
         "extras_cont": extras_require_cont,
+        "hpo_analysis": hpo_analysis_require,
     },
     entry_points={
         "console_scripts": """
