@@ -5,6 +5,7 @@ import copy
 import numpy as np
 from mdp_playground.envs.rl_toy_env import RLToyEnv
 import unittest
+import pytest
 
 
 log_filename = (
