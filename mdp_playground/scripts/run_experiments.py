@@ -158,9 +158,10 @@ def main(args):
                         help="Num CPU cores for Ray to use.")
     parser.add_argument('-o', '--object_store_memory', default=8e9,
                         help="Size (in bytes) to use for Ray's object store.")
-    parser.add_argument("-w", "--wandb", action='store_true',
-                        default=False,
-                        help="Use Tune's wandb callback for tracking the exp.")
+    parser.add_argument("-w", "--wandb", default=None,
+                        help="Use Tune's wandb callback for tracking the exp."
+                        "Passed arg is the wand project name. No syncing if "
+                        "none provided.")
     parser.add_argument("-i", "--init_ray", action='store_false',
                         default=True,
                         help="Flag to DEACTIVATE Ray initialization in case of"
@@ -276,12 +277,11 @@ def main(args):
         res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
         print("## Results dir: {}".format(res_dir))
 
-        if args.wandb:
+        if args.wandb is not None:
             from ray.tune.integration.wandb import WandbLoggerCallback
             API_KEY_FILE = "~/wandb_api_key.txt"
             callbacks = [WandbLoggerCallback(
-                project="HiWi_AutoRL_eval",
-                # TODO: make also work on cluster!
+                project=args.wandb,
                 api_key_file=API_KEY_FILE,
                 log_config=True)]
         else:
