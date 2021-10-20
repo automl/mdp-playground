@@ -4,8 +4,11 @@ import numpy as np
 import sys
 from gym.spaces import Box, Tuple
 from gym.wrappers import AtariPreprocessing
-from ray.rllib.env.atari_wrappers import wrap_deepmind, is_atari
 from mdp_playground.envs.rl_toy_env import RLToyEnv
+import warnings
+import PIL.ImageDraw as ImageDraw
+import PIL.Image as Image
+from PIL.Image import FLIP_LEFT_RIGHT, FLIP_TOP_BOTTOM
 
 # def get_gym_wrapper(base_class):
 
@@ -17,6 +20,7 @@ class GymEnvWrapper(gym.Env):
         transition noise (for discrete environments)
         reward delay
         reward noise
+        image_transforms
 
     The wrapper is pretty general and can be applied to any Gym Environment. The environment should be instantiated and passed as the 1st argument to the __init__ method of this class. If using this wrapper with Atari, additional keys may be added specifying either atari_preprocessing = True or wrap_deepmind_ray = True. These would use the AtariPreprocessing wrapper from OpenAI Gym or wrap_deepmind() wrapper from Ray Rllib.
 
@@ -88,9 +92,65 @@ class GymEnvWrapper(gym.Env):
         else:
             self.reward_noise = None
 
+        if "image_transforms" not in config:
+            self.image_transforms = False
+        else:
+            assert config["state_space_type"] == "discrete", (
+                "Image transforms are only applicable to discrete envs."
+            )
+            self.image_transforms = config["image_transforms"]
+            if len(self.env.observation_space.shape) != 3:
+                warnings.warn("The length of observation_space.shape ="\
+                    + self.env.observation_space.shape + "It was expected"\
+                    + "to be 3 for environments with image representations."
+                )
+
+            if "image_padding" in config:
+                self.image_padding = config["image_padding"]
+            else:
+                self.image_padding = 20
+
+            if "image_sh_quant" not in config:
+                if "shift" in self.image_transforms:
+                    warnings.warn(
+                        "Setting image shift quantisation to the \
+                    default of 1, since no config value was provided for it."
+                    )
+                    self.image_sh_quant = 1
+                else:
+                    self.image_sh_quant = None
+            else:
+                self.image_sh_quant = config["image_sh_quant"]
+
+            if "image_ro_quant" not in config:
+                if "rotate" in self.image_transforms:
+                    warnings.warn(
+                        "Setting image rotate quantisation to the \
+                    default of 1, since no config value was provided for it."
+                    )
+                    self.image_ro_quant = 1
+                else:
+                    self.image_ro_quant = None
+            else:
+                self.image_ro_quant = config["image_ro_quant"]
+
+            if "image_scale_range" not in config:
+                if "scale" in self.image_transforms:
+                    warnings.warn(
+                        "Setting image scale range to the default \
+                    of (0.5, 1.5), since no config value was provided for it."
+                    )
+                    self.image_scale_range = (0.5, 1.5)
+                else:
+                    self.image_scale_range = None
+            else:
+                self.image_scale_range = config["image_scale_range"]
+
+
         if (
             "wrap_deepmind_ray" in config and config["wrap_deepmind_ray"]
         ):  # hack ##TODO remove?
+            from ray.rllib.env.atari_wrappers import wrap_deepmind, is_atari
             self.env = wrap_deepmind(self.env, dim=42, framestack=True)
         elif "atari_preprocessing" in config and config["atari_preprocessing"]:
             self.frame_skip = 4  # default for AtariPreprocessing
@@ -100,11 +160,16 @@ class GymEnvWrapper(gym.Env):
             if "grayscale_obs" in config:
                 self.grayscale_obs = config["grayscale_obs"]
 
+            if "image_width" in config:
+                self.image_width = config["image_width"]
+            else:
+                self.image_width = 84  # Atari default
+
             # Use AtariPreprocessing with frame_skip
             # noop_max set to 1 because we want to keep the vanilla env as
             # deterministic as possible and setting it 0 was not allowed. ##TODO
             # noop_max=0 is poosible in new Gym version, so update Gym version.
-            self.env = AtariPreprocessing(self.env, frame_skip=self.frame_skip, grayscale_obs=self.grayscale_obs, noop_max=1, )
+            self.env = AtariPreprocessing(self.env, frame_skip=self.frame_skip, grayscale_obs=self.grayscale_obs, noop_max=1, screen_size=self.image_width)
             print("self.env.noop_max set to: ", self.env.noop_max)
 
         if "irrelevant_features" in config:
@@ -131,7 +196,7 @@ class GymEnvWrapper(gym.Env):
                 self.observation_space = Tuple(
                     (self.env.observation_space, self.irr_toy_env.observation_space)
                 )  # TODO for image observations, concatenate to 1 obs. space here and in step() and reset()?
-            else:  # TODO Check the test case added for cont. irr features case and code for it in run_experiments.py.
+            else:  # cont. env # TODO Check the test case added for cont. irr features case and code for it in run_experiments.py.
                 env_obs_low = self.env.observation_space.low
                 env_obs_high = self.env.observation_space.high
                 env_obs_dtype = env_obs_low.dtype
@@ -171,11 +236,30 @@ class GymEnvWrapper(gym.Env):
                     low=ext_low, high=ext_high, dtype=env_act_dtype
                 )  # TODO Use BoxExtended here and above?
 
-            self.observation_space.seed(obs_space_seed)  # seed
-            self.action_space.seed(act_space_seed)  # seed
-        else:
+            self.observation_space.seed(obs_space_seed)  # #seed
+            self.action_space.seed(act_space_seed)  # #seed
+        else:  # no irrelevant features
+
             self.action_space = self.env.action_space
-            self.observation_space = self.env.observation_space
+            if self.image_transforms:
+                env_obs_low = self.env.observation_space.low
+                env_obs_high = self.env.observation_space.high
+                env_obs_dtype = env_obs_low.dtype
+                env_obs_shape = env_obs_low.shape
+                ext_low_shape = (
+                            env_obs_shape[0] + self.image_padding * 2,
+                            env_obs_shape[1] + self.image_padding * 2,
+                            env_obs_shape[2]
+                    )
+                # #hardcoded stuff next
+                ext_low = np.zeros(shape=(ext_low_shape))
+                ext_high = np.ones(shape=(ext_low_shape)) * 255
+                self.observation_space = Box(
+                    low=ext_low, high=ext_high, dtype=env_obs_dtype
+                )
+
+            else:  # no image transforms
+                self.observation_space = self.env.observation_space
 
         self.total_episodes = 0
 
@@ -253,6 +337,9 @@ class GymEnvWrapper(gym.Env):
         else:
             next_state, reward, done, info = self.env.step(action)
 
+        if self.image_transforms:
+            next_state = self.get_transformed_image(next_state)
+
         if done:
             # if episode is finished return the rewards that were delayed and not
             # handed out before ##TODO add test case for this
@@ -318,6 +405,10 @@ class GymEnvWrapper(gym.Env):
                 reset_state = np.concatenate((reset_state, reset_state_irr))
         else:
             reset_state = self.env.reset()
+
+        if self.image_transforms:
+            reset_state = self.get_transformed_image(reset_state)
+
         return reset_state
         # return super(GymEnvWrapper, self).reset()
 
@@ -344,6 +435,108 @@ class GymEnvWrapper(gym.Env):
         )
 
         return self.seed_
+
+    def get_transformed_image(self, env_img):
+        # ###TODO write tests
+
+        height = self.env.observation_space.shape[0]
+        width = self.env.observation_space.shape[1]
+        image_padding = self.image_padding
+        tot_width = width + image_padding * 2
+        tot_height = height + image_padding * 2
+        assert height == width, "Currently only square images are supported."
+        if len(self.env.observation_space.shape) == 3:
+            channels = self.env.observation_space.shape[2]
+        elif len(self.env.observation_space.shape) == 2:
+            channels = 1
+        else:
+            raise ValueError()
+
+
+        sh_quant = self.image_sh_quant
+        ro_quant = self.image_ro_quant
+        scale_range = self.image_scale_range
+
+        # Assumes that if 3rd tensor dim is 3 that image is RGB
+        if channels == 3:  # #hardcoded
+            image_ = Image.new(
+                "RGB", (tot_width, tot_height)
+            )  # Use RGB for textures / custom images
+        else:
+            image_ = Image.new(
+                "L", (tot_width, tot_height)
+            )  # Use L for black and white 8-bit pixels instead of RGB in case not using custom images
+        draw = ImageDraw.Draw(image_)
+
+        # Currently assumes image width = height ###TODO rename R variable
+        R = width
+        # Assume COM of env_img is in centre of whole image
+        shift_w = int(tot_width / 2)
+        shift_h = int(tot_height / 2)
+        #
+        # if "scale" in self.transforms:
+        #     # max_R = 0.6 * min(self.width, self.height) / 2 # Not sure whether to make this depend on provided R as well
+        #     # min_R = 0.1 * min(self.width, self.height) / 2 # /2 because it's R, 0.6
+        #     # and 0.1 to allow some wiggle for shift below and not make too small
+        #     max_R = scale_range[1] * R
+        #     if int(max_R) > min(self.width, self.height) / 2:
+        #         warnings.warn(
+        #             "Maximum possible size of polygon might be too big for the given resolution. It's set to: "
+        #             + str(max_R)
+        #         )
+        #     max_R = np.log(max_R)
+        #     min_R = scale_range[0] * R
+        #     if int(min_R) < 3:
+        #         warnings.warn(
+        #             "Minimum possible size of polygon might be too small and lead too much noise in image. It's set to: "
+        #             + str(min_R)
+        #         )
+        #     min_R = np.log(min_R)
+        #     log_sample = min_R + self.np_random.random() * (max_R - min_R)
+        #     sample_ = np.exp(log_sample)
+        #     R = int(sample_)
+        #     # print("R", min_R, max_R)
+        #
+        if "shift" in self.image_transforms:
+            max_shift_w = (tot_width - R) // 2
+            max_shift_h = (tot_height - R) // 2
+            add_shift_w = self.np_random.randint(-max_shift_w + 1, max_shift_w)
+            add_shift_h = self.np_random.randint(-max_shift_h + 1, max_shift_h)
+            # print("add_shift_w, add_shift_h", add_shift_w, add_shift_h)
+            add_shift_w = int(add_shift_w / sh_quant) * sh_quant
+            add_shift_h = int(add_shift_h / sh_quant) * sh_quant
+            # print("add_shift_w, add_shift_h", add_shift_w, add_shift_h)
+            shift_w += add_shift_w
+            shift_h += add_shift_h
+
+
+        img_arr_ = np.array(image_)
+        sq_width = R
+        if (
+            sq_width % 2 == 1
+        ):  # If sq_width is not even, it causes errors with the //2 below.
+            sq_width += 1
+        # tex_img = tex_img.resize((sq_width, sq_width))
+        # tex_arr = np.array(tex_img)
+        top_left = (
+            shift_h - height // 2,
+            shift_w - width // 2,
+        )
+        bottom_right = (
+            shift_h + height // 2,
+            shift_w + width // 2,
+        )
+        img_arr_[
+            top_left[0]: bottom_right[0], top_left[1]: bottom_right[1]
+        ] = env_img
+
+        image_ = Image.fromarray(img_arr_, "RGB")
+
+
+        # Because numpy is row-major and Image is column major, need to transpose
+        ret_arr = np.transpose(np.array(image_), axes=(1, 0, 2))
+        # ret_arr = np.array(image_)
+        return ret_arr
 
     # return GymEnvWrapper
 

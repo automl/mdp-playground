@@ -1,0 +1,4 @@
+[run]
+omit = 
+    example.py 
+    mdp_playground/analysis/mdpp_to_cave.py
