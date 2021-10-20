@@ -847,7 +847,6 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
 
         elif final_configs[i]["env"] in ["Walker2dWrapper-v3",
                                          "HumanoidWrapper-v3"]:
-            timesteps_total = 500000  # TODO: how many to use?
 
             from mdp_playground.envs.mujoco_env_wrapper import (
                 get_mujoco_wrapper,
