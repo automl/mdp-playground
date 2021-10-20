@@ -151,7 +151,7 @@ def main(args):
     #                     ' Please look in to the code for details.')
     parser.add_argument("-l", "--log-level",
                         default="WARNING", help="Set log level.")
-    parser.add_argument("-r", "--local-mode", action='store_true',
+    parser.add_argument("--local-mode", action='store_true',
                         default=False,
                         help='Initialize ray in local mode.')
     parser.add_argument('-k', '--num_cpus', default=1,
@@ -162,7 +162,7 @@ def main(args):
                         help="Use Tune's wandb callback for tracking the exp."
                         "Passed arg is the wand project name. No syncing if "
                         "none provided.")
-    parser.add_argument("-i", "--init_ray", action='store_false',
+    parser.add_argument("-r", "--ray_init", action='store_false',
                         default=True,
                         help="Flag to DEACTIVATE Ray initialization in case of"
                         " initialization of Ray outside MDPP.")
@@ -217,7 +217,7 @@ def main(args):
         config_num=args.config_num,
         log_level=log_level_,
         framework_dir=args.framework_dir,
-        init_ray=args.init_ray,
+        init_ray=args.ray_init,
         **ray_kwargs
     )
 
