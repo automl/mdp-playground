@@ -940,9 +940,9 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                 # Patching it here as it might be also be provided in the var confs.
                 if ("use_lstm" in final_configs[i]["model"]
                         and "sequence_length" not in final_configs[i]["env_config"]):
-                    from ray.rllib.models.catalog import MODEL_DEFAULTS
-                    final_configs[i]["env_config"]["sequence_length"] = \
-                        MODEL_DEFAULTS["max_seq_len"]
+                    # HACK: use default value of 1 if sequence length not given
+                    # TODO: have a unified storage and use of default values
+                    final_configs[i]["env_config"]["sequence_length"] = 1
                 # setting of sequence length
                 if "use_lstm" in final_configs[i]["model"] and final_configs[i]["model"]["use_lstm"]:
                         final_configs[i]["model"]["max_seq_len"] = (
