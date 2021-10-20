@@ -17,6 +17,7 @@ import cloudpickle
 
 import ray
 from ray import tune
+from ray.rllib.agents.callbacks import MemoryTrackingCallbacks
 
 # import configparser
 import pprint
@@ -305,15 +306,15 @@ def main(args):
         res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
         print("## Results dir: {}".format(res_dir))
 
+        callbacks = [MemoryTrackingCallbacks]
+
         if args.wandb is not None:
             from ray.tune.integration.wandb import WandbLoggerCallback
             API_KEY_FILE = "~/wandb_api_key.txt"
-            callbacks = [WandbLoggerCallback(
+            callbacks.append(WandbLoggerCallback(
                 project=args.wandb,
                 api_key_file=API_KEY_FILE,
-                log_config=True)]
-        else:
-            callbacks = []
+                log_config=True))
 
         if ray.__version__[0] == "0":
             analysis = tune.run(
