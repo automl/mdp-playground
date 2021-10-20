@@ -1061,8 +1061,10 @@ def create_gym_env_wrapper_generic(config):
     import gym
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
 
-    ae = gym.make(config["GymEnv"]["game"])
-    gew = GymEnvWrapper(ae, **config)
+    # HACK(Jan): key should logically be env, not game. for now calling it game
+    # for unified naming with AtariWrapper.
+    ge = gym.make(config["GymEnv"]["game"])
+    gew = GymEnvWrapper(ge, **config)
     return gew
 
 
