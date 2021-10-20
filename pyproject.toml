@@ -78,6 +78,7 @@ extras_test = ["pandas", "requests", "configspace", "scipy", "tensorflow-probabi
 pytest = "^5.2"
 sphinx = "^3.5.4"
 sphinx-book-theme = "^0.1.0"
+sphinx-argparse = "^0.3.1"
 
 [tool.poetry.scripts]
 run-mdpp-experiments = "mdp_playground.scripts.run_experiments:cli"

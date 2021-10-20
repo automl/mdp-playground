@@ -9,7 +9,7 @@ pip install -e .[extras]
 
 In addition to the standard dependencies, please install the following:
 ```bash
-pip install sphinx, sphinx-book-theme  # for generating documentation
+pip install sphinx, sphinx-book-theme, sphinx-argparse  # for generating documentation
 pip install pytest-cov  # for coverage report
 # install poetry for packaging and publishing to PyPI
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
