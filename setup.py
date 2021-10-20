@@ -12,15 +12,14 @@ packages = [
 package_data = {"": ["*"]}
 
 extras_require = [
-    "ray[default,rllib,debug]==1.3.0",
-    "tensorflow==2.2.0",
+    "ray[default,rllib,debug]==1.6.0",
+    "tensorflow==2.6.0",
     "pillow>=6.1.0",
     "pandas==0.25.0",
     "requests==2.22.0",
     "configspace==0.4.10",
-    "scipy>=1.3.0",
-    "pandas==0.25.0",
-    "gym[atari]==0.18",
+    "scipy>=1.4.1",
+    "gym[atari]==0.19",
 ]
 
 extras_require_disc = [
@@ -31,11 +30,9 @@ extras_require_disc = [
     "requests==2.22.0",
     "configspace==0.4.10",
     "scipy==1.3.0",
-    "pandas==0.25.0",
     "gym[atari]==0.14",
     "atari-py==0.2.5",  # https://github.com/openai/atari-py/issues/81 #TODO Remove
     "matplotlib==3.2.1",  # #TODO Remove?
-    "pillow==6.1.0",
 ]
 
 extras_require_cont = [
