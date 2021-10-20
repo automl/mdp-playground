@@ -8,6 +8,8 @@ Calling this file as a script, invokes the following examples:
     one for grid environments with image representations
     one for wrapping Atari env qbert
     one for wrapping Mujoco env HalfCheetah
+    one for wrapping MiniGrid env
+    one for wrapping ProcGen env
     two examples at the end showing how to create toy envs using gym.make()
 
 Many further examples can be found in test_mdp_playground.py.
@@ -20,6 +22,17 @@ For an example with multiple use cases of how to use the continuous environments
 from mdp_playground.envs import RLToyEnv
 import numpy as np
 
+
+def display_image(obs, mode="RGB"):
+    # Display the image observation associated with the next state
+    from PIL import Image
+
+    # Because numpy is row-major and Image is column major, need to transpose
+    obs = obs.transpose(1, 0, 2)
+    img1 = Image.fromarray(np.squeeze(obs), mode)  # squeeze() is
+    # used because the image is 3-D because frameworks like Ray expect the image
+    # to be 3-D.
+    img1.show()
 
 def discrete_environment_example():
 
@@ -100,17 +113,9 @@ def discrete_environment_image_representations_example():
     # the current discrete state.
     print("sars', done =", state, action, reward, next_state, done)
 
-    # Display the image observation associated with the next state
-    from PIL import Image
-
-    # Because numpy is row-major and Image is column major, need to transpose
-    next_state_image = next_state_image.transpose(1, 0, 2)
-    img1 = Image.fromarray(np.squeeze(next_state_image), "L")  # 'L' is used for
-    # black and white. squeeze() is used because the image is 3-D because
-    # frameworks like Ray expect the image to be 3-D.
-    img1.show()
-
     env.close()
+
+    display_image(next_state_image, mode="L")
 
 
 def continuous_environment_example_move_along_a_line():
@@ -235,15 +240,8 @@ def grid_environment_image_representations_example():
     env.reset()
     env.close()
 
-    # Display the image observation associated with the next state
-    from PIL import Image
+    display_image(next_obs)
 
-    # Because numpy is row-major and Image is column major, need to transpose
-    next_obs = next_obs.transpose(1, 0, 2)
-    img1 = Image.fromarray(np.squeeze(next_obs), "RGB")  # squeeze() is
-    # used because the image is 3-D because frameworks like Ray expect the image
-    # to be 3-D.
-    img1.show()
 
 
 def atari_wrapper_example():
@@ -256,7 +254,7 @@ def atari_wrapper_example():
         "state_space_type": "discrete",
     }
 
-    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    from mdp_playground.envs import GymEnvWrapper
     import gym
 
     ae = gym.make("QbertNoFrameskip-v4")
@@ -264,20 +262,23 @@ def atari_wrapper_example():
     state = env.reset()
 
     print(
-        "Taking a step in the environment with a random action and printing the transition:"
+        "Taking 10 steps in the environment with a random action and printing the transition:"
     )
-    action = env.action_space.sample()
-    next_state, reward, done, info = env.step(action)
-    print(
-        "s.shape ar s'.shape, done =",
-        state.shape,
-        action,
-        reward,
-        next_state.shape,
-        done,
-    )
+    for i in range(10):
+        action = env.action_space.sample()
+        next_state, reward, done, info = env.step(action)
+        print(
+            "s.shape ar s'.shape, done =",
+            state.shape,
+            action,
+            reward,
+            next_state.shape,
+            done,
+        )
 
     env.close()
+
+    display_image(next_state)
 
 
 def mujoco_wrapper_example():
@@ -298,22 +299,102 @@ def mujoco_wrapper_example():
     # This actually makes a subclass and not a wrapper. Because, some
     # frameworks might need an instance of this class to also be an instance
     # of the Mujoco base_class.
-    from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper
-    from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+    try:
+        from mdp_playground.envs import get_mujoco_wrapper
+        from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+        wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
 
-    wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
+        env = wrapped_mujoco_env(**config)
+        state = env.reset()
 
-    env = wrapped_mujoco_env(**config)
-    state = env.reset()
+        print(
+            "Taking a step in the environment with a random action and printing the transition:"
+        )
+        action = env.action_space.sample()
+        next_state, reward, done, info = env.step(action)
+        print("sars', done =", state, action, reward, next_state, done)
+
+        env.close()
+
+    except ImportError as e:
+        print("Exception:", type(e), e, "caught. You may need to install mujoco-py. NOT running mujoco_wrapper_example.")
+        return
+
+
+def minigrid_wrapper_example():
+
+    config = {
+        "seed": 0,
+        "delay": 1,
+        "transition_noise": 0.25,
+        "reward_noise": lambda a: a.normal(0, 0.1),
+        "state_space_type": "discrete",
+    }
+
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    import gym
+
+    from gym_minigrid.wrappers import RGBImgPartialObsWrapper, ImgObsWrapper
+    env = gym.make('MiniGrid-Empty-8x8-v0')
+    env = RGBImgPartialObsWrapper(env) # Get pixel observations
+    env = ImgObsWrapper(env) # Get rid of the 'mission' field
+
+    env = GymEnvWrapper(env, **config)
+    obs = env.reset() # This now produces an RGB tensor only
 
     print(
         "Taking a step in the environment with a random action and printing the transition:"
     )
     action = env.action_space.sample()
-    next_state, reward, done, info = env.step(action)
-    print("sars', done =", state, action, reward, next_state, done)
+    next_obs, reward, done, info = env.step(action)
+    print(
+        "s.shape ar s'.shape, done =",
+        obs.shape,
+        action,
+        reward,
+        next_obs.shape,
+        done,
+    )
 
     env.close()
+
+    display_image(next_obs)
+
+
+def procgen_wrapper_example():
+
+    config = {
+        "seed": 0,
+        "delay": 1,
+        "transition_noise": 0.25,
+        "reward_noise": lambda a: a.normal(0, 0.1),
+        "state_space_type": "discrete",
+    }
+
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+    import gym
+
+    env = gym.make("procgen:procgen-coinrun-v0")
+    env = GymEnvWrapper(env, **config)
+    obs = env.reset()
+
+    print(
+        "Taking a step in the environment with a random action and printing the transition:"
+    )
+    action = env.action_space.sample()
+    next_obs, reward, done, info = env.step(action)
+    print(
+        "s.shape ar s'.shape, done =",
+        obs.shape,
+        action,
+        reward,
+        next_obs.shape,
+        done,
+    )
+
+    env.close()
+
+    display_image(next_obs)
 
 
 if __name__ == "__main__":
@@ -358,6 +439,12 @@ if __name__ == "__main__":
     print(set_ansi_escape + "\nRunning Mujoco wrapper example:\n" + reset_ansi_escape)
     mujoco_wrapper_example()
 
+    print(set_ansi_escape + "\nRunning MiniGrid wrapper example:\n" + reset_ansi_escape)
+    minigrid_wrapper_example()
+
+    # print(set_ansi_escape + "\nRunning ProcGen wrapper example:\n" + reset_ansi_escape)
+    # procgen_wrapper_example()
+
     # Using gym.make() example 1
     import mdp_playground
     import gym
@@ -371,7 +458,6 @@ if __name__ == "__main__":
             "action_space_size": 8,
             "state_space_type": "discrete",
             "action_space_type": "discrete",
-            "terminal_state_density": 0.25,
             "maximally_connected": True,
         }
     )
