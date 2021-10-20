@@ -15,6 +15,7 @@ import os
 import logging
 import cloudpickle
 
+import ray
 from ray import tune
 
 # import configparser
@@ -166,7 +167,7 @@ def generate_parser():
     parser.add_argument("-w", "--wandb", default=None,
                         help="Use Tune's wandb callback for tracking the exp."
                         "Passed arg is the wand project name. No syncing if "
-                        "none provided.")
+                        "none provided. Only works for Ray >= 1.0.")
     parser.add_argument("-r", "--ray_init", action='store_false',
                         default=True,
                         help="Flag to DEACTIVATE Ray initialization in case of"
@@ -314,22 +315,37 @@ def main(args):
         else:
             callbacks = []
 
-        analysis = tune.run(
-            algorithm,
-            name=algorithm
-            + "_"
-            + str(stats_file_name.split("/")[-1])
-            + "_",  # IMP "name" has to be specified, otherwise,
-            # it may lead to clashing for temp file in ~/ray_results/... directory.
-            stop={
-                "timesteps_total": timesteps_total,
-            },
-            config=tune_config,
-            callbacks=callbacks,
-            checkpoint_at_end=args.save_model,
-            local_dir=res_dir,
-            # return_trials=True # add trials = tune.run( above
-        )
+        if ray.__version__[0] == "0":
+            analysis = tune.run(
+                algorithm,
+                name=algorithm
+                + "_"
+                + str(stats_file_name.split("/")[-1])
+                + "_",  # IMP "name" has to be specified, otherwise,
+                # it may lead to clashing for temp file in ~/ray_results/... directory.
+                stop={
+                    "timesteps_total": timesteps_total,
+                },
+                config=tune_config,
+                checkpoint_at_end=args.save_model,
+                local_dir=res_dir,
+            )
+        else:
+            analysis = tune.run(
+                algorithm,
+                name=algorithm
+                + "_"
+                + str(stats_file_name.split("/")[-1])
+                + "_",  # IMP "name" has to be specified, otherwise,
+                # it may lead to clashing for temp file in ~/ray_results/... directory.
+                stop={
+                    "timesteps_total": timesteps_total,
+                },
+                config=tune_config,
+                callbacks=callbacks,
+                checkpoint_at_end=args.save_model,
+                local_dir=res_dir,
+            )
 
         if args.save_model:
             analysis_file_name = "{}_{}_analysis.pickle".format(
