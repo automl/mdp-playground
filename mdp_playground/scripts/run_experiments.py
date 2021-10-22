@@ -306,7 +306,7 @@ def main(args):
         res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
         print("## Results dir: {}".format(res_dir))
 
-        callbacks = [MemoryTrackingCallbacks]
+        callbacks = [MemoryTrackingCallbacks()]
 
         if args.wandb is not None:
             from ray.tune.integration.wandb import WandbLoggerCallback
