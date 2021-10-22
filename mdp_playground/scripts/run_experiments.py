@@ -306,9 +306,18 @@ def main(args):
         res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
         print("## Results dir: {}".format(res_dir))
 
-        callbacks = [MemoryTrackingCallbacks()]
+        callbacks = []
 
-        if False:
+        mem_callback = MemoryTrackingCallbacks()
+        mdpp_on_episode_end = tune_config["callbacks"]["on_episode_end"]
+
+        def combined_on_episode_end(*args, **kwargs):
+            mem_callback.on_episode_end(*args, **kwargs)
+            mdpp_on_episode_end(*args, **kwargs)
+
+        tune_config["callbacks"]["on_episode_end"] = combined_on_episode_end
+
+        if args.wandb is not None:
             from ray.tune.integration.wandb import WandbLoggerCallback
             API_KEY_FILE = "~/wandb_api_key.txt"
             callbacks.append(WandbLoggerCallback(
