@@ -308,7 +308,7 @@ def main(args):
 
         callbacks = [MemoryTrackingCallbacks()]
 
-        if args.wandb is not None:
+        if False:
             from ray.tune.integration.wandb import WandbLoggerCallback
             API_KEY_FILE = "~/wandb_api_key.txt"
             callbacks.append(WandbLoggerCallback(
