@@ -23,6 +23,8 @@ import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
 
+WANDB_API_KEY_FILE = "~/wandb_api_key.txt"
+
 
 def generate_parser():
     """
@@ -307,10 +309,14 @@ def main(args):
 
         if args.wandb is not None:
             from ray.tune.integration.wandb import WandbLoggerCallback
-            API_KEY_FILE = "~/wandb_api_key.txt"
+            if not os.path.isfile(WANDB_API_KEY_FILE):
+                raise FileNotFoundError(
+                    "WANDB API KEY NOT FOUND: You passed a wandb project name "
+                    "but MDPP could not find you wandb api key. MDPP expects "
+                    "your key to be located at {}".format(WANDB_API_KEY_FILE))
             callbacks = [WandbLoggerCallback(
                 project=args.wandb,
-                api_key_file=API_KEY_FILE,
+                api_key_file=WANDB_API_KEY_FILE,
                 log_config=True)]
         else:
             callbacks = []
