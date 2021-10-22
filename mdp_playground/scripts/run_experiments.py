@@ -2,6 +2,14 @@
 
 Takes a configuration file, experiment name and config number to run as
 optional arguments.
+
+If save_model is passed, the script also pickles the tune analysis file of
+ each run (ie. each ran configuration). This can be used to extract the model
+ checkpoint and additional information.
+
+To change the configuration of Ray, you can also intialize it externally and
+ pass the '-r' flag. In that case it is recommended to import the setup_ray
+ function from mdp_playground.config_processor and use it to init ray.
 """
 
 from __future__ import absolute_import
@@ -174,6 +182,9 @@ def generate_parser():
 def main(args):
     """
     Main function for running an experiment.
+    Besides writing MDPP's stats files, a Tune analysis file can be pickled for
+    each run (ie. each ran configuration) for further analysis and extraction
+    of model checkpoints; just pass the --save-model flag.
 
     Parameters
     ----------
