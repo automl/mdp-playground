@@ -76,7 +76,6 @@ def process_configs(
     framework="ray",
     framework_dir="/tmp/ray",
     init_ray=True,
-    **ray_kwargs
 ):
     config_file_path = os.path.abspath("/".join(config_file.split("/")[:-1]))
 
@@ -176,7 +175,7 @@ def process_configs(
 
         if init_ray:
             setup_ray(config, config_num, log_level,
-                      framework_dir, **ray_kwargs)
+                      framework_dir)
         on_train_result, on_episode_end = setup_ray_callbacks(
             stats_file_prefix,
             variable_configs_deepcopy,

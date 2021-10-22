@@ -23,7 +23,7 @@ import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
 
-WANDB_API_KEY_FILE = "~/wandb_api_key.txt"
+WANDB_API_KEY_FILE = os.path.expanduser("~/wandb_api_key.txt")
 
 
 def generate_parser():
@@ -159,13 +159,6 @@ def generate_parser():
     #                     ' Please look in to the code for details.')
     parser.add_argument("-l", "--log-level",
                         default="WARNING", help="Set log level.")
-    parser.add_argument("--local-mode", action='store_true',
-                        default=False,
-                        help='Initialize ray in local mode.')
-    parser.add_argument('-k', '--num_cpus', default=1,
-                        help="Num CPU cores for Ray to use.")
-    parser.add_argument('-o', '--object_store_memory', default=1e9,
-                        help="Size (in bytes) to use for Ray's object store.")
     parser.add_argument("-w", "--wandb", default=None,
                         help="Use Tune's wandb callback for tracking the exp."
                         "Passed arg is the wand project name. No syncing if "
@@ -234,12 +227,6 @@ def main(args):
 
     print("Stats file being written to:", stats_file_name)
 
-    ray_kwargs = {
-        'local_mode': args.local_mode,
-        'num_cpus': int(args.num_cpus),
-        'object_store_memory': int(float(args.object_store_memory)),
-    }
-
     config, final_configs = config_processor.process_configs(
         config_file,
         stats_file_prefix=stats_file_name,
@@ -248,7 +235,6 @@ def main(args):
         log_level=log_level_,
         framework_dir=args.framework_dir,
         init_ray=args.ray_init,
-        **ray_kwargs
     )
 
     print(
