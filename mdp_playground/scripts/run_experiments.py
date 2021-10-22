@@ -315,14 +315,14 @@ def main(args):
         else:
             callbacks = []
 
+        # IMP "name" has to be specified, otherwise,
+        # it may lead to clashing for temp file in ~/ray_results/... directory.
+        run_name = algorithm + "_" + str(stats_file_name.split("/")[-1]) + "_"
+
         if ray.__version__[0] == "0":
             analysis = tune.run(
                 algorithm,
-                name=algorithm
-                + "_"
-                + str(stats_file_name.split("/")[-1])
-                + "_",  # IMP "name" has to be specified, otherwise,
-                # it may lead to clashing for temp file in ~/ray_results/... directory.
+                name=run_name,
                 stop={
                     "timesteps_total": timesteps_total,
                 },
@@ -333,11 +333,7 @@ def main(args):
         else:
             analysis = tune.run(
                 algorithm,
-                name=algorithm
-                + "_"
-                + str(stats_file_name.split("/")[-1])
-                + "_",  # IMP "name" has to be specified, otherwise,
-                # it may lead to clashing for temp file in ~/ray_results/... directory.
+                name=run_name,
                 stop={
                     "timesteps_total": timesteps_total,
                 },
