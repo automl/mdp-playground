@@ -1,6 +1,7 @@
 from functools import reduce
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.preprocessors import OneHotPreprocessor
+import logging
 import warnings
 import numpy as np
 from mdp_playground.envs import RLToyEnv
@@ -15,6 +16,8 @@ mujoco_envs = [
     "HopperWrapper-v3",
     "PusherWrapper-v2",
     "ReacherWrapper-v2",
+    "Walker2dWrapper-v3",
+    "HumanoidWrapper-v3"
 ]
 
 
@@ -25,6 +28,21 @@ ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 #              object_store_memory=int(2e9),
 #              redis_max_memory=int(1e9), local_mode=False):
 def init_ray(**kwargs):
+    """
+    Initialize Ray with the given kwargs and returns session info.
+    As Ray's API has changed for versions >= 1.0, rename some kwargs to their
+    new name.
+
+    Parameters
+    ----------
+    **kwargs :
+        Kwargs passed to ray.init.
+
+    Returns
+    -------
+    dict
+        Session info returned by ray.init.
+    """
     import ray
 
     if ray.__version__[0] == "1":  # new version 1.0 API
@@ -48,7 +66,21 @@ def init_ray(**kwargs):
         del kwargs["log_level"]
         kwargs["logging_level"] = value
 
-    ray.init(**kwargs)
+    # kwargs = {**kwargs,
+    #           "_memory": 2e8,
+    #           "include_dashboard": True,
+    #           "dashboard_host": "0.0.0.0"}
+
+    logging.info("Init ray with args {}".format(str(kwargs)))
+
+    session_info = ray.init(**kwargs)
+
+    # resources = ray.cluster_resources()
+    # print(resources)
+    # ava_reso = ray.available_resources()
+    # print(ava_reso)
+
+    return session_info
 
 
 def process_configs(
@@ -58,6 +90,7 @@ def process_configs(
     log_level,
     framework="ray",
     framework_dir="/tmp/ray",
+    init_ray=True,
 ):
     config_file_path = os.path.abspath("/".join(config_file.split("/")[:-1]))
 
@@ -111,7 +144,8 @@ def process_configs(
     # print("VARYING_CONFIGS:", varying_configs)
 
     num_configs_ = max(
-        [len(separate_var_configs[i]) for i in range(len(separate_var_configs))]
+        [len(separate_var_configs[i])
+         for i in range(len(separate_var_configs))]
     )
     for i in range(num_configs_):
         to_combine = [
@@ -119,7 +153,8 @@ def process_configs(
         ]
         # overwrite = False because the keys in different modes of
         # config generation need to be disjoint
-        varying_configs.append(deepmerge_multiple_dicts(*to_combine, overwrite=False))
+        varying_configs.append(deepmerge_multiple_dicts(
+            *to_combine, overwrite=False))
 
     # #hack ####TODO Remove extra pre-processing done here and again below:
     pre_final_configs = combined_processing(
@@ -131,7 +166,6 @@ def process_configs(
         framework=framework,
         algorithm=config.algorithm,
     )
-
 
     if "timesteps_total" in dir(config):
         hacky_timesteps_total = config.timesteps_total  # hack
@@ -154,7 +188,9 @@ def process_configs(
     if framework.lower() == "ray":
         from ray import tune
 
-        setup_ray(config, config_num, log_level, framework_dir)
+        if init_ray:
+            setup_ray(config, config_num, log_level,
+                      framework_dir)
         on_train_result, on_episode_end = setup_ray_callbacks(
             stats_file_prefix,
             variable_configs_deepcopy,
@@ -186,7 +222,6 @@ def process_configs(
             + ". Available options are: ray and stable_baselines."
         )
 
-
     # varying_configs is a list of dict of dicts with a specific structure.
     final_configs = combined_processing(
         default_config,
@@ -202,42 +237,34 @@ def process_configs(
     return config, final_configs
 
 
-def setup_ray(config, config_num, log_level, framework_dir):
-    tmp_dir = framework_dir + "/tmp_" + str(config_num)
-    # import ray
-    if config.algorithm == "DQN":  # hack
-        init_ray(log_level=log_level, tmp_dir=tmp_dir)
-        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-        #          temp_dir=tmp_dir,
-        #          logging_level=log_level,
-        #          # local_mode=True,
-        #          # webui_host='0.0.0.0'); logging_level=logging.INFO,
-        #          )
-        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-        # local_mode=True, plasma_directory='/tmp') #, memory=int(8e9),
-        # local_mode=True # local_mode (bool): If true, the code will be executed
-        # serially. This is useful for debugging. # when true on_train_result and
-        # on_episode_end operate in the same current directory as the script. A3C
-        # is crashing in local mode, so didn't use it and had to work around by
-        # giving full path + filename in stats_file_name.; also has argument
-        # driver_object_store_memory=, plasma_directory='/tmp'
-    elif config.algorithm == "A3C":  # hack
-        init_ray(log_level=log_level, tmp_dir=tmp_dir)
-        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-        #          temp_dir=tmp_dir,
-        #          logging_level=log_level,
-        #          # local_mode=True,
-        #          # webui_host='0.0.0.0'); logging_level=logging.INFO,
-        #          )        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9), local_mode=True, plasma_directory='/tmp')
-    else:
-        init_ray(log_level=log_level, tmp_dir=tmp_dir, local_mode=True)
+def setup_ray(config, config_num, log_level, framework_dir, **ray_kwargs):
+    """
+    Initialize Ray with the proper tmp_dir and log the returned session info.
 
-        # ray.init(object_store_memory=int(2e9), redis_max_memory=int(1e9),
-        #          temp_dir=tmp_dir,
-        #          logging_level=log_level,
-        #          local_mode=True,
-        #          # webui_host='0.0.0.0'); logging_level=logging.INFO,
-        #          )
+    Accepts additional kwargs that are passed to ray.init. If you want to
+    externally initalize ray to change ray's configuration, import and use this
+    function.
+
+    Parameters
+    ----------
+    config : module
+        The MDPP config of the experiment.
+    config_num : int or None
+        Number of configurations to run. Used to suffix the tmp_dir.
+        See run_experiments.py for details.
+    log_level : int
+        Logging level. Eg. 30 = logging.WARNING
+    framework_dir : str
+        Prefix for the tmp dir.
+    **ray_kwargs :
+        Additional kwargs passed to ray.init.
+
+    """
+    # TODO: config is not used anymore. Remove?
+    tmp_dir = framework_dir + "/tmp_" + str(config_num)
+    session_info = init_ray(log_level=log_level,
+                            tmp_dir=tmp_dir, **ray_kwargs)
+    logging.info("Ray session info: {}".format(str(session_info)))
 
 
 def init_stats_file(stats_file_name, columns_to_write):
@@ -292,7 +319,8 @@ def setup_ray_callbacks(
                         for elem in field_val:
                             # print(key)
                             str_to_write += (
-                                "%.2e" % elem if isinstance(elem, float) else str(elem)
+                                "%.2e" % elem if isinstance(
+                                    elem, float) else str(elem)
                             )
                             str_to_write += ","
                         str_to_write += "]"
@@ -346,7 +374,8 @@ def setup_ray_callbacks(
                 elif config_type == "model":
                     # if key == 'conv_filters':
                     fout.write(
-                        str(info["result"]["config"]["model"][key]).replace(" ", "")
+                        str(info["result"]["config"]
+                            ["model"][key]).replace(" ", "")
                         + " "
                     )
 
@@ -404,7 +433,8 @@ def setup_ray_callbacks(
             stats_file_eval = stats_file_prefix + "_eval.csv"
             fout = open(stats_file_eval, "a")  # hardcoded
             fout.write(
-                "%.2e" % reward_this_episode + " " + str(length_this_episode) + "\n"
+                "%.2e" % reward_this_episode + " "
+                + str(length_this_episode) + "\n"
             )
             fout.close()
 
@@ -417,7 +447,8 @@ def setup_ray_callbacks(
             step_reward = episode.total_reward - np.sum(
                 episode.custom_metrics["step_reward"]
             )
-            episode.custom_metrics["step_reward"].append(step_reward)  # This line
+            episode.custom_metrics["step_reward"].append(
+                step_reward)  # This line
             # should not be executed the 1st time this function is called because
             # no step has actually taken place then (Ray 0.9.0)!!
         # episode.custom_metrics = {}
@@ -444,7 +475,8 @@ def get_list_of_varying_configs(var_configs, mode="grid", num_configs=None):
         varying_configs = get_grid_of_configs(var_configs)
 
     elif mode == "random":
-        varying_configs = get_random_configs(var_configs, num_configs=num_configs)
+        varying_configs = get_random_configs(
+            var_configs, num_configs=num_configs)
     elif mode == "sobol":
         varying_configs = sobol_configs_from_config_dict(
             var_configs, num_configs=num_configs
@@ -473,7 +505,8 @@ def get_list_of_varying_configs(var_configs, mode="grid", num_configs=None):
                 ):  # hack All these are hacks to get around different limitations
                     num_configs_done = len(list(var_configs["env"]))
                     agent_config["agent"][key] = current_config[
-                        num_configs_done + list(var_configs[config_type]).index(key)
+                        num_configs_done
+                        + list(var_configs[config_type]).index(key)
                     ]
 
                 elif config_type == "model":
@@ -481,7 +514,8 @@ def get_list_of_varying_configs(var_configs, mode="grid", num_configs=None):
                         list(var_configs["agent"])
                     )
                     model_config["model"][key] = current_config[
-                        num_configs_done + list(var_configs[config_type]).index(key)
+                        num_configs_done
+                        + list(var_configs[config_type]).index(key)
                     ]
 
         combined_config = {**agent_config, **model_config, **env_config}
@@ -661,7 +695,8 @@ def sobol_configs_from_config_dict(var_configs, num_configs):
                 elif "cat" in val:
                     # Seems faster than ast.literal_eval (See
                     # https://stackoverflow.com/questions/1894269/how-to-convert-string-representation-of-list-to-a-list)
-                    choices = json.loads("[" + val.split("[")[1].split("]")[0] + "]")
+                    choices = json.loads(
+                        "[" + val.split("[")[1].split("]")[0] + "]")
                     len_c = len(choices)
                     if (
                         sample[j] == 1.0
@@ -728,7 +763,8 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
     final_configs = []
     for i in range(len(varying_configs)):
         static_configs_copy = copy.deepcopy(static_configs)
-        merged_conf = deepmerge_multiple_dicts(*static_configs_copy, varying_configs[i])
+        merged_conf = deepmerge_multiple_dicts(
+            *static_configs_copy, varying_configs[i])
         final_configs.append(merged_conf)
 
     # Post-processing common to frameworks:
@@ -846,6 +882,30 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                 ),
             )
 
+        elif final_configs[i]["env"] in ["Walker2dWrapper-v3",
+                                         "HumanoidWrapper-v3"]:
+
+            from mdp_playground.envs.mujoco_env_wrapper import (
+                get_mujoco_wrapper,
+            )  # hack
+            from gym.envs.mujoco.walker2d import Walker2dEnv
+            from gym.envs.mujoco.humanoid import HumanoidEnv
+
+            env_assoc = {
+                "Walker2dWrapper-v3": Walker2dEnv,
+                "HumanoidWrapper-v3": HumanoidEnv
+            }
+
+            GymEnv = env_assoc[final_configs[i]["env"]]
+
+            wrapped_mujoco_env = get_mujoco_wrapper(GymEnv)
+            register_env(
+                final_configs[i]["env"],
+                lambda config: create_gym_env_wrapper_mujoco_wrapper(
+                    config, wrapped_mujoco_env
+                ),
+            )
+
         elif final_configs[i]["env"] in ["GymEnvWrapper-Atari"]:  # hack
             if "AtariEnv" in final_configs[i]["env_config"]:
                 timesteps_total = 10_000_000
@@ -910,14 +970,23 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                             "target_noise_clip_relative"
                         ]  # hack have to delete it otherwise Ray will crash for unknown config param.
 
-                if key == "model":
-                    for key_2 in final_configs[i][key]:
-                        if key_2 == "use_lstm" and final_configs[i][key][key_2]:
-                            final_configs[i][key]["max_seq_len"] = (
-                                final_configs[i]["env_config"]["delay"]
-                                + final_configs[i]["env_config"]["sequence_length"]
-                                + 1
-                            )
+            if "model" in final_configs[i]:
+                # patch for potentially missing sequence_length key in conf
+                # would be supplied by RLLIB's MODEL_DEFAULTS later on, but already
+                # needed as this point for setting MDPP's sequence_length.
+                # Patching it here as it might be also be provided in the var confs.
+                if ("use_lstm" in final_configs[i]["model"]
+                        and "sequence_length" not in final_configs[i]["env_config"]):
+                    # HACK: use default value of 1 if sequence length not given
+                    # TODO: have a unified storage and use of default values
+                    final_configs[i]["env_config"]["sequence_length"] = 1
+                # setting of sequence length
+                if "use_lstm" in final_configs[i]["model"] and final_configs[i]["model"]["use_lstm"]:
+                        final_configs[i]["model"]["max_seq_len"] = (
+                            final_configs[i]["env_config"]["delay"]
+                            + final_configs[i]["env_config"]["sequence_length"]
+                            + 1
+                        )
 
     # Post-processing for Stable Baselines:
     elif framework.lower() == "stable_baselines":
@@ -943,7 +1012,8 @@ def deepmerge_multiple_dicts(*configs, overwrite=True):
     merged_configs = {}
     for i in range(len(configs)):
         # print(i)
-        merged_configs = deepmerge(merged_configs, configs[i], overwrite=overwrite)
+        merged_configs = deepmerge(
+            merged_configs, configs[i], overwrite=overwrite)
 
     return merged_configs
 
@@ -1024,9 +1094,23 @@ def create_gym_env_wrapper_frame_stack_atari(config):  # hack ###TODO remove?
     return gew
 
 
+def create_gym_env_wrapper_generic(config):
+    import gym
+    from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
+
+    # HACK(Jan): key should logically be env, not game. for now calling it game
+    # for unified naming with AtariWrapper.
+    ge = gym.make(config["GymEnv"]["game"])
+    gew = GymEnvWrapper(ge, **config)
+    return gew
+
+
 register_env("RLToy-v0", lambda config: RLToyEnv(**config))
-register_env("GymEnvWrapper-Atari", lambda config: create_gym_env_wrapper_atari(config))
+register_env("GymEnvWrapper-Atari",
+             lambda config: create_gym_env_wrapper_atari(config))
 register_env(
     "GymEnvWrapperFrameStack-Atari",
     lambda config: create_gym_env_wrapper_frame_stack_atari(config),
 )
+register_env("GymEnvWrapper",
+             lambda config: create_gym_env_wrapper_generic(config))

@@ -38,7 +38,8 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosummary",
-]
+    "sphinxarg.ext",
+    ]
 
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True

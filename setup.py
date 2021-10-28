@@ -17,15 +17,15 @@ extras_require = [
     "pillow>=6.1.0",
     "requests==2.22.0",
     "configspace==0.4.10",
-    "scipy>=1.3.0",
+    "scipy>=1.4.1",
+    "gym[atari]==0.19",
     "pandas==0.25.0",
-    "gym[atari]==0.18",
 ]
 
 extras_require_disc = [
     "ray[rllib,debug]==0.7.3",
     "tensorflow==1.13.0rc1",
-    "pillow>=6.1.0",
+    "pillow==6.1.0",
     "requests==2.22.0",
     "configspace==0.4.10",
     "scipy==1.3.0",
@@ -33,7 +33,6 @@ extras_require_disc = [
     "gym[atari]==0.14",
     "atari-py==0.2.5",  # https://github.com/openai/atari-py/issues/81 #TODO Remove
     "matplotlib==3.2.1",  # #TODO Remove?
-    "pillow==6.1.0",
 ]
 
 extras_require_cont = [
