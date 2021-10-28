@@ -25,7 +25,6 @@ import cloudpickle
 
 import ray
 from ray import tune
-from ray.rllib.agents.callbacks import MemoryTrackingCallbacks
 
 # import configparser
 import pprint
@@ -304,31 +303,6 @@ def main(args):
 
         res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
         print("## Results dir: {}".format(res_dir))
-
-        callbacks = []
-
-        mem_callback = MemoryTrackingCallbacks()
-        mdpp_on_episode_end = tune_config["callbacks"]["on_episode_end"]
-
-        def combined_on_episode_end(info):
-            """
-            Old Ray: callbacks were just a dict of functions getting an info
-            dict.
-            New Ray: callbacks are objects and their functions have a more
-            explicit signature.
-            When we pass this dict, Ray passes the old info-dict. For using the
-            MemoryTrackingCallbacks, we have to fake its signature, which works
-            fine as it only needs the "episode" value anyways.
-
-            .. _See: https://docs.ray.io/en/releases-1.6.0/_modules/ray/rllib\
-/agents/callbacks.html
-            """
-            mem_callback.on_episode_end(worker=None, base_env=None,
-                                        policies=None, episode=info["episode"],
-                                        env_index=None)
-            mdpp_on_episode_end(info)
-
-        tune_config["callbacks"]["on_episode_end"] = combined_on_episode_end
 
         if args.wandb is not None:
             from ray.tune.integration.wandb import WandbLoggerCallback
