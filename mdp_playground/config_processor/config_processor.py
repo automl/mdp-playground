@@ -28,6 +28,21 @@ ModelCatalog.register_custom_preprocessor("ohe", OneHotPreprocessor)
 #              object_store_memory=int(2e9),
 #              redis_max_memory=int(1e9), local_mode=False):
 def init_ray(**kwargs):
+    """
+    Initialize Ray with the given kwargs and returns session info.
+    As Ray's API has changed for versions >= 1.0, rename some kwargs to their
+    new name.
+
+    Parameters
+    ----------
+    **kwargs :
+        Kwargs passed to ray.init.
+
+    Returns
+    -------
+    dict
+        Session info returned by ray.init.
+    """
     import ray
 
     if ray.__version__[0] == "1":  # new version 1.0 API
@@ -76,7 +91,6 @@ def process_configs(
     framework="ray",
     framework_dir="/tmp/ray",
     init_ray=True,
-    **ray_kwargs
 ):
     config_file_path = os.path.abspath("/".join(config_file.split("/")[:-1]))
 
@@ -176,7 +190,7 @@ def process_configs(
 
         if init_ray:
             setup_ray(config, config_num, log_level,
-                      framework_dir, **ray_kwargs)
+                      framework_dir)
         on_train_result, on_episode_end = setup_ray_callbacks(
             stats_file_prefix,
             variable_configs_deepcopy,
@@ -224,6 +238,29 @@ def process_configs(
 
 
 def setup_ray(config, config_num, log_level, framework_dir, **ray_kwargs):
+    """
+    Initialize Ray with the proper tmp_dir and log the returned session info.
+
+    Accepts additional kwargs that are passed to ray.init. If you want to
+    externally initalize ray to change ray's configuration, import and use this
+    function.
+
+    Parameters
+    ----------
+    config : module
+        The MDPP config of the experiment.
+    config_num : int or None
+        Number of configurations to run. Used to suffix the tmp_dir.
+        See run_experiments.py for details.
+    log_level : int
+        Logging level. Eg. 30 = logging.WARNING
+    framework_dir : str
+        Prefix for the tmp dir.
+    **ray_kwargs :
+        Additional kwargs passed to ray.init.
+
+    """
+    # TODO: config is not used anymore. Remove?
     tmp_dir = framework_dir + "/tmp_" + str(config_num)
     session_info = init_ray(log_level=log_level,
                             tmp_dir=tmp_dir, **ray_kwargs)

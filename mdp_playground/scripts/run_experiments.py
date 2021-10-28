@@ -2,6 +2,14 @@
 
 Takes a configuration file, experiment name and config number to run as
 optional arguments.
+
+If save_model is passed, the script also pickles the tune analysis file of
+each run (ie. each ran configuration). This can be used to extract the model
+checkpoint and additional information.
+
+To change the configuration of Ray, you can also intialize it externally and
+pass the '-r' flag. In that case it is recommended to import the setup_ray
+function from mdp_playground.config_processor and use it to init ray.
 """
 
 from __future__ import absolute_import
@@ -17,12 +25,13 @@ import cloudpickle
 
 import ray
 from ray import tune
-from ray.rllib.agents.callbacks import MemoryTrackingCallbacks
 
 # import configparser
 import pprint
 
 pp = pprint.PrettyPrinter(indent=4)
+
+WANDB_API_KEY_FILE = os.path.expanduser("~/wandb_api_key.txt")
 
 
 def generate_parser():
@@ -158,13 +167,6 @@ def generate_parser():
     #                     ' Please look in to the code for details.')
     parser.add_argument("-l", "--log-level",
                         default="WARNING", help="Set log level.")
-    parser.add_argument("--local-mode", action='store_true',
-                        default=False,
-                        help='Initialize ray in local mode.')
-    parser.add_argument('-k', '--num_cpus', default=1,
-                        help="Num CPU cores for Ray to use.")
-    parser.add_argument('-o', '--object_store_memory', default=1e9,
-                        help="Size (in bytes) to use for Ray's object store.")
     parser.add_argument("-w", "--wandb", default=None,
                         help="Use Tune's wandb callback for tracking the exp."
                         "Passed arg is the wand project name. No syncing if "
@@ -180,6 +182,9 @@ def generate_parser():
 def main(args):
     """
     Main function for running an experiment.
+    Besides writing MDPP's stats files, a Tune analysis file can be pickled for
+    each run (ie. each ran configuration) for further analysis and extraction
+    of model checkpoints; just pass the --save-model flag.
 
     Parameters
     ----------
@@ -233,12 +238,6 @@ def main(args):
 
     print("Stats file being written to:", stats_file_name)
 
-    ray_kwargs = {
-        'local_mode': args.local_mode,
-        'num_cpus': int(args.num_cpus),
-        'object_store_memory': int(float(args.object_store_memory)),
-    }
-
     config, final_configs = config_processor.process_configs(
         config_file,
         stats_file_prefix=stats_file_name,
@@ -247,7 +246,6 @@ def main(args):
         log_level=log_level_,
         framework_dir=args.framework_dir,
         init_ray=args.ray_init,
-        **ray_kwargs
     )
 
     print(
@@ -306,47 +304,28 @@ def main(args):
         res_dir = args.framework_dir + "/_ray_results_" + str(args.config_num)
         print("## Results dir: {}".format(res_dir))
 
-        callbacks = []
-
-        mem_callback = MemoryTrackingCallbacks()
-        mdpp_on_episode_end = tune_config["callbacks"]["on_episode_end"]
-
-        def combined_on_episode_end(info):
-            """
-            Old Ray: callbacks were just a dict of functions getting an info
-            dict.
-            New Ray: callbacks are objects and their functions have a more
-            explicit signature.
-            When we pass this dict, Ray passes the old info-dict. For using the
-            MemoryTrackingCallbacks, we have to fake its signature, which works
-            fine as it only needs the "episode" value anyways.
-
-            .. _See: https://docs.ray.io/en/releases-1.6.0/_modules/ray/rllib\
-/agents/callbacks.html
-            """
-            mem_callback.on_episode_end(worker=None, base_env=None,
-                                        policies=None, episode=info["episode"],
-                                        env_index=None)
-            mdpp_on_episode_end(info)
-
-        tune_config["callbacks"]["on_episode_end"] = combined_on_episode_end
-
         if args.wandb is not None:
             from ray.tune.integration.wandb import WandbLoggerCallback
-            API_KEY_FILE = "~/wandb_api_key.txt"
-            callbacks.append(WandbLoggerCallback(
+            if not os.path.isfile(WANDB_API_KEY_FILE):
+                raise FileNotFoundError(
+                    "WANDB API KEY NOT FOUND: You passed a wandb project name "
+                    "but MDPP could not find you wandb api key. MDPP expects "
+                    "your key to be located at {}".format(WANDB_API_KEY_FILE))
+            callbacks = [WandbLoggerCallback(
                 project=args.wandb,
-                api_key_file=API_KEY_FILE,
-                log_config=True))
+                api_key_file=WANDB_API_KEY_FILE,
+                log_config=True)]
+        else:
+            callbacks = []
+
+        # IMP "name" has to be specified, otherwise,
+        # it may lead to clashing for temp file in ~/ray_results/... directory.
+        run_name = algorithm + "_" + str(stats_file_name.split("/")[-1]) + "_"
 
         if ray.__version__[0] == "0":
             analysis = tune.run(
                 algorithm,
-                name=algorithm
-                + "_"
-                + str(stats_file_name.split("/")[-1])
-                + "_",  # IMP "name" has to be specified, otherwise,
-                # it may lead to clashing for temp file in ~/ray_results/... directory.
+                name=run_name,
                 stop={
                     "timesteps_total": timesteps_total,
                 },
@@ -357,11 +336,7 @@ def main(args):
         else:
             analysis = tune.run(
                 algorithm,
-                name=algorithm
-                + "_"
-                + str(stats_file_name.split("/")[-1])
-                + "_",  # IMP "name" has to be specified, otherwise,
-                # it may lead to clashing for temp file in ~/ray_results/... directory.
+                name=run_name,
                 stop={
                     "timesteps_total": timesteps_total,
                 },
