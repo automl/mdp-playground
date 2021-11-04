@@ -184,6 +184,7 @@ class GymEnvWrapper(gym.Env):
                 # This is a bit hacky because we need to define the state_space_dim
                 # of the irrelevant toy env in the "base" config and not the nested irrelevant_features
                 # dict inside the base config to be compatible with the config_processor of MDPP
+                # which requires variable config to be in the "base" config.
                 irr_toy_env_conf["state_space_dim"] = \
                     config["irr_state_space_dim"]  # #hack
 

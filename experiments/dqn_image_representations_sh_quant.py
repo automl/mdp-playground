@@ -1,33 +1,57 @@
-"""###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
+"""
+This files specifies different configurations to be run for an MDP Playground
+experiment. The configurations are divided into varying and static configs.
+The varying configs are the ones that will vary across this experiment. The
+static configs remain fixed throughout an experiment. Additionally, evaluation
+configurations are run interleaved with the experiment to evaluate the agent's
+learning progress.
+
+Varying configs can be specified for the environment, agent and the NN model used.
+This is done as follows:
+
+Specify var_configs as a dict of dicts with fixed keys:
+"env" for holding configs to vary in the environment
+"agent" for holding configs to vary for the agent
+"model" for holding configs to vary for the NN used
+
+Static configs are specified using:
+env_config specifies static environment configurations
+agent_config specifies static agent configurations
+model_config specifies static NN model configurations
+eval_config specifies static evaluation configurations
 """
 import itertools
 from ray import tune
 from collections import OrderedDict
 num_seeds = 10
+timesteps_total = 20_000
 
-
+# var_env_configs specifies variable configs in the environment and we use it as
+# the value for the key "env" in var_configs:
 var_env_configs = OrderedDict(
     {
-        "state_space_size": [8],  # , 10, 12, 14] # [2**i for i in range(1,6)]
-        "action_space_size": [8],  # 2, 4, 8, 16] # [2**i for i in range(1,6)]
-        "delay": [0],  # + [2**i for i in range(4)],
-        "sequence_length": [1],  # , 2, 3, 4],#i for i in range(1,4)]
-        "reward_density": [0.25],  # np.linspace(0.0, 1.0, num=5)
-        "make_denser": [False],
-        "terminal_state_density": [0.25],  # np.linspace(0.1, 1.0, num=5)
-        "transition_noise": [0],  # , 0.01, 0.02, 0.10, 0.25]
-        "reward_noise": [0],  # , 1, 5, 10, 25] # Std dev. of normal dist.
+        "state_space_size": [8],
+        "action_space_size": [8],
         "image_representations": [True],
-        "image_transforms": ["shift"],  # , 'scale', 'flip', 'rotate'],
+        "image_transforms": ["shift"],
         "image_sh_quant": [2, 4, 8, 16],
         "image_width": [100],
         "image_height": [100],
+        "delay": [0],
+        "sequence_length": [1],
+        "reward_density": [0.25],
+        "make_denser": [False],
+        "terminal_state_density": [0.25],
+        "transition_noise": [0],
+        "reward_noise": [0],
         "dummy_seed": [i for i in range(num_seeds)],
     }
 )
 
 var_configs = OrderedDict({"env": var_env_configs})
 
+# All the configs from here on are static configs, i.e., those that won't be
+# varied in any runs in this experiment:
 env_config = {
     "env": "RLToy-v0",
     "horizon": 100,
@@ -54,7 +78,7 @@ agent_config = {
     "final_prioritized_replay_beta": 1.0,
     "hiddens": None,
     "learning_starts": 1000,
-    "lr": 1e-5,  # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    "lr": 1e-5,
     "n_step": 1,
     "noisy": False,
     "num_atoms": 1,
@@ -69,21 +93,6 @@ agent_config = {
 }
 
 
-# formula [(W−K+2P)/S]+1; for padding=same: P = ((S-1)*W - S + K)/2
-filters_84x84 = [
-    [
-        16,
-        [8, 8],
-        4,
-    ],  # changes from 84x84x1 with padding 4 to 22x22x16 (or 26x26x16 for 100x100x1)
-    [32, [4, 4], 2],  # changes to 11x11x32 with padding 2 (or 13x13x32 for 100x100x1)
-    [
-        256,
-        [11, 11],
-        1,
-    ],  # changes to 1x1x256 with padding 0 (or 3x3x256 for 100x100x1); this is the only layer with valid padding in Ray!
-]
-
 filters_100x100 = [
     [
         16,
@@ -97,36 +106,13 @@ filters_100x100 = [
         1,
     ],  # changes to 1x1x64 with padding 0 (or 3x3x64 for 100x100x1); this is the only layer with valid padding in Ray!
 ]
-# [num_outputs(=8 in this case), [1, 1], 1] conv2d appended by Ray always followed by a Dense layer with 1 output
-
-# filters_99x99 = [
-#     [16, [8, 8], 4], # 51x51x16
-#     [32, [4, 4], 2],
-#     [64, [13, 13], 1],
-# ]
-
-filters_50x50 = [
-    [16, [4, 4], 2],
-    [32, [4, 4], 2],
-    [64, [13, 13], 1],
-]
-
-filters_400x400 = [
-    [16, [32, 32], 16],
-    [32, [4, 4], 2],
-    [64, [13, 13], 1],
-]
 
 model_config = {
     "model": {
         "fcnet_hiddens": [256, 256],
-        # "custom_preprocessor": "ohe",
-        "custom_options": {},  # extra options to pass to your preprocessor
+        "custom_options": {},
         "conv_activation": "relu",
         "conv_filters": filters_100x100,
-        # "no_final_linear": False,
-        # "vf_share_layers": True,
-        # "fcnet_activation": "tanh",
         "use_lstm": False,
         "max_seq_len": 20,
         "lstm_cell_size": 256,
@@ -154,14 +140,3 @@ eval_config = {
         },
     },
 }
-value_tuples = []
-for config_type, config_dict in var_configs.items():
-    for key in config_dict:
-        assert (
-            isinstance(var_configs[config_type][key], list)
-        ), "var_config should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
-        value_tuples.append(var_configs[config_type][key])
-
-
-cartesian_product_configs = list(itertools.product(*value_tuples))
-print("Total number of configs. to run:", len(cartesian_product_configs))
