@@ -102,6 +102,7 @@ class ImageContinuous(Box):
 
         if self.target_point is not None:
             if self.draw_grid:
+                target_point = target_point.astype(float)
                 target_point += 0.5
             self.target_point_pixel = self.convert_to_pixel(target_point)
 

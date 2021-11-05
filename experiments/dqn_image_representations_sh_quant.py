@@ -19,6 +19,11 @@ env_config specifies static environment configurations
 agent_config specifies static agent configurations
 model_config specifies static NN model configurations
 eval_config specifies static evaluation configurations
+
+NOTE: Please note that for any configuration values not provided here, reasonable
+default values would be used. As such, these config values are much more verbose
+than needed. We only explicitly provide many important configuration values here
+to have them be easy to find.
 """
 import itertools
 from ray import tune

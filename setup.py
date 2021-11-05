@@ -24,7 +24,7 @@ extras_require = [
 
 extras_require_disc = [
     "ray[rllib,debug]==0.7.3",
-    "tensorflow==1.13.0rc1",
+    "tensorflow==1.13.1",
     "pillow>=6.1.0",
     "requests==2.22.0",
     "configspace==0.4.10",
