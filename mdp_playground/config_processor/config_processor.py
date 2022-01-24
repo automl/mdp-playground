@@ -1098,10 +1098,13 @@ def create_gym_env_wrapper_generic(config):
     import gym
     try:
         import minatar
-        minatar.register_envs()
     except gym.error.DependencyNotInstalled as e:
         print("Exception:", type(e), e, "caught. To use MinAtar, please "
               "install.")
+    try:
+        minatar.register_envs()
+    except gym.error.Error:
+        print("Already registered MinAtar, skipping.")
 
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
 
