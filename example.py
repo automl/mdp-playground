@@ -208,6 +208,7 @@ def grid_environment_example():
         next_obs, reward, done, info = env.step(action)
         next_state = env.get_augmented_state()["augmented_state"][-1]
         print("sars', done =", state, action, reward, next_state, done)
+        state = next_state
 
     env.reset()
     env.close()
@@ -236,6 +237,7 @@ def grid_environment_image_representations_example():
         next_obs, reward, done, info = env.step(action)
         next_state = env.get_augmented_state()["augmented_state"][-1]
         print("sars', done =", state, action, reward, next_state, done)
+        state = next_state
 
     env.reset()
     env.close()

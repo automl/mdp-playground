@@ -268,6 +268,7 @@ class RLToyEnv(gym.Env):
                 # logging.basicConfig(filename='/tmp/' + self.log_filename, filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=self.log_level)
                 log_file_handler = logging.FileHandler(self.log_filename)
                 self.logger.addHandler(log_file_handler)
+                print("Logger logging to:", self.log_filename)
         # log_filename = "logs/output.log"
         # os.makedirs(os.path.dirname(log_filename), exist_ok=True)
 
