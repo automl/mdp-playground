@@ -1,9 +1,9 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-19 # specifies array job indices
-#MOAB -l nodes=1:ppn=5
-#MOAB -l walltime=0:80:00:00
-#MOAB -l pmem=8GB # Seems like it is memory per CPU core
+#MOAB -t 0-99 # specifies array job indices
+#MOAB -l nodes=1:ppn=1
+#MOAB -l walltime=0:00:10:00
+#MOAB -l pmem=2GB # Seems like it is memory per CPU core
 #MOAB -d /work/ws/nemo/fr_rr1034-ws_mdpp-0 # initial working dir.
 
 ##MOAB -V # export env. variables from launch env. I think
@@ -23,7 +23,7 @@ echo "TMPDIR: " $TMPDIR
 
 printenv
 
-export EXP_NAME='dqn_space_invaders_image_transforms_42_sh_quant' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='dqn_del' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 echo -e '\033[32m'
 # Print some information about the job to STDOUT
@@ -48,7 +48,7 @@ echo Shell used is $SHELL
 # source activate /home/rajanr/anaconda2/envs/py36
 # source activate /home/rajanr/anaconda3/envs/py36_toy_rl
 . /home/fr/fr_fr/fr_rr1034/anaconda3/etc/profile.d/conda.sh # for anaconda3
-conda activate /home/fr/fr_fr/fr_rr1034/anaconda3/envs/py36_toy_rl # should be conda activate and not source when using anaconda3?
+conda activate /home/fr/fr_fr/fr_rr1034/anaconda3/envs/old_py36_toy_rl # should be conda activate and not source when using anaconda3?
 echo $?
 echo Paths: $PATH
 #/home/rajanr/anaconda3/bin/conda activate /home/rajanr/anaconda2/envs/py36
