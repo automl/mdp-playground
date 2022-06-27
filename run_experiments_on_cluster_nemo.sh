@@ -1,6 +1,6 @@
 #!/bin/bash
 #MOAB -N mdpp
-#MOAB -t 0-99 # specifies array job indices
+#MOAB -t 0-1 # specifies array job indices
 #MOAB -l nodes=1:ppn=1
 #MOAB -l walltime=0:00:10:00
 #MOAB -l pmem=2GB # Seems like it is memory per CPU core
@@ -62,6 +62,7 @@ ping google.com -c 3
 echo "Line common to all tasks with MOAB_JOBID: ${MOAB_JOBID}, MOAB_JOBID: ${MOAB_JOBID}, SLURM_ARRAY_TASK_ID: ${SLURM_ARRAY_TASK_ID}"
 echo -e '\033[0m'
 
+
 echo -e "Script file start:\n====================="
 cat $0
 echo -e "\n======================\nScript file end!"
@@ -80,10 +81,6 @@ echo "MOAB_JOBID:" ${MOAB_JOBID} "MOAB_JOBARRAYINDEX:" ${MOAB_JOBARRAYINDEX} "MO
 \time -v python3 /home/fr/fr_fr/fr_rr1034/mdp-playground/run_experiments.py --exp-name ${EXP_NAME} --config-file /home/fr/fr_fr/fr_rr1034/mdp-playground/experiments/${EXP_NAME} --config-num ${MOAB_JOBARRAYINDEX} --framework-dir ${TMPDIR}
 #/work/ws/nemo/fr_rr1034-ws_mdpp-0/mdpp_10405451/ray
 
-
-#python output_argv_1.py
-#\time -v rllib train --env=BreakoutDeterministic-v4 --run=DQN --config '{"num_workers": 0, "monitor": true}'
-#rllib train -f $HOME/atari-dqn_mod_breakout.yaml
 
 # Print some Information about the end-time to STDOUT
 echo "DONE";

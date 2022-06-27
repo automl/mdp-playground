@@ -1,7 +1,7 @@
 import itertools
 from ray import tune
 from collections import OrderedDict
-num_seeds = 5
+num_seeds = 10
 timesteps_total = 10_000_000
 
 var_env_configs = OrderedDict(
