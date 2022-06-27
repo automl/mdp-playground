@@ -82,6 +82,9 @@ echo "MOAB_JOBID:" ${MOAB_JOBID} "MOAB_JOBARRAYINDEX:" ${MOAB_JOBARRAYINDEX} "MO
 #/work/ws/nemo/fr_rr1034-ws_mdpp-0/mdpp_10405451/ray
 
 
+echo "The cut-out JOB_ID is: ${JOB_ID}"
+
+
 # Print some Information about the end-time to STDOUT
 echo "DONE";
 echo "Finished at $(date)";
