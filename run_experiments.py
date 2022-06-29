@@ -238,7 +238,7 @@ for current_config in cartesian_product_configs:
 
 
     eval_config = {
-        "evaluation_interval": 1, # I think this means every x training_iterations
+        "evaluation_interval": None, # I think this means every x training_iterations
         "evaluation_config": {
         "exploration_fraction": 0,
         "exploration_final_eps": 0,

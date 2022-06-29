@@ -200,7 +200,7 @@ class MDPP_Analysis():
         return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval
 
 
-    def plot_1d_dimensions(self, stats_data, save_fig=False, train=True):
+    def plot_1d_dimensions(self, stats_data, save_fig=False, train=True, show_plots=True):
         '''Plots 1-D bar plots across a single dimension with mean and std. dev.
 
         Parameters
@@ -237,7 +237,8 @@ class MDPP_Analysis():
         plt.ylabel(y_axis_label)
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_1d.pdf', dpi=300, bbox_inches="tight")
-        plt.show()
+        if show_plots:
+            plt.show()
 
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
             fig_width = len(self.tick_labels[1])
@@ -248,9 +249,10 @@ class MDPP_Analysis():
             plt.ylabel(y_axis_label)
             if save_fig:
                 plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_1d.pdf', dpi=300, bbox_inches="tight")
-            plt.show()
+            if show_plots:
+                plt.show()
 
-    def plot_2d_heatmap(self, stats_data, save_fig=False, train=True):
+    def plot_2d_heatmap(self, stats_data, save_fig=False, train=True, show_plots=True):
         '''Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground
 
         Parameters
@@ -283,7 +285,8 @@ class MDPP_Analysis():
         plt.ylabel(self.axis_labels[0])
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map.pdf', dpi=300, bbox_inches="tight")
-        plt.show()
+        if show_plots:
+            plt.show()
         std_dev_ = np.std(stats_data[..., -2], axis=-1)
         to_plot_ = np.squeeze(std_dev_)
         # print(to_plot_, to_plot_.shape)
@@ -301,9 +304,10 @@ class MDPP_Analysis():
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map.pdf', dpi=300, bbox_inches="tight")
             # plt.savefig(stats_file.split('/')[-1] + '_train_heat_map.png')#, dpi=300)
-        plt.show()
+        if show_plots:
+            plt.show()
 
-    def plot_learning_curves(self, stats_data, save_fig=False, train=True):
+    def plot_learning_curves(self, stats_data, save_fig=False, train=True, show_plots=True):
         '''Plots learning curves: Either across 1 or 2 meta-features of MDP Playground. Different colours represent learning curves for different seeds.
 
         Parameters
@@ -364,6 +368,7 @@ class MDPP_Analysis():
         #         plt.legend(loc='upper left', prop={'size': 26})
         fig.tight_layout()
         # plt.suptitle("Training Learning Curves")
-        plt.show()
+        if show_plots:
+            plt.show()
         if save_fig:
             fig.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_learning_curves.pdf', dpi=300, bbox_inches="tight") # Generates high quality vector graphic PDF 125kb; dpi doesn't matter for this
