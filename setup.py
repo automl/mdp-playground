@@ -12,14 +12,14 @@ packages = [
 package_data = {"": ["*"]}
 
 extras_require = [
-    "ray[default,rllib]==1.3.0",
-    "tensorflow==2.2.0",
+    "ray[default,rllib]==1.6.0",
+    "tensorflow==2.6.0",
     "pillow>=6.1.0",
     "requests==2.22.0",
     "configspace==0.4.10",
     "scipy>=1.4.1",
     "gym[atari]==0.19",
-    "pandas==0.25.0",
+    "pandas>=0.25.0",
 ]
 
 extras_require_disc = [
