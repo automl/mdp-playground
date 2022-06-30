@@ -85,6 +85,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     license=LICENSE,
+    py_modules=[],
     url="https://github.com/automl/mdp-playground",
     project_urls={
         "Bug Tracker": "https://github.com/automl/mdp-playground/issues",
