@@ -1,14 +1,14 @@
 #!/bin/bash
-#SBATCH -p testbosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
+#SBATCH -p mldlc_gpu-rtx2080 # ml_cpu-ivy # partition (queue)
 #SBATCH -a 0-4%50 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
-#SBATCH -t 4-00:00 # time (D-HH:MM)
+#SBATCH -t 1-01:00 # time (D-HH:MM)
 #SBATCH -c 5 # number of CPUs/task
 #SBATCH -o log/%x.%A.%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%A.%a.out # STDERR  (the folder log has to exist!)  %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -J mdp-playground-job-array # sets the job name. If not specified, the file name will be used as job name
 #SBATCH -D /work/dlclarge2/rajanr-mdpp # Change working_dir (I think this directory _has_ to exist and won't be created!)
 ##SBATCH --mail-type=END,FAIL # (receive mails about end and timeouts/crashes of your job)
-##SBATCH --gres=gpu:1  # reserves one GPU
+#SBATCH --gres=gpu:1  # reserves one GPU
 #SBATCH --mem 16000M # Specify the real memory required per node, not needed as for our cluster, -c below takes priority and auto-sets the memory. For CPU, use --mem-per-cpu
 
 echo -e '\033[32m'
@@ -16,7 +16,7 @@ echo "Started at $(date)";
 # Output general info, timing info
 echo "TMPDIR: " $TMPDIR
 
-export EXP_NAME='dqn_beam_rider_p_noise' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='dqn_beam_rider_del' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 # echo -e '\033[32m'
 # Print some information about the job to STDOUT
@@ -42,7 +42,7 @@ echo Shell used is $SHELL
 # source activate /home/rajanr/anaconda2/envs/py36
 # source activate /home/rajanr/anaconda3/envs/py36_toy_rl
 . /home/rajanr/anaconda3/etc/profile.d/conda.sh # for anaconda3
-conda activate /home/rajanr/anaconda3/envs/py36_toy_rl # should be conda activate and not source when using anaconda3?
+conda activate /home/rajanr/anaconda3/envs/jair_gpu # should be conda activate and not source when using anaconda3?
 echo $?
 #/home/rajanr/anaconda3/bin/conda activate /home/rajanr/anaconda2/envs/py36
 which python
@@ -60,6 +60,8 @@ printenv
 
 # TODO
 echo "Line common to all tasks with SLURM_JOB_ID: ${SLURM_JOB_ID}, SLURM_ARRAY_JOB_ID: ${SLURM_ARRAY_JOB_ID}, SLURM_ARRAY_TASK_ID: ${SLURM_ARRAY_TASK_ID}"
+
+# cuda10.2
 
 # ================================================== #
 # Begin actual Code

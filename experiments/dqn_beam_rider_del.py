@@ -1,7 +1,8 @@
 import itertools
 from ray import tune
 from collections import OrderedDict
-num_seeds = 5
+num_seeds = 10
+timesteps_total = 10_000_000
 
 var_env_configs = OrderedDict(
     {
@@ -46,7 +47,7 @@ agent_config = {  # Taken from Ray tuned_examples
     "n_step": 1,
     "noisy": False,
     "num_atoms": 1,
-    "num_gpus": 0,
+    "num_gpus": 1,
     "prioritized_replay": False,
     "prioritized_replay_alpha": 0.5,
     "prioritized_replay_beta_annealing_timesteps": 2000000,
@@ -56,19 +57,19 @@ agent_config = {  # Taken from Ray tuned_examples
     "train_batch_size": 32,
     "tf_session_args": {
         # note: overriden by `local_tf_session_args`
-        "intra_op_parallelism_threads": 4,
-        "inter_op_parallelism_threads": 4,
+        "intra_op_parallelism_threads": 8,
+        "inter_op_parallelism_threads": 8,
         # "gpu_options": {
         #     "allow_growth": True,
         # },
         # "log_device_placement": False,
-        "device_count": {"CPU": 2},
+        "device_count": {"CPU": 8, "GPU": 1,},
         # "allow_soft_placement": True,  # required by PPO multi-gpu
     },
     # Override the following tf session args on the local worker
     "local_tf_session_args": {
-        "intra_op_parallelism_threads": 4,
-        "inter_op_parallelism_threads": 4,
+        "intra_op_parallelism_threads": 8,
+        "inter_op_parallelism_threads": 8,
     },
 }
 

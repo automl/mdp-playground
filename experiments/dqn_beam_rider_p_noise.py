@@ -1,7 +1,7 @@
 import itertools
 from ray import tune
 from collections import OrderedDict
-num_seeds = 5
+num_seeds = 10 
 timesteps_total = 10_000_000
 
 var_env_configs = OrderedDict(
@@ -48,7 +48,7 @@ agent_config = {  # Taken from Ray tuned_examples
     "noisy": False,
     "num_atoms": 1,
     "num_gpus": 0,
-    "num_workers": 3,
+    "num_workers": 4,
     "prioritized_replay": False,
     "prioritized_replay_alpha": 0.5,
     "prioritized_replay_beta_annealing_timesteps": 2000000,
@@ -64,7 +64,7 @@ agent_config = {  # Taken from Ray tuned_examples
         #     "allow_growth": True,
         # },
         # "log_device_placement": False,
-        "device_count": {"CPU": 2},
+        "device_count": {"CPU": 5},
         # "allow_soft_placement": True,  # required by PPO multi-gpu
     },
     # Override the following tf session args on the local worker
