@@ -1,6 +1,6 @@
 '''###IMP dummy_seed should always be last in the order in the OrderedDict below!!!
 '''
-num_seeds = 10
+num_seeds = 100
 
 from collections import OrderedDict
 var_env_configs = OrderedDict({
