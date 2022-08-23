@@ -1,15 +1,15 @@
-num_seeds = 10
+num_seeds = 100
 from collections import OrderedDict
 var_env_configs = OrderedDict({
-    'state_space_size': [8],
-    'action_space_size': [8],
-    'delay': [0],
+    'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
+    'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
+    'delay': [0], # + [2**i for i in range(4)],
     'sequence_length': [1],
-    'reward_density': [0.25, 0.5, 0.75],
+    'reward_density': [0.25, 0.5, 0.75], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
-    'terminal_state_density': [0.25],
-    'transition_noise': [0],
-    'reward_noise': [0],
+    'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
+    'transition_noise': [0], #, 0.01, 0.02, 0.10, 0.25],
+    'reward_noise': [0], #, 1, 5, 10, 25], # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -19,6 +19,7 @@ var_configs = OrderedDict({
 
 env_config = {
     "env": "RLToy-v0",
+    "horizon": 100,
     "env_config": {
         'seed': 0, #seed
         'state_space_type': 'discrete',
@@ -55,7 +56,7 @@ agent_config = {
     "sample_batch_size": 4,
     "timesteps_per_iteration": 1000,
     "train_batch_size": 32,
-    "min_iter_time_s": 1,
+    "min_iter_time_s": 0,
 }
 
 model_config = {

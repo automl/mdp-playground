@@ -1,15 +1,16 @@
-num_seeds = 10
+num_seeds = 100
+
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
     'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0],
-    'sequence_length': [1],#i for i in range(1,4)]
+    'delay': [0], # + [2**i for i in range(4)],
+    'sequence_length': [1], #, 2, 3, 4],#i for i in range(1,4)]
     'reward_density': [0.25, 0.5, 0.75], # np.linspace(0.0, 1.0, num=5)
     'make_denser': [False],
     'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
-    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
-    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
+    'transition_noise': [0], # 0.01, 0.02, 0.10, 0.25],
+    'reward_noise': [0], # 1, 5, 10, 25], # Std dev. of normal dist.
     'dummy_seed': [i for i in range(num_seeds)],
 })
 
@@ -19,6 +20,7 @@ var_configs = OrderedDict({
 
 env_config = {
     "env": "RLToy-v0",
+    "horizon": 100,
     "env_config": {
         'seed': 0, #seed
         'state_space_type': 'discrete',
@@ -54,7 +56,7 @@ agent_config = {
     # Workers sample async. Note that this increases the effective
     # sample_batch_size by up to 5x due to async buffering of batches.
     "sample_async": True,
-    "timesteps_per_iteration": 1000,
+    "timesteps_per_iteration": 7500,
     "num_workers": 3,
     "num_envs_per_worker": 5,
 

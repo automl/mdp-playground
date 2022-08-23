@@ -1,32 +1,36 @@
-num_seeds = 10
+import itertools
+from ray import tune
 from collections import OrderedDict
-var_env_configs = OrderedDict({
-    'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
-    'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0],
-    'sequence_length': [1],#i for i in range(1,4)]
-    'reward_density': [0.25, 0.5, 0.75], # np.linspace(0.0, 1.0, num=5)
-    'make_denser': [False],
-    'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
-    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
-    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
-    'dummy_seed': [i for i in range(num_seeds)],
-})
+num_seeds = 100
 
-var_configs = OrderedDict({
-"env": var_env_configs
-})
+var_env_configs = OrderedDict(
+    {
+        "state_space_size": [8],  # , 10, 12, 14] # [2**i for i in range(1,6)]
+        "action_space_size": [8],  # 2, 4, 8, 16] # [2**i for i in range(1,6)]
+        "delay": [0], # + [2 ** i for i in range(4)],
+        "sequence_length": [1],  # i for i in range(1,4)]
+        "reward_density": [0.25, 0.5, 0.75],  # np.linspace(0.0, 1.0, num=5)
+        "make_denser": [False],
+        "terminal_state_density": [0.25],  # np.linspace(0.1, 1.0, num=5)
+        "transition_noise": [0], #, 0.01, 0.02, 0.10, 0.25],
+        "reward_noise": [0], #, 1, 5, 10, 25], # Std dev. of normal dist.
+        "dummy_seed": [i for i in range(num_seeds)],
+    }
+)
+
+var_configs = OrderedDict({"env": var_env_configs})
 
 env_config = {
     "env": "RLToy-v0",
+    "horizon": 100,
     "env_config": {
-        'seed': 0, #seed
-        'state_space_type': 'discrete',
-        'action_space_type': 'discrete',
-        'generate_random_mdp': True,
-        'repeats_in_sequences': False,
-        'reward_scale': 1.0,
-        'completely_connected': True,
+        "seed": 0,  # seed
+        "state_space_type": "discrete",
+        "action_space_type": "discrete",
+        "generate_random_mdp": True,
+        "repeats_in_sequences": False,
+        "reward_scale": 1.0,
+        "completely_connected": True,
     },
 }
 
@@ -42,7 +46,7 @@ agent_config = {
     "final_prioritized_replay_beta": 1.0,
     "hiddens": None,
     "learning_starts": 1000,
-    "lr": 1e-4, # "lr": grid_search([1e-2, 1e-4, 1e-6]),
+    "lr": 1e-4,  # "lr": grid_search([1e-2, 1e-4, 1e-6]),
     "n_step": 1,
     "noisy": False,
     "num_atoms": 1,
@@ -52,6 +56,7 @@ agent_config = {
     "schedule_max_timesteps": 20000,
     "target_network_update_freq": 800,
     "timesteps_per_iteration": 1000,
+    "min_iter_time_s": 0,
     "train_batch_size": 32,
 }
 
