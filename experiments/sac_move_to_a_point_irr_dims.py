@@ -15,8 +15,7 @@ var_env_configs = OrderedDict(
             6,
             10,
         ],  # , 10, 12, 14] # [2**i for i in range(1,6)]
-        "state_space_relevant_indices": [[0, 1]],
-        "action_space_relevant_indices": [[0, 1]],
+        "relevant_indices": [[0, 1]],
         "delay": [0],  # + [2**i for i in range(4)],
         # 'sequence_length': [1], #, 2, 3, 4],#i for i in range(1,4)]
         # 'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)

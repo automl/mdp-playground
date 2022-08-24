@@ -65,7 +65,8 @@ class MDPP_Analysis():
                     if i==0:
                         raise FileNotFoundError("No files to combine were present. Please check your location and/or filenames that they are correct.")
             join_files(stats_file,  '.csv')
-            join_files(stats_file, '_eval.csv')
+            if load_eval:
+                join_files(stats_file, '_eval.csv')
 
         stats_pd = pd.read_csv(stats_file + '.csv', skip_blank_lines=True, header=None, comment='#', sep=' ')
         # print(stats_pd)
