@@ -15,7 +15,7 @@ echo -e '\033[32m'
 echo "Started at $(date)"
 echo "TMPDIR: " $TMPDIR
 
-export EXP_NAME='sac_move_to_a_point_target_radius' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='sac_move_to_a_point_irr_dims' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 # Print some information about the job to STDOUT
 echo "Workingdir: $PWD";

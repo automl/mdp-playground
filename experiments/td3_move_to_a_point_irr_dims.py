@@ -3,7 +3,7 @@
 import itertools
 from ray import tune
 from collections import OrderedDict
-num_seeds = 10
+num_seeds = 100
 
 
 var_env_configs = OrderedDict(
@@ -136,7 +136,7 @@ model_config = {
 
 
 eval_config = {
-    "evaluation_interval": 1,  # I think this means every x training_iterations
+    "evaluation_interval": None,  # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
