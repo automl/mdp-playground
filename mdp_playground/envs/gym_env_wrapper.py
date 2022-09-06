@@ -17,12 +17,13 @@ class GymEnvWrapper(gym.Env):
     """Wraps an OpenAI Gym environment to be able to modify its dimensions corresponding to MDP Playground. Please see [`example.py`](example.py) for some simple examples of how to use this class. The values for these dimensions are passed in a config dict as for mdp_playground.envs.RLToyEnv. The description for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.
 
     Currently supported dimensions:
-        transition noise (for discrete environments)
+        transition noise
         reward delay
         reward noise
         reward scale
         reward shift
-        image_transforms
+        terminal state reward
+        image_transforms (for discrete environments)
 
     The wrapper is pretty general and can be applied to any Gym Environment. The environment should be instantiated and passed as the 1st argument to the __init__ method of this class. If using this wrapper with Atari, additional keys may be added specifying either atari_preprocessing = True or wrap_deepmind_ray = True. These would use the AtariPreprocessing wrapper from OpenAI Gym or wrap_deepmind() wrapper from Ray Rllib.
 
@@ -70,10 +71,11 @@ class GymEnvWrapper(gym.Env):
         if "transition_noise" in config:
             self.transition_noise = config["transition_noise"]
             if config["state_space_type"] == "continuous":
-                assert callable(self.transition_noise), (
-                    "transition_noise must be a function when env is continuous, it was of type:"
-                    + str(type(self.transition_noise))
-                )
+                if callable(config["transition_noise"]):
+                    self.transition_noise = config["transition_noise"]
+                else:
+                    p_noise_std = config["transition_noise"]
+                    self.transition_noise = lambda a: a.normal(0, p_noise_std)
             else:
                 assert self.transition_noise <= 1.0 and self.transition_noise >= 0.0, (
                     "transition_noise must be a value in [0.0, 1.0] when env is discrete, it was:"
@@ -103,6 +105,11 @@ class GymEnvWrapper(gym.Env):
             self.reward_shift = 0.0
         else:
             self.reward_shift = config["reward_shift"]
+
+        if "term_state_reward" not in config:
+            self.term_state_reward = 0.0
+        else:
+            self.term_state_reward = config["term_state_reward"]
 
         if "image_transforms" not in config:
             self.image_transforms = False
@@ -337,8 +344,10 @@ class GymEnvWrapper(gym.Env):
                 # print("NOISE inserted", old_action, action)
                 self.total_noisy_transitions_episode += 1
         else:  # cont. envs
-            pass  # TODO
-            # self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
+            noise_in_transition = (
+                self.transition_noise(self.np_random) if self.transition_noise else 0
+            )  # #random
+            self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
 
         if "irrelevant_features" in self.config:
             if self.config["state_space_type"] == "discrete":
@@ -358,6 +367,7 @@ class GymEnvWrapper(gym.Env):
                 next_state = np.concatenate((next_state, next_state_irr))
         else:
             next_state, reward, done, info = self.env.step(action)
+            next_state += noise_in_transition
 
         if self.image_transforms:
             next_state = self.get_transformed_image(next_state)
@@ -365,7 +375,10 @@ class GymEnvWrapper(gym.Env):
         if done:
             # if episode is finished return the rewards that were delayed and not
             # handed out before ##TODO add test case for this
-            reward = np.sum(self.reward_buffer)
+            reward += np.sum(self.reward_buffer)
+            reward += (
+                self.term_state_reward * self.reward_scale
+            )  # Scale before or after?
         else:
             self.reward_buffer.append(reward)
             old_reward = reward

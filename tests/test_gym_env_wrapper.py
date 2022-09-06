@@ -117,7 +117,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
     def test_r_scale(self):
         """ """
-        print("\033[32;1;4mTEST_REWARD_SHIFT\033[0m")
+        print("\033[32;1;4mTEST_REWARD_SCALE\033[0m")
         config = {
             "AtariEnv": {
                 "game": "beam_rider",  # "breakout",
@@ -161,6 +161,54 @@ class TestGymEnvWrapper(unittest.TestCase):
             total_reward += reward
         print("total_reward:", total_reward)
         aew.reset()
+
+    # #TODO Enable test
+    # def test_term_state_reward(self):
+    #     """ """
+    #     print("\033[32;1;4mTEST_TERM_STATE_REWARD\033[0m")
+    #     config = {
+    #         "AtariEnv": {
+    #             "game": "beam_rider",  # "breakout",
+    #             "obs_type": "image",
+    #             "frameskip": 1,
+    #         },
+    #         "term_state_reward": 200,
+    #         # "GymEnvWrapper": {
+    #         "atari_preprocessing": True,
+    #         "frame_skip": 4,
+    #         "grayscale_obs": False,
+    #         "state_space_type": "discrete",
+    #         "action_space_type": "discrete",
+    #         "seed": 0,
+    #         # },
+    #         # 'seed': 0, #seed
+    #     }
+
+    #     # config["log_filename"] = log_filename
+
+    #     from gym.envs.atari import AtariEnv
+
+    #     ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+    #     aew = GymEnvWrapper(ae, **config)
+    #     ob = aew.reset()
+    #     print("observation_space.shape:", ob.shape)
+    #     # print(ob)
+    #     total_reward = 0.0
+    #     for i in range(200):
+    #         act = aew.action_space.sample()
+    #         next_state, reward, done, info = aew.step(act)
+    #         print("step, reward, done, act:", i, reward, done, act)
+    #         if i == 153 or i == 158:
+    #             assert reward == 88.0, (
+    #                 "Scaled reward in step: " + str(i) + " should have been 88.0."
+    #             )
+    #         if i == 154 or i == 160:
+    #             assert reward == 0.0, (
+    #                 "Scaled reward in step: " + str(i) + " should have been 0.0."
+    #             )
+    #         total_reward += reward
+    #     print("total_reward:", total_reward)
+    #     aew.reset()
 
     def test_r_delay_ray_frame_stack(self):
         """
