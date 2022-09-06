@@ -253,8 +253,10 @@ class TestRLToyEnv(unittest.TestCase):
         # reset. The 2nd element is taken from the relevant dimensions of the
         # state reached after 2 iterations below. This is to trigger reaching a
         # terminal state.
-        config["terminal_states"] = [[0.92834036, 2.16924632, -4.88226269, -
-                                      0.12869191], [2.96422742, -2.17263562, -2.71264267, 0.07446024], ]
+        config["terminal_states"] = [
+            [0.92834036, 2.16924632, -4.88226269, -0.12869191],
+            [2.96422742, -2.17263562, -2.71264267, 0.07446024],
+        ]
         config["term_state_edge"] = 1.0
         env = RLToyEnv(**config)
         state = env.get_augmented_state()["curr_state"].copy()  # env.reset()
@@ -496,7 +498,9 @@ class TestRLToyEnv(unittest.TestCase):
             # At each step, the distance reduces by ~0.035355 to the final point of
             # this trajectory which is also the target point by design for this test.
             # That is also the reward given at each step.
-            np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg="Step: " + str(i))
+            np.testing.assert_allclose(
+                0.035355, reward, atol=1e-6, err_msg="Step: " + str(i)
+            )
             state = next_state.copy()
         np.testing.assert_allclose(state, np.array([-0.29792, 1.71012]), atol=1e-6)
         env.reset()
@@ -518,7 +522,9 @@ class TestRLToyEnv(unittest.TestCase):
             # At each step, the distance reduces by ~0.035355 to the final point of
             # this trajectory which is also the target point by design for this test.
             # That is also the reward given at each step.
-            np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg="Step: " + str(i))
+            np.testing.assert_allclose(
+                0.035355, reward, atol=1e-6, err_msg="Step: " + str(i)
+            )
             state = next_state.copy()
         np.testing.assert_allclose(
             state,
@@ -530,7 +536,9 @@ class TestRLToyEnv(unittest.TestCase):
         print("sars', done =", state, action, reward, next_state, done)
         # At each step, the distance reduces by ~0.035355 to the final point of
         # this trajectory which is also the target point by design for this
-        np.testing.assert_allclose(-0.035355, reward, atol=1e-5, err_msg="Step: " + str(i))
+        np.testing.assert_allclose(
+            -0.035355, reward, atol=1e-5, err_msg="Step: " + str(i)
+        )
         env.reset()
         env.close()
 
@@ -551,7 +559,9 @@ class TestRLToyEnv(unittest.TestCase):
                 # At each step, the distance reduces by ~0.035355 to the final point of
                 # this trajectory which is also the target point by design for this test.
                 # That is also the reward given at each step.
-                np.testing.assert_allclose(0.035355, reward, atol=1e-6, err_msg="Step: " + str(i))
+                np.testing.assert_allclose(
+                    0.035355, reward, atol=1e-6, err_msg="Step: " + str(i)
+                )
             state = next_state.copy()
         np.testing.assert_allclose(
             state,
@@ -655,7 +665,9 @@ class TestRLToyEnv(unittest.TestCase):
                 # At each step, the distance reduces by ~0.035355 to the final point of
                 # this trajectory which is also the target point by design for this test.
                 # That is also the reward given at each step.
-                np.testing.assert_allclose(0.0, reward, atol=1e-6, err_msg="Step: " + str(i))
+                np.testing.assert_allclose(
+                    0.0, reward, atol=1e-6, err_msg="Step: " + str(i)
+                )
             elif i >= 27 and i <= 31:
                 np.testing.assert_allclose(
                     2.0, reward, atol=1e-6, err_msg="Step: " + str(i)
@@ -1426,10 +1438,8 @@ class TestRLToyEnv(unittest.TestCase):
         ]
         for i in range(len(expected_rewards)):
             expected_rewards[i] = (
-                expected_rewards[i] * config["reward_scale"]
-                + config["reward_shift"]
-                + expected_reward_noises[i]
-            )
+                expected_rewards[i] + expected_reward_noises[i]
+            ) * config["reward_scale"] + config["reward_shift"]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -1697,10 +1707,8 @@ class TestRLToyEnv(unittest.TestCase):
         ]  # [152745, 282030, 528870], [105060, 232050, 78795]
         for i in range(len(expected_rewards)):
             expected_rewards[i] = (
-                expected_rewards[i] * config["reward_scale"]
-                + config["reward_shift"]
-                + expected_reward_noises[i]
-            )
+                expected_rewards[i] + expected_reward_noises[i]
+            ) * config["reward_scale"] + config["reward_shift"]
         for i in range(len(expected_rewards)):
             next_state, reward, done, info = env.step(actions[i])
             assert next_state.shape == (

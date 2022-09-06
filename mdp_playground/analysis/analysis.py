@@ -148,9 +148,10 @@ class MDPP_Analysis:
                     # print("Unique line count values:", np.unique(num_diff_lines))
                     if i == 0:
                         raise FileNotFoundError(
-                            "No files to combine were present. Please check your location and/or filenames that they are correct. Filename passed: " +
-                            file_prefix +
-                            file_suffix)
+                            "No files to combine were present. Please check your location and/or filenames that they are correct. Filename passed: "
+                            + file_prefix
+                            + file_suffix
+                        )
 
             join_files(stats_file, ".csv")
             join_files(stats_file, "_eval.csv")
@@ -266,12 +267,12 @@ class MDPP_Analysis:
         for i in range(len(final_rows_for_a_config)):
             if i == 0:
                 to_avg_ = stats_pd.iloc[
-                    0: self.final_rows_for_a_config[i] + 1, -num_metrics:
+                    0 : self.final_rows_for_a_config[i] + 1, -num_metrics:
                 ]
             else:
                 to_avg_ = stats_pd.iloc[
                     self.final_rows_for_a_config[i - 1]
-                    + 1: self.final_rows_for_a_config[i]
+                    + 1 : self.final_rows_for_a_config[i]
                     + 1,
                     -num_metrics:,
                 ]
@@ -328,11 +329,11 @@ class MDPP_Analysis:
             # eval episodes is less than 10.
             final_10_evals = []
             for i in range(len(hack_indices)):
-                final_10_evals.append(eval_stats[hack_indices_10[i]: hack_indices[i]])
+                final_10_evals.append(eval_stats[hack_indices_10[i] : hack_indices[i]])
             #     print(final_10_evals[-1])
             if ray_0_9_0:  # hack
                 final_10_evals.append(
-                    eval_stats[hack_indices[i]:]
+                    eval_stats[hack_indices[i] :]
                 )  # appends the very last eval which begins at last hack_index for Ray 0.9.0
 
             final_10_evals = np.array(
@@ -388,12 +389,12 @@ class MDPP_Analysis:
             for i in range(len(final_rows_for_a_config)):
                 if i == 0:
                     to_avg_ = mean_data_eval[
-                        0: self.final_rows_for_a_config[i] + 1, -num_metrics:
+                        0 : self.final_rows_for_a_config[i] + 1, -num_metrics:
                     ]
                 else:
                     to_avg_ = mean_data_eval[
                         self.final_rows_for_a_config[i - 1]
-                        + 1: self.final_rows_for_a_config[i]
+                        + 1 : self.final_rows_for_a_config[i]
                         + 1,
                         -num_metrics:,
                     ]
@@ -572,7 +573,9 @@ class MDPP_Analysis:
                     # the slice sub-selects the metric written in position metric_num from the
                     # "last axis of diff. metrics that were written" and then the axis of
                     # #seeds becomes axis=-1 ( before slice it was -2).
-                    mean_data_ = np.mean(stats[..., metric_num], axis=exp_data["seed_idx"])
+                    mean_data_ = np.mean(
+                        stats[..., metric_num], axis=exp_data["seed_idx"]
+                    )
                     to_plot_ = np.squeeze(mean_data_)
 
                     # #hack transpose the array and choose first column elements always
@@ -580,7 +583,8 @@ class MDPP_Analysis:
                         # print(idx, idx_2, to_plot_.shape)
                         axes = np.arange(len(to_plot_.shape))
                         new_axes = [
-                            axes[(i - (idx + idx_2)) % len(axes)] for i, x in enumerate(axes)
+                            axes[(i - (idx + idx_2)) % len(axes)]
+                            for i, x in enumerate(axes)
                         ]  # ##TODO this will cause a bug for >2 dims used.
                         to_plot_ = np.transpose(to_plot_, tuple(new_axes))[:, 0]
                     stats_data[group_key][sub_group_key]["to_plot_"] = to_plot_
@@ -598,13 +602,17 @@ class MDPP_Analysis:
                     stats_data[group_key][sub_group_key]["labels"] = sub_group_key
                     stats_data[group_key][sub_group_key]["tick_labels"] = exp_data[
                         "tick_labels"
-                    ][idx + idx_2]  # #hack assumes only 1 of these has >1 values
+                    ][
+                        idx + idx_2
+                    ]  # #hack assumes only 1 of these has >1 values
                     # ###TODO print warning
                     # print(sub_group_keys, group_keys, idx, idx_2, exp_data["tick_labels"])
                     # print(exp_data["axis_labels"])
                     stats_data[group_key][sub_group_key]["axis_labels"] = exp_data[
                         "axis_labels"
-                    ][idx + idx_2] # sub_group_keys
+                    ][
+                        idx + idx_2
+                    ]  # sub_group_keys
                     # print(stats_data[group_key][sub_group_key]["tick_labels"], stats_data[group_key][sub_group_key]["axis_labels"])
                     stats_data[group_key][sub_group_key]["metric_names"] = exp_data[
                         "metric_names"
@@ -727,14 +735,16 @@ class MDPP_Analysis:
 
             # save figure
             if save_fig:
-                fig_name = ((
-                    stats_data[group_key][sub_group_key]["stats_file"].split("/")[-1]
-                    + ("_train" if train else "_eval")
-                    + ("_aucs" if use_aucs else "")
-                    + "_final_reward_"
-                    + stats_data[group_key][sub_group_key]["axis_labels"]).replace(
-                        " ", "_"
-                    )
+                fig_name = (
+                    (
+                        stats_data[group_key][sub_group_key]["stats_file"].split("/")[
+                            -1
+                        ]
+                        + ("_train" if train else "_eval")
+                        + ("_aucs" if use_aucs else "")
+                        + "_final_reward_"
+                        + stats_data[group_key][sub_group_key]["axis_labels"]
+                    ).replace(" ", "_")
                     + "_"
                     + str(
                         stats_data[group_key][sub_group_key]["metric_names"][metric_num]
@@ -926,7 +936,9 @@ class MDPP_Analysis:
             exp_data = list_exp_data[
                 0
             ]  # TODO make changes to handle multiple experiments plot
-            warnings.warn("We currently plot only 1st expt.'s data for the following learning curve plots")
+            warnings.warn(
+                "We currently plot only 1st expt.'s data for the following learning curve plots"
+            )
         else:
             return
 
@@ -967,17 +979,17 @@ class MDPP_Analysis:
             )  # = num_seeds * shape of more frequently changing hyperparam
             j_index = (i // nseeds_) % ncols_  #
             if i == 0:
-                to_plot_ = stats_data[0: final_rows_for_a_config[i] + 1, metric_num]
+                to_plot_ = stats_data[0 : final_rows_for_a_config[i] + 1, metric_num]
                 to_plot_x = stats_data[
-                    0: final_rows_for_a_config[i] + 1, exp_data["ts_idx"]
+                    0 : final_rows_for_a_config[i] + 1, exp_data["ts_idx"]
                 ]
             else:
                 to_plot_ = stats_data[
-                    final_rows_for_a_config[i - 1] + 1: final_rows_for_a_config[i] + 1,
+                    final_rows_for_a_config[i - 1] + 1 : final_rows_for_a_config[i] + 1,
                     metric_num,
                 ]
                 to_plot_x = stats_data[
-                    final_rows_for_a_config[i - 1] + 1: final_rows_for_a_config[i] + 1,
+                    final_rows_for_a_config[i - 1] + 1 : final_rows_for_a_config[i] + 1,
                     exp_data["ts_idx"],
                 ]
             # print(to_plot_[-1])
@@ -1111,12 +1123,14 @@ class MDPP_Analysis:
 
         # save figure
         if save_fig:
-            fig_name = ((
-                stats_data[group_key][sub_group_key]["stats_file"].split("/")[-1]
-                + ("_train" if train else "_eval")
-                + ("_aucs" if use_aucs else "")
-                + "_final_reward_"
-                + stats_data[group_key][sub_group_key]["axis_labels"]).replace(" ", "_")
+            fig_name = (
+                (
+                    stats_data[group_key][sub_group_key]["stats_file"].split("/")[-1]
+                    + ("_train" if train else "_eval")
+                    + ("_aucs" if use_aucs else "")
+                    + "_final_reward_"
+                    + stats_data[group_key][sub_group_key]["axis_labels"]
+                ).replace(" ", "_")
                 + "_"
                 + str(stats_data[group_key][sub_group_key]["metric_names"][metric_num])
                 + "_spider.pdf"

@@ -197,10 +197,12 @@ class ImageMultiDiscrete(Box):
                 shift_w + tex_arr.shape[1] // 2,
             )
             img_arr_[
-                top_left[0]: bottom_right[0], top_left[1]: bottom_right[1]
+                top_left[0] : bottom_right[0], top_left[1] : bottom_right[1]
             ] //= 255
             # //255 to make white pixels be (1, 1, 1) - so when multiplied it's a mask; shift_h and shift_w interchanged as numpy is row major
-            img_arr_[top_left[0]: bottom_right[0], top_left[1]: bottom_right[1]] *= tex_arr
+            img_arr_[
+                top_left[0] : bottom_right[0], top_left[1] : bottom_right[1]
+            ] *= tex_arr
             # texed_img =
             image_ = Image.fromarray(img_arr_, "RGB")
         elif self.use_custom_images == "images":
@@ -224,7 +226,7 @@ class ImageMultiDiscrete(Box):
                 shift_w + tex_arr.shape[1] // 2,
             )
             img_arr_[
-                top_left[0]: bottom_right[0], top_left[1]: bottom_right[1]
+                top_left[0] : bottom_right[0], top_left[1] : bottom_right[1]
             ] = tex_arr
             image_ = Image.fromarray(img_arr_, "RGB")
         else:

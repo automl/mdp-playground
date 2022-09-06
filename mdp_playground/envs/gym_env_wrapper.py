@@ -104,17 +104,18 @@ class GymEnvWrapper(gym.Env):
         else:
             self.reward_shift = config["reward_shift"]
 
-
         if "image_transforms" not in config:
             self.image_transforms = False
         else:
-            assert config["state_space_type"] == "discrete", (
-                "Image transforms are only applicable to discrete envs."
-            )
+            assert (
+                config["state_space_type"] == "discrete"
+            ), "Image transforms are only applicable to discrete envs."
             self.image_transforms = config["image_transforms"]
             if len(self.env.observation_space.shape) != 3:
-                warnings.warn("The length of observation_space.shape ="\
-                    + self.env.observation_space.shape + "It was expected"\
+                warnings.warn(
+                    "The length of observation_space.shape ="
+                    + self.env.observation_space.shape
+                    + "It was expected"
                     + "to be 3 for environments with image representations."
                 )
 
@@ -159,11 +160,11 @@ class GymEnvWrapper(gym.Env):
             else:
                 self.image_scale_range = config["image_scale_range"]
 
-
         if (
             "wrap_deepmind_ray" in config and config["wrap_deepmind_ray"]
         ):  # hack ##TODO remove?
             from ray.rllib.env.atari_wrappers import wrap_deepmind, is_atari
+
             self.env = wrap_deepmind(self.env, dim=42, framestack=True)
         elif "atari_preprocessing" in config and config["atari_preprocessing"]:
             self.frame_skip = 4  # default for AtariPreprocessing
@@ -182,14 +183,20 @@ class GymEnvWrapper(gym.Env):
             # noop_max set to 1 because we want to keep the vanilla env as
             # deterministic as possible and setting it 0 was not allowed. ##TODO
             # noop_max=0 is poosible in new Gym version, so update Gym version.
-            self.env = AtariPreprocessing(self.env, frame_skip=self.frame_skip, grayscale_obs=self.grayscale_obs, noop_max=1, screen_size=self.image_width)
+            self.env = AtariPreprocessing(
+                self.env,
+                frame_skip=self.frame_skip,
+                grayscale_obs=self.grayscale_obs,
+                noop_max=1,
+                screen_size=self.image_width,
+            )
             print("self.env.noop_max set to: ", self.env.noop_max)
 
         if "irrelevant_features" in config:
             # self.irrelevant_features =  config["irrelevant_features"]
             irr_toy_env_conf = config["irrelevant_features"]
             if "seed" not in irr_toy_env_conf:
-                irr_toy_env_conf["seed"] = self.np_random.randint(sys.maxsize)  #random
+                irr_toy_env_conf["seed"] = self.np_random.randint(sys.maxsize)  # random
 
             if config["state_space_type"] == "discrete":
                 pass
@@ -198,8 +205,9 @@ class GymEnvWrapper(gym.Env):
                 # of the irrelevant toy env in the "base" config and not the nested irrelevant_features
                 # dict inside the base config to be compatible with the config_processor of MDPP
                 # which requires variable config to be in the "base" config.
-                irr_toy_env_conf["state_space_dim"] = \
-                    config["irr_state_space_dim"]  # #hack
+                irr_toy_env_conf["state_space_dim"] = config[
+                    "irr_state_space_dim"
+                ]  # #hack
 
             self.irr_toy_env = RLToyEnv(**irr_toy_env_conf)
 
@@ -261,10 +269,10 @@ class GymEnvWrapper(gym.Env):
                 env_obs_dtype = env_obs_low.dtype
                 env_obs_shape = env_obs_low.shape
                 ext_low_shape = (
-                            env_obs_shape[0] + self.image_padding * 2,
-                            env_obs_shape[1] + self.image_padding * 2,
-                            env_obs_shape[2]
-                    )
+                    env_obs_shape[0] + self.image_padding * 2,
+                    env_obs_shape[1] + self.image_padding * 2,
+                    env_obs_shape[2],
+                )
                 # #hardcoded stuff next
                 ext_low = np.zeros(shape=(ext_low_shape))
                 ext_high = np.ones(shape=(ext_low_shape)) * 255
@@ -345,7 +353,7 @@ class GymEnvWrapper(gym.Env):
                     action[: self.env_act_shape[0]]
                 )
                 next_state_irr, _, done_irr, _ = self.irr_toy_env.step(
-                    action[self.env_act_shape[0]:]
+                    action[self.env_act_shape[0] :]
                 )
                 next_state = np.concatenate((next_state, next_state_irr))
         else:
@@ -369,7 +377,7 @@ class GymEnvWrapper(gym.Env):
         # action and time_step as well. Would need to change implementation to
         # have a queue for the rewards achieved and then pick the reward that was
         # generated delay timesteps ago.
-        noise_in_reward = (self.reward_noise(self.np_random) if self.reward_noise else 0)
+        noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
@@ -384,18 +392,20 @@ class GymEnvWrapper(gym.Env):
         # episode end reached by reaching a terminal state, but reset() may have
         # been called in the middle of an episode):
         if not self.total_episodes == 0:
-            print("Noise stats for previous episode num.: " +
-                  str(self.total_episodes) +
-                  " (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): " +
-                  str(self.total_abs_noise_in_reward_episode) +
-                  " " +
-                  str(self.total_abs_noise_in_transition_episode) +
-                  " " +
-                  str(self.total_reward_episode) +
-                  " " +
-                  str(self.total_noisy_transitions_episode) +
-                  " " +
-                  str(self.total_transitions_episode))
+            print(
+                "Noise stats for previous episode num.: "
+                + str(self.total_episodes)
+                + " (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): "
+                + str(self.total_abs_noise_in_reward_episode)
+                + " "
+                + str(self.total_abs_noise_in_transition_episode)
+                + " "
+                + str(self.total_reward_episode)
+                + " "
+                + str(self.total_noisy_transitions_episode)
+                + " "
+                + str(self.total_transitions_episode)
+            )
 
         # on episode start stuff:
         self.reward_buffer = [0.0] * (self.delay)
@@ -468,7 +478,6 @@ class GymEnvWrapper(gym.Env):
         else:
             raise ValueError()
 
-
         sh_quant = self.image_sh_quant
         ro_quant = self.image_ro_quant
         scale_range = self.image_scale_range
@@ -525,7 +534,6 @@ class GymEnvWrapper(gym.Env):
             shift_w += add_shift_w
             shift_h += add_shift_h
 
-
         img_arr_ = np.array(image_)
         sq_width = R
         if (
@@ -542,12 +550,9 @@ class GymEnvWrapper(gym.Env):
             shift_h + height // 2,
             shift_w + width // 2,
         )
-        img_arr_[
-            top_left[0]: bottom_right[0], top_left[1]: bottom_right[1]
-        ] = env_img
+        img_arr_[top_left[0] : bottom_right[0], top_left[1] : bottom_right[1]] = env_img
 
         image_ = Image.fromarray(img_arr_, "RGB")
-
 
         # Because numpy is row-major and Image is column major, need to transpose
         ret_arr = np.transpose(np.array(image_), axes=(1, 0, 2))

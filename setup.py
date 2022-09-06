@@ -52,7 +52,7 @@ extras_require_cont = [
 ]
 
 hpo_analysis_require = [
-    'cave>=1.4.0',
+    "cave>=1.4.0",
 ]
 
 AUTHORS = (

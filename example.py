@@ -34,6 +34,7 @@ def display_image(obs, mode="RGB"):
     # to be 3-D.
     img1.show()
 
+
 def discrete_environment_example():
 
     config = {}
@@ -245,7 +246,6 @@ def grid_environment_image_representations_example():
     display_image(next_obs)
 
 
-
 def atari_wrapper_example():
 
     config = {
@@ -304,6 +304,7 @@ def mujoco_wrapper_example():
     try:
         from mdp_playground.envs import get_mujoco_wrapper
         from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+
         wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
 
         env = wrapped_mujoco_env(**config)
@@ -319,7 +320,12 @@ def mujoco_wrapper_example():
         env.close()
 
     except ImportError as e:
-        print("Exception:", type(e), e, "caught. You may need to install mujoco-py. NOT running mujoco_wrapper_example.")
+        print(
+            "Exception:",
+            type(e),
+            e,
+            "caught. You may need to install mujoco-py. NOT running mujoco_wrapper_example.",
+        )
         return
 
 
@@ -337,12 +343,13 @@ def minigrid_wrapper_example():
     import gym
 
     from gym_minigrid.wrappers import RGBImgPartialObsWrapper, ImgObsWrapper
-    env = gym.make('MiniGrid-Empty-8x8-v0')
-    env = RGBImgPartialObsWrapper(env) # Get pixel observations
-    env = ImgObsWrapper(env) # Get rid of the 'mission' field
+
+    env = gym.make("MiniGrid-Empty-8x8-v0")
+    env = RGBImgPartialObsWrapper(env)  # Get pixel observations
+    env = ImgObsWrapper(env)  # Get rid of the 'mission' field
 
     env = GymEnvWrapper(env, **config)
-    obs = env.reset() # This now produces an RGB tensor only
+    obs = env.reset()  # This now produces an RGB tensor only
 
     print(
         "Taking a step in the environment with a random action and printing the transition:"

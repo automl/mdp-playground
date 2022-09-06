@@ -132,7 +132,6 @@ def process_configs(
         algorithm=config.algorithm,
     )
 
-
     if "timesteps_total" in dir(config):
         hacky_timesteps_total = config.timesteps_total  # hack
     else:
@@ -185,7 +184,6 @@ def process_configs(
             + framework
             + ". Available options are: ray and stable_baselines."
         )
-
 
     # varying_configs is a list of dict of dicts with a specific structure.
     final_configs = combined_processing(
@@ -502,8 +500,8 @@ def get_grid_of_configs(var_configs):
     # processing can take place in framework_specific_processing() below.
     for config_type, config_dict in var_configs.items():
         for key in config_dict:
-            assert (
-                isinstance(var_configs[config_type][key], list)
+            assert isinstance(
+                var_configs[config_type][key], list
             ), "var_configs should be a dict of dicts with lists as the leaf values to allow each configuration option to take multiple possible values"
             value_tuples.append(var_configs[config_type][key])
 
@@ -861,7 +859,7 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
         if final_configs[i]["env"] in mujoco_envs:
             # hack This is needed so that the environment runs the same amount of
             # seconds of simulation, even though episode steps are different.
-            if ("time_unit" in final_configs[i]["env_config"]):
+            if "time_unit" in final_configs[i]["env_config"]:
                 timesteps_total /= final_configs[i]["env_config"]["time_unit"]
                 timesteps_total = int(timesteps_total)
 
@@ -895,7 +893,7 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
                 # because then more values for target_noise_clip are witten to CSVs than
                 # actually used during HPO but for normal (non-HPO) runs this needs to be
                 # not done.
-                if (algorithm == "DDPG"):
+                if algorithm == "DDPG":
                     if key == "critic_lr":
                         final_configs[i]["actor_lr"] = value
                     if key == "critic_hiddens":

@@ -1,5 +1,6 @@
 from ray import tune
 from collections import OrderedDict
+
 num_seeds = 1
 timesteps_total = 10_000_000
 
@@ -30,7 +31,9 @@ random_agent_configs = OrderedDict(
 # hack because ConfigSpace below orders alphabetically, the returned
 # configs are in a jumbled order compared to the order above, which would
 # create problems with config processing.
-random_agent_configs = OrderedDict(sorted(random_agent_configs.items(), key=lambda t: t[0]))
+random_agent_configs = OrderedDict(
+    sorted(random_agent_configs.items(), key=lambda t: t[0])
+)
 
 random_configs = [
     (

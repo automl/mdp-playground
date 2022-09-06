@@ -3,6 +3,7 @@
 from ray import tune
 from collections import OrderedDict
 from mdp_playground.config_processor import *
+
 num_seeds = 5
 timesteps_total = 3000000
 
@@ -38,7 +39,7 @@ env_config = {
             "state_space_type": "continuous",
             "reward_function": "move_to_a_point",
             "dtype": np.float64,
-            },
+        },
         "seed": 0,  # seed
         "state_space_type": "continuous",
         "action_space_type": "continuous",

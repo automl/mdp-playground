@@ -263,7 +263,7 @@ class RLToyEnv(gym.Env):
             # checks that handlers is [], before adding a file logger, otherwise we
             # would have multiple loggers to file if multiple RLToyEnvs were
             # instantiated by the same process.
-            if (not self.logger.handlers):
+            if not self.logger.handlers:
                 self.log_filename = config["log_filename"]
                 # logging.basicConfig(filename='/tmp/' + self.log_filename, filemode='a', format='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', level=self.log_level)
                 log_file_handler = logging.FileHandler(self.log_filename)
@@ -281,8 +281,8 @@ class RLToyEnv(gym.Env):
         elif isinstance(config["seed"], dict):
             self.seed_dict = config["seed"]
             need_to_gen_seeds = False
-        elif (
-            isinstance(config["seed"], int)
+        elif isinstance(
+            config["seed"], int
         ):  # should be an int then. Gym doesn't accept np.int64, etc..
             self.seed_int = config["seed"]
             need_to_gen_seeds = True
@@ -601,7 +601,9 @@ class RLToyEnv(gym.Env):
             if config["reward_function"] == "move_to_a_point":
                 assert self.sequence_length == 1
                 if "target_point" in config:
-                    self.target_point = np.array(config["target_point"], dtype=self.dtype)
+                    self.target_point = np.array(
+                        config["target_point"], dtype=self.dtype
+                    )
                     assert self.target_point.shape == (
                         len(config["relevant_indices"]),
                     ), "target_point should have dimensionality = relevant_state_space dimensionality"
@@ -1084,11 +1086,8 @@ class RLToyEnv(gym.Env):
                         self.action_space_size[0],
                     ):
                         for a in range(self.action_space_size[0]):
-                            assert (
-                                self.is_terminal_state(
-                                    i_s * self.action_space_size[0] + s
-                                )
-
+                            assert self.is_terminal_state(
+                                i_s * self.action_space_size[0] + s
                             )
                             self.config["transition_function"][
                                 i_s * self.action_space_size[0] + s, a
@@ -1583,7 +1582,7 @@ class RLToyEnv(gym.Env):
                     # per dimension to give different kinds of dynamics per dimension: maybe
                     # even sample this scale per dimension from a probability distribution to
                     # generate different random Ps?
-                    self.state_derivatives[-1] = (action / self.inertia)
+                    self.state_derivatives[-1] = action / self.inertia
                     factorial_array = scipy.special.factorial(
                         np.arange(1, self.dynamics_order + 1)
                     )  # This is just to speed things up as scipy calculates the factorial only for largest array member
@@ -1591,8 +1590,11 @@ class RLToyEnv(gym.Env):
                         for j in range(self.dynamics_order - i):
                             # print('i, j, self.state_derivatives, (self.time_unit**(j + 1)), factorial_array:', i, j, self.state_derivatives, (self.time_unit**(j + 1)), factorial_array)
                             # + state_derivatives_prev[i] Don't need to add previous value as it's already in there at the beginning ##### TODO Keep an old self.state_derivatives and a new one otherwise higher order derivatives will be overwritten before being used by lower order ones.
-                            self.state_derivatives[i] += (self.state_derivatives[i + j + 1] *
-                                                          (self.time_unit ** (j + 1)) / factorial_array[j])
+                            self.state_derivatives[i] += (
+                                self.state_derivatives[i + j + 1]
+                                * (self.time_unit ** (j + 1))
+                                / factorial_array[j]
+                            )
                     # print('self.state_derivatives:', self.state_derivatives)
                     next_state = self.state_derivatives[0]
 
@@ -1756,7 +1758,7 @@ class RLToyEnv(gym.Env):
                 ):
                     # ###TODO also implement this for make_denser case and continuous envs.
                     sub_seq = tuple(
-                        state_considered[1: self.augmented_state_length - delay]
+                        state_considered[1 : self.augmented_state_length - delay]
                     )
                     if sub_seq in self.rewardable_sequences:
                         # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
@@ -1785,7 +1787,7 @@ class RLToyEnv(gym.Env):
                     # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
                     # #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_deviation calc.?.
                     data_ = np.array(state_considered, dtype=self.dtype)[
-                        1: self.augmented_state_length - delay,
+                        1 : self.augmented_state_length - delay,
                         self.config["relevant_indices"],
                     ]
                     data_mean = data_.mean(axis=0)
@@ -1994,8 +1996,11 @@ class RLToyEnv(gym.Env):
         self.curr_obs = next_obs
 
         # #### TODO curr_state is external state, while we need to check relevant state for terminality! Done - by using augmented_state now instead of curr_state!
-        self.done = (self.is_terminal_state(self.augmented_state[-1]) or self.reached_terminal)
+        self.done = (
+            self.is_terminal_state(self.augmented_state[-1]) or self.reached_terminal
+        )
         if self.done:
+            self.reward += np.sum(self.reward_buffer)
             self.reward += (
                 self.term_state_reward * self.reward_scale
             )  # Scale before or after?

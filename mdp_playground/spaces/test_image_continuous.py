@@ -33,19 +33,21 @@ class TestImageContinuous(unittest.TestCase):
         pos = np.array([5.0, 7.0])
         img1 = Image.fromarray(np.squeeze(imc.generate_image(pos)), "RGB")
         # img1 = ImageOps.invert(img1)
-        if render: img1.show()
+        if render:
+            img1.show()
         # img1.save("cont_state_no_target.pdf")
 
         target = np.array([10, 10])
         imc = ImageContinuous(
             cs2,
-            circle_radius=10, 
+            circle_radius=10,
             target_point=target,
             width=400,
             height=400,
         )
         img1 = Image.fromarray(np.squeeze(imc.generate_image(pos)), "RGB")
-        if render: img1.show()
+        if render:
+            img1.show()
         # img1.save("cont_state_target.pdf")
 
         # Terminal sub-spaces
@@ -67,14 +69,15 @@ class TestImageContinuous(unittest.TestCase):
         imc = ImageContinuous(
             cs2,
             target_point=target,
-            circle_radius=10, 
+            circle_radius=10,
             term_spaces=term_spaces,
             width=400,
             height=400,
         )
         pos = np.array([5.0, 7.0])
         img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), "RGB")
-        if render: img1.show()
+        if render:
+            img1.show()
         # img1.save("cont_state_target_terminal_states.pdf")
 
         # Irrelevant features
@@ -87,7 +90,8 @@ class TestImageContinuous(unittest.TestCase):
         )
         pos = np.array([5.0, 7.0, 10.0, 15.0])
         img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), "RGB")
-        if render: img1.show()
+        if render:
+            img1.show()
         # print(imc.get_concatenated_image(pos).shape)
 
         # Random sample and __repr__
@@ -99,10 +103,11 @@ class TestImageContinuous(unittest.TestCase):
         )
         # print(imc)
         img1 = Image.fromarray(np.squeeze(imc.sample()), "RGB")
-        if render: img1.show()
+        if render:
+            img1.show()
 
         # Draw grid
-        grid_shape=(5, 5)
+        grid_shape = (5, 5)
         cs2_grid = Box(
             low=0 * np.array(grid_shape).astype(np.float64),
             high=np.array(grid_shape).astype(np.float64),
@@ -110,15 +115,16 @@ class TestImageContinuous(unittest.TestCase):
         pos = np.array([2, 3])
         target = np.array([4, 4])
         imc = ImageContinuous(
-            cs2_grid, 
-            target_point=target, 
-            circle_radius=10, 
-            width=400, 
-            height=400, 
-            grid_shape=grid_shape
+            cs2_grid,
+            target_point=target,
+            circle_radius=10,
+            width=400,
+            height=400,
+            grid_shape=grid_shape,
         )
         img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), "RGB")
-        if render: img1.show()
+        if render:
+            img1.show()
         # img1.save("grid_target.pdf")
 
         # Grid with terminal sub-spaces
@@ -140,17 +146,17 @@ class TestImageContinuous(unittest.TestCase):
         target = np.array([4, 4])
         imc = ImageContinuous(
             cs2_grid,
-            circle_radius=10, 
-            target_point=target, 
+            circle_radius=10,
+            target_point=target,
             term_spaces=term_spaces,
-            width=400, 
-            height=400, 
-            grid_shape=grid_shape
+            width=400,
+            height=400,
+            grid_shape=grid_shape,
         )
         img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), "RGB")
-        if render: img1.show()
+        if render:
+            img1.show()
         # img1.save("grid_target_terminal_states.pdf")
-
 
 
 if __name__ == "__main__":

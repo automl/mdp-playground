@@ -105,15 +105,11 @@ class TestGymEnvWrapper(unittest.TestCase):
             print("step, reward, done, act:", i, reward, done, act)
             if i == 153 or i == 158:
                 assert reward == 45.0, (
-                    "Shifted reward in step: "
-                    + str(i)
-                    + " should have been 45.0."
+                    "Shifted reward in step: " + str(i) + " should have been 45.0."
                 )
             if i == 154 or i == 160:
                 assert reward == 1.0, (
-                    "Shifted reward in step: "
-                    + str(i)
-                    + " should have been 1.0."
+                    "Shifted reward in step: " + str(i) + " should have been 1.0."
                 )
             total_reward += reward
         print("total_reward:", total_reward)
@@ -156,15 +152,11 @@ class TestGymEnvWrapper(unittest.TestCase):
             print("step, reward, done, act:", i, reward, done, act)
             if i == 153 or i == 158:
                 assert reward == 88.0, (
-                    "Scaled reward in step: "
-                    + str(i)
-                    + " should have been 88.0."
+                    "Scaled reward in step: " + str(i) + " should have been 88.0."
                 )
             if i == 154 or i == 160:
                 assert reward == 0.0, (
-                    "Scaled reward in step: "
-                    + str(i)
-                    + " should have been 0.0."
+                    "Scaled reward in step: " + str(i) + " should have been 0.0."
                 )
             total_reward += reward
         print("total_reward:", total_reward)
@@ -361,7 +353,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             # "image_sh_quant": 2,
             "image_width": 40,
             "image_padding": 30,
-              # "GymEnvWrapper": {
+            # "GymEnvWrapper": {
             "atari_preprocessing": True,
             "frame_skip": 4,
             "grayscale_obs": False,
@@ -389,14 +381,11 @@ class TestGymEnvWrapper(unittest.TestCase):
             print("step, reward, done, act:", i, reward, done, act)
             if i == 153 or i == 158:
                 assert reward == 44.0, (
-                    "Reward in step: "
-                    + str(i)
-                    + " should have been 44.0."
+                    "Reward in step: " + str(i) + " should have been 44.0."
                 )
             total_reward += reward
         print("total_reward:", total_reward)
         aew.reset()
-
 
     @pytest.mark.skip(reason="Cannot run mojoco in CI/CD currently.")
     def test_cont_irr_features(self):
@@ -481,14 +470,14 @@ class TestGymEnvWrapper(unittest.TestCase):
             )
             if i == 0:
                 np.testing.assert_allclose(
-                    next_state[hc3w.env.observation_space.shape[0]:],
+                    next_state[hc3w.env.observation_space.shape[0] :],
                     [-4.51594779e-01, -1.00795288e00],
                     rtol=1e-05,
                     err_msg="Mismatch for irr. toy envs' state in step " + str(i) + ".",
                 )
             elif i == 2:
                 np.testing.assert_allclose(
-                    next_state[hc3w.env.observation_space.shape[0]:],
+                    next_state[hc3w.env.observation_space.shape[0] :],
                     [-2.95129723, 0.05893834],
                     rtol=1e-05,
                     err_msg="Mismatch for irr. toy envs' state in step " + str(i) + ".",
