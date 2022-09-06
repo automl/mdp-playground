@@ -326,28 +326,30 @@ class GymEnvWrapper(gym.Env):
         # next_state, reward, done, info = super(GymEnvWrapper, self).step(action)
         self.total_transitions_episode += 1
 
-        if (
-            self.config["state_space_type"] == "discrete"
-            and self.transition_noise > 0.0
-        ):
-            probs = (
-                np.ones(shape=(self.env.action_space.n,))
-                * self.transition_noise
-                / (self.env.action_space.n - 1)
-            )
-            probs[action] = 1 - self.transition_noise
-            old_action = action
-            action = int(
-                self.np_random.choice(self.env.action_space.n, size=1, p=probs)
-            )  # random
-            if old_action != action:
-                # print("NOISE inserted", old_action, action)
-                self.total_noisy_transitions_episode += 1
+        if self.config["state_space_type"] == "discrete":
+            if self.transition_noise > 0.0:
+                probs = (
+                    np.ones(shape=(self.env.action_space.n,))
+                    * self.transition_noise
+                    / (self.env.action_space.n - 1)
+                )
+                probs[action] = 1 - self.transition_noise
+                old_action = action
+                action = int(
+                    self.np_random.choice(self.env.action_space.n, size=1, p=probs)
+                )  # random
+                if old_action != action:
+                    # print("NOISE inserted", old_action, action)
+                    self.total_noisy_transitions_episode += 1
         else:  # cont. envs
-            noise_in_transition = (
-                self.transition_noise(self.np_random) if self.transition_noise else 0
-            )  # #random
-            self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
+            if self.transition_noise is not None:
+                noise_in_transition = (
+                    self.transition_noise(self.np_random) if self.transition_noise else 0
+                )  # #random
+                self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
+            else:
+                noise_in_transition = 0.0
+                
 
         if "irrelevant_features" in self.config:
             if self.config["state_space_type"] == "discrete":
