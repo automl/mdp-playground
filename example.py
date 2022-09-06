@@ -67,8 +67,10 @@ def discrete_environment_image_representations_example():
     config["seed"] = 0
 
     config["state_space_type"] = "discrete"
-    config["action_space_size"] = 8
+    config["action_space_size"] = 8 # [8, 8]
+    # config["irrelevant_features"] = True
     config["image_representations"] = True
+    # config["image_transforms"] = "shift,scale,rotate,flip"
     config["delay"] = 1
     config["sequence_length"] = 3
     config["reward_scale"] = 2.5
@@ -109,6 +111,7 @@ def discrete_environment_image_representations_example():
     # black and white. squeeze() is used because the image is 3-D because
     # frameworks like Ray expect the image to be 3-D.
     img1.show()
+    # img1.save("image_repr_irr_features_transforms.pdf")
 
     env.close()
 
@@ -331,6 +334,7 @@ if __name__ == "__main__":
         + reset_ansi_escape
     )
     discrete_environment_image_representations_example()
+    # import sys; sys.exit(0)
 
     print(
         set_ansi_escape

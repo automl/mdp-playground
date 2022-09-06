@@ -8,7 +8,7 @@ import yaml
 import argparse
 
 def generate_plots(exp_name, exp_id, show_plots=False, options=''):
-    print("Generating plots for " + exp_id + ": " + exp_name + " with addnl. options:" + options)
+    print("Generating plots for " + str(exp_id) + ": " + exp_name + " with addnl. options:" + options)
     
     # Set dir_name to the location where the CSV files from running an experiment were saved
     dir_name = '/home/rajanr/mdpp_' + str(exp_id) # e.g. 13699485
@@ -27,10 +27,13 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     # Plots across n runs: Training: with std dev across the runs
     mdpp_analysis.plot_1d_dimensions(train_stats, save_fig, bonferroni=False, err_bar='bootstrap', show_plots=show_plots)
 
+    if 'ep_len' in options:
+        mdpp_analysis.plot_1d_dimensions(train_stats, save_fig, bonferroni=False, err_bar='bootstrap', show_plots=show_plots, metric_num=-1)
+
     # 2-D heatmap plots across n runs: Training runs: with std dev across the runs
     # There seems to be a bug with matplotlib - x and y axes tick labels are not correctly set even though we pass them. Please feel free to look into the code and suggest a correction if you find it.
     if 'plot_2d' in options:
-        mdpp_analysis.plot_2d_heatmap(train_stats, save_fig, bonferroni=False, err_bar='bootstrap', show_plots=show_plots)
+        mdpp_analysis.plot_2d_heatmap(train_stats, save_fig, show_plots=show_plots)
 
     # Plot learning curves: Training: Each curve corresponds to a different seed for the agent
     if 'plot_learn' in options:

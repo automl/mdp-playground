@@ -233,30 +233,36 @@ class MDPP_Analysis():
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
 
         '''
-        y_axis_label = 'Reward' if 'reward' in self.metric_names[metric_num] else self.metric_names[metric_num]
+        if 'reward' in self.metric_names[metric_num]:
+            y_axis_label = 'Reward'
+        elif "len_mean" in self.metric_names[metric_num]:
+            y_axis_label = 'Episode Length'
+        else:
+            y_axis_label = self.metric_names[metric_num]
 
         plt.rcParams.update({'font.size': 18}) # default 12, for poster: 30
         # print(stats_data.shape)
 
         n_samp = stats_data.shape[-2]  # No. of seeds
-        print("n_samp", n_samp)
+        # print("n_samp", n_samp)
         if bonferroni:  # Apply bonferroni corrections
             from scipy.special import comb
             n_configs = np.prod(self.config_counts[:-1])  # Total no. of diff configs that were ran. Ignore last dimension num_seeds
-            print(n_configs, self.config_counts)
+            # print(n_configs, self.config_counts)
             alpha /= comb(n_configs, 2)  # Number of comparisons being made in the 1-D plots is between any 2 configs at once so n choose 2
         mean_data_ = np.mean(stats_data[..., metric_num], axis=-1) # the slice sub-selects the metric written in position metric_num from the "last axis of diff. metrics that were written" and then the axis of #seeds becomes axis=-1 ( before slice it was -2).
         to_plot_ = np.squeeze(mean_data_)
         std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
         if err_bar=='std':
             to_plot_bars_ = np.squeeze(std_dev_)
+            to_plot_bars_ = to_plot_bars_[np.newaxis, :]  # Make it 3-D like other to_plot_bars_ below
         elif err_bar=='t_dist':
             perc = 1 - alpha/2
             df = n_samp - 1  # Degrees of freedom for t-dist
             lb = t.ppf(perc, df) * (np.squeeze(std_dev_) / np.sqrt(n_samp))  # mean_data_ - 
             ub = t.ppf(perc, df) * (np.squeeze(std_dev_) / np.sqrt(n_samp))  # mean_data_ + 
-            print('lb', lb)
-            print('ub', ub)
+            # print('lb', lb)
+            # print('ub', ub)
             to_plot_bars_ = np.stack((lb, ub), axis=0)  # np.array(zip(lb, ub))
             print("to_plot_bars_", to_plot_bars_, type(to_plot_bars_))
         elif err_bar=='bootstrap':
@@ -265,9 +271,9 @@ class MDPP_Analysis():
             res = bootstrap(stats_data[..., metric_num], np.mean, confidence_level=1-alpha, random_state=rng, axis=-1)
             lb = to_plot_ - np.squeeze(res.confidence_interval.low)
             ub = np.squeeze(res.confidence_interval.high) - to_plot_
-            print("lb, ub", lb, ub)
+            # print("lb, ub", lb, ub)
             to_plot_bars_ = np.stack((lb, ub), axis=0)  # np.array(zip(lb, ub))
-            print("to_plot_bars_", to_plot_bars_, type(to_plot_bars_))
+            # print("to_plot_bars_", to_plot_bars_, to_plot_bars_.shape, type(to_plot_bars_))
 
         fig_width = len(self.tick_labels[0])
         # plt.figure()
@@ -275,10 +281,10 @@ class MDPP_Analysis():
 
         # print(to_plot_.shape)
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
-            plt.bar(self.tick_labels[0], to_plot_[:, 0], yerr=to_plot_bars_[:, 0])
+            plt.bar(self.tick_labels[0], to_plot_[:, 0], yerr=to_plot_bars_[:, :, 0])
         else:
             plt.bar(self.tick_labels[0], to_plot_, yerr=to_plot_bars_)
-        plt.xlabel(self.axis_labels[0])
+        plt.xlabel(self.axis_labels[0].title().replace("_", " "))
         plt.ylabel(y_axis_label)
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
@@ -288,9 +294,9 @@ class MDPP_Analysis():
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
             fig_width = len(self.tick_labels[1])
             plt.figure(figsize=(fig_width, 1.5))
-            plt.bar(self.tick_labels[1], to_plot_[0, :], yerr=to_plot_bars_[0, :])
+            plt.bar(self.tick_labels[1], to_plot_[0, :], yerr=to_plot_bars_[:, 0, :])
             # plt.tight_layout()
-            plt.xlabel(self.axis_labels[1])
+            plt.xlabel(self.axis_labels[1].title().replace("_", " "))
             plt.ylabel(y_axis_label)
             if save_fig:
                 plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
@@ -330,10 +336,10 @@ class MDPP_Analysis():
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 25
         cbar.set_label(label_, rotation=270)
         if len(self.axis_labels) == 2:
-            plt.xlabel(self.axis_labels[1])
-            plt.ylabel(self.axis_labels[0])
+            plt.xlabel(self.axis_labels[1].title().replace("_", " "))
+            plt.ylabel(self.axis_labels[0].title().replace("_", " "))
         else:
-            plt.xlabel(self.axis_labels[0])
+            plt.xlabel(self.axis_labels[0].title().replace("_", " "))
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
         if show_plots:
@@ -351,10 +357,10 @@ class MDPP_Analysis():
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 30
         cbar.set_label('Reward Std Dev.', rotation=270)
         if len(self.axis_labels) == 2:
-            plt.xlabel(self.axis_labels[1])
-            plt.ylabel(self.axis_labels[0])
+            plt.xlabel(self.axis_labels[1].title().replace("_", " "))
+            plt.ylabel(self.axis_labels[0].title().replace("_", " "))
         else:
-            plt.xlabel(self.axis_labels[0])
+            plt.xlabel(self.axis_labels[0].title().replace("_", " "))
         # plt.tight_layout()
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")

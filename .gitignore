@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Plots
+*.pdf
+
+MUJOCO_LOG.TXT
+
 *.swp
 *.csv
 .directory
