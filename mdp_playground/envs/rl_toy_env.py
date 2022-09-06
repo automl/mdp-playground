@@ -1877,12 +1877,12 @@ class RLToyEnv(gym.Env):
                     if list(new_relevant_state) == self.target_point:
                         reward += 1.0
 
-        reward *= self.reward_scale
         noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0
         # #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
+        reward *= self.reward_scale
         reward += self.reward_shift
         return reward
 

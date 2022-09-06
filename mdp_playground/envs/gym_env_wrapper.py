@@ -20,6 +20,8 @@ class GymEnvWrapper(gym.Env):
         transition noise (for discrete environments)
         reward delay
         reward noise
+        reward scale
+        reward shift
         image_transforms
 
     The wrapper is pretty general and can be applied to any Gym Environment. The environment should be instantiated and passed as the 1st argument to the __init__ method of this class. If using this wrapper with Atari, additional keys may be added specifying either atari_preprocessing = True or wrap_deepmind_ray = True. These would use the AtariPreprocessing wrapper from OpenAI Gym or wrap_deepmind() wrapper from Ray Rllib.
@@ -91,6 +93,17 @@ class GymEnvWrapper(gym.Env):
                 self.reward_noise = lambda a: a.normal(0, reward_noise_std)
         else:
             self.reward_noise = None
+
+        if "reward_scale" not in config:
+            self.reward_scale = 1.0
+        else:
+            self.reward_scale = config["reward_scale"]
+
+        if "reward_shift" not in config:
+            self.reward_shift = 0.0
+        else:
+            self.reward_shift = config["reward_shift"]
+
 
         if "image_transforms" not in config:
             self.image_transforms = False
@@ -360,6 +373,8 @@ class GymEnvWrapper(gym.Env):
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
+        reward *= self.reward_scale
+        reward += self.reward_shift
 
         return next_state, reward, done, info
 
