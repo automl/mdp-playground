@@ -369,7 +369,8 @@ class GymEnvWrapper(gym.Env):
                 next_state = np.concatenate((next_state, next_state_irr))
         else:
             next_state, reward, done, info = self.env.step(action)
-            next_state += noise_in_transition
+            if self.config["state_space_type"] == "continuous":
+                next_state += noise_in_transition
 
         if self.image_transforms:
             next_state = self.get_transformed_image(next_state)
