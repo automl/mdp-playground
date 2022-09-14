@@ -28,9 +28,9 @@
 14683184: ddpg_move_to_a_point_irr_dims
 14683793: td3_move_to_a_point_irr_dims
 14683806: sac_move_to_a_point_irr_dims
-14685016: ddpg_move_to_a_point_action_max
-14685017: td3_move_to_a_point_action_max
-14685018: sac_move_to_a_point_action_max
+14685016: ddpg_move_to_a_point_action_max ep_len
+14685017: td3_move_to_a_point_action_max ep_len
+14685018: sac_move_to_a_point_action_max ep_len
 14685023: ddpg_move_to_a_point_action_loss_weight
 14685024: td3_move_to_a_point_action_loss_weight
 14767452: sac_move_to_a_point_action_loss_weight

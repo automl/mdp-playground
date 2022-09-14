@@ -188,10 +188,24 @@ class MDPP_Analysis():
         x_axis_labels = []
         x_tick_labels_ = []
         dims_varied = []
-        for i in range(len(self.config_counts) - 1): # -1 is added to ignore #seeds as dimensions of difficulty
+        for i in range(len(self.config_counts) - 1): # -1 is added to ignore #seeds as dimensions of difficulty #hack
             if self.config_counts[i]> 1:
                 x_axis_labels.append(self.config_names[i])
                 x_tick_labels_.append([str(j) for j in self.dims_values[i]])
+                if 'state_space_dim' == self.config_names[i]:
+                    # print("self.dims_values[i], type(self.dims_values[i])", self.dims_values[i], type(self.dims_values[i]))
+                    x_tick_labels_[-1] = [str(j - 2) for j in self.dims_values[i]]  # 2 is #hardcoded default value of length of relevant_indices config
+                elif 'image_scale_range' == self.config_names[i]:
+                    ...
+                    # del x_axis_labels[-1]
+                    # x_axis_labels.append('')
+                    # print("self.dims_values", self.dims_values, self.dims_values[i])
+                    def hack_process_label(s):
+                        s = s.split(',')[0].split('(')[1]
+                        if len(s) >= 6:
+                            s = s[:5]
+                        return s
+                    x_tick_labels_[-1] = [hack_process_label(j) for j in self.dims_values[i]]  # j is a str like "(0.8,1.25)"
                 for j in range(len(x_tick_labels_[-1])):
                     if len(x_tick_labels_[-1][j]) > 2: #hack
                         abridged_str = x_tick_labels_[-1][j].split(',')
@@ -275,6 +289,7 @@ class MDPP_Analysis():
             to_plot_bars_ = np.stack((lb, ub), axis=0)  # np.array(zip(lb, ub))
             # print("to_plot_bars_", to_plot_bars_, to_plot_bars_.shape, type(to_plot_bars_))
 
+        # print("self.tick_labels[0],", self.tick_labels[0], len(self.tick_labels[0]))
         fig_width = len(self.tick_labels[0])
         # plt.figure()
         plt.figure(figsize=(fig_width, 1.5))
@@ -284,7 +299,8 @@ class MDPP_Analysis():
             plt.bar(self.tick_labels[0], to_plot_[:, 0], yerr=to_plot_bars_[:, :, 0])
         else:
             plt.bar(self.tick_labels[0], to_plot_, yerr=to_plot_bars_)
-        plt.xlabel(self.axis_labels[0].title().replace("_", " "))
+        x_axis_label = self.process_axis_labels(self.axis_labels[0])
+        plt.xlabel(x_axis_label)
         plt.ylabel(y_axis_label)
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
@@ -296,12 +312,34 @@ class MDPP_Analysis():
             plt.figure(figsize=(fig_width, 1.5))
             plt.bar(self.tick_labels[1], to_plot_[0, :], yerr=to_plot_bars_[:, 0, :])
             # plt.tight_layout()
-            plt.xlabel(self.axis_labels[1].title().replace("_", " "))
+            x_axis_label = self.process_axis_labels(self.axis_labels[1])
+            plt.xlabel(x_axis_label)
             plt.ylabel(y_axis_label)
             if save_fig:
                 plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
             if show_plots:
                 plt.show()
+
+    def process_axis_labels(self, string):
+        '''Hacky code for X-axis labels to be better human readable instead of code variable names
+        e.g. Rotation Quantisation instead of image_ro_quant'''
+
+        label = string
+        if 'state_space_dim' == string:
+            label = 'Irrelevant Dimensions'
+        elif 'action_space_max' == string:
+            label = 'Action Range'
+            # x_tick_labels_ = [j[0] for j in self.dims_values[i]]
+        elif 'image_sh_quant' == string:
+            label = 'Shift Quantisation'
+            # x_tick_labels_ = [j[0] for j in self.dims_values[i]]
+        elif 'image_ro_quant' == string:
+            label = 'Rotation Quantisation'
+            # x_tick_labels_ = [j[0] for j in self.dims_values[i]]
+
+        label = label.title().replace("_", " ")
+
+        return label
 
     def plot_2d_heatmap(self, stats_data, save_fig=False, train=True, metric_num=-2, show_plots=True):
         '''Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground
@@ -336,10 +374,13 @@ class MDPP_Analysis():
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 25
         cbar.set_label(label_, rotation=270)
         if len(self.axis_labels) == 2:
-            plt.xlabel(self.axis_labels[1].title().replace("_", " "))
-            plt.ylabel(self.axis_labels[0].title().replace("_", " "))
+            x_axis_label = self.process_axis_labels(self.axis_labels[1])
+            plt.xlabel(x_axis_label)
+            y_axis_label = self.process_axis_labels(self.axis_labels[0])
+            plt.ylabel(y_axis_label)
         else:
-            plt.xlabel(self.axis_labels[0].title().replace("_", " "))
+            x_axis_label = self.process_axis_labels(self.axis_labels[0])
+            plt.xlabel(x_axis_label)
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
         if show_plots:
@@ -357,10 +398,13 @@ class MDPP_Analysis():
         cbar.ax.get_yaxis().labelpad = 15 # default 15, for poster: 30
         cbar.set_label('Reward Std Dev.', rotation=270)
         if len(self.axis_labels) == 2:
-            plt.xlabel(self.axis_labels[1].title().replace("_", " "))
-            plt.ylabel(self.axis_labels[0].title().replace("_", " "))
+            x_axis_label = self.process_axis_labels(self.axis_labels[1])
+            plt.xlabel(x_axis_label)
+            y_axis_label = self.process_axis_labels(self.axis_labels[0])
+            plt.ylabel(y_axis_label)
         else:
-            plt.xlabel(self.axis_labels[0].title().replace("_", " "))
+            x_axis_label = self.process_axis_labels(self.axis_labels[0])
+            plt.xlabel(x_axis_label)
         # plt.tight_layout()
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_std_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
