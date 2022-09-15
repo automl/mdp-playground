@@ -233,7 +233,7 @@ class MDPP_Analysis():
         return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval
 
 
-    def plot_1d_dimensions(self, stats_data, save_fig=False, train=True, err_bar='t_dist', alpha=0.05, bonferroni=True, rand_seed=0, metric_num=-2, show_plots=True):
+    def plot_1d_dimensions(self, stats_data, save_fig=False, train=True, err_bar='t_dist', alpha=0.05, bonferroni=True, common_y_scale=False, rand_seed=0, metric_num=-2, show_plots=True):
         '''Plots 1-D bar plots across a single dimension with mean and std. dev.
 
         Parameters
@@ -302,6 +302,10 @@ class MDPP_Analysis():
         x_axis_label = self.process_axis_labels(self.axis_labels[0])
         plt.xlabel(x_axis_label)
         plt.ylabel(y_axis_label)
+        # Common Y-axis scale, only for episodic reward plots:
+        if common_y_scale and 'reward' in self.metric_names[metric_num]:
+            ylim = self.process_axis_limits()
+            plt.ylim(ylim)
         if save_fig:
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[0].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
         if show_plots:
@@ -315,6 +319,10 @@ class MDPP_Analysis():
             x_axis_label = self.process_axis_labels(self.axis_labels[1])
             plt.xlabel(x_axis_label)
             plt.ylabel(y_axis_label)
+            # Common Y-axis scale, only for episodic reward plots:
+            if common_y_scale and 'reward' in self.metric_names[metric_num]:
+                ylim = self.process_axis_limits()
+                plt.ylim(ylim)
             if save_fig:
                 plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_' + self.axis_labels[1].replace(' ','_') + '_' + str(self.metric_names[metric_num]) + '_1d.pdf', dpi=300, bbox_inches="tight")
             if show_plots:
@@ -341,7 +349,51 @@ class MDPP_Analysis():
 
         return label
 
-    def plot_2d_heatmap(self, stats_data, save_fig=False, train=True, metric_num=-2, show_plots=True):
+    def process_axis_limits(self,):
+        '''Hacky code for Y-axis limits to be common for an env across expts.'''
+
+        toy_discrete_y = [0, 90]
+        toy_continuous_y = [0, 9]
+        beam_rider_y = [0, 1800]
+        breakout_y = [0, 260]
+        qbert_y = [0, 5000]
+        space_invaders_y = [0, 450]
+        halfcheetah_y = [0, 15000]  # -1000
+        pusher_y = [-150, 0]
+        reacher_y = [-100, 30]
+
+        if 'beam_rider' in self.stats_file:
+            return beam_rider_y
+        elif 'breakout' in self.stats_file:
+            return breakout_y
+        elif 'qbert' in self.stats_file:
+            return qbert_y
+        elif 'space_invaders' in self.stats_file:
+            return space_invaders_y
+        elif 'halfcheetah' in self.stats_file:
+            return halfcheetah_y
+        elif 'pusher' in self.stats_file:
+            return pusher_y
+        elif 'reacher' in self.stats_file:
+            return reacher_y
+        elif 'dqn' in self.stats_file:
+            return toy_discrete_y
+        elif 'rainbow' in self.stats_file:
+            return toy_discrete_y
+        elif 'a3c' in self.stats_file:
+            return toy_discrete_y
+        elif 'ddpg' in self.stats_file:
+            return toy_continuous_y
+        elif 'td3' in self.stats_file:
+            return toy_continuous_y
+        elif 'sac' in self.stats_file:
+            return toy_continuous_y
+        else:
+            return toy_discrete_y
+
+
+
+    def plot_2d_heatmap(self, stats_data, save_fig=False, common_y_scale=False, train=True, metric_num=-2, show_plots=True):
         '''Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground
 
         Parameters
@@ -364,7 +416,12 @@ class MDPP_Analysis():
         if len(to_plot_.shape) > 2:
             # warning.warn("Data contains variation in more than 2 dimensions (apart from seeds). May lead to plotting error!")
             raise ValueError("Data contains variation in more than 2 dimensions (apart from seeds). This is currently not supported") #TODO Add 2-D plots for all combinations of 2 varying dims?
-        plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_))
+        # Common Y-axis scale, only for episodic reward plots:
+        if common_y_scale and 'reward' in self.metric_names[metric_num]:
+            vmax = self.process_axis_limits()
+        else:
+            vmax = np.max(to_plot_)
+        plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=vmax)
         if len(self.tick_labels) == 2:
             plt.gca().set_xticklabels(self.tick_labels[1])
             plt.gca().set_yticklabels(self.tick_labels[0])
@@ -388,7 +445,11 @@ class MDPP_Analysis():
         std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
         to_plot_ = np.squeeze(std_dev_)
         # print(to_plot_, to_plot_.shape)
-        plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=np.max(to_plot_)) # 60 for DQN, 100 for A3C
+        if common_y_scale and 'reward' in self.metric_names[metric_num]:
+            vmax = self.process_axis_limits()
+        else:
+            vmax = np.max(to_plot_)
+        plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=vmax) # 60 for DQN, 100 for A3C
         if len(self.tick_labels) == 2:
             plt.gca().set_xticklabels(self.tick_labels[1])
             plt.gca().set_yticklabels([str(i) for i in self.tick_labels[0]])
@@ -412,7 +473,7 @@ class MDPP_Analysis():
         if show_plots:
             plt.show()
 
-    def plot_learning_curves(self, stats_data, save_fig=False, train=True, metric_num=-2, show_plots=True): # metric_num needs to be minus indexed because stats_pd reutrned for train stats has _all_ columns
+    def plot_learning_curves(self, stats_data, save_fig=False, common_y_scale=False, train=True, metric_num=-2, show_plots=True): # metric_num needs to be minus indexed because stats_pd reutrned for train stats has _all_ columns
         '''Plots learning curves: Either across 1 or 2 meta-features of MDP Playground. Different colours represent learning curves for different seeds.
 
         Parameters
@@ -462,6 +523,10 @@ class MDPP_Analysis():
         #         print("Plot no.", i//10)
                 ax[i_index][j_index].set_xlabel("Train Timesteps")
                 ax[i_index][j_index].set_ylabel("Reward")
+                # Common Y-axis scale, only for episodic reward plots:
+                if common_y_scale and 'reward' in self.metric_names[metric_num]:
+                    ylim = self.process_axis_limits()
+                    ax[i_index][j_index].axis(ymin=ylim[0], ymax=ylim[1])
         #         ax[i_index][j_index].set_title('Delay ' + str(delays[i_index]) + ', Sequence Length ' + str(sequence_lengths[j_index]))
                 if len(self.dims_varied) > 1:
                     title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][i_index])

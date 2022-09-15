@@ -18,6 +18,9 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     # show_plots = True
     # Set the following to True to save PDFs of plots that you generate below
     save_fig = True
+    err_bar = 'bootstrap'  # 't_dist'
+    bonferroni = True
+    common_y_scale = True
 
     # Data loading
     mdpp_analysis = MDPP_Analysis()
@@ -25,19 +28,19 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
 
     # 1-D: Plots showing reward after total timesteps when varying a single meta-feature
     # Plots across n runs: Training: with std dev across the runs
-    mdpp_analysis.plot_1d_dimensions(train_stats, save_fig, bonferroni=False, err_bar='bootstrap', show_plots=show_plots)
+    mdpp_analysis.plot_1d_dimensions(train_stats, save_fig, bonferroni=bonferroni, err_bar=err_bar, show_plots=show_plots, common_y_scale=common_y_scale)
 
     if 'ep_len' in options:
-        mdpp_analysis.plot_1d_dimensions(train_stats, save_fig, bonferroni=False, err_bar='bootstrap', show_plots=show_plots, metric_num=-1)
+        mdpp_analysis.plot_1d_dimensions(train_stats, save_fig, bonferroni=bonferroni, err_bar=err_bar, show_plots=show_plots, metric_num=-1)
 
     # 2-D heatmap plots across n runs: Training runs: with std dev across the runs
     # There seems to be a bug with matplotlib - x and y axes tick labels are not correctly set even though we pass them. Please feel free to look into the code and suggest a correction if you find it.
     if 'plot_2d' in options:
-        mdpp_analysis.plot_2d_heatmap(train_stats, save_fig, show_plots=show_plots)
+        mdpp_analysis.plot_2d_heatmap(train_stats, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
 
     # Plot learning curves: Training: Each curve corresponds to a different seed for the agent
-    if 'plot_learn' in options:
-        mdpp_analysis.plot_learning_curves(train_curves, save_fig, show_plots=show_plots)
+    if 'learn_curves' in options:
+        mdpp_analysis.plot_learning_curves(train_curves, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
 
 
 if __name__ == "__main__":
@@ -54,11 +57,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--exp-name", "-n", type=str, help="expt name, corresponds to the names of the CSV stats files and the <config>.py file used for the expt."
+        "--exp-name", "-e", type=str, help="expt name, corresponds to the names of the CSV stats files and the <config>.py file used for the expt."
     )
 
     parser.add_argument(
         "--show-plots", "-p", action='store_true', dest='show_plots', help="Toggle displaying plots", default=False,
+    )
+
+    parser.add_argument(
+        "--num-expts", "-n", type=int, help="First n expts in the list are plotted"
     )
 
     args = parser.parse_args()
@@ -71,16 +78,18 @@ if __name__ == "__main__":
 
         print("List of expts.:", yaml_dict)
 
-        for exp_id in yaml_dict:
+        for i, exp_id in enumerate(yaml_dict):
             exp_name = yaml_dict[exp_id].split(' ')[0]
-            options = yaml_dict[exp_id].split(' ')[1] if ' ' in yaml_dict[exp_id] else ''
+            options = ' '.join(yaml_dict[exp_id].split(' ')[1:]) if ' ' in yaml_dict[exp_id] else ''
             generate_plots(exp_id=exp_id, exp_name=exp_name, show_plots=args.show_plots, options=options)
+            if i == args.num_expts - 1:
+                break
 
     else:
         dict_args = vars(args)
         del dict_args['exp_file']
         dict_args['exp_id'] = dict_args['exp_id'].split(' ')[0]
-        dict_args['options'] = dict_args['exp_id'].split(' ')[1] if ' ' in dict_args['exp_id'] else ''
+        dict_args['options'] = ' '.join(dict_args['exp_id'].split(' ')[1:]) if ' ' in dict_args['exp_id'] else ''
         # print(dict_args)
         generate_plots(**dict_args)
 
