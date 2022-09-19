@@ -75,7 +75,7 @@ model_config = {
 
 
 eval_config = {
-    "evaluation_interval": None,  # I think this means every x training_iterations
+    "evaluation_interval": 1,  # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,

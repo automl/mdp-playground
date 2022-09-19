@@ -1,3 +1,4 @@
+scp_list.txt
 expt_list.txt
 # Ignore PDFs generated from plotting scripts
 *.pdf
