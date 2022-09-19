@@ -1,4 +1,3 @@
-70_p_r_noises: 70_p_r_noises
 14527279: dqn_del
 14531516: rainbow_del
 14533713: a3c_del
@@ -36,6 +35,12 @@
 14685024: td3_move_to_a_point_action_loss_weight eval
 14767452: sac_move_to_a_point_action_loss_weight eval
 14685068: ddpg_move_to_a_point_action_max_time_unit plot_2d
+12707717: td3_move_to_a_point_p_noise_target_radius plot_2d ep_len
+12762946: sac_move_to_a_point_p_noise_target_radius plot_2d ep_len
+12703863: ddpg_move_to_a_point_p_order_2 plot_2d
+12704353: ddpg_move_to_a_point_p_order_3 plot_2d
+12715696: td3_move_to_a_point_p_order_2 plot_2d
+13094249: sac_move_to_a_point_p_order_2 plot_2d
 8780519: dqn_beam_rider_del learn_curves
 8826225: rainbow_beam_rider_del
 3214031: a3c_beam_rider_del

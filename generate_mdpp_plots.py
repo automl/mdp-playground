@@ -38,6 +38,9 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     if 'plot_2d' in options:
         mdpp_analysis.plot_2d_heatmap(train_aucs, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
 
+        if 'ep_len' in options:
+            mdpp_analysis.plot_2d_heatmap(train_aucs, save_fig, show_plots=show_plots, common_y_scale=common_y_scale, metric_num=-1)
+
     # Plot learning curves: Training: Each curve corresponds to a different seed for the agent
     if 'learn_curves' in options:
         mdpp_analysis.plot_learning_curves(train_curves, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)

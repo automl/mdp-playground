@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
-#SBATCH -a 0-599 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
+#SBATCH -a 0-249 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
 #SBATCH -t 0-00:10 # time (D-HH:MM)
 #SBATCH -c 2 # number of CPUs/task
 #SBATCH -o log/%x.%A.%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
@@ -15,7 +15,7 @@ echo -e '\033[32m'
 echo "Started at $(date)"
 echo "TMPDIR: " $TMPDIR
 
-export EXP_NAME='td3_move_to_a_point_action_loss_weight' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='rainbow_p_r_noises' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 # Print some information about the job to STDOUT
 echo "Workingdir: $PWD";
@@ -40,7 +40,7 @@ echo Shell used is $SHELL
 # source activate /home/rajanr/anaconda2/envs/py36
 # source activate /home/rajanr/anaconda3/envs/py36_toy_rl
 . /home/rajanr/anaconda3/etc/profile.d/conda.sh # for anaconda3
-conda activate /home/rajanr/anaconda3/envs/py36_toy_rl # should be conda activate and not source when using anaconda3?
+conda activate /home/rajanr/anaconda3/envs/old_py36_toy_rl # should be conda activate and not source when using anaconda3?
 echo $?
 #/home/rajanr/anaconda3/bin/conda activate /home/rajanr/anaconda2/envs/py36
 which python
