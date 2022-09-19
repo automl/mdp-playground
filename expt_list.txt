@@ -1,21 +1,22 @@
-14527279: dqn_del ep_len learn_curves
+70_p_r_noises: 70_p_r_noises
+14527279: dqn_del
 14531516: rainbow_del
 14533713: a3c_del
 14573511: dqn_seq
 14573512: rainbow_seq
 14573513: a3c_seq
-14583025: dqn_p_noise
-14763743: rainbow_p_noise
-14583028: a3c_p_noise
+14583025: dqn_p_noise eval
+14763743: rainbow_p_noise eval
+14583028: a3c_p_noise eval
 14641777: dqn_image_representations
 14642128: rainbow_image_representations
 14642130: a3c_image_representations
 14649914: dqn_image_representations_sh_quant
 14650024: dqn_image_representations_ro_quant
 14650034: dqn_image_representations_scale_range
-14656578: dqn_r_noise
-14656614: rainbow_r_noise
-14656615: a3c_r_noise
+14656578: dqn_r_noise eval
+14656614: rainbow_r_noise eval
+14656615: a3c_r_noise eval
 14657193: dqn_sparsity
 14657195: rainbow_sparsity
 14657196: a3c_sparsity
@@ -25,52 +26,52 @@
 14679254: ddpg_move_to_a_point_target_radius ep_len
 14665689: td3_move_to_a_point_target_radius ep_len
 14679255: sac_move_to_a_point_target_radius ep_len
-14683184: ddpg_move_to_a_point_irr_dims
-14683793: td3_move_to_a_point_irr_dims
-14683806: sac_move_to_a_point_irr_dims
+14683184: ddpg_move_to_a_point_irr_dims ep_len
+14683793: td3_move_to_a_point_irr_dims ep_len
+14683806: sac_move_to_a_point_irr_dims ep_len
 14685016: ddpg_move_to_a_point_action_max ep_len
 14685017: td3_move_to_a_point_action_max ep_len
 14685018: sac_move_to_a_point_action_max ep_len
-14685023: ddpg_move_to_a_point_action_loss_weight
-14685024: td3_move_to_a_point_action_loss_weight
-14767452: sac_move_to_a_point_action_loss_weight
+14685023: ddpg_move_to_a_point_action_loss_weight eval
+14685024: td3_move_to_a_point_action_loss_weight eval
+14767452: sac_move_to_a_point_action_loss_weight eval
 14685068: ddpg_move_to_a_point_action_max_time_unit plot_2d
-8780519: dqn_beam_rider_del
+8780519: dqn_beam_rider_del learn_curves
 8826225: rainbow_beam_rider_del
 3214031: a3c_beam_rider_del
-8817766: dqn_beam_rider_p_noise
-8824025: rainbow_beam_rider_p_noise
-3173847: a3c_beam_rider_p_noise
-8837194: dqn_beam_rider_r_noise
-8837241: rainbow_beam_rider_r_noise
-3527485: a3c_beam_rider_r_noise
-8824067: dqn_breakout_del
+8817766: dqn_beam_rider_p_noise learn_curves eval
+8824025: rainbow_beam_rider_p_noise eval
+3173847: a3c_beam_rider_p_noise eval
+8837194: dqn_beam_rider_r_noise eval
+8837241: rainbow_beam_rider_r_noise eval
+3527485: a3c_beam_rider_r_noise eval
+8824067: dqn_breakout_del learn_curves
 8826374: rainbow_breakout_del
 3214031: a3c_breakout_del
-8805478: dqn_breakout_p_noise
-8824009: rainbow_breakout_p_noise
-3173847: a3c_breakout_p_noise
-8837278: dqn_breakout_r_noise
-8837277: rainbow_breakout_r_noise
-3616776: a3c_breakout_r_noise
-8780992: dqn_qbert_del
+8805478: dqn_breakout_p_noise learn_curves eval
+8824009: rainbow_breakout_p_noise eval
+3173847: a3c_breakout_p_noise eval
+8837278: dqn_breakout_r_noise eval
+8837277: rainbow_breakout_r_noise eval
+3616776: a3c_breakout_r_noise eval
+8780992: dqn_qbert_del learn_curves
 8815604: rainbow_qbert_del
 3214031: a3c_qbert_del
-8828044: dqn_qbert_p_noise
-8824010: rainbow_qbert_p_noise
-3173847: a3c_qbert_p_noise
-8837197: dqn_qbert_r_noise
-9031907: rainbow_qbert_r_noise
-3527485: a3c_qbert_r_noise
-8781032: dqn_space_invaders_del
+8828044: dqn_qbert_p_noise learn_curves eval
+8824010: rainbow_qbert_p_noise eval
+3173847: a3c_qbert_p_noise eval
+8837197: dqn_qbert_r_noise eval
+9031907: rainbow_qbert_r_noise eval
+3527485: a3c_qbert_r_noise eval
+8781032: dqn_space_invaders_del learn_curves
 8815605: rainbow_space_invaders_del
 3214031: a3c_space_invaders_del
-8828049: dqn_space_invaders_p_noise
-8828059: rainbow_space_invaders_p_noise
-3173847: a3c_space_invaders_p_noise
-8837198: dqn_space_invaders_r_noise
-9036107: rainbow_space_invaders_r_noise
-3527485: a3c_space_invaders_r_noise
+8828049: dqn_space_invaders_p_noise learn_curves eval
+8828059: rainbow_space_invaders_p_noise eval
+3173847: a3c_space_invaders_p_noise eval
+8837198: dqn_space_invaders_r_noise eval
+9036107: rainbow_space_invaders_r_noise eval
+3527485: a3c_space_invaders_r_noise eval
 8737568: ddpg_halfcheetah_action_max
 8752703: td3_halfcheetah_action_max
 8678527: sac_halfcheetah_action_max

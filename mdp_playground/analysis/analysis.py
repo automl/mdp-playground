@@ -21,6 +21,10 @@ class MDPP_Analysis():
             The location where the training and evaluation CSV files were written
         exp_name : str
             The name of the experiment: the training and evaluation CSV filenames are formed using this string
+        num_metrics : int
+            The number of metrics that were written to CSV stats files. Default is 3 (timesteps_total, episode_reward_mean, episode_len_mean).
+        load_eval : bool
+            Whether to load evaluation stats CSV or not.
 
         Returns
         -------
@@ -38,9 +42,9 @@ class MDPP_Analysis():
         self.stats_file = stats_file
 
         if os.path.isfile(stats_file + '.csv'):
-            print("Loading data from a sequential run/already combined runs of experiment configurations.")
+            print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations.\033[0;0m")
         else:
-            print("Loading data from a distributed run of experiment configurations. Creating a combined CSV stats file.")
+            print("\033[1;31mLoading data from a distributed run of experiment configurations. Creating a combined CSV stats file.\033[0;0m")
             def join_files(file_prefix, file_suffix):
                 '''Utility to join files that were written with different experiment configs'''
                 with open(file_prefix + file_suffix, 'ab') as combined_file:
@@ -121,10 +125,23 @@ class MDPP_Analysis():
 #         to_plot_ = np.squeeze(stats_reshaped[:, :, :, :, 0, 0, :, 1])
 #         print('Episode reward (at end of training) for 10 seeds for vanilla env.:', to_plot_)
 
+        # Calculate AUC metrics
+        train_aucs = []
+        for i in range(len(final_rows_for_a_config)):
+            if i == 0:
+                to_avg_ = stats_pd.iloc[0:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            else:
+                to_avg_ = stats_pd.iloc[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -num_metrics:]
+            auc = np.mean(to_avg_, axis=0)
+            train_aucs.append(auc)
+            # print(auc)
 
+        train_aucs = np.reshape(np.array(train_aucs), config_counts)
+        print("train_aucs.shape:", train_aucs.shape)
+
+        final_eval_metrics_reshaped, mean_data_eval, eval_aucs = None, None, None
         eval_stats = None
         mean_data_eval = None
-        final_eval_metrics_reshaped = None
         if load_eval:
             # Load evaluation stats
             stats_file_eval = stats_file + '_eval.csv'
@@ -181,6 +198,22 @@ class MDPP_Analysis():
     #         print("eval stats shapes (before and after reshape):", final_eval_metrics_.shape, final_eval_metrics_reshaped.shape)
             print("eval stats shape:", final_eval_metrics_reshaped.shape)
 
+            # Calculate AUC metrics
+            eval_aucs = []
+            for i in range(len(final_rows_for_a_config)):
+                if i == 0:
+                    to_avg_ = mean_data_eval[0:self.final_rows_for_a_config[i]+1, -num_metrics:]
+                else:
+                    to_avg_ = mean_data_eval[self.final_rows_for_a_config[i-1]+1:self.final_rows_for_a_config[i]+1, -num_metrics:]
+                auc = np.mean(to_avg_, axis=0)
+                eval_aucs.append(auc)
+                # print(auc)
+
+            eval_aucs = np.reshape(np.array(eval_aucs), config_counts)
+            print("eval_aucs.shape:", eval_aucs.shape)
+
+        print("train_curves.shape:", np.array(stats_pd).shape)
+
         self.config_counts = config_counts[:-1] # -1 is added to ignore "no. of stats that were saved" as dimensions of difficulty
         self.dims_values = dims_values
 
@@ -224,14 +257,19 @@ class MDPP_Analysis():
                         x_tick_labels_[-1][j] = ''.join(abridged_str)
                 dims_varied.append(i)
 
+        if x_tick_labels_ == []:
+            warnings.warn("No varying dims were found!")
+            x_tick_labels_.append('single_config')
+            x_axis_labels.append('single_config')
+            dims_varied.append(0)
+
         self.axis_labels = x_axis_labels
         self.tick_labels = x_tick_labels_
         self.dims_varied = dims_varied
         for d,v,i in zip(x_axis_labels, x_tick_labels_, dims_varied):
             print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
 
-        return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval
-
+        return stats_reshaped, final_eval_metrics_reshaped, np.array(stats_pd), mean_data_eval, train_aucs, eval_aucs
 
     def plot_1d_dimensions(self, stats_data, save_fig=False, train=True, err_bar='t_dist', alpha=0.05, bonferroni=True, common_y_scale=False, rand_seed=0, metric_num=-2, show_plots=True):
         '''Plots 1-D bar plots across a single dimension with mean and std. dev.
@@ -352,8 +390,8 @@ class MDPP_Analysis():
     def process_axis_limits(self,):
         '''Hacky code for Y-axis limits to be common for an env across expts.'''
 
-        toy_discrete_y = [0, 90]
-        toy_continuous_y = [0, 9]
+        toy_discrete_y = [0, 80]
+        toy_continuous_y = [0, 8]
         beam_rider_y = [0, 1800]
         breakout_y = [0, 260]
         qbert_y = [0, 5000]
@@ -416,15 +454,39 @@ class MDPP_Analysis():
         if len(to_plot_.shape) > 2:
             # warning.warn("Data contains variation in more than 2 dimensions (apart from seeds). May lead to plotting error!")
             raise ValueError("Data contains variation in more than 2 dimensions (apart from seeds). This is currently not supported") #TODO Add 2-D plots for all combinations of 2 varying dims?
+
+        import matplotlib.ticker as mticker
         # Common Y-axis scale, only for episodic reward plots:
         if common_y_scale and 'reward' in self.metric_names[metric_num]:
-            vmax = self.process_axis_limits()
+            vmin, vmax = self.process_axis_limits()
         else:
-            vmax = np.max(to_plot_)
-        plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=vmax)
+            vmin, vmax = 0, np.max(to_plot_)
+        plt.clf()
+        fig_width = len(self.tick_labels[1])
+        fig_height = len(self.tick_labels[0])
+        # plt.figure()
+        plt.figure(figsize=(fig_width, fig_height))
+        plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=vmin, vmax=vmax)
         if len(self.tick_labels) == 2:
-            plt.gca().set_xticklabels(self.tick_labels[1])
-            plt.gca().set_yticklabels(self.tick_labels[0])
+            print("self.tick_labels[1]", self.tick_labels[1], self.tick_labels[0])
+            label_format = '{:,.0f}'
+            ax = plt.gca()
+            ax.xaxis.set_major_locator(mticker.MaxNLocator(len(self.tick_labels[1]) - 2))
+            ax.yaxis.set_major_locator(mticker.MaxNLocator(len(self.tick_labels[0]) - 2))
+            xticks_loc = ax.get_xticks().tolist()
+            print("xticks_loc",xticks_loc)
+            xticks_loc = [i for i in range(len(xticks_loc))]
+            print("xticks_loc",xticks_loc)
+            ax.xaxis.set_major_locator(mticker.FixedLocator(xticks_loc))
+            ax.set_xticklabels([float(x) for x in self.tick_labels[1]])
+            yticks_loc = ax.get_yticks().tolist()
+            print("yticks_loc",yticks_loc)
+            yticks_loc = [i for i in range(len(yticks_loc))]
+            print("yticks_loc",yticks_loc)
+            ax.yaxis.set_major_locator(mticker.FixedLocator(yticks_loc))
+            ax.set_yticklabels([float(x) for x in self.tick_labels[0]])
+            # ax.set_xticklabels(self.tick_labels[1])
+            # ax.set_yticklabels(self.tick_labels[0])
         else:
             plt.gca().set_xticklabels(self.tick_labels[0])
         cbar = plt.colorbar()
@@ -445,10 +507,12 @@ class MDPP_Analysis():
         std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
         to_plot_ = np.squeeze(std_dev_)
         # print(to_plot_, to_plot_.shape)
-        if common_y_scale and 'reward' in self.metric_names[metric_num]:
-            vmax = self.process_axis_limits()
-        else:
-            vmax = np.max(to_plot_)
+        # if common_y_scale and 'reward' in self.metric_names[metric_num]:
+        #     vmin, vmax = self.process_axis_limits()
+        # else:
+        # For Std dev, determine from data
+        vmin, vmax = 0, np.max(to_plot_)
+        plt.clf()
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=vmax) # 60 for DQN, 100 for A3C
         if len(self.tick_labels) == 2:
             plt.gca().set_xticklabels(self.tick_labels[1])
