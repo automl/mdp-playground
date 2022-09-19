@@ -19,6 +19,12 @@
 14657193: dqn_sparsity
 14657195: rainbow_sparsity
 14657196: a3c_sparsity
+15092236: dqn_p_r_noises plot_2d auto_y_scale eval
+15092490: rainbow_p_r_noises plot_2d auto_y_scale eval
+15092592: a3c_p_r_noises plot_2d auto_y_scale eval
+15093000: dqn_seq_del plot_2d auto_y_scale
+15093102: rainbow_seq_del plot_2d auto_y_scale
+15093203: a3c_seq_del plot_2d auto_y_scale
 14664772: ddpg_move_to_a_point_time_unit ep_len
 14665496: td3_move_to_a_point_time_unit ep_len
 14679288: sac_move_to_a_point_time_unit ep_len
@@ -34,13 +40,13 @@
 14685023: ddpg_move_to_a_point_action_loss_weight eval
 14685024: td3_move_to_a_point_action_loss_weight eval
 14767452: sac_move_to_a_point_action_loss_weight eval
-14685068: ddpg_move_to_a_point_action_max_time_unit plot_2d
-12707717: td3_move_to_a_point_p_noise_target_radius plot_2d ep_len
-12762946: sac_move_to_a_point_p_noise_target_radius plot_2d ep_len
-12703863: ddpg_move_to_a_point_p_order_2 plot_2d
-12704353: ddpg_move_to_a_point_p_order_3 plot_2d
-12715696: td3_move_to_a_point_p_order_2 plot_2d
-13094249: sac_move_to_a_point_p_order_2 plot_2d
+14685068: ddpg_move_to_a_point_action_max_time_unit plot_2d auto_y_scale
+12707717: td3_move_to_a_point_p_noise_target_radius plot_2d ep_len auto_y_scale
+12762946: sac_move_to_a_point_p_noise_target_radius plot_2d ep_len auto_y_scale
+12703863: ddpg_move_to_a_point_p_order_2 plot_2d auto_y_scale
+12704353: ddpg_move_to_a_point_p_order_3 plot_2d auto_y_scale
+12715696: td3_move_to_a_point_p_order_2 plot_2d auto_y_scale
+13094249: sac_move_to_a_point_p_order_2 plot_2d auto_y_scale
 8780519: dqn_beam_rider_del learn_curves
 8826225: rainbow_beam_rider_del
 3214031: a3c_beam_rider_del

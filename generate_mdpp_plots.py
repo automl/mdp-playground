@@ -8,7 +8,7 @@ import yaml
 import argparse
 
 def generate_plots(exp_name, exp_id, show_plots=False, options=''):
-    print("Generating plots for " + str(exp_id) + ": " + exp_name + " with addnl. options:" + options)
+    print("Generating plots for " + str(exp_id) + ": " + exp_name + " with the following addnl. options: " + options)
     
     # Set dir_name to the location where the CSV files from running an experiment were saved
     dir_name = '/home/rajanr/mdpp_' + str(exp_id) # e.g. 13699485
@@ -20,7 +20,10 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     save_fig = True
     err_bar = 'bootstrap'  # 't_dist'
     bonferroni = True
-    common_y_scale = True
+    if 'auto_y_scale' in options:
+        common_y_scale = False
+    else:
+        common_y_scale = True
 
     # Data loading
     mdpp_analysis = MDPP_Analysis()
@@ -45,8 +48,22 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     if 'learn_curves' in options:
         mdpp_analysis.plot_learning_curves(train_curves, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
 
-    # if 'eval' in options:
-    #     ...
+    if 'eval' in options:
+        mdpp_analysis.plot_1d_dimensions(eval_aucs, save_fig, bonferroni=bonferroni, err_bar=err_bar, show_plots=show_plots, common_y_scale=common_y_scale)
+
+        if 'ep_len' in options:
+            mdpp_analysis.plot_1d_dimensions(eval_aucs, save_fig, bonferroni=bonferroni, err_bar=err_bar, show_plots=show_plots, metric_num=-1)
+
+        if 'plot_2d' in options:
+            mdpp_analysis.plot_2d_heatmap(eval_aucs, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
+
+            if 'ep_len' in options:
+                mdpp_analysis.plot_2d_heatmap(eval_aucs, save_fig, show_plots=show_plots, common_y_scale=common_y_scale, metric_num=-1)
+
+        # Plot learning curves: Training: Each curve corresponds to a different seed for the agent
+        if 'learn_curves' in options:
+            mdpp_analysis.plot_learning_curves(eval_curves, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
+
 
 if __name__ == "__main__":
 

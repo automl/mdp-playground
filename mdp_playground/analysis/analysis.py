@@ -469,20 +469,19 @@ class MDPP_Analysis():
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=vmin, vmax=vmax)
         if len(self.tick_labels) == 2:
             print("self.tick_labels[1]", self.tick_labels[1], self.tick_labels[0])
-            label_format = '{:,.0f}'
             ax = plt.gca()
-            ax.xaxis.set_major_locator(mticker.MaxNLocator(len(self.tick_labels[1]) - 2))
-            ax.yaxis.set_major_locator(mticker.MaxNLocator(len(self.tick_labels[0]) - 2))
-            xticks_loc = ax.get_xticks().tolist()
-            print("xticks_loc",xticks_loc)
-            xticks_loc = [i for i in range(len(xticks_loc))]
-            print("xticks_loc",xticks_loc)
+            # ax.xaxis.set_major_locator(mticker.MaxNLocator(len(self.tick_labels[1]) - 2))
+            # xticks_loc = ax.get_xticks().tolist()
+            # print("xticks_loc",xticks_loc)
+            xticks_loc = [i for i in range(len(self.tick_labels[1]))]
+            # print("xticks_loc",xticks_loc)
             ax.xaxis.set_major_locator(mticker.FixedLocator(xticks_loc))
             ax.set_xticklabels([float(x) for x in self.tick_labels[1]])
-            yticks_loc = ax.get_yticks().tolist()
-            print("yticks_loc",yticks_loc)
-            yticks_loc = [i for i in range(len(yticks_loc))]
-            print("yticks_loc",yticks_loc)
+            # ax.yaxis.set_major_locator(mticker.MaxNLocator(len(self.tick_labels[0]) - 0.5))
+            # yticks_loc = ax.get_yticks().tolist()
+            # print("yticks_loc",yticks_loc)
+            yticks_loc = [i for i in range(len(self.tick_labels[0]))]
+            # print("yticks_loc",yticks_loc)
             ax.yaxis.set_major_locator(mticker.FixedLocator(yticks_loc))
             ax.set_yticklabels([float(x) for x in self.tick_labels[0]])
             # ax.set_xticklabels(self.tick_labels[1])
@@ -515,8 +514,21 @@ class MDPP_Analysis():
         plt.clf()
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=vmax) # 60 for DQN, 100 for A3C
         if len(self.tick_labels) == 2:
-            plt.gca().set_xticklabels(self.tick_labels[1])
-            plt.gca().set_yticklabels([str(i) for i in self.tick_labels[0]])
+            ax = plt.gca()
+            # ax.xaxis.set_major_locator(mticker.MaxNLocator(len(self.tick_labels[1]) - 2))
+            # xticks_loc = ax.get_xticks().tolist()
+            # print("xticks_loc",xticks_loc)
+            xticks_loc = [i for i in range(len(self.tick_labels[1]))]
+            # print("xticks_loc",xticks_loc)
+            ax.xaxis.set_major_locator(mticker.FixedLocator(xticks_loc))
+            ax.set_xticklabels([float(x) for x in self.tick_labels[1]])
+            # ax.yaxis.set_major_locator(mticker.MaxNLocator(len(self.tick_labels[0]) - 2))
+            # yticks_loc = ax.get_yticks().tolist()
+            # print("yticks_loc",yticks_loc)
+            yticks_loc = [i for i in range(len(self.tick_labels[0]))]
+            # print("yticks_loc",yticks_loc)
+            ax.yaxis.set_major_locator(mticker.FixedLocator(yticks_loc))
+            ax.set_yticklabels([float(x) for x in self.tick_labels[0]])
         else:
             plt.gca().set_xticklabels(self.tick_labels[0])
         cbar = plt.colorbar()
