@@ -11,6 +11,8 @@ __pycache__/
 *.csv
 .directory
 
+MUJOCO_LOG.TXT
+
 # C extensions
 *.so
 
