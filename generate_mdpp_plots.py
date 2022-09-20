@@ -20,6 +20,10 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     save_fig = True
     err_bar = 'bootstrap'  # 't_dist'
     bonferroni = True
+    if 'eval' in options:
+        load_eval = True
+    else:
+        load_eval = False
     if 'auto_y_scale' in options:
         common_y_scale = False
     else:
@@ -27,7 +31,7 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
 
     # Data loading
     mdpp_analysis = MDPP_Analysis()
-    train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=False)
+    train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=load_eval)
 
     # 1-D: Plots showing reward after total timesteps when varying a single meta-feature
     # Plots across n runs: Training: with std dev across the runs
@@ -49,20 +53,20 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
         mdpp_analysis.plot_learning_curves(train_curves, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
 
     if 'eval' in options:
-        mdpp_analysis.plot_1d_dimensions(eval_aucs, save_fig, bonferroni=bonferroni, err_bar=err_bar, show_plots=show_plots, common_y_scale=common_y_scale)
+        mdpp_analysis.plot_1d_dimensions(eval_aucs, save_fig, bonferroni=bonferroni, err_bar=err_bar, show_plots=show_plots, common_y_scale=common_y_scale, train=False)
 
         if 'ep_len' in options:
-            mdpp_analysis.plot_1d_dimensions(eval_aucs, save_fig, bonferroni=bonferroni, err_bar=err_bar, show_plots=show_plots, metric_num=-1)
+            mdpp_analysis.plot_1d_dimensions(eval_aucs, save_fig, bonferroni=bonferroni, err_bar=err_bar, show_plots=show_plots, metric_num=-1, train=False)
 
         if 'plot_2d' in options:
-            mdpp_analysis.plot_2d_heatmap(eval_aucs, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
+            mdpp_analysis.plot_2d_heatmap(eval_aucs, save_fig, show_plots=show_plots, common_y_scale=common_y_scale, train=False)
 
             if 'ep_len' in options:
-                mdpp_analysis.plot_2d_heatmap(eval_aucs, save_fig, show_plots=show_plots, common_y_scale=common_y_scale, metric_num=-1)
+                mdpp_analysis.plot_2d_heatmap(eval_aucs, save_fig, show_plots=show_plots, common_y_scale=common_y_scale, metric_num=-1, train=False)
 
         # Plot learning curves: Training: Each curve corresponds to a different seed for the agent
         if 'learn_curves' in options:
-            mdpp_analysis.plot_learning_curves(eval_curves, save_fig, show_plots=show_plots, common_y_scale=common_y_scale)
+            mdpp_analysis.plot_learning_curves(eval_curves, save_fig, show_plots=show_plots, common_y_scale=common_y_scale, train=False)
 
 
 if __name__ == "__main__":
