@@ -2,8 +2,8 @@
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
 #SBATCH -t 0-00:10 # time (D-HH:MM)
 #SBATCH -c 2 # number of CPUs/task
-#SBATCH -o log/%x.%A.%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
-#SBATCH -e log/%x.%A.%a.out # STDERR  (the folder log has to exist!)  %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
+#SBATCH -o log/%x.%A_%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
+#SBATCH -e log/%x.%A_%a.out # STDERR  (the folder log has to exist!)  %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -J mdp-playground-job-array # sets the job name. If not specified, the file name will be used as job name
 #SBATCH -D /work/dlclarge2/rajanr-mdpp # Change working_dir (I think this directory _has_ to exist and won't be created!)
 ##SBATCH --mail-type=END,FAIL # (receive mails about end and timeouts/crashes of your job)
