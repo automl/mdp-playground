@@ -37,9 +37,9 @@
 14685016: ddpg_move_to_a_point_action_max ep_len
 14685017: td3_move_to_a_point_action_max ep_len
 14685018: sac_move_to_a_point_action_max ep_len
-14685023: ddpg_move_to_a_point_action_loss_weight eval
-14685024: td3_move_to_a_point_action_loss_weight eval
-14767452: sac_move_to_a_point_action_loss_weight eval
+15118778: ddpg_move_to_a_point_action_loss_weight eval
+15118546: td3_move_to_a_point_action_loss_weight eval
+15118347: sac_move_to_a_point_action_loss_weight eval
 14685068: ddpg_move_to_a_point_action_max_time_unit plot_2d auto_y_scale
 12707717: td3_move_to_a_point_p_noise_target_radius plot_2d ep_len auto_y_scale
 12762946: sac_move_to_a_point_p_noise_target_radius plot_2d ep_len auto_y_scale
