@@ -1,0 +1,68 @@
+env_name: !!str lava                        # Enironment to use, in (lava[_perc, _ng], lava2, lava3, lava4)
+agent_name: !!str double_q_learning         # the agent name (q_learning, double_q_learning, dyna_q, sarsa, n_step_sarsa)
+seed: !!int 12345                           # random initialization seed
+no_render: !!bool False                     # Deactivate rendering of environment evaluation
+discount_factor: !!float .99
+eval_eps: !!int 500                         # Evaluation frequency either in terms of episodes or number of steps
+
+agents:
+  q_learning:
+    alpha: !!float .3
+    env_max_steps: !!int 100                 # Maximal steps in environment before termination.
+    episodes: !!int 1_000                   # Number of training episodes
+    timesteps_total: !!int 1_000              # Number of training steps (takes priority over episodes)
+    agent_eps_decay: !!str linear            # Epsilon decay schedule, in (linear, log, const)
+    agent_eps: !!float 0.1                   # Epsilon value. Used as start value when decay linear or log. Otherwise constant value.
+
+  double_q_learning:
+    alpha: !!float .5
+    env_max_steps: !!int 100                 # Maximal steps in environment before termination.
+    episodes: !!int 1_000                   # Number of training episodes
+    timesteps_total: !!int 1_000              # Number of training steps (takes priority over episodes)
+    agent_eps_decay: !!str linear            # Epsilon decay schedule, in (linear, log, const)
+    agent_eps: !!float 0.1                   # Epsilon value. Used as start value when decay linear or log. Otherwise constant value.
+
+  sarsa:
+    alpha: !!float .1
+    env_max_steps: !!int 100                 # Maximal steps in environment before termination.
+    episodes: !!int 1_000                   # Number of training episodes
+    timesteps_total: !!int 1_000              # Number of training steps (takes priority over episodes)
+    agent_eps_decay: !!str linear            # Epsilon decay schedule, in (linear, log, const)
+    agent_eps: !!float 0.1                   # Epsilon value. Used as start value when decay linear or log. Otherwise constant value.
+
+  n_step_sarsa:
+    env_max_steps: !!int 100                 # Maximal steps in environment before termination.
+    episodes: !!int 1_000                   # Number of training episodes
+    timesteps_total: !!int 1_000              # Number of training steps (takes priority over episodes)
+    agent_eps_decay: !!str const            # Epsilon decay schedule, in (linear, log, const)
+    agent_eps: !!float 0.1                   # Epsilon value. Used as start value when decay linear or log. Otherwise constant value.
+    n: !!int 5                               # number of steps in n-step SARSA
+
+  sarsa_lambda:
+    env_max_steps: !!int 100                 # Maximal steps in environment before termination.
+    episodes: !!int 1_000                   # Number of training episodes
+    timesteps_total: !!int 1_000              # Number of training steps (takes priority over episodes)
+    agent_eps_decay: !!str const            # Epsilon decay schedule, in (linear, log, const)
+    agent_eps: !!float 0.1                  # Epsilon value. Used as start value when decay linear or log. Otherwise constant value.
+    lambd: !!float 0.9                        # lambda parameter of sarsa(\lambda)
+    parallel_eligibility_updates: !!bool False # whether the eligibility trace updates should be performed in serial
+                                              # or parallel fashion (parallel only faster for large state spaces)
+
+# Only model based algo
+  dyna_q:
+    env_max_steps: !!int 100                 # Maximal steps in environment before termination.
+    episodes: !!int 1_000                   # Number of training episodes
+    timesteps_total: !!int 1_000              # Number of training steps (takes priority over episodes)
+    agent_eps_decay: !!str const            # Epsilon decay schedule, in (linear, log, const)
+    agent_eps: !!float 0.1                  # Epsilon value. Used as start value when decay linear or log. Otherwise constant value.
+    mem_size: !!int 10_000                   # Memory size
+    model_samples: !!int 10                  # Num steps to update with model
+
+
+
+envs:
+  lava:
+    example: !!int 0                         # todo
+  lava2:
+  lava3:
+  lava4:
