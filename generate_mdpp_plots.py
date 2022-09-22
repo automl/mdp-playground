@@ -7,6 +7,32 @@ from mdp_playground.analysis import MDPP_Analysis
 import yaml
 import argparse
 
+from collections import Counter
+
+# Based on https://stackoverflow.com/a/71751051/11063709, to allow keys to have a list of values
+# in case duplicate keys are present in the YAML.
+def parse_preserving_duplicates(src):
+    class PreserveDuplicatesLoader(yaml.loader.Loader):
+        pass
+
+    def map_constructor(loader, node, deep=False):
+        keys = [loader.construct_object(node, deep=deep) for node, _ in node.value]
+        vals = [loader.construct_object(node, deep=deep) for _, node in node.value]
+        key_count = Counter(keys)
+        data = {}
+        for key, val in zip(keys, vals):
+            if key_count[key] > 1:
+                if key not in data:
+                    data[key] = []
+                data[key].append(val)
+            else:
+                data[key] = [val]
+        return data
+
+    PreserveDuplicatesLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, map_constructor)
+    return yaml.load(src, PreserveDuplicatesLoader)
+
+
 def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     print("Generating plots for " + str(exp_id) + ": " + exp_name + " with the following addnl. options: " + options)
     
@@ -71,7 +97,7 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
 
 if __name__ == "__main__":
 
-    
+
     parser = argparse.ArgumentParser(description="Process Latex .bib files")
 
     parser.add_argument(
@@ -100,16 +126,30 @@ if __name__ == "__main__":
 
     if args.exp_file is not None:
         with open(args.exp_file) as f:
-            yaml_dict = yaml.safe_load(f)
+            yaml_dict = parse_preserving_duplicates(f)  # yaml.safe_load(f)
 
         print("List of expts.:", yaml_dict)
 
-        for i, exp_id in enumerate(yaml_dict):
-            exp_name = yaml_dict[exp_id].split(' ')[0]
-            options = ' '.join(yaml_dict[exp_id].split(' ')[1:]) if ' ' in yaml_dict[exp_id] else ''
-            generate_plots(exp_id=exp_id, exp_name=exp_name, show_plots=args.show_plots, options=options)
-            if args.num_expts is not None and i == args.num_expts - 1:
+        i = 0
+        for exp_id in yaml_dict:
+            if len(yaml_dict[exp_id]) > 1:
+                print("More than 1 expt. for the same expt_id:", exp_id, ". The expts.:", yaml_dict[exp_id])
+            for j in range(len(yaml_dict[exp_id])):
+                i += 1
+                print("\nExpt. no.:", i , "from the list.")
+
+                exp_name = yaml_dict[exp_id][j].split(' ')[0]
+                options = ' '.join(yaml_dict[exp_id][j].split(' ')[1:]) if ' ' in yaml_dict[exp_id][j] else ''
+                # if 'learn_curves' in options:
+                generate_plots(exp_id=exp_id, exp_name=exp_name, show_plots=args.show_plots, options=options)
+
+                # Need to break out of 2 for loops
+                if args.num_expts is not None and i == args.num_expts:
+                    break
+
+            if args.num_expts is not None and i == args.num_expts:
                 break
+
 
     else:
         dict_args = vars(args)

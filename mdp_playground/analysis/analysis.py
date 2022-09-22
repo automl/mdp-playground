@@ -227,7 +227,7 @@ class MDPP_Analysis():
                 x_tick_labels_.append([str(j) for j in self.dims_values[i]])
                 if 'state_space_dim' == self.config_names[i]:
                     # print("self.dims_values[i], type(self.dims_values[i])", self.dims_values[i], type(self.dims_values[i]))
-                    x_tick_labels_[-1] = [str(j - 2) for j in self.dims_values[i]]  # 2 is #hardcoded default value of length of relevant_indices config
+                    x_tick_labels_[-1] = [str(j - 0) for j in self.dims_values[i]]  # 2 is #hardcoded default value of length of relevant_indices config
                 elif 'image_scale_range' == self.config_names[i]:
                     ...
                     # del x_axis_labels[-1]
@@ -395,7 +395,7 @@ class MDPP_Analysis():
         beam_rider_y = [0, 1800]
         breakout_y = [0, 260]
         qbert_y = [0, 5000]
-        space_invaders_y = [0, 450]
+        space_invaders_y = [0, 650]
         halfcheetah_y = [0, 15000]  # -1000
         pusher_y = [-150, 0]
         reacher_y = [-100, 30]
@@ -605,10 +605,10 @@ class MDPP_Analysis():
                     ax[i_index][j_index].axis(ymin=ylim[0], ymax=ylim[1])
         #         ax[i_index][j_index].set_title('Delay ' + str(delays[i_index]) + ', Sequence Length ' + str(sequence_lengths[j_index]))
                 if len(self.dims_varied) > 1:
-                    title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][i_index])
-                    title_2nd_dim = self.config_names[self.dims_varied[1]] + ' '  + str(self.dims_values[self.dims_varied[1]][j_index])
+                    title_1st_dim = self.process_axis_labels(self.config_names[self.dims_varied[0]]) + ' ' + str(self.dims_values[self.dims_varied[0]][i_index])
+                    title_2nd_dim = self.process_axis_labels(self.config_names[self.dims_varied[1]]) + ' '  + str(self.dims_values[self.dims_varied[1]][j_index])
                 else:
-                    title_1st_dim = self.config_names[self.dims_varied[0]] + ' ' + str(self.dims_values[self.dims_varied[0]][j_index])
+                    title_1st_dim = self.process_axis_labels(self.config_names[self.dims_varied[0]]) + ' ' + str(self.dims_values[self.dims_varied[0]][j_index])
                     title_2nd_dim = ''
                 ax[i_index][j_index].set_title(title_1st_dim + ', ' + title_2nd_dim)
         #         ax[i_index][j_index].set_title('Sequence Length ' + str(seq_lens[j_index]))

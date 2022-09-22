@@ -1,7 +1,8 @@
+sarsa_tabular_seq_5: sarsa_tabular_seq_5
 14527279: dqn_del
 14531516: rainbow_del
 14533713: a3c_del
-14573511: dqn_seq
+14573511: dqn_seq learn_curves
 14573512: rainbow_seq
 14573513: a3c_seq
 15095735: dqn_p_noise eval
@@ -37,9 +38,9 @@
 14685016: ddpg_move_to_a_point_action_max ep_len
 14685017: td3_move_to_a_point_action_max ep_len
 14685018: sac_move_to_a_point_action_max ep_len
-15118778: ddpg_move_to_a_point_action_loss_weight eval
-15118546: td3_move_to_a_point_action_loss_weight eval
-15118347: sac_move_to_a_point_action_loss_weight eval
+15120301: ddpg_move_to_a_point_action_loss_weight eval
+15124646: td3_move_to_a_point_action_loss_weight eval
+15120501: sac_move_to_a_point_action_loss_weight eval
 14685068: ddpg_move_to_a_point_action_max_time_unit plot_2d auto_y_scale
 12707717: td3_move_to_a_point_p_noise_target_radius plot_2d ep_len auto_y_scale
 12762946: sac_move_to_a_point_p_noise_target_radius plot_2d ep_len auto_y_scale
@@ -50,39 +51,39 @@
 8780519: dqn_beam_rider_del learn_curves
 8826225: rainbow_beam_rider_del
 3214031: a3c_beam_rider_del
-8817766: dqn_beam_rider_p_noise learn_curves eval
-8824025: rainbow_beam_rider_p_noise eval
-3173847: a3c_beam_rider_p_noise eval
-8837194: dqn_beam_rider_r_noise eval
-8837241: rainbow_beam_rider_r_noise eval
-3527485: a3c_beam_rider_r_noise eval
+8817766: dqn_beam_rider_p_noise learn_curves
+8824025: rainbow_beam_rider_p_noise
+3173847: a3c_beam_rider_p_noise
+8837194: dqn_beam_rider_r_noise
+8837241: rainbow_beam_rider_r_noise
+3527485: a3c_beam_rider_r_noise
 8824067: dqn_breakout_del learn_curves
 8826374: rainbow_breakout_del
 3214031: a3c_breakout_del
-8805478: dqn_breakout_p_noise learn_curves eval
-8824009: rainbow_breakout_p_noise eval
-3173847: a3c_breakout_p_noise eval
-8837278: dqn_breakout_r_noise eval
-8837277: rainbow_breakout_r_noise eval
-3616776: a3c_breakout_r_noise eval
+8805478: dqn_breakout_p_noise learn_curves
+8824009: rainbow_breakout_p_noise
+3173847: a3c_breakout_p_noise
+8837278: dqn_breakout_r_noise
+8837277: rainbow_breakout_r_noise
+3616776: a3c_breakout_r_noise
 8780992: dqn_qbert_del learn_curves
 8815604: rainbow_qbert_del
 3214031: a3c_qbert_del
-8828044: dqn_qbert_p_noise learn_curves eval
-8824010: rainbow_qbert_p_noise eval
-3173847: a3c_qbert_p_noise eval
-8837197: dqn_qbert_r_noise eval
-9031907: rainbow_qbert_r_noise eval
-3527485: a3c_qbert_r_noise eval
+8828044: dqn_qbert_p_noise learn_curves
+8824010: rainbow_qbert_p_noise
+3173847: a3c_qbert_p_noise
+8837197: dqn_qbert_r_noise
+9031907: rainbow_qbert_r_noise
+3527485: a3c_qbert_r_noise
 8781032: dqn_space_invaders_del learn_curves
 8815605: rainbow_space_invaders_del
 3214031: a3c_space_invaders_del
-8828049: dqn_space_invaders_p_noise learn_curves eval
-8828059: rainbow_space_invaders_p_noise eval
-3173847: a3c_space_invaders_p_noise eval
-8837198: dqn_space_invaders_r_noise eval
-9036107: rainbow_space_invaders_r_noise eval
-3527485: a3c_space_invaders_r_noise eval
+8828049: dqn_space_invaders_p_noise learn_curves
+8828059: rainbow_space_invaders_p_noise
+3173847: a3c_space_invaders_p_noise
+8837198: dqn_space_invaders_r_noise
+9036107: rainbow_space_invaders_r_noise
+3527485: a3c_space_invaders_r_noise
 8737568: ddpg_halfcheetah_action_max
 8752703: td3_halfcheetah_action_max
 8678527: sac_halfcheetah_action_max
@@ -90,3 +91,15 @@
 8756121: td3_halfcheetah_time_unit
 8748802: sac_halfcheetah_time_unit
 10758076: sac_halfcheetah_irr_dims
+8752702: ddpg_pusher_action_max
+8776905: td3_pusher_action_max
+8733946: sac_pusher_action_max
+8774239: ddpg_pusher_time_unit
+8776907: td3_pusher_time_unit
+8776013: sac_pusher_time_unit
+8753079: ddpg_reacher_action_max
+8776906: td3_reacher_action_max
+8733940: sac_reacher_action_max
+8776064: ddpg_reacher_time_unit
+8776908: td3_reacher_time_unit
+8776020: sac_reacher_time_unit
