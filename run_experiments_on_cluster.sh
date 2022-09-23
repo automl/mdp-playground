@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -p bosch_cpu-cascadelake # ml_cpu-ivy # partition (queue)
 #SBATCH -a 0-99 # Sets SLURM_ARRAY_TASK_ID - array index values, e.g. 0-31:2; 0-11%4 (it means max 4 tasks at a time)
-#SBATCH -t 0-00:20 # time (D-HH:MM)
+#SBATCH -t 0-00:30 # time (D-HH:MM)
 #SBATCH -c 2 # number of CPUs/task
 #SBATCH -o log/%x.%A.%a.out # STDOUT  (the folder log has to exist!)  %N replaced by node name, %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
 #SBATCH -e log/%x.%A.%a.out # STDERR  (the folder log has to exist!)  %A will be replaced by the SLURM_ARRAY_JOB_ID value, whilst %a will be replaced by the SLURM_ARRAY_TASK_ID
@@ -15,7 +15,7 @@ echo -e '\033[32m'
 echo "Started at $(date)"
 echo "TMPDIR: " $TMPDIR
 
-export EXP_NAME='rainbow_image_representations_ablate_none' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
+export EXP_NAME='rainbow_image_representations_ablate_double' # Ideally contains Area of research + algorithm + dataset # Could just pass this as job name?
 
 # Print some information about the job to STDOUT
 echo "Workingdir: $PWD";
