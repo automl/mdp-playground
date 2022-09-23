@@ -3,7 +3,7 @@
 from ray import tune
 from collections import OrderedDict
 import itertools
-num_seeds = 10
+num_seeds = 100
 
 
 transforms = ["shift", "scale", "flip", "rotate"]
@@ -36,11 +36,6 @@ var_env_configs = OrderedDict(
         "image_representations": [True],
         "image_transforms": [
             "none",
-            "shift",
-            "scale",
-            "flip",
-            "rotate",
-            "shift,scale,rotate,flip",
         ],  # image_transforms,
         "image_scale_range": [(0.5, 2)],
         "image_width": [100],

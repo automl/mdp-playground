@@ -34,11 +34,13 @@ var_env_configs = OrderedDict(
         "transition_noise": [0],  # , 0.01, 0.02, 0.10, 0.25]
         "reward_noise": [0],  # , 1, 5, 10, 25] # Std dev. of normal dist.
         "image_representations": [True],
-        "image_transforms": ["none"],  # image_transforms,
+        "image_transforms": [
+            "none",
+        ],  # image_transforms,
         "image_scale_range": [(0.5, 2)],
         "image_width": [100],
         "image_height": [100],
-        "ablate": ["noisy"],
+        "ablate": ["none"],
         "dummy_seed": [i for i in range(num_seeds)],
     }
 )
@@ -73,7 +75,7 @@ agent_config = {
     "learning_starts": 500,
     "target_network_update_freq": 800,
     "n_step": 1,  # delay + sequence_length [1, 2, 4, 8]
-    "noisy": False,
+    "noisy": True,
     "num_atoms": 10,  # [5, 10, 20]
     "prioritized_replay": True,
     "prioritized_replay_alpha": 0.75,  #
