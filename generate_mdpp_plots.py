@@ -44,7 +44,7 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     # show_plots = True
     # Set the following to True to save PDFs of plots that you generate below
     save_fig = True
-    err_bar = 'bootstrap'  # 't_dist'
+    err_bar = 'bootstrap'  # 't_dist', 'std'
     bonferroni = True
     if 'eval' in options:
         load_eval = True

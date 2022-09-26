@@ -1,4 +1,5 @@
-#Rough and experimental
+# Rough and experimental
+# e.g.: py run_batch_expts_mdpp.py -f ~/mdp-playground/expt_list.txt -n 1
 
 import sys
 import os
@@ -84,10 +85,10 @@ if __name__ == "__main__":
                 options = ' '.join(yaml_dict[exp_id][j].split(' ')[1:]) if ' ' in yaml_dict[exp_id][j] else ''
                 # if 'learn_curves' in options:
                 os.system(sys.executable + " " + cmd) # sys.executable contains "current" Python
-                # print(sys.executable + " " + cmd)
+                print(sys.executable + " " + cmd)
 
                 cp_cmd = "cp " + exp_name + ".csv ~/mdpp_" + exp_name + "/"
-                # print(cp_cmd)
+                print(cp_cmd)
                 os.system(cp_cmd)
 
                 # Need to break out of 2 for loops

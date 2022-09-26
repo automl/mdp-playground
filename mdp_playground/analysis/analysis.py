@@ -301,25 +301,32 @@ class MDPP_Analysis():
             from scipy.special import comb
             n_configs = np.prod(self.config_counts[:-1])  # Total no. of diff configs that were ran. Ignore last dimension num_seeds
             # print(n_configs, self.config_counts)
-            alpha /= comb(n_configs, 2)  # Number of comparisons being made in the 1-D plots is between any 2 configs at once so n choose 2
+            if n_configs > 1:
+                alpha /= comb(n_configs, 2)  # Number of comparisons being made in the 1-D plots is between any 2 configs at once so n choose 2
+            else:
+                warnings.warn("alpha value unchanged with Bonferroni corrections as n_configs is <= 1, i.e., no comparisons being made.")
+                print("alpha:", alpha)
         mean_data_ = np.mean(stats_data[..., metric_num], axis=-1) # the slice sub-selects the metric written in position metric_num from the "last axis of diff. metrics that were written" and then the axis of #seeds becomes axis=-1 ( before slice it was -2).
-        to_plot_ = np.squeeze(mean_data_)
-        std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
+        to_plot_ = np.atleast_1d(np.squeeze(mean_data_))
+        std_dev_ = np.squeeze(np.std(stats_data[..., metric_num], axis=-1)) #seed
+        std_dev_ = np.atleast_1d(std_dev_)
         if err_bar=='std':
-            to_plot_bars_ = np.squeeze(std_dev_)
+            to_plot_bars_ = std_dev_
+            # print("std_dev_", std_dev_, to_plot_.shape, to_plot_bars_.shape)
             to_plot_bars_ = to_plot_bars_[np.newaxis, :]  # Make it 3-D like other to_plot_bars_ below
         elif err_bar=='t_dist':
             perc = 1 - alpha/2
             df = n_samp - 1  # Degrees of freedom for t-dist
-            lb = t.ppf(perc, df) * (np.squeeze(std_dev_) / np.sqrt(n_samp))  # mean_data_ - 
-            ub = t.ppf(perc, df) * (np.squeeze(std_dev_) / np.sqrt(n_samp))  # mean_data_ + 
-            # print('lb', lb)
+            lb = t.ppf(perc, df) * (std_dev_) / np.sqrt(n_samp)  # mean_data_ - 
+            ub = t.ppf(perc, df) * (std_dev_) / np.sqrt(n_samp)  # mean_data_ + 
+            # print('lb', lb, t.ppf(perc, df))
             # print('ub', ub)
             to_plot_bars_ = np.stack((lb, ub), axis=0)  # np.array(zip(lb, ub))
             print("to_plot_bars_", to_plot_bars_, type(to_plot_bars_))
         elif err_bar=='bootstrap':
             from scipy.stats import bootstrap
             rng = np.random.RandomState(rand_seed)
+            # print(stats_data[..., metric_num], stats_data[..., metric_num].shape)
             res = bootstrap(stats_data[..., metric_num], np.mean, confidence_level=1-alpha, random_state=rng, axis=-1)
             lb = to_plot_ - np.squeeze(res.confidence_interval.low)
             ub = np.squeeze(res.confidence_interval.high) - to_plot_
@@ -332,7 +339,7 @@ class MDPP_Analysis():
         # plt.figure()
         plt.figure(figsize=(fig_width, 1.5))
 
-        # print(to_plot_.shape)
+        # print("to_plot_, to_plot_bars_", to_plot_, to_plot_bars_, to_plot_.shape, to_plot_bars_.shape)
         if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
             plt.bar(self.tick_labels[0], to_plot_[:, 0], yerr=to_plot_bars_[:, :, 0])
         else:
