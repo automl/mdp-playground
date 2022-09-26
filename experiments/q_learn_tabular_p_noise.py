@@ -46,7 +46,7 @@ eval_eps = config["eval_eps"]
 seed = config["seed"]
 no_render = config["no_render"]
 discount_factor = config["discount_factor"]
-alpha = config["alpha"]
+alpha = agent_config["alpha"]
 
 episodes = agent_config["episodes"]
 env_max_steps = agent_config["env_max_steps"]

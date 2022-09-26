@@ -88,6 +88,7 @@ if __name__ == "__main__":
                 print(sys.executable + " " + cmd)
 
                 cp_cmd = "cp " + exp_name + ".csv ~/mdpp_" + exp_name + "/"
+                cp_cmd = "cp -f " + exp_name + ".csv /work/dlclarge2/rajanr-mdpp/mdpp_tabular/"
                 print(cp_cmd)
                 os.system(cp_cmd)
 

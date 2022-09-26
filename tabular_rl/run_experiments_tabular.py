@@ -214,10 +214,12 @@ for current_config in cartesian_product_configs:
     np.random.seed(current_config[location_dummy_seed])
     random.seed(current_config[location_dummy_seed])
 
-
-    train_data, test_data, num_steps, timesteps_per_iteration_statistics = double_q_learning(env, **agent_config)
-    # train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
-    # train_data, test_data, num_steps, timesteps_per_iteration_statistics = sarsa(env, **agent_config)
+    if "double_q_learning" in algorithm:
+        train_data, test_data, num_steps, timesteps_per_iteration_statistics = double_q_learning(env, **agent_config)
+    elif "q_learning" in algorithm:
+        train_data, test_data, num_steps, timesteps_per_iteration_statistics = q_learning(env, **agent_config)
+    elif "sarsa" in algorithm:
+        train_data, test_data, num_steps, timesteps_per_iteration_statistics = sarsa(env, **agent_config)
 
     first_keys = {"#training_iteration,": [], "algorithm,": []}
 
