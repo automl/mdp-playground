@@ -3,6 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+scp_list.txt
+
 # Plots
 *.pdf
 

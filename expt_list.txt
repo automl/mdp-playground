@@ -1,3 +1,15 @@
+sarsa_tabular_p_noise: sarsa_tabular_p_noise
+q_learn_tabular_p_noise: q_learn_tabular_p_noise
+double_q_learn_tabular_p_noise: double_q_learn_tabular_p_noise
+sarsa_tabular_r_noise: sarsa_tabular_r_noise
+q_learn_tabular_r_noise: q_learn_tabular_r_noise
+double_q_learn_tabular_r_noise: double_q_learn_tabular_r_noise
+sarsa_tabular_seq: sarsa_tabular_seq
+q_learn_tabular_seq: q_learn_tabular_seq
+double_q_learn_tabular_seq: double_q_learn_tabular_seq
+sarsa_tabular_del: sarsa_tabular_del
+q_learn_tabular_del: q_learn_tabular_del
+double_q_learn_tabular_del: double_q_learn_tabular_del
 14527279: dqn_del
 14531516: rainbow_del
 14533713: a3c_del

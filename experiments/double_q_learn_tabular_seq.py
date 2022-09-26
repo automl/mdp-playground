@@ -1,4 +1,4 @@
-num_seeds = 10
+num_seeds = 100
 from collections import OrderedDict
 var_env_configs = OrderedDict({
     'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
