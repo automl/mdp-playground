@@ -23,7 +23,7 @@ agents:
     agent_eps: !!float 0.1                   # Epsilon value. Used as start value when decay linear or log. Otherwise constant value.
 
   sarsa:
-    alpha: !!float .1
+    alpha: !!float .3
     env_max_steps: !!int 100                 # Maximal steps in environment before termination.
     episodes: !!int 1_000                   # Number of training episodes
     timesteps_total: !!int 1_000              # Number of training steps (takes priority over episodes)

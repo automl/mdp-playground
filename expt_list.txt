@@ -11,6 +11,7 @@ tabular: q_learn_tabular_del
 tabular: double_q_learn_tabular_del
 tabular: sarsa_tabular_del
 14527279: dqn_del
+"14527279_2": dqn_del learn_curves
 14531516: rainbow_del
 14533713: a3c_del
 14573511: dqn_seq learn_curves
