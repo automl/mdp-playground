@@ -2000,7 +2000,7 @@ class RLToyEnv(gym.Env):
             self.is_terminal_state(self.augmented_state[-1]) or self.reached_terminal
         )
         if self.done:
-            self.reward += np.sum(self.reward_buffer)
+            # self.reward += np.sum(self.reward_buffer * self.reward_scale + self.reward_shift)
             self.reward += (
                 self.term_state_reward * self.reward_scale
             )  # Scale before or after?

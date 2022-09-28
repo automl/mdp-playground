@@ -88,6 +88,7 @@ eval_config = {
             if "state_space_type" in env_config["env_config"]
             and env_config["env_config"]["state_space_type"] == "discrete"
             else tune.function(lambda a: a.normal(0, 0)),
+            "make_denser": [False],
             "reward_noise": tune.function(lambda a: a.normal(0, 0)),
             "action_loss_weight": 0.0,
         },

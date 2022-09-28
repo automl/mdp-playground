@@ -12,7 +12,7 @@ def get_mujoco_wrapper(base_class):
         time_unit
         action_space_max
 
-    For both of these dimensions the scalar value passed in the dict is used to multiply the base environments values.
+    For both of these dimensions, the scalar value passed in the dict is used to multiply the base environments' values.
 
     For the Mujoco environments, the time_unit is achieved by multiplying the Gym Mujoco environments's frame_skip and thus needs to be such that time_unit * frame_skip is an integer. The time_unit is NOT achieved by changing Mujoco's timestep because that would change the numerical integration done by Mujoco and thus the objective of the environment. The _ctrl_cost_weight and _forward_reward_weight used by the underlying mujoco-py class to calculate rewards in th e environment are proportionally multiplied by the time_unit, so that the rewards are on the same scale across different time_units on average.
 
@@ -66,14 +66,14 @@ def get_mujoco_wrapper(base_class):
                 self.action_space.high *= action_space_max
                 print("to:", self.action_space.low, self.action_space.high)
 
-                if base_class == HalfCheetahEnv and action_space_max >= 4:  # hack
-                    self.model.opt.timestep /= 2  # 0.005
-                    self.frame_skip *= 2
-                    print(
-                        "Setting Mujoco timestep to",
-                        self.model.opt.timestep,
-                        "half of the usual to avoid instabilities. At the same time action repeat increased to twice its usual.",
-                    )
+                # if base_class == HalfCheetahEnv and action_space_max >= 4:  # hack
+                #     self.model.opt.timestep /= 2  # 0.005
+                #     self.frame_skip *= 2
+                #     print(
+                #         "Setting Mujoco timestep to",
+                #         self.model.opt.timestep,
+                #         "half of the usual to avoid instabilities. At the same time action repeat increased to twice its usual.",
+                #     )
 
             if (
                 "time_unit" in self.config

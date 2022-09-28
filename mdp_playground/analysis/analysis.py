@@ -1078,9 +1078,19 @@ class MDPP_Analysis:
             list_exp_data, train, metric_num, plot_type, use_aucs
         )
 
+        # print("stats_data".title(), stats_data, type(stats_data), type(stats_data.values))
         # get axes labels
         first_group = next(iter(stats_data.values()))
-        spoke_labels = first_group.keys()
+        # print("first_group", first_group)
+        spoke_labels = list(first_group.keys())
+        # print("spoke_labels", spoke_labels)
+        for i, label in enumerate(spoke_labels):
+            if 'state_space_dim' == label:
+                label = 'Irrelevant Dimensions'
+            elif 'action_space_max' == label:
+                label = 'Action Range'
+            label = label.title().replace("_", " ")
+            spoke_labels[i] = label
 
         # plot
         N = len(spoke_labels)
