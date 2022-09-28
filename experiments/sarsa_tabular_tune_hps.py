@@ -44,7 +44,7 @@ env_config = {
 
 import yaml
 
-with open("tabular_rl/config.yaml", "r") as stream:
+with open("tabular_rl/sarsa_config.yaml", "r") as stream:
     config = yaml.safe_load(stream)
 
 env_name = config["env_name"]
@@ -56,7 +56,7 @@ eval_eps = config["eval_eps"]
 seed = config["seed"]
 no_render = config["no_render"]
 discount_factor = config["discount_factor"]
-alpha = config["alpha"]
+alpha = agent_config["alpha"]
 
 episodes = agent_config["episodes"]
 env_max_steps = agent_config["env_max_steps"]

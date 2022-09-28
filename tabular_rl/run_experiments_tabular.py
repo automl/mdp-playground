@@ -214,6 +214,9 @@ for current_config in cartesian_product_configs:
     np.random.seed(current_config[location_dummy_seed])
     random.seed(current_config[location_dummy_seed])
 
+    print("agent_name:", config.agent_name)
+    print("agent_config", agent_config)
+
     if "double_q_learn" in algorithm:
         train_data, test_data, num_steps, timesteps_per_iteration_statistics = double_q_learning(env, **agent_config)
     elif "q_learn" in algorithm:

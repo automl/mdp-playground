@@ -1,5 +1,5 @@
 env_name: !!str lava                        # Enironment to use, in (lava[_perc, _ng], lava2, lava3, lava4)
-agent_name: !!str double_q_learning         # the agent name (q_learning, double_q_learning, dyna_q, sarsa, n_step_sarsa)
+agent_name: !!str sarsa         # the agent name (q_learning, double_q_learning, dyna_q, sarsa, n_step_sarsa)
 seed: !!int 12345                           # random initialization seed
 no_render: !!bool False                     # Deactivate rendering of environment evaluation
 discount_factor: !!float .99

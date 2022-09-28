@@ -44,7 +44,7 @@ env_config = {
 
 import yaml
 
-with open("tabular_rl/config.yaml", "r") as stream:
+with open("tabular_rl/q_learn_config.yaml", "r") as stream:
     config = yaml.safe_load(stream)
 
 env_name = config["env_name"]

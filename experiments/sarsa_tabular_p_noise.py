@@ -34,11 +34,13 @@ env_config = {
 
 import yaml
 
-with open("tabular_rl/config.yaml", "r") as stream:
+with open("tabular_rl/sarsa_config.yaml", "r") as stream:
     config = yaml.safe_load(stream)
+    print("Loaded config", config)
 
 env_name = config["env_name"]
 agent_name = config["agent_name"]
+print("agent_name:", agent_name)
 
 agent_config = config["agents"][agent_name]
 
