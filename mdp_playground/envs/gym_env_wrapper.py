@@ -344,12 +344,15 @@ class GymEnvWrapper(gym.Env):
         else:  # cont. envs
             if self.transition_noise is not None:
                 noise_in_transition = (
-                    self.transition_noise(self.np_random) if self.transition_noise else 0
+                    self.transition_noise(self.np_random)
+                    if self.transition_noise
+                    else 0
                 )  # #random
-                self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
+                self.total_abs_noise_in_transition_episode += np.abs(
+                    noise_in_transition
+                )
             else:
                 noise_in_transition = 0.0
-                
 
         if "irrelevant_features" in self.config:
             if self.config["state_space_type"] == "discrete":

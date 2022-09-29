@@ -1085,10 +1085,10 @@ class MDPP_Analysis:
         spoke_labels = list(first_group.keys())
         # print("spoke_labels", spoke_labels)
         for i, label in enumerate(spoke_labels):
-            if 'state_space_dim' == label:
-                label = 'Irrelevant Dimensions'
-            elif 'action_space_max' == label:
-                label = 'Action Range'
+            if "state_space_dim" == label:
+                label = "Irrelevant Dimensions"
+            elif "action_space_max" == label:
+                label = "Action Range"
             label = label.title().replace("_", " ")
             spoke_labels[i] = label
 
