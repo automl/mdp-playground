@@ -32,6 +32,7 @@ env_config = {
         "repeats_in_sequences": False,
         "reward_scale": 1.0,
         "completely_connected": True,
+        "reward_every_n_steps": True,
     },
 }
 

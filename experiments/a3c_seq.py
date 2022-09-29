@@ -29,6 +29,7 @@ env_config = {
         'repeats_in_sequences': False,
         'reward_scale': 1.0,
         'completely_connected': True,
+        "reward_every_n_steps": True,
     },
 }
 
@@ -80,7 +81,7 @@ model_config = {
 
 from ray import tune
 eval_config = {
-    "evaluation_interval": None,  # I think this means every x training_iterations
+    "evaluation_interval": 1,  # I think this means every x training_iterations
     "evaluation_config": {
         "explore": False,
         "exploration_fraction": 0,
