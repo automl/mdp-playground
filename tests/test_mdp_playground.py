@@ -1031,6 +1031,11 @@ class TestRLToyEnv(unittest.TestCase):
             [0, 1],
             [-1, 0],
         ]
+        expected_rewards = [-1, -1, 1, -1, 1, 1, 1, 1, 0.75]
+        for i in range(len(expected_rewards)):
+            expected_rewards[i] = (
+                expected_rewards[i]
+            ) * config["reward_scale"]
 
         tot_rew = 0
         for i in range(len(actions)):
@@ -1038,6 +1043,14 @@ class TestRLToyEnv(unittest.TestCase):
             next_obs, reward, done, info = env.step(action)
             next_state = env.get_augmented_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
+            self.assertEqual(
+                reward,
+                expected_rewards[i],
+                "Expected reward mismatch in time step: "
+                + str(i + 1)
+                + " when reward delay = "
+                + str(config["delay"])
+            )
             state = next_state.copy()
             tot_rew += reward
 
@@ -1046,7 +1059,7 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
-        # Test 2: Almost the same as 1, but with irrelevant features
+        # Test 2: Almost the same as 1, but with irrelevant features and no terminal reward
         config["irrelevant_features"] = True
         config["term_state_reward"] = 0.0
 
@@ -1063,6 +1076,11 @@ class TestRLToyEnv(unittest.TestCase):
             [0, 1],
             [-1, 0],
         ]
+        expected_rewards = [-1, -1, 1, -1, 1, 1, 1, 1, 1]
+        for i in range(len(expected_rewards)):
+            expected_rewards[i] = (
+                expected_rewards[i]
+            ) * config["reward_scale"]
 
         tot_rew = 0
         for i in range(len(actions)):
@@ -1070,9 +1088,18 @@ class TestRLToyEnv(unittest.TestCase):
             next_obs, reward, done, info = env.step(action)
             next_state = env.get_augmented_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
+            self.assertEqual(
+                reward,
+                expected_rewards[i],
+                "Expected reward mismatch in time step: "
+                + str(i + 1)
+                + " when reward delay = "
+                + str(config["delay"])
+            )
             state = next_state.copy()
             tot_rew += reward
 
+        # Perform actions only in irrelevant space and noop in relevant space
         for i in range(len(actions)):
             action = [0, 0] + actions[i]
             next_obs, reward, done, info = env.step(action)
@@ -1082,6 +1109,54 @@ class TestRLToyEnv(unittest.TestCase):
             tot_rew += reward
 
         assert tot_rew == 9, str(tot_rew)
+
+        env.reset()
+        env.close()
+
+        # Test 3: Almost the same as 1, but with delay
+        config["delay"] = 1
+        config["irrelevant_features"] = False
+        config["term_state_reward"] = -0.25
+        env = RLToyEnv(**config)
+
+        state = env.get_augmented_state()["augmented_state"][-1]
+        actions = [
+            [0, -1],
+            [-1, 0],
+            [1, 0],
+            [1, 0],
+            [0, 1],
+            [0, 1],
+            [0, 1],
+            [0, 1],
+            [-1, 0],
+            [0, 0],  # noop
+            [0, 0],  # noop
+        ]
+        expected_rewards = [0, -1, -1, 1, -1, 1, 1, 1, 0.75, 0.75, -0.25]
+        for i in range(len(expected_rewards)):
+            expected_rewards[i] = (
+                expected_rewards[i]
+            ) * config["reward_scale"]
+
+        tot_rew = 0
+        for i in range(len(actions)):
+            action = actions[i]
+            next_obs, reward, done, info = env.step(action)
+            next_state = env.get_augmented_state()["augmented_state"][-1]
+            print("sars', done =", state, action, reward, next_state, done)
+            self.assertEqual(
+                reward,
+                expected_rewards[i],
+                "Expected reward mismatch in time step: "
+                + str(i + 1)
+                + " when reward delay = "
+                + str(config["delay"])
+            )
+            state = next_state.copy()
+            tot_rew += reward
+
+        assert tot_rew == 6.75, str(tot_rew)
 
         env.reset()
         env.close()
@@ -1800,6 +1875,82 @@ class TestRLToyEnv(unittest.TestCase):
 
         env.reset()
         env.close()
+
+        # With delay
+        config["delay"] = 1
+        config["sequence_length"] = 3
+        config["reward_every_n_steps"] = True
+
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()["curr_state"]
+
+        actions = [
+            6,
+            6,
+            2,
+            3,
+            4,
+            2,
+            6,
+            1,
+            0,
+            np.random.randint(config["action_space_size"]),
+            5,
+        ]  #
+        expected_rewards = [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            self.assertEqual(
+                reward,
+                expected_rewards[i],
+                "Expected reward mismatch in time step: "
+                + str(i + 1)
+                + " when sequence length = 3.",
+            )
+            state = next_state
+
+        env.reset()
+        env.close()
+
+
+        # With delay >= sequence length
+        config["delay"] = 1
+        config["sequence_length"] = 1
+        config["reward_every_n_steps"] = True
+
+        env = RLToyEnv(**config)
+        state = env.get_augmented_state()["curr_state"]
+
+        actions = [
+            6,
+            6,
+            2,
+            3,
+            4,
+            2,
+            6,
+            1,
+            0,
+            np.random.randint(config["action_space_size"]),
+            5,
+        ]  #
+        expected_rewards = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for i in range(len(expected_rewards)):
+            next_state, reward, done, info = env.step(actions[i])
+            print("sars', done =", state, actions[i], reward, next_state, done)
+            self.assertEqual(
+                reward,
+                expected_rewards[i],
+                "Expected reward mismatch in time step: "
+                + str(i + 1)
+                + " when sequence length = 1.",
+            )
+            state = next_state
+
+        env.reset()
+        env.close()
+
 
     def test_discrete_custom_P_R(self):
         """"""
