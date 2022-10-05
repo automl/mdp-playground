@@ -615,7 +615,7 @@ class RLToyEnv(gym.Env):
                 self.target_point = config["target_point"]
 
         self.config = config
-        self.augmented_state_length = self.sequence_length + self.delay + 1
+        self.augmented_state_length = self.sequence_length + 1
 
         self.total_episodes = 0
 
@@ -1735,7 +1735,6 @@ class RLToyEnv(gym.Env):
             self.reward_buffer.append(reward)  # ##TODO Modify seq_len and delay
             # code for discrete and continuous case to use buffer too?
             reward = self.reward_buffer[0]
-            # print("rewards:", self.reward_buffer, old_reward, reward)
             del self.reward_buffer[0]
 
         elif self.config["state_space_type"] == "discrete":
@@ -1754,20 +1753,27 @@ class RLToyEnv(gym.Env):
                 )
                 if not self.reward_every_n_steps or (
                     self.reward_every_n_steps
-                    and self.total_transitions_episode % self.sequence_length == delay
+                    and self.total_transitions_episode % self.sequence_length == 0
                 ):
                     # ###TODO also implement this for make_denser case and continuous envs.
                     sub_seq = tuple(
-                        state_considered[1 : self.augmented_state_length - delay]
+                        state_considered[1 : self.augmented_state_length]
                     )
+                    # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
                     if sub_seq in self.rewardable_sequences:
-                        # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
-                        reward += self.rewardable_sequences[sub_seq]
+                        reward = self.rewardable_sequences[sub_seq]
+                        print(state_considered, "with delay", self.delay, "rewarded with:", reward)
                     else:
                         # print(state_considered, "with delay", self.delay, "NOT rewarded.")
                         pass
 
-                    self.logger.info("rew" + str(reward))
+            self.reward_buffer.append(reward)
+            reward = self.reward_buffer[0]
+            # print("self.reward_buffer", self.reward_buffer)
+            del self.reward_buffer[0]
+                
+
+            self.logger.info("rew" + str(reward))
 
         elif self.config["state_space_type"] == "continuous":
             # ##TODO Make reward for along a line case to be length of line
@@ -1787,7 +1793,7 @@ class RLToyEnv(gym.Env):
                     # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
                     # #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_deviation calc.?.
                     data_ = np.array(state_considered, dtype=self.dtype)[
-                        1 : self.augmented_state_length - delay,
+                        1 : self.augmented_state_length,
                         self.config["relevant_indices"],
                     ]
                     data_mean = data_.mean(axis=0)
@@ -1830,10 +1836,10 @@ class RLToyEnv(gym.Env):
                     if self.make_denser:
                         old_relevant_state = np.array(
                             state_considered, dtype=self.dtype
-                        )[-2 - delay, self.config["relevant_indices"]]
+                        )[-2, self.config["relevant_indices"]]
                         new_relevant_state = np.array(
                             state_considered, dtype=self.dtype
-                        )[-1 - delay, self.config["relevant_indices"]]
+                        )[-1, self.config["relevant_indices"]]
                         reward = -np.linalg.norm(new_relevant_state - self.target_point)
                         # Should allow other powers of the distance from target_point,
                         # or more norms?
@@ -1846,7 +1852,7 @@ class RLToyEnv(gym.Env):
                     else:  # sparse reward
                         new_relevant_state = np.array(
                             state_considered, dtype=self.dtype
-                        )[-1 - delay, self.config["relevant_indices"]]
+                        )[-1, self.config["relevant_indices"]]
                         if (
                             np.linalg.norm(new_relevant_state - self.target_point)
                             < self.target_radius
@@ -1859,11 +1865,16 @@ class RLToyEnv(gym.Env):
                         np.array(action, dtype=self.dtype)
                     )
 
+            self.reward_buffer.append(reward)
+            reward = self.reward_buffer[0]
+            # print("self.reward_buffer", self.reward_buffer)
+            del self.reward_buffer[0]
+
         elif self.config["state_space_type"] == "grid":
             if self.config["reward_function"] == "move_to_a_point":
                 if self.make_denser:
-                    old_relevant_state = np.array(state_considered)[-2 - delay]
-                    new_relevant_state = np.array(state_considered)[-1 - delay]
+                    old_relevant_state = np.array(state_considered)[-2]
+                    new_relevant_state = np.array(state_considered)[-1]
 
                     manhat_dist_old = distance.cityblock(
                         old_relevant_state, np.array(self.target_point)
@@ -1875,9 +1886,15 @@ class RLToyEnv(gym.Env):
                     reward += manhat_dist_old - manhat_dist_new
 
                 else:  # sparse reward
-                    new_relevant_state = np.array(state_considered)[-1 - delay]
+                    new_relevant_state = np.array(state_considered)[-1]
                     if list(new_relevant_state) == self.target_point:
                         reward += 1.0
+
+            self.reward_buffer.append(reward)
+            reward = self.reward_buffer[0]
+            # print("self.reward_buffer", self.reward_buffer)
+            del self.reward_buffer[0]
+
 
         noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0
         # #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
