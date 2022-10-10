@@ -615,7 +615,7 @@ class RLToyEnv(gym.Env):
                 self.target_point = config["target_point"]
 
         self.config = config
-        self.augmented_state_length = self.sequence_length + 1
+        self.augmented_state_length = self.sequence_length + self.delay + 1
 
         self.total_episodes = 0
 
@@ -1738,7 +1738,7 @@ class RLToyEnv(gym.Env):
             del self.reward_buffer[0]
 
         elif self.config["state_space_type"] == "discrete":
-            if np.isnan(state_considered[0]):
+            if np.isnan(state_considered[0 + delay]):
                 pass  # ###IMP: This check is to get around case of
                 # augmented_state_length being > 2, i.e. non-vanilla seq_len or
                 # delay, because then rewards may be handed out for the initial
@@ -1755,9 +1755,9 @@ class RLToyEnv(gym.Env):
                     self.reward_every_n_steps
                     and self.total_transitions_episode % self.sequence_length == 0
                 ):
-                    # ###TODO also implement this for make_denser case and continuous envs.
+                    # ###TODO also implement reward_every_n_steps for continuous envs.?
                     sub_seq = tuple(
-                        state_considered[1 : self.augmented_state_length]
+                        state_considered[1 + delay : self.augmented_state_length]
                     )
                     # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
                     if sub_seq in self.rewardable_sequences:
@@ -1783,7 +1783,10 @@ class RLToyEnv(gym.Env):
             # mean a larger distance covered in that direction and hence would
             # lead to +ve reward always and would mean larger random actions give
             # a larger reward! Should penalise actions in proportion that scale then?
-            if np.isnan(state_considered[0][0]):  # Instead of below commented out
+
+            # 2nd index of 0 is guaranteed to be present as state_space_dim >= 1:
+            if np.isnan(state_considered[0 + delay][0]):  
+                # Instead of below commented out
                 # check, this is more robust for imaginary transitions
                 # if self.total_transitions_episode + 1 < self.augmented_state_length:
                 # + 1 because augmented_state_length is always 1 greater than seq_len + del
@@ -1793,7 +1796,7 @@ class RLToyEnv(gym.Env):
                     # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
                     # #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_deviation calc.?.
                     data_ = np.array(state_considered, dtype=self.dtype)[
-                        1 : self.augmented_state_length,
+                        1 + delay : self.augmented_state_length,
                         self.config["relevant_indices"],
                     ]
                     data_mean = data_.mean(axis=0)
