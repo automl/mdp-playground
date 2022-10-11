@@ -1762,7 +1762,7 @@ class RLToyEnv(gym.Env):
                     # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
                     if sub_seq in self.rewardable_sequences:
                         reward = self.rewardable_sequences[sub_seq]
-                        print(state_considered, "with delay", self.delay, "rewarded with:", reward)
+                        # print(state_considered, "with delay", self.delay, "rewarded with:", reward)
                     else:
                         # print(state_considered, "with delay", self.delay, "NOT rewarded.")
                         pass

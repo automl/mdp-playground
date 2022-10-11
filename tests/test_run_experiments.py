@@ -34,7 +34,7 @@ class TestRunExperiments(unittest.TestCase):
         )
         assert exit_code == 0
 
-        from mdp_playground.analysis import MDPP_Analysis
+        from mdp_playground.analysis import MDPP_Analysis_Multiple as MDPP_Analysis
 
         save_fig = False
         mdpp_analysis = MDPP_Analysis()
