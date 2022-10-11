@@ -9,5 +9,11 @@ coverage:
         target: 68%
         threshold: 5%
         base: auto 
+    patch:
+      default:
+        # basic
+        target: 68%
+        threshold: 5%
+        base: auto    
 ignore:
   "experiments"  
