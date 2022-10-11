@@ -46,6 +46,10 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
     save_fig = True
     err_bar = 'bootstrap'  # 't_dist', 'std'
     bonferroni = True
+    if 'normalise_episodic_reward' in options:
+        normalise_episodic_reward = True
+    else:
+        normalise_episodic_reward = False
     if 'eval' in options:
         load_eval = True
     else:
@@ -57,7 +61,7 @@ def generate_plots(exp_name, exp_id, show_plots=False, options=''):
 
     # Data loading
     mdpp_analysis = MDPP_Analysis()
-    train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=load_eval)
+    train_stats, eval_stats, train_curves, eval_curves, train_aucs, eval_aucs = mdpp_analysis.load_data(dir_name, exp_name, load_eval=load_eval, normalise_episodic_reward=normalise_episodic_reward)
 
     # 1-D: Plots showing reward after total timesteps when varying a single meta-feature
     # Plots across n runs: Training: with std dev across the runs
@@ -141,6 +145,7 @@ if __name__ == "__main__":
                 exp_name = yaml_dict[exp_id][j].split(' ')[0]
                 options = ' '.join(yaml_dict[exp_id][j].split(' ')[1:]) if ' ' in yaml_dict[exp_id][j] else ''
                 # if 'learn_curves' in options:
+                # if 'breakout_r' in exp_name:
                 generate_plots(exp_id=exp_id, exp_name=exp_name, show_plots=args.show_plots, options=options)
 
                 # Need to break out of 2 for loops

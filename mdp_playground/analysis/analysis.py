@@ -12,7 +12,7 @@ class MDPP_Analysis():
     def __init__(self):
         pass
 
-    def load_data(self, dir_name, exp_name, num_metrics=3, load_eval=False): #, max_total_configs=200):
+    def load_data(self, dir_name, exp_name, num_metrics=3, load_eval=False, normalise_episodic_reward=True): #, max_total_configs=200):
         '''Loads training and evaluation data from given file
 
         Parameters
@@ -25,6 +25,10 @@ class MDPP_Analysis():
             The number of metrics that were written to CSV stats files. Default is 3 (timesteps_total, episode_reward_mean, episode_len_mean).
         load_eval : bool
             Whether to load evaluation stats CSV or not.
+        normalise_episodic_reward: bool
+            Whether to normalise episodic rewards in the case of sequence lengths and delays. Because maximal possible episodic reward is reduced in 
+            the presence of these dimensions, we re-scale the episodic rewards by the factor by which it is reduced. e.g. 100/99 in the case of a delay
+            of 1; and 2 in the case of a sequence length of 2.
 
         Returns
         -------
@@ -40,6 +44,7 @@ class MDPP_Analysis():
 
         stats_file = dir_name + '/' + exp_name #Name of file to which benchmark stats were written
         self.stats_file = stats_file
+        self.normalise_episodic_reward = normalise_episodic_reward
 
         if os.path.isfile(stats_file + '.csv'):
             print("\033[1;31mLoading data from a sequential run/already combined runs of experiment configurations.\033[0;0m")
@@ -239,6 +244,22 @@ class MDPP_Analysis():
                             s = s[:5]
                         return s
                     x_tick_labels_[-1] = [hack_process_label(j) for j in self.dims_values[i]]  # j is a str like "(0.8,1.25)"
+                elif self.config_names[i] in ['sequence_length', 'delay'] and normalise_episodic_reward == True:
+                    print("Re-scaling episodic reward by (1 / sequence length) or (100/(100-delay)) to normalise maximal episodic reward across sequence lengths / delays.")
+                    for j in range(self.config_counts[i]):
+                        n_dims_ = len(self.config_counts)
+                        # (1, ) at the end is hardcoded to select episodic reward as the metric to be re-scaled:
+                        ind_ = (slice(None), ) * (i) + (j, ) + (slice(None), ) * (n_dims_ - i - 1) + (1, )
+                        # print(self.config_names[i], self.dims_values[i][j], "train_aucs BEFORE", train_aucs[ind_])
+                        # print("ind_", ind_)
+                        mult = self.normaliser_episodic_reward(self.config_names[i], self.dims_values[i][j])
+                        # print("MULT", mult)
+                        stats_reshaped[ind_] = stats_reshaped[ind_] * mult
+                        train_aucs[ind_] = train_aucs[ind_] * mult
+                        if load_eval:
+                            final_eval_metrics_reshaped[ind_] *= mult
+                            eval_aucs[ind_] *= mult
+                        # print("train_aucs AFTER", train_aucs[ind_])
                 for j in range(len(x_tick_labels_[-1])):
                     if len(x_tick_labels_[-1][j]) > 2: #hack
                         abridged_str = x_tick_labels_[-1][j].split(',')
@@ -266,6 +287,11 @@ class MDPP_Analysis():
         self.axis_labels = x_axis_labels
         self.tick_labels = x_tick_labels_
         self.dims_varied = dims_varied
+        # print("self.config_counts", self.config_counts)
+        # print("self.config_names", self.config_names)
+        # print("self.dims_values", self.dims_values)
+        # print("self.dims_varied", dims_varied)
+
         for d,v,i in zip(x_axis_labels, x_tick_labels_, dims_varied):
             print("Dimension varied:", d, ". The values it took:", v, ". Number of values it took:", config_counts[i], ". Index in loaded data:", i)
 
@@ -373,6 +399,16 @@ class MDPP_Analysis():
             if show_plots:
                 plt.show()
 
+    def normaliser_episodic_reward(self, string, dim_val):
+        '''Returns factor by which to normalise epsiodic reward in case of a dimension that needs such normalisation'''
+        if string == "sequence_length":
+            return dim_val
+        elif string == "delay":
+            return 100.0 / (100 - dim_val)
+        else:
+            return np.nan
+
+
     def process_axis_labels(self, string):
         '''Hacky code for X-axis labels to be better human readable instead of code variable names
         e.g. Rotation Quantisation instead of image_ro_quant'''
@@ -400,7 +436,7 @@ class MDPP_Analysis():
         toy_discrete_y = [0, 80]
         toy_continuous_y = [0, 8]
         beam_rider_y = [0, 1800]
-        breakout_y = [0, 260]
+        breakout_y = [0, 180]
         qbert_y = [0, 5000]
         space_invaders_y = [0, 650]
         halfcheetah_y = [0, 15000]  # -1000
@@ -469,8 +505,12 @@ class MDPP_Analysis():
         else:
             vmin, vmax = 0, np.max(to_plot_)
         plt.clf()
-        fig_width = len(self.tick_labels[1])
-        fig_height = len(self.tick_labels[0])
+        if len(self.tick_labels) > 1:
+            fig_width = len(self.tick_labels[1]) 
+            fig_height = len(self.tick_labels[0])
+        else:  # only 1 dim varied
+            fig_width = len(self.tick_labels[0]) 
+            fig_height = 1
         # plt.figure()
         plt.figure(figsize=(fig_width, fig_height))
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=vmin, vmax=vmax)
@@ -510,6 +550,8 @@ class MDPP_Analysis():
             plt.savefig(self.stats_file.split('/')[-1] + ('_train' if train else '_eval') + '_final_reward_mean_heat_map_' + str(self.metric_names[metric_num]) + '.pdf', dpi=300, bbox_inches="tight")
         if show_plots:
             plt.show()
+
+        # Plotting for std dev.
         std_dev_ = np.std(stats_data[..., metric_num], axis=-1) #seed
         to_plot_ = np.squeeze(std_dev_)
         # print(to_plot_, to_plot_.shape)
@@ -519,6 +561,7 @@ class MDPP_Analysis():
         # For Std dev, determine from data
         vmin, vmax = 0, np.max(to_plot_)
         plt.clf()
+        plt.figure(figsize=(fig_width, fig_height))
         plt.imshow(np.atleast_2d(to_plot_), cmap=cmap, interpolation='none', vmin=0, vmax=vmax) # 60 for DQN, 100 for A3C
         if len(self.tick_labels) == 2:
             ax = plt.gca()
@@ -571,12 +614,25 @@ class MDPP_Analysis():
         '''
         # Plot for train metrics: learning curves; with subplot
         # Comment out unneeded labels in code lines 41-44 in this cell
+        rescale_list = []
+        if self.normalise_episodic_reward:
+            if self.config_names[self.dims_varied[0]] in ["sequence_length", "delay"]:
+                rescale_list.append((True, self.config_names[self.dims_varied[0]]))
+            else:
+                rescale_list.append((False, self.config_names[self.dims_varied[0]]))
+
         if len(self.dims_varied) > 1:
             ncols_ = self.config_counts[self.dims_varied[1]]
             nrows_ = self.config_counts[self.dims_varied[0]]
-        else:
+            if self.normalise_episodic_reward:
+                if self.config_names[self.dims_varied[1]] in ["sequence_length", "delay"]:
+                    rescale_list.append((True, self.config_names[self.dims_varied[1]]))
+                else:
+                    rescale_list.append((False, self.config_names[self.dims_varied[1]]))
+        else:  # only 1 dim varied
             ncols_ = self.config_counts[self.dims_varied[0]]
             nrows_ = 1
+        print("Rescaling learning curve plots for dims:", rescale_list)
         nseeds_ = self.config_counts[-1]
         # print(ax, type(ax), type(ax[0]))
 #         color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -600,6 +656,22 @@ class MDPP_Analysis():
         #     if i % 10 == 0:
         #         fig = plt.figure(figsize=(12, 7))
         #     print(i//50, (i//10) % 5)
+            if self.normalise_episodic_reward:
+                if len(self.dims_varied) > 1:
+                    if rescale_list[0][0] == True:
+                        mult = self.normaliser_episodic_reward(rescale_list[0][1], self.dims_values[self.dims_varied[0]][i_index])
+                        to_plot_ *= mult
+                    if rescale_list[1][0] == True:
+                        mult = self.normaliser_episodic_reward(rescale_list[1][1], self.dims_values[self.dims_varied[1]][j_index])
+                        # print(to_plot_)
+                        # print("rescale_list[1][1], self.dims_values[self.dims_varied[0]][j_index]", rescale_list[1][1], self.dims_values[self.dims_varied[0]][j_index], mult)
+                        to_plot_ *= mult
+                        # print(to_plot_)
+                else:  # only 1 dim varied
+                    if rescale_list[0][0] == True:
+                        mult = self.normaliser_episodic_reward(rescale_list[0][1], self.dims_values[self.dims_varied[0]][j_index])
+                        to_plot_ *= mult
+
             ax[i_index][j_index].plot(to_plot_x, to_plot_, rasterized=False)#, label="Seq len" + str(seq_lens[i//10]))
             if i % nseeds_ == nseeds_ - 1: # 10 is num. of seeds
         #         pass
@@ -617,7 +689,7 @@ class MDPP_Analysis():
                 else:
                     title_1st_dim = self.process_axis_labels(self.config_names[self.dims_varied[0]]) + ' ' + str(self.dims_values[self.dims_varied[0]][j_index])
                     title_2nd_dim = ''
-                ax[i_index][j_index].set_title(title_1st_dim + ', ' + title_2nd_dim)
+                ax[i_index][j_index].set_title(title_1st_dim + ((', ' + title_2nd_dim) if title_2nd_dim != '' else ''))
         #         ax[i_index][j_index].set_title('Sequence Length ' + str(seq_lens[j_index]))
         #         ax[i_index][j_index].set_title('Reward Density ' + str(reward_densities[j_index]))
 

@@ -1,3 +1,12 @@
+14527279: dqn_del normalise_episodic_reward
+14531516: rainbow_del normalise_episodic_reward
+14533713: a3c_del normalise_episodic_reward
+15783553: dqn_seq normalise_episodic_reward
+15783953: rainbow_seq normalise_episodic_reward
+15784353: a3c_seq normalise_episodic_reward
+15786014: dqn_seq_del learn_curves normalise_episodic_reward plot_2d auto_y_scale
+15786214: rainbow_seq_del normalise_episodic_reward plot_2d auto_y_scale
+15786316: a3c_seq_del normalise_episodic_reward plot_2d auto_y_scale
 tabular: q_learn_tabular_p_noise
 tabular: double_q_learn_tabular_p_noise
 tabular: sarsa_tabular_p_noise
@@ -10,10 +19,7 @@ tabular: sarsa_tabular_seq
 tabular: q_learn_tabular_del
 tabular: double_q_learn_tabular_del
 tabular: sarsa_tabular_del
-14527279: dqn_del
 "14527279_2": dqn_del learn_curves
-14531516: rainbow_del
-14533713: a3c_del
 14573511: dqn_seq learn_curves
 14573512: rainbow_seq
 14573513: a3c_seq
