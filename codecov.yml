@@ -17,3 +17,6 @@ coverage:
         base: auto    
 ignore:
   - "experiments"  # regex / glob both accepted
+  - "setup.py"  # is run by pip install anyway
+  - "mdp_playground/analysis/analysis_multiple.py"
+  - "mdp_playground/analysis/radar_chart.py"
