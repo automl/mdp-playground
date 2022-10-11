@@ -510,9 +510,9 @@
 <span class="sd">        experiment data: dictionary type with following key-value</span>
 
 <span class="sd">        train_stats : np.ndarray</span>
-<span class="sd">            Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved</span>
+<span class="sd">            Training stats at end of training: 8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved</span>
 <span class="sd">        eval_stats : np.ndarray</span>
-<span class="sd">            Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved</span>
+<span class="sd">            Training stats at end of training: 8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved</span>
 <span class="sd">        train_curves: np.ndarray</span>
 <span class="sd">            The loaded training CSV with the last 3 columns the train stats that were saved and the initial columns are various setting for the algorithm and environment.</span>
 <span class="sd">        eval_curves: np.ndarray</span>
@@ -1044,7 +1044,7 @@
 
 
 <div class="viewcode-block" id="MDPP_Analysis.plot_2d_heatmap"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.analysis.analysis.MDPP_Analysis.html#mdp_playground.analysis.analysis.MDPP_Analysis.plot_2d_heatmap">[docs]</a>    <span class="k">def</span> <span class="nf">plot_2d_heatmap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_exp_data</span><span class="p">,</span> <span class="n">save_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metric_num</span><span class="o">=-</span><span class="mi">2</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground</span>
+        <span class="sd">&#39;&#39;&#39;Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 dimensions of hardness of MDP Playground</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1122,7 +1122,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MDPP_Analysis.plot_learning_curves"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.analysis.analysis.MDPP_Analysis.html#mdp_playground.analysis.analysis.MDPP_Analysis.plot_learning_curves">[docs]</a>    <span class="k">def</span> <span class="nf">plot_learning_curves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_exp_data</span><span class="p">,</span> <span class="n">save_fig</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">metric_num</span><span class="o">=-</span><span class="mi">2</span><span class="p">):</span> <span class="c1"># metric_num needs to be minus indexed because stats_pd reutrned for train stats has _all_ columns</span>
-        <span class="sd">&#39;&#39;&#39;Plots learning curves: Either across 1 or 2 meta-features of MDP Playground. Different colours represent learning curves for different seeds.</span>
+        <span class="sd">&#39;&#39;&#39;Plots learning curves: Either across 1 or 2 dimensions of hardness of MDP Playground. Different colours represent learning curves for different seeds.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

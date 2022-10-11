@@ -1457,7 +1457,7 @@ class TestRLToyEnv(unittest.TestCase):
     # TODO Tests for imaginary rollouts for discrete and continuous - for different Ps and Rs
 
     def test_discrete_multiple_meta_features(self):
-        """Tests using multiple meta-features together.
+        """Tests using multiple dimensions of hardness together.
 
         #TODO Currently tests for seq, del and r noise, r scale, r shift together. Include others? Gets complicated with P noise: trying to avoid terminal states while still following a rewardable sequence. Maybe try low P noise to test this? Or low terminal state density?
         """

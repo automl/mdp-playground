@@ -11,7 +11,7 @@ Configuration files are an easy way to define the experiments to run in mdp-play
  
  ## Variable configurations
 
-Variable configurations allow you to define variables whose impact is desired to be studied. For instance one might be interested on the effect on the agents' performance when varying the `sequence_length` and `delay` meta-features for the current experiment. Then `delay`  and `sequence_length` would be a key in `var_env_configs` dict and its corresponding value would be a *list of values they can take*.  Then a cartesian product of these lists is taken to generate various possible configurations to be run. 
+Variable configurations allow you to define variables whose impact is desired to be studied. For instance one might be interested on the effect on the agents' performance when varying the `sequence_length` and `delay` dimensions of hardness for the current experiment. Then `delay`  and `sequence_length` would be a key in `var_env_configs` dict and its corresponding value would be a *list of values they can take*.  Then a cartesian product of these lists is taken to generate various possible configurations to be run. 
 
     var_env_configs = OrderedDict({
 		'state_space_size': [8],

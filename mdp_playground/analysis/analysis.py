@@ -33,9 +33,9 @@ class MDPP_Analysis():
         Returns
         -------
         train_stats : np.ndarray
-            Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+            Training stats at end of training: 8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         eval_stats : np.ndarray
-            Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+            Training stats at end of training: 8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         train_curves: np.ndarray
             The loaded training CSV with the last 3 columns the train stats that were saved and the initial columns are various setting for the algorithm and environment.
         eval_curves: np.ndarray
@@ -303,7 +303,7 @@ class MDPP_Analysis():
         Parameters
         ----------
         stats_data : np.array
-            8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+            8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         save_fig : bool, optional
             A flag used to save a PDF (default is
             False)
@@ -366,7 +366,7 @@ class MDPP_Analysis():
         plt.figure(figsize=(fig_width, 1.5))
 
         # print("to_plot_, to_plot_bars_", to_plot_, to_plot_bars_, to_plot_.shape, to_plot_bars_.shape)
-        if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
+        if len(to_plot_.shape) == 2: # Case when 2 dimensions of hardness were varied
             plt.bar(self.tick_labels[0], to_plot_[:, 0], yerr=to_plot_bars_[:, :, 0])
         else:
             plt.bar(self.tick_labels[0], to_plot_, yerr=to_plot_bars_)
@@ -382,7 +382,7 @@ class MDPP_Analysis():
         if show_plots:
             plt.show()
 
-        if len(to_plot_.shape) == 2: # Case when 2 meta-features were varied
+        if len(to_plot_.shape) == 2: # Case when 2 dimensions of hardness were varied
             fig_width = len(self.tick_labels[1])
             plt.figure(figsize=(fig_width, 1.5))
             plt.bar(self.tick_labels[1], to_plot_[0, :], yerr=to_plot_bars_[:, 0, :])
@@ -475,12 +475,12 @@ class MDPP_Analysis():
 
 
     def plot_2d_heatmap(self, stats_data, save_fig=False, common_y_scale=False, train=True, metric_num=-2, show_plots=True):
-        '''Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground
+        '''Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 dimensions of hardness of MDP Playground
 
         Parameters
         ----------
         stats_data : np.array
-            8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+            8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         save_fig : bool, optional
             A flag used to save a PDF (default is
             False)
@@ -600,12 +600,12 @@ class MDPP_Analysis():
             plt.show()
 
     def plot_learning_curves(self, stats_data, save_fig=False, common_y_scale=False, train=True, metric_num=-2, show_plots=True): # metric_num needs to be minus indexed because stats_pd reutrned for train stats has _all_ columns
-        '''Plots learning curves: Either across 1 or 2 meta-features of MDP Playground. Different colours represent learning curves for different seeds.
+        '''Plots learning curves: Either across 1 or 2 dimensions of hardness of MDP Playground. Different colours represent learning curves for different seeds.
 
         Parameters
         ----------
         stats_data : np.array
-            8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+            8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         save_fig : bool, optional
             A flag used to save a PDF (default is
             False)

@@ -406,7 +406,7 @@ if __name__ == "__main__":
     # Common analysis
     cave.performance_table()
     cave.local_parameter_importance()
-    cave.cave_fanova()  # can only be used with more than 1 meta-feature
+    cave.cave_fanova()  # can only be used with more than 1 dimension of hardness
 
     # Other analysis
     # cave.parallel_coordinates()

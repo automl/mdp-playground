@@ -80,9 +80,9 @@ class MDPP_Analysis:
         experiment data: dictionary type with following key-value
 
         train_stats : np.ndarray
-            Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+            Training stats at end of training: 8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         eval_stats : np.ndarray
-            Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
+            Training stats at end of training: 8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved
         train_curves: np.ndarray
             The loaded training CSV with the last 3 columns the train stats that were saved and the initial columns are various setting for the algorithm and environment.
         eval_curves: np.ndarray
@@ -799,7 +799,7 @@ class MDPP_Analysis:
         ax.set_xticklabels(tick_labels)
 
     def plot_2d_heatmap(self, list_exp_data, save_fig=False, train=True, metric_num=-2):
-        """Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground
+        """Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 dimensions of hardness of MDP Playground
 
         Parameters
         ----------
@@ -920,7 +920,7 @@ class MDPP_Analysis:
     def plot_learning_curves(
         self, list_exp_data, save_fig=False, train=True, metric_num=-2
     ):  # metric_num needs to be minus indexed because stats_pd reutrned for train stats has _all_ columns
-        """Plots learning curves: Either across 1 or 2 meta-features of MDP Playground. Different colours represent learning curves for different seeds.
+        """Plots learning curves: Either across 1 or 2 dimensions of hardness of MDP Playground. Different colours represent learning curves for different seeds.
 
         Parameters
         ----------

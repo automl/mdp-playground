@@ -498,7 +498,7 @@
 <td><p>Plots 1-D bar plots across a single dimension with mean and std.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.analysis.analysis.MDPP_Analysis.plot_learning_curves" title="mdp_playground.analysis.analysis.MDPP_Analysis.plot_learning_curves"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_learning_curves</span></code></a>(list_exp_data[, …])</p></td>
-<td><p>Plots learning curves: Either across 1 or 2 meta-features of MDP Playground.</p></td>
+<td><p>Plots learning curves: Either across 1 or 2 dimensions of hardness of MDP Playground.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#mdp_playground.analysis.analysis.MDPP_Analysis.plot_radar" title="mdp_playground.analysis.analysis.MDPP_Analysis.plot_radar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_radar</span></code></a>(list_exp_data[, save_fig, train, …])</p></td>
 <td><p>Plots radar (spider) chart across different dimensions</p></td>
@@ -524,8 +524,8 @@
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p><strong>experiment data</strong> (<em>dictionary type with following key-value</em>)</p></li>
-<li><p><strong>train_stats</strong> (<em>np.ndarray</em>) – Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved</p></li>
-<li><p><strong>eval_stats</strong> (<em>np.ndarray</em>) – Training stats at end of training: 8-D tensor with 1st 6 dims the meta-features of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved</p></li>
+<li><p><strong>train_stats</strong> (<em>np.ndarray</em>) – Training stats at end of training: 8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved</p></li>
+<li><p><strong>eval_stats</strong> (<em>np.ndarray</em>) – Training stats at end of training: 8-D tensor with 1st 6 dims the dimensions of hardness of MDP Playground, 7th dim is across the seeds, 8th dim is across different stats saved</p></li>
 <li><p><strong>train_curves</strong> (<em>np.ndarray</em>) – The loaded training CSV with the last 3 columns the train stats that were saved and the initial columns are various setting for the algorithm and environment.</p></li>
 <li><p><strong>eval_curves</strong> (<em>np.ndarray</em>) – The loaded evaluation CSV with the columns the evaluation stats that were saved</p></li>
 </ul>
@@ -588,7 +588,7 @@
 <dl class="py method">
 <dt id="mdp_playground.analysis.analysis.MDPP_Analysis.plot_2d_heatmap">
 <code class="sig-name descname"><span class="pre">plot_2d_heatmap</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_exp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/analysis/analysis.html#MDPP_Analysis.plot_2d_heatmap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.analysis.analysis.MDPP_Analysis.plot_2d_heatmap" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 meta-features of MDP Playground</p>
+<dd><p>Plots 2 2-D heatmaps: 1 for mean and 1 for std. dev. across 2 dimensions of hardness of MDP Playground</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -624,7 +624,7 @@
 <dl class="py method">
 <dt id="mdp_playground.analysis.analysis.MDPP_Analysis.plot_learning_curves">
 <code class="sig-name descname"><span class="pre">plot_learning_curves</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_exp_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_fig</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/analysis/analysis.html#MDPP_Analysis.plot_learning_curves"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.analysis.analysis.MDPP_Analysis.plot_learning_curves" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plots learning curves: Either across 1 or 2 meta-features of MDP Playground. Different colours represent learning curves for different seeds.</p>
+<dd><p>Plots learning curves: Either across 1 or 2 dimensions of hardness of MDP Playground. Different colours represent learning curves for different seeds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
