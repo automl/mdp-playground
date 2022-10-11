@@ -309,6 +309,23 @@ class MDPP_Analysis():
             False)
         train : bool, optional
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
+        err_bar : str
+            Chooses the type of error bars plotted. Options are 'std' for standard deviations, 't_dist' for studentised CIs,
+            bootstrap for bootstrapped CIs.
+        alpha : float
+            Significance level for statistical testing. Default 0.05.
+        bonferroni : bool
+            Whether to apply bonferroni corrections
+        common_y_scale : bool or, in future, float
+            Sets Y-axis limits to be common across plots for an environment. Values can be found in process_axis_limits().
+        rand_seed : int
+            Sets the random seed used for bootstrapped CIs.
+        metric_num : int
+            Selects / slices the metric written in position metric_num from the last axis of stats_data.
+            The different metrics in the last axis are timesteps_total, episode_reward_mean, episode_len_mean.
+        show_plots : bool
+            Toggle showing plots
+
 
         '''
         if 'reward' in self.metric_names[metric_num]:
@@ -400,7 +417,17 @@ class MDPP_Analysis():
                 plt.show()
 
     def normaliser_episodic_reward(self, string, dim_val):
-        '''Returns factor by which to normalise epsiodic reward in case of a dimension that needs such normalisation'''
+        '''
+        Returns factor by which to normalise epsiodic reward in case of a dimension that needs such normalisation.
+
+        Parameters
+        ----------
+        string : str
+            Name of dimension of hardness
+        dim_val : float, int, etc.
+            Value of dimension
+
+        '''
         if string == "sequence_length":
             return dim_val
         elif string == "delay":
@@ -410,8 +437,19 @@ class MDPP_Analysis():
 
 
     def process_axis_labels(self, string):
-        '''Hacky code for X-axis labels to be better human readable instead of code variable names
-        e.g. Rotation Quantisation instead of image_ro_quant'''
+        '''
+        Hacky code for X-axis labels to be better human readable instead of code variable names
+        e.g. Rotation Quantisation instead of image_ro_quant
+
+        Parameters
+        ----------
+        string : str
+            Name of dimension of hardness
+
+        Returns
+        -------
+        Processed label : str
+        '''
 
         label = string
         if 'state_space_dim' == string:
@@ -431,7 +469,18 @@ class MDPP_Analysis():
         return label
 
     def process_axis_limits(self,):
-        '''Hacky code for Y-axis limits to be common for an env across expts.'''
+        '''
+        Hacky code for Y-axis limits to be common for an env across expts.
+        
+        Parameters
+        ----------
+        None. The name of the env is taken from the name of the stats file stored in self.
+
+        Returns
+        -------
+        2-D list : str
+            2-D list with Y-axis limits
+        '''
 
         toy_discrete_y = [0, 80]
         toy_continuous_y = [0, 8]
@@ -486,6 +535,8 @@ class MDPP_Analysis():
             False)
         train : bool, optional
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
+
+        For a description of the other parameters please see plot_1d_dimensions()
         '''
         plt.rcParams.update({'font.size': 18}) # default 12, 24 for paper, for poster: 30
         cmap = 'Purples' # 'Blues' #
@@ -611,6 +662,9 @@ class MDPP_Analysis():
             False)
         train : bool, optional
             A flag used to insert either _train or _eval in the filename of the PDF (default is True)
+
+        For a description of the other parameters please see plot_1d_dimensions()
+
         '''
         # Plot for train metrics: learning curves; with subplot
         # Comment out unneeded labels in code lines 41-44 in this cell
