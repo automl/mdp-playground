@@ -291,8 +291,8 @@ class ImageMultiDiscrete(Box):
     def __repr__(self):
         return (
             "{} with multi-discrete space of shape: {} and "
-            "images of resolution: {} and dtype: {}".format(
-                self.__class__, self.state_space_sizes, self.shape, self.dtype
+            "images of resolution: {} x {} and dtype: {}".format(
+                self.__class__, self.state_space_sizes, self.width, self.height, self.dtype
             )
         )
 
