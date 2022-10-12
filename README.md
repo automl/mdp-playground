@@ -19,13 +19,13 @@
 
 
 # MDP Playground
-A python package to inject low-level dimensions of difficulties in RL environments. There are toy environments to design and debug RL agents. And complex environment wrappers for Atari and Mujoco to test robustness to these dimensions in complex environments.
+A python package to inject low-level dimensions of hardness in RL environments. There are toy environments to design and debug RL agents. And complex environment wrappers for Gym environments (inclduing Atari and Mujoco) to test robustness to these dimensions in complex environments.
 
 ## Getting started
 There are 4 parts to the package:
-1) **Toy Environments**: The base toy Environment in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py) implements the toy environment functionality, including discrete and continuous environments, and is parameterised by a `config` dict which contains all the information needed to instantiate the required MDP. Please see [`example.py`](example.py) for some simple examples of how to use the MDP environments in the package. For further details, please refer to the documentation in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py).
+1) **Toy Environments**: The base toy Environment in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py) implements the toy environment functionality, including discrete and continuous environments, and is parameterised by a `config` dict which contains all the information needed to instantiate the required toy MDP. Please see [`example.py`](example.py) for some simple examples of how to use these. For further details, please refer to the documentation in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py).
 
-2) **Complex Environment Wrappers**: Similar to the toy environment, this is parameterised by a `config` dict which contains all the information needed to inject the dimensions into Atari or Mujoco environments. Please see [`example.py`](example.py) for some simple examples of how to use these. The Atari wrapper is in [`mdp_playground/envs/gym_env_wrapper.py`](mdp_playground/envs/gym_env_wrapper.py) and the Mujoco wrapper is in [`mdp_playground/envs/mujoco_env_wrapper.py`](mdp_playground/envs/mujoco_env_wrapper.py).
+2) **Complex Environment Wrappers**: Similar to the toy environment, this is parameterised by a `config` dict which contains all the information needed to inject the dimensions into Gym environments (tested with Atari, Mujoco and ProcGen). Please see [`example.py`](example.py) for some simple examples of how to use these. The generic Gym wrapper (for Atari, ProcGen, etc.) is in [`mdp_playground/envs/gym_env_wrapper.py`](mdp_playground/envs/gym_env_wrapper.py) and the Mujoco specific wrapper is in [`mdp_playground/envs/mujoco_env_wrapper.py`](mdp_playground/envs/mujoco_env_wrapper.py).
 
 3) **Experiments**: Experiments are launched using [`run_experiments.py`](run_experiments.py). Config files for experiments are located inside the [`experiments`](experiments) directory. Please read the [instructions](#running-experiments) below for details on how to launch experiments.
 
@@ -35,7 +35,7 @@ There are 4 parts to the package:
 ## Running experiments from the main paper
 For reproducing experiments from the main paper, please continue reading.
 
-For general instructions, please see [here](#installation).
+For general install and usage instructions, please see [here](#installation).
 
 ### Installation for running experiments from the main paper
 We recommend using `conda` environments to manage virtual `Python` environments to run the experiments. Unfortunately, you will have to maintain 2 environments - 1 for the "older" **discrete toy** experiments and 1 for the "newer" **continuous and complex** experiments from the paper. As mentioned in Appendix section **Tuned Hyperparameters** in the paper, this is because of issues with Ray, the library that we used for our baseline agents.
@@ -60,14 +60,15 @@ wget 'https://ray-wheels.s3-us-west-2.amazonaws.com/master/8d0c1b5e068853bf748f7
 pip install ray-0.9.0.dev0-cp36-cp36m-manylinux1_x86_64.whl[rllib,debug]
 ```
 
-We list here the commands for the experiments from the main paper:
+We list here how the commands for the experiments from the main paper look like:
 ```bash
-# Discrete toy environments:
+# For example, for the discrete toy experiments:
+conda activate py36_toy_rl_disc_toy
+python run_experiments.py -c experiments/dqn_del.py -e dqn_del
+
 # Image representation experiments:
 conda activate py36_toy_rl_disc_toy
 python run_experiments.py -c experiments/dqn_image_representations.py -e dqn_image_representations
-python run_experiments.py -c experiments/rainbow_image_representations.py -e rainbow_image_representations
-python run_experiments.py -c experiments/a3c_image_representations.py -e a3c_image_representations
 python run_experiments.py -c experiments/dqn_image_representations_sh_quant.py -e dqn_image_representations_sh_quant
 
 # Continuous toy environments:
@@ -84,18 +85,16 @@ conda activate py36_toy_rl_cont_comp
 python run_experiments.py -c experiments/dqn_qbert_del.py -e dqn_qbert_del
 python run_experiments.py -c experiments/ddpg_halfcheetah_time_unit.py -e ddpg_halfcheetah_time_unit
 
-# For the spider plots, experiments for all the agents and dimensions will need to be run from the experiments directory, i.e., for discrete: dqn_p_r_noises.py, a3c_p_r_noises, ..., dqn_seq_del, ..., dqn_sparsity, ..., dqn_image_representations, ...
-# for continuous:, ddpg_move_to_a_point_p_noise, td3_move_to_a_point_p_noise, ..., ddpg_move_to_a_point_r_noise, ..., ddpg_move_to_a_point_irr_dims, ..., ddpg_move_to_a_point_action_loss_weight, ..., ddpg_move_to_a_point_action_max, ..., ddpg_move_to_a_point_target_radius, ..., ddpg_move_to_a_point_time_unit
-# and then follow the instructions in plot_experiments.ipynb
-
-# For the bsuite debugging experiment, please run the bsuite sonnet dqn agent on our toy environment while varying reward density. Commit https://github.com/deepmind/bsuite/commit/5116216b62ce0005100a6036fb5397e358652530 should work fine.
+# For the bsuite debugging experiment, please run the bsuite sonnet dqn agent on our toy environment while varying reward density. Commit https://github.com/deepmind/bsuite/commit/5116216b62ce0005100a6036fb5397e358652530 from the bsuite repo should work fine.
 ```
 
-The CSV stats files will be saved to the current directory and can be analysed in [`plot_experiments.ipynb`](plot_experiments.ipynb).
+For plotting, please follow the instructions [here](#plotting).
 
 
 ## Installation
 For reproducing experiments from the main paper, please see [here](#running-experiments-from-the-main-paper).
+
+For continued usage of MDP Playground as it is in development, please continue reading.
 
 ### Production use
 We recommend using `conda` to manage environments. After setup of the environment, you can install MDP Playground in two ways:
@@ -107,7 +106,7 @@ pip install -e .[extras]
 This might be the preferred way if you want easy access to the included experiments.
 
 #### From PyPI
-MDP Playground is also on PyPI. Just run:
+Alternatively, MDP Playground can also be installed from PyPI. Just run:
 ```bash
 pip install mdp_playground[extras]
 ```
@@ -119,11 +118,12 @@ You can run experiments using:
 run-mdpp-experiments -c <config_file> -e <exp_name> -n <config_num>
 ```
 The `exp_name` is a prefix for the filenames of CSV files where stats for the experiments are recorded. The CSV stats files will be saved to the current directory.<br>
-Each of the command line arguments has defaults. Please refer to the documentation inside [`run_experiments.py`](run_experiments.py) for further details on the command line arguments. (Or run it with the `-h` flag to bring up help.)
+The command line arguments also usually have defaults. Please refer to the documentation inside [`run_experiments.py`](run_experiments.py) for further details on the command line arguments. (Or run it with the `-h` flag to bring up help.)
 
-The config files for experiments from the [paper](https://arxiv.org/abs/1909.07750) are in the experiments directory.<br>
-The name of the file corresponding to an experiment is formed as: `<algorithm_name>_<dimension_names>.py`<br>
-Some sample `algorithm_name`s are: `dqn`, `rainbow`, `a3c`, `a3c_lstm`, `ddpg`, `td3` and `sac`<br>
+The config files for experiments from the [paper](https://arxiv.org/abs/1909.07750) are in the `experiments` directory.<br>
+The name of the file corresponding to an experiment is formed as: `<algorithm_name>_<dimension_names>.py` for the toy environments<br>
+And as: `<algorithm_name>_<env>_<dimension_names>.py` for the complex environments<br>
+Some sample `algorithm_name`s are: `dqn`, `rainbow`, `a3c`, `ddpg`, `td3` and `sac`<br>
 Some sample `dimension_name`s are: `seq_del` (for **delay** and **sequence length** varied together), `p_r_noises` (for **P** and **R noises** varied together),
 `target_radius` (for varying **target radius**) and `time_unit` (for varying **time unit**)<br>
 For example, for algorithm **DQN** when varying dimensions **delay** and **sequence length**, the corresponding experiment file is [`dqn_seq_del.py`](experiments/dqn_seq_del.py)
@@ -131,9 +131,8 @@ For example, for algorithm **DQN** when varying dimensions **delay** and **seque
 The CSV stats files will be saved to the current directory and can be analysed in [`plot_experiments.ipynb`](plot_experiments.ipynb).
 
 ## Plotting
-To plot results from experiments, run `jupyter-notebook` and open [`plot_experiments.ipynb`](plot_experiments.ipynb) in Jupyter. There are instructions within each of the cells on how to generate and save plots.
+To plot results from experiments, please be sure that you installed MDP Playground for production use manually (please see [here](#manual)) and then run `jupyter-notebook` and open [`plot_experiments.ipynb`](plot_experiments.ipynb) in Jupyter. There are instructions within each of the cells on how to generate and save plots.
 
-We have provided a sample set of CSVs you could use in the supplementary material. There correspond to experiments from the main paper used for the spider plots for continuous environments (Figure 3b).
 
 ## Documentation
 The documentation can be found at: https://automl.github.io/mdp-playground/
