@@ -1313,6 +1313,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 0
         config["sequence_length"] = 3
+        config["reward_every_n_steps"] = False
         config["reward_scale"] = 1.0
 
         config["generate_random_mdp"] = True
@@ -1475,6 +1476,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 1
         config["sequence_length"] = 3
+        config["reward_every_n_steps"] = False
         config["reward_scale"] = 2.5
         config["reward_shift"] = -1.75
         # config["transition_noise"] = 0.1
@@ -1733,6 +1735,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["repeats_in_sequences"] = False
         config["delay"] = 1
         config["sequence_length"] = 3
+        config["reward_every_n_steps"] = False
         config["reward_scale"] = 2.5
         config["reward_shift"] = -1.75
         # config["transition_noise"] = 0.1
@@ -2196,6 +2199,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["delay"] = 0
         config["diameter"] = 3
         config["sequence_length"] = 3
+        config["reward_every_n_steps"] = False
         config["reward_scale"] = 1.0
         config["reward_shift"] = 0.0
 
