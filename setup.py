@@ -103,6 +103,7 @@ setup(
         # 'Topic :: Scientific/Engineering :: Reinforcement Learning', invalid classifiers on Pypi
     ],
     # package_dir={"": "src"},
+    py_modules=[],
     python_requires=">=3.6",
     setup_requires=["numpy"],
     install_requires=["dill", "numpy"],
