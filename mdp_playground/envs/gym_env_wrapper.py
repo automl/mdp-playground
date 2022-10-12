@@ -381,7 +381,7 @@ class GymEnvWrapper(gym.Env):
         if done:
             # if episode is finished return the rewards that were delayed and not
             # handed out before ##TODO add test case for this
-            # reward += np.sum(self.reward_buffer * self.reward_scale + self.reward_shift)
+            reward += np.sum(self.reward_buffer * self.reward_scale + self.reward_shift)
             reward += (
                 self.term_state_reward * self.reward_scale
             )  # Scale before or after?

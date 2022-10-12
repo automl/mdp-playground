@@ -525,7 +525,7 @@ class RLToyEnv(gym.Env):
             self.action_loss_weight = config["action_loss_weight"]
 
         if "reward_every_n_steps" not in config:
-            self.reward_every_n_steps = False
+            self.reward_every_n_steps = True
         else:
             self.reward_every_n_steps = config["reward_every_n_steps"]
 
