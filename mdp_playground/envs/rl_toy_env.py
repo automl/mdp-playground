@@ -1771,7 +1771,6 @@ class RLToyEnv(gym.Env):
             reward = self.reward_buffer[0]
             # print("self.reward_buffer", self.reward_buffer)
             del self.reward_buffer[0]
-                
 
             self.logger.info("rew" + str(reward))
 
@@ -1785,7 +1784,7 @@ class RLToyEnv(gym.Env):
             # a larger reward! Should penalise actions in proportion that scale then?
 
             # 2nd index of 0 is guaranteed to be present as state_space_dim >= 1:
-            if np.isnan(state_considered[0 + delay][0]):  
+            if np.isnan(state_considered[0 + delay][0]):
                 # Instead of below commented out
                 # check, this is more robust for imaginary transitions
                 # if self.total_transitions_episode + 1 < self.augmented_state_length:
@@ -1897,7 +1896,6 @@ class RLToyEnv(gym.Env):
             reward = self.reward_buffer[0]
             # print("self.reward_buffer", self.reward_buffer)
             del self.reward_buffer[0]
-
 
         noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0
         # #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.

@@ -12,7 +12,7 @@ import PIL.Image as Image
 class TestImageContinuous(unittest.TestCase):
     def test_image_continuous(self):
         render = False
-        
+
         lows = 0.0
         highs = 20.0
         cs2 = Box(

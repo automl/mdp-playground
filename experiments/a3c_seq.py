@@ -1,34 +1,35 @@
 num_seeds = 100
 
 from collections import OrderedDict
-var_env_configs = OrderedDict({
-    'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
-    'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0], # + [2**i for i in range(4)],
-    'sequence_length': [i for i in range(1,5)],
-    'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
-    'make_denser': [False],
-    'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
-    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
-    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
-    'dummy_seed': [i for i in range(num_seeds)],
-})
 
-var_configs = OrderedDict({
-"env": var_env_configs
-})
+var_env_configs = OrderedDict(
+    {
+        "state_space_size": [8],  # , 10, 12, 14] # [2**i for i in range(1,6)]
+        "action_space_size": [8],  # 2, 4, 8, 16] # [2**i for i in range(1,6)]
+        "delay": [0],  # + [2**i for i in range(4)],
+        "sequence_length": [i for i in range(1, 5)],
+        "reward_density": [0.25],  # np.linspace(0.0, 1.0, num=5)
+        "make_denser": [False],
+        "terminal_state_density": [0.25],  # np.linspace(0.1, 1.0, num=5)
+        "transition_noise": [0],  # , 0.01, 0.02, 0.10, 0.25]
+        "reward_noise": [0],  # , 1, 5, 10, 25] # Std dev. of normal dist.
+        "dummy_seed": [i for i in range(num_seeds)],
+    }
+)
+
+var_configs = OrderedDict({"env": var_env_configs})
 
 env_config = {
     "env": "RLToy-v0",
     "horizon": 100,
     "env_config": {
-        'seed': 0, #seed
-        'state_space_type': 'discrete',
-        'action_space_type': 'discrete',
-        'generate_random_mdp': True,
-        'repeats_in_sequences': False,
-        'reward_scale': 1.0,
-        'completely_connected': True,
+        "seed": 0,  # seed
+        "state_space_type": "discrete",
+        "action_space_type": "discrete",
+        "generate_random_mdp": True,
+        "repeats_in_sequences": False,
+        "reward_scale": 1.0,
+        "completely_connected": True,
         "reward_every_n_steps": True,
     },
 }
@@ -36,22 +37,22 @@ env_config = {
 algorithm = "A3C"
 agent_config = {
     # Size of rollout batch
-    "sample_batch_size": 10, # maybe num_workers * sample_batch_size * num_envs_per_worker * grads_per_step
-    "train_batch_size": 100, # seems to have no effect
+    "sample_batch_size": 10,  # maybe num_workers * sample_batch_size * num_envs_per_worker * grads_per_step
+    "train_batch_size": 100,  # seems to have no effect
     # Use PyTorch as backend - no LSTM support
     "use_pytorch": False,
     # GAE(gamma) parameter
-    "lambda": 0.0, #
+    "lambda": 0.0,  #
     # Max global norm for each gradient calculated by worker
-    "grad_clip": 10.0, # low prio.
+    "grad_clip": 10.0,  # low prio.
     # Learning rate
-    "lr": 0.0001, #
+    "lr": 0.0001,  #
     # Learning rate schedule
     "lr_schedule": None,
     # Value Function Loss coefficient
-    "vf_loss_coeff": 0.5, #
+    "vf_loss_coeff": 0.5,  #
     # Entropy coefficient
-    "entropy_coeff": 0.1, #
+    "entropy_coeff": 0.1,  #
     # Min time per iteration
     "min_iter_time_s": 0,
     # Workers sample async. Note that this increases the effective
@@ -60,10 +61,7 @@ agent_config = {
     "timesteps_per_iteration": 7500,
     "num_workers": 3,
     "num_envs_per_worker": 5,
-
-    "optimizer": {
-        "grads_per_step": 10
-    },
+    "optimizer": {"grads_per_step": 10},
 }
 
 model_config = {
@@ -80,6 +78,7 @@ model_config = {
 }
 
 from ray import tune
+
 eval_config = {
     "evaluation_interval": 1,  # I think this means every x training_iterations
     "evaluation_config": {
@@ -99,4 +98,3 @@ eval_config = {
         },
     },
 }
-

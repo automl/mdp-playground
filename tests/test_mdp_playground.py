@@ -1033,9 +1033,7 @@ class TestRLToyEnv(unittest.TestCase):
         ]
         expected_rewards = [-1, -1, 1, -1, 1, 1, 1, 1, 0.75]
         for i in range(len(expected_rewards)):
-            expected_rewards[i] = (
-                expected_rewards[i]
-            ) * config["reward_scale"]
+            expected_rewards[i] = (expected_rewards[i]) * config["reward_scale"]
 
         tot_rew = 0
         for i in range(len(actions)):
@@ -1049,7 +1047,7 @@ class TestRLToyEnv(unittest.TestCase):
                 "Expected reward mismatch in time step: "
                 + str(i + 1)
                 + " when reward delay = "
-                + str(config["delay"])
+                + str(config["delay"]),
             )
             state = next_state.copy()
             tot_rew += reward
@@ -1078,9 +1076,7 @@ class TestRLToyEnv(unittest.TestCase):
         ]
         expected_rewards = [-1, -1, 1, -1, 1, 1, 1, 1, 1]
         for i in range(len(expected_rewards)):
-            expected_rewards[i] = (
-                expected_rewards[i]
-            ) * config["reward_scale"]
+            expected_rewards[i] = (expected_rewards[i]) * config["reward_scale"]
 
         tot_rew = 0
         for i in range(len(actions)):
@@ -1094,7 +1090,7 @@ class TestRLToyEnv(unittest.TestCase):
                 "Expected reward mismatch in time step: "
                 + str(i + 1)
                 + " when reward delay = "
-                + str(config["delay"])
+                + str(config["delay"]),
             )
             state = next_state.copy()
             tot_rew += reward
@@ -1135,9 +1131,7 @@ class TestRLToyEnv(unittest.TestCase):
         ]
         expected_rewards = [0, -1, -1, 1, -1, 1, 1, 1, 0.75, 0.75, -0.25]
         for i in range(len(expected_rewards)):
-            expected_rewards[i] = (
-                expected_rewards[i]
-            ) * config["reward_scale"]
+            expected_rewards[i] = (expected_rewards[i]) * config["reward_scale"]
 
         tot_rew = 0
         for i in range(len(actions)):
@@ -1151,7 +1145,7 @@ class TestRLToyEnv(unittest.TestCase):
                 "Expected reward mismatch in time step: "
                 + str(i + 1)
                 + " when reward delay = "
-                + str(config["delay"])
+                + str(config["delay"]),
             )
             state = next_state.copy()
             tot_rew += reward
@@ -1913,7 +1907,6 @@ class TestRLToyEnv(unittest.TestCase):
         env.reset()
         env.close()
 
-
         # With delay >= sequence length
         config["delay"] = 1
         config["sequence_length"] = 1
@@ -1950,7 +1943,6 @@ class TestRLToyEnv(unittest.TestCase):
 
         env.reset()
         env.close()
-
 
     def test_discrete_custom_P_R(self):
         """"""

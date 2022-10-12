@@ -45,7 +45,6 @@ class TestRunExperiments(unittest.TestCase):
             experiments, load_eval=False, exp_type="grid"
         )
 
-
         final_metrics = np.squeeze(list_exp_data[0]["train_stats"])
         np.testing.assert_allclose(
             final_metrics,

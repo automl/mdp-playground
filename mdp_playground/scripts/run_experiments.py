@@ -149,7 +149,7 @@ def main(args):
         action="store",
         default=None,
         type=int,
-        help="Total number of env steps to run expt for."
+        help="Total number of env steps to run expt for.",
     )
     # parser.add_argument('-t', '--tune-hps', dest='tune_hps', action='store',
     #                     default=False, type=bool,

@@ -32,7 +32,6 @@ class TestAnalysisCode(unittest.TestCase):
     #     import collections
     #     assert collections.Counter(plot_list) == collections.Counter(plot_list_exp), "Unexpected PDF file found when generating plots. Found:" + str(plot_list)
 
-
     @pytest.mark.skip(
         reason="CAVE dependencies throw ImportError: cannot import name 'StatusType'"
     )
@@ -80,6 +79,7 @@ class TestAnalysisCode(unittest.TestCase):
             for i in range(2):
                 l = fh.readline()
             assert l.strip() == results_json_line_2
+
 
 if __name__ == "__main__":
     unittest.main()

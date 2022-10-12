@@ -1,33 +1,34 @@
 num_seeds = 100
 from collections import OrderedDict
-var_env_configs = OrderedDict({
-    'state_space_size': [8],#, 10, 12, 14] # [2**i for i in range(1,6)]
-    'action_space_size': [8],#2, 4, 8, 16] # [2**i for i in range(1,6)]
-    'delay': [0] + [2**i for i in range(4)],
-    'sequence_length': [1],
-    'reward_density': [0.25], # np.linspace(0.0, 1.0, num=5)
-    'make_denser': [False],
-    'terminal_state_density': [0.25], # np.linspace(0.1, 1.0, num=5)
-    'transition_noise': [0],#, 0.01, 0.02, 0.10, 0.25]
-    'reward_noise': [0],#, 1, 5, 10, 25] # Std dev. of normal dist.
-    'dummy_seed': [i for i in range(num_seeds)],
-})
 
-var_configs = OrderedDict({
-"env": var_env_configs
-})
+var_env_configs = OrderedDict(
+    {
+        "state_space_size": [8],  # , 10, 12, 14] # [2**i for i in range(1,6)]
+        "action_space_size": [8],  # 2, 4, 8, 16] # [2**i for i in range(1,6)]
+        "delay": [0] + [2 ** i for i in range(4)],
+        "sequence_length": [1],
+        "reward_density": [0.25],  # np.linspace(0.0, 1.0, num=5)
+        "make_denser": [False],
+        "terminal_state_density": [0.25],  # np.linspace(0.1, 1.0, num=5)
+        "transition_noise": [0],  # , 0.01, 0.02, 0.10, 0.25]
+        "reward_noise": [0],  # , 1, 5, 10, 25] # Std dev. of normal dist.
+        "dummy_seed": [i for i in range(num_seeds)],
+    }
+)
+
+var_configs = OrderedDict({"env": var_env_configs})
 
 env_config = {
     "env": "RLToy-v0",
     "horizon": 100,
     "env_config": {
-        'seed': 0, #seed
-        'state_space_type': 'discrete',
-        'action_space_type': 'discrete',
-        'generate_random_mdp': True,
-        'repeats_in_sequences': False,
-        'reward_scale': 1.0,
-        'completely_connected': True,
+        "seed": 0,  # seed
+        "state_space_type": "discrete",
+        "action_space_type": "discrete",
+        "generate_random_mdp": True,
+        "repeats_in_sequences": False,
+        "reward_scale": 1.0,
+        "completely_connected": True,
     },
 }
 
@@ -44,15 +45,14 @@ agent_config = {
     # "hiddens": None,
     "learning_starts": 500,
     "target_network_update_freq": 80,
-    "n_step": 4, # delay + sequence_length [1, 2, 4, 8]
+    "n_step": 4,  # delay + sequence_length [1, 2, 4, 8]
     "noisy": True,
-    "num_atoms": 10, # [5, 10, 20]
+    "num_atoms": 10,  # [5, 10, 20]
     "prioritized_replay": True,
-    "prioritized_replay_alpha": 0.75, #
+    "prioritized_replay_alpha": 0.75,  #
     "prioritized_replay_beta": 0.4,
-    "final_prioritized_replay_beta": 1.0, #
-    "beta_annealing_fraction": 1.0, #
-
+    "final_prioritized_replay_beta": 1.0,  #
+    "beta_annealing_fraction": 1.0,  #
     "sample_batch_size": 4,
     "timesteps_per_iteration": 1000,
     "train_batch_size": 32,
@@ -73,6 +73,7 @@ model_config = {
 }
 
 from ray import tune
+
 eval_config = {
     "evaluation_interval": None,  # I think this means every x training_iterations
     "evaluation_config": {
@@ -92,4 +93,3 @@ eval_config = {
         },
     },
 }
-
