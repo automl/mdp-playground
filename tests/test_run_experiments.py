@@ -3,6 +3,8 @@ import unittest
 import sys
 import os
 
+import numpy as np
+
 import logging
 
 from datetime import datetime
@@ -30,7 +32,7 @@ class TestRunExperiments(unittest.TestCase):
 
         exit_code = os.system(
             sys.executable
-            + " mdp_playground/scripts/run_experiments.py -a 0 -n 0 -c experiments/dqn_test_expt.py -e dqn_test_expt"
+            + " run_experiments.py -n 0 -c experiments/dqn_test_expt.py -e dqn_test_expt"
         )
         assert exit_code == 0
 
@@ -43,7 +45,6 @@ class TestRunExperiments(unittest.TestCase):
             experiments, load_eval=False, exp_type="grid"
         )
 
-        import numpy as np
 
         final_metrics = np.squeeze(list_exp_data[0]["train_stats"])
         np.testing.assert_allclose(
@@ -56,13 +57,32 @@ class TestRunExperiments(unittest.TestCase):
         exit_code = os.system("rm dqn_test_expt_0*.csv")
         assert exit_code == 0
 
-    def test_default_config(self):
+    # Similar thing is tested above. These tests are time consuming, so rather have only a few of them.
+    # def test_default_config(self):
 
-        exit_code = os.system(
-            sys.executable
-            + " mdp_playground/scripts/run_experiments.py -a 0 -n 0 -c default_config.py -e default_config"
-        )
-        assert exit_code == 0
+    #     exit_code = os.system(
+    #         sys.executable
+    #         + " mdp_playground/scripts/run_experiments.py -n 0 -c default_config.py -e default_config"
+    #     )
+    #     assert exit_code == 0
+
+    # ###TODO Enable once branches are merged
+    # def test_10_random_expts(self):
+
+    #     from glob import glob
+    #     expt_list = glob("experiments/*.py")
+
+    #     # sel_expt_list = np.random.randint(0, len(expt_list), 10)
+    #     expt_list = np.random.permutation(expt_list)
+    #     for i in range(2):
+    #         conf_file = expt_list[i]
+    #         exp_name = conf_file.split('/')[-1].split('.')[0]
+
+    #         exit_code = os.system(
+    #             sys.executable
+    #             + " run_experiments.py -n 0 -c " + conf_file + " -e " + exp_name + " -t 2000"
+    #         )
+    #         assert exit_code == 0
 
 
 if __name__ == "__main__":

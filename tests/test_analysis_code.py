@@ -1,9 +1,8 @@
-import sys
+import sys, os
 from datetime import datetime
 import logging
 import copy
 import numpy as np
-from mdp_playground.envs.rl_toy_env import RLToyEnv
 import unittest
 import pytest
 
@@ -16,6 +15,24 @@ log_filename = (
 
 
 class TestAnalysisCode(unittest.TestCase):
+
+    # ###TODO Enable once scipy can be upraded
+    # def test_generate_plots(self):
+
+    #     exit_code = os.system(
+    #         sys.executable
+    #         + " misc/generate_mdpp_plots.py -f misc/test_expt_list.txt -n 1"
+    #     )
+    #     assert exit_code == 0
+
+    #     from glob import glob
+    #     plot_list = glob("*.pdf")
+    #     plot_list_exp = ['rainbow_seq_del_train_final_reward_delay_episode_reward_mean_1d.pdf', 'rainbow_seq_del_train_final_reward_sequence_length_episode_reward_mean_1d.pdf', 'dqn_seq_del_train_learning_curves_episode_reward_mean.pdf', 'rainbow_seq_del_train_final_reward_mean_heat_map_episode_reward_mean.pdf', 'dqn_seq_del_train_final_reward_mean_heat_map_episode_reward_mean.pdf', 'dqn_seq_del_train_final_reward_sequence_length_episode_reward_mean_1d.pdf', 'rainbow_seq_del_train_final_reward_std_heat_map_episode_reward_mean.pdf', 'dqn_seq_del_train_final_reward_delay_episode_reward_mean_1d.pdf', 'dqn_seq_del_train_final_reward_std_heat_map_episode_reward_mean.pdf']
+
+    #     import collections
+    #     assert collections.Counter(plot_list) == collections.Counter(plot_list_exp), "Unexpected PDF file found when generating plots. Found:" + str(plot_list)
+
+
     @pytest.mark.skip(
         reason="CAVE dependencies throw ImportError: cannot import name 'StatusType'"
     )
@@ -63,3 +80,6 @@ class TestAnalysisCode(unittest.TestCase):
             for i in range(2):
                 l = fh.readline()
             assert l.strip() == results_json_line_2
+
+if __name__ == "__main__":
+    unittest.main()

@@ -2,6 +2,9 @@
 
 Takes a configuration file, experiment name and config number to run as
 optional arguments.
+
+e.g.: python mdp_playground/scripts/run_experiments.py -a 0 -n 0 -c \
+    default_config.py -e default_config
 """
 
 from __future__ import absolute_import
@@ -129,7 +132,7 @@ def main(args):
         "training.",
     )
     parser.add_argument(
-        "-t",
+        "-d",
         "--framework-dir",
         dest="framework_dir",
         action="store",
@@ -138,6 +141,15 @@ def main(args):
         help="Prefix of directory to be used by underlying "
         "framework (e.g. Ray Rllib, Stable Baselines 3). This "
         "name will be passed to the framework.",
+    )
+    parser.add_argument(
+        "-t",
+        "--timesteps-total",
+        dest="timesteps_total",
+        action="store",
+        default=None,
+        type=int,
+        help="Total number of env steps to run expt for."
     )
     # parser.add_argument('-t', '--tune-hps', dest='tune_hps', action='store',
     #                     default=False, type=bool,
@@ -227,7 +239,9 @@ def main(args):
         )
         pp.pprint(tune_config)
 
-        if "timesteps_total" in dir(config):
+        if args.timesteps_total is not None:
+            timesteps_total = args.timesteps_total
+        elif "timesteps_total" in dir(config):
             timesteps_total = config.timesteps_total
         else:
             timesteps_total = tune_config["timesteps_total"]
