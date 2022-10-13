@@ -53,7 +53,7 @@ class TestRunExperiments(unittest.TestCase):
             err_msg="Expected training timesteps, episode_reward, episode_len after 10,000 timesteps to be within 10% of [10000., 80.0, 80.0].",
         )
 
-        exit_code = os.system("rm dqn_test_expt_0*.csv")
+        exit_code = os.system("rm -f dqn_test_expt_0*.csv")
         assert exit_code == 0
 
     # Similar thing is tested above. These tests are time consuming, so rather have only a few of them.
