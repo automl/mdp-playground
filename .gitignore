@@ -114,3 +114,4 @@ venv.bak/
 
 #whitelist
 !tests/files/mdpp_12744267_SAC_target_radius/*.csv
+!misc/sample_recorded_data/*/*.csv

@@ -1,3 +1,3 @@
-/home/rajanr/mdpp_15786014: dqn_seq_del learn_curves normalise_episodic_reward plot_2d auto_y_scale
-/home/rajanr/mdpp_15786214: rainbow_seq_del normalise_episodic_reward plot_2d auto_y_scale
-/home/rajanr/mdpp_15786316: a3c_seq_del normalise_episodic_reward plot_2d auto_y_scale 
+sample_recorded_data/mdpp_15786014: dqn_seq_del learn_curves normalise_episodic_reward plot_2d auto_y_scale eval
+sample_recorded_data/mdpp_15786214: rainbow_seq_del normalise_episodic_reward plot_2d auto_y_scale eval
+sample_recorded_data/mdpp_15786316: a3c_seq_del normalise_episodic_reward plot_2d auto_y_scale eval
