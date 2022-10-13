@@ -101,6 +101,7 @@ We recommend using `conda` to manage environments. After setup of the environmen
 #### Manual
 To install MDP Playground manually, clone the repository and run:
 ```bash
+pip install -r requirements.txt
 pip install -e .[extras]
 ```
 This might be the preferred way if you want easy access to the included experiments.
