@@ -98,17 +98,25 @@ For continued usage of MDP Playground as it is in development, please continue r
 
 ### Production use
 We recommend using `conda` to manage environments. After setup of the environment, you can install MDP Playground in two ways:
+
 #### Manual
-To install MDP Playground manually, clone the repository and run:
+To install MDP Playground manually (this might be the preferred way if you want easy access to the included experiments), clone the repository and run:
 ```bash
+# If you just want to use the environments as in example.py:
+pip install -e .
+
+# If you want to run experiments using Ray, etc.:
 pip install -r requirements.txt
 pip install -e .[extras]
 ```
-This might be the preferred way if you want easy access to the included experiments.
 
 #### From PyPI
 Alternatively, MDP Playground can also be installed from PyPI. Just run:
 ```bash
+# If you just want to use the environments as in example.py:
+pip install mdp_playground
+
+# If you want to run experiments using Ray, etc.:
 pip install mdp_playground[extras]
 ```
 

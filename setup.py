@@ -12,17 +12,17 @@ packages = [
 package_data = {"": ["*"]}
 
 extras_require = [
-    "ray[default,rllib]==1.0.0",
-    "tensorflow==2.5.0",
+    "ray[default,rllib]>=1.0.0",
+    "tensorflow>=2.5.0",
     "pillow>=6.1.0",
-    "requests==2.22.0",
-    "configspace==0.4.10",
+    "requests>=2.22.0",
+    "configspace>=0.4.10",
     "scipy>=1.7.0",
     "pandas>=0.25.0",
-    "gym[atari]==0.20",
+    "gym[atari]<=0.25",
     "matplotlib",
-    "opencv-python==4.2.0.34",  # due to https://stackoverflow.com/questions/72706073/attributeerror-partially-initialized-module-cv2-has-no-attribute-gapi-wip-gs
-    "opencv-python-headless==4.2.0.34", # and https://stackoverflow.com/questions/70537488/cannot-import-name-registermattype-from-cv2-cv2
+    "opencv-python>=4.2.0.34",  # due to https://stackoverflow.com/questions/72706073/attributeerror-partially-initialized-module-cv2-has-no-attribute-gapi-wip-gs
+    "opencv-python-headless>=4.2.0.34", # and https://stackoverflow.com/questions/70537488/cannot-import-name-registermattype-from-cv2-cv2
 ]
 
 extras_require_disc = [
