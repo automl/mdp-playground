@@ -83,9 +83,12 @@ class ImageContinuous(Box):
 
         self.goal_colour = (0, 255, 0)
         self.agent_colour = (0, 0, 255)
-        self.term_colour = (255, 0, 0)
-        self.bg_colour = (0, 0, 0)
+        self.term_colour = (0, 0, 0)
+        self.bg_colour = (208, 208, 208)
         self.line_colour = (255, 255, 255)
+        # Alternate scheme
+        # self.term_colour = (255, 0, 0)
+        # self.bg_colour = (0, 0, 0)
 
         assert len(feature_space.shape) == 1
         relevant_dims = len(relevant_indices)

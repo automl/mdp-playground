@@ -1298,7 +1298,7 @@ class RLToyEnv(gym.Env):
                         )
                         permutations = []
                         for i in range(length):
-                            permutations.append(maximum - i // diameter)
+                            permutations.append(maximum - (i // diameter))
                         # permutations = list(range(maximum + 1 - length, maximum + 1))
                         self.logger.info(
                             "No. of choices for each element in a"
@@ -1365,18 +1365,28 @@ class RLToyEnv(gym.Env):
                                         list(range(maximum))
                                     )  # # has to contain every number up to n so
                                     # that any one of them can be picked as part
-                                    # of the sequence below
+                                    # of the sequence below. An example of curr_rem_digits
+                                    # is [[0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5], [0, 1, 2, 3, 4, 5]] for
+                                    # diameter = 3 and maximum = 6 (when number of non-terminal
+                                    # states = 6). e.g. permutations = [6, 6, 6, 5, 5].
                                 for enum, j in enumerate(permutations):  # Goes
                                     # from largest to smallest number among the factors of nPk
                                     rem_ = curr_permutation % j
                                     # rem_ = (enum // maximum) * maximum + rem_
                                     seq_.append(
                                         curr_rem_digits[(enum + i_s) % diameter][rem_]
-                                        + ((enum + i_s) % diameter)
-                                        * self.action_space_size[0]
-                                    )  # Use (enum + i_s)
+                                        + (((enum + i_s) % diameter)
+                                        * self.action_space_size[0])
+                                    )  # enum iterates over the current independent set
+                                    # for the sequence being constructed by getting the
+                                    # remainder with the diameter because each position in
+                                    # the sequence belongs to a different independent set.
+                                    # Adding i_s, i.e., the current independent set, to it
+                                    # just offsets every state in the sequence
                                     # to allow other independent sets to have
-                                    # states beginning a rewardable sequence
+                                    # states beginning a rewardable sequence. The multiplication
+                                    # by self.action_space_size[0] is to get the correct state
+                                    # number for the selected independent set.
                                     del curr_rem_digits[(enum + i_s) % diameter][rem_]
                                     #         print("curr_rem_digits", curr_rem_digits)
                                     curr_permutation = curr_permutation // j

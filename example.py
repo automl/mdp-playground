@@ -3,7 +3,10 @@
 Calling this file as a script, invokes the following examples:
     one for basic discrete environments
     one for discrete environments with image representations
+    one for discrete environments with a diameter > 1 and image representations
     one for continuous environments with reward function move to a target point
+    one for continuous environments with reward function move to a target point with irrelevant features and image representations
+    one for continuous environments with reward function move along a line
     one for basic grid environments
     one for grid environments with image representations
     one for wrapping Atari env qbert
@@ -33,6 +36,7 @@ def display_image(obs, mode="RGB"):
     # used because the image is 3-D because frameworks like Ray expect the image
     # to be 3-D.
     img1.show()
+    return img1
 
 
 def discrete_environment_example():
@@ -110,6 +114,7 @@ def discrete_environment_image_representations_example():
     )
     action = env.action_space.sample()
     next_state_image, reward, done, info = env.step(action)
+    augmented_state_dict = env.get_augmented_state()
     next_state = augmented_state_dict["curr_state"]  # Underlying MDP state holds
     # the current discrete state.
     print("sars', done =", state, action, reward, next_state, done)
@@ -119,38 +124,50 @@ def discrete_environment_image_representations_example():
     display_image(next_state_image, mode="L")
 
 
-def continuous_environment_example_move_along_a_line():
+def discrete_environment_diameter_image_representations_example():
 
     config = {}
-    config["seed"] = 0
+    config["seed"] = 3
 
-    config["state_space_type"] = "continuous"
-    config["state_space_dim"] = 4
-    config["transition_dynamics_order"] = 1
-    config["inertia"] = 1  # 1 unit, e.g. kg for mass, or kg * m^2 for moment of
-    # inertia.
-    config["time_unit"] = 1  # Discretization of time domain and the time
-    # duration over which action is applied
+    config["state_space_type"] = "discrete"
+    config["action_space_size"] = 4
+    config["image_representations"] = True
+    config["delay"] = 1
+    config["diameter"] = 2
+    config["sequence_length"] = 3
+    config["reward_scale"] = 2.5
+    config["reward_shift"] = -1.75
+    config["reward_noise"] = 0.5  # std dev of a Gaussian dist.
+    config["transition_noise"] = 0.1
+    config["reward_density"] = 0.25
+    config["make_denser"] = False
+    config["terminal_state_density"] = 0.25
+    config["maximally_connected"] = True
+    config["repeats_in_sequences"] = False
 
-    config["delay"] = 0
-    config["sequence_length"] = 10
-    config["reward_scale"] = 1.0
-    config["reward_noise"] = 0.1  # std dev of a Gaussian dist.
-    config["transition_noise"] = 0.1  # std dev of a Gaussian dist.
-    config["reward_function"] = "move_along_a_line"
-
+    config["generate_random_mdp"] = True
     env = RLToyEnv(**config)
-    state = env.reset()
+
+    # The environment maintains an augmented state which contains the underlying
+    # state used by the MDP to perform transitions and hand out rewards. We can
+    # fetch a dict containing the augmented state and current state like this:
+    augmented_state_dict = env.get_augmented_state()
+    state = augmented_state_dict["curr_state"]
 
     print(
         "Taking a step in the environment with a random action and printing "
         "the transition:"
     )
     action = env.action_space.sample()
-    next_state, reward, done, info = env.step(action)
+    next_state_image, reward, done, info = env.step(action)
+    augmented_state_dict = env.get_augmented_state()
+    next_state = augmented_state_dict["curr_state"]  # Underlying MDP state holds
+    # the current discrete state.
     print("sars', done =", state, action, reward, next_state, done)
 
     env.close()
+
+    display_image(next_state_image, mode="L")
 
 
 def continuous_environment_example_move_to_a_point():
@@ -175,7 +192,89 @@ def continuous_environment_example_move_to_a_point():
     config["reward_function"] = "move_to_a_point"
 
     env = RLToyEnv(**config)
+    state = env.reset().copy()
+
+    print(
+        "Taking a step in the environment with a random action and printing "
+        "the transition:"
+    )
+    action = env.action_space.sample()
+    next_state, reward, done, info = env.step(action)
+    print("sars', done =", state, action, reward, next_state, done)
+
+    env.close()
+
+
+def continuous_environment_example_move_to_a_point_irrelevant_image():
+    config = {}
+    config["seed"] = 0
+
+    config["state_space_type"] = "continuous"
+    config["state_space_dim"] = 4
+    config["transition_dynamics_order"] = 1
+    config["inertia"] = 1  # 1 unit, e.g. kg for mass, or kg * m^2 for moment of
+    # inertia.
+    config["time_unit"] = 1  # Discretization of time domain and the time
+    # duration over which action is applied
+
+    config["make_denser"] = True
+    config["target_point"] = [0, 0]
+    config["target_radius"] = 0.05
+    config["state_space_max"] = 10
+    config["action_space_max"] = 1
+    config["action_loss_weight"] = 0.0
+
+    config["reward_function"] = "move_to_a_point"
+
+    config["image_representations"] = True
+    config["irrelevant_features"] = True
+    config["relevant_indices"] = [0, 1]
+
+    env = RLToyEnv(**config)
     state = env.reset()
+    augmented_state_dict = env.get_augmented_state()
+    state = augmented_state_dict["curr_state"].copy()  # Underlying MDP state holds
+    # the current continuous state.
+
+    print(
+        "Taking a step in the environment with a random action and printing "
+        "the transition:"
+    )
+    action = env.action_space.sample()
+    next_state_image, reward, done, info = env.step(action)
+    augmented_state_dict = env.get_augmented_state()
+    next_state = augmented_state_dict["curr_state"].copy()  # Underlying MDP state holds
+    # the current continuous state.
+    print("sars', done =", state, action, reward, next_state, done)
+
+    env.close()
+
+    img1 = display_image(next_state_image, mode="RGB")
+    img1.save("cont_env_irrelevant_image.pdf")
+
+
+def continuous_environment_example_move_along_a_line():
+
+    config = {}
+    config["seed"] = 0
+
+    config["state_space_type"] = "continuous"
+    config["state_space_dim"] = 4
+    config["transition_dynamics_order"] = 1
+    config["inertia"] = 1  # 1 unit, e.g. kg for mass, or kg * m^2 for moment of
+    # inertia.
+    config["time_unit"] = 1  # Discretization of time domain and the time
+    # duration over which action is applied
+
+    config["delay"] = 0
+    config["sequence_length"] = 10
+    config["reward_scale"] = 1.0
+    config["reward_noise"] = 0.1  # std dev of a Gaussian dist.
+    config["transition_noise"] = 0.1  # std dev of a Gaussian dist.
+    config["reward_function"] = "move_along_a_line"
+
+    env = RLToyEnv(**config)
+    state = env.reset().copy()
 
     print(
         "Taking a step in the environment with a random action and printing "
@@ -270,13 +369,14 @@ def atari_wrapper_example():
         action = env.action_space.sample()
         next_state, reward, done, info = env.step(action)
         print(
-            "s.shape ar s'.shape, done =",
+            "s.shape a r s'.shape, done =",
             state.shape,
             action,
             reward,
             next_state.shape,
             done,
         )
+        state = next_state
 
     env.close()
 
@@ -424,10 +524,31 @@ if __name__ == "__main__":
 
     print(
         set_ansi_escape
+        + "\nRunning discrete environment with diameter and image representations\n"
+        + reset_ansi_escape
+    )
+    discrete_environment_diameter_image_representations_example()
+
+    print(
+        set_ansi_escape
         + "\nRunning continuous environment: move_to_a_point\n"
         + reset_ansi_escape
     )
     continuous_environment_example_move_to_a_point()
+
+    print(
+        set_ansi_escape
+        + "\nRunning continuous environment: move_to_a_point with irrelevant features and image representations\n"
+        + reset_ansi_escape
+    )
+    continuous_environment_example_move_to_a_point_irrelevant_image()
+
+    print(
+        set_ansi_escape
+        + "\nRunning continuous environment: move_along_a_line\n"
+        + reset_ansi_escape
+    )
+    continuous_environment_example_move_along_a_line()
 
     print(
         set_ansi_escape

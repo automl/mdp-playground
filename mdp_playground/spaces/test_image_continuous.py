@@ -11,6 +11,8 @@ import PIL.Image as Image
 
 class TestImageContinuous(unittest.TestCase):
     def test_image_continuous(self):
+        # For images in the paper width and height were 100
+        # circle_radius was 5
         render = False
 
         lows = 0.0
@@ -38,18 +40,19 @@ class TestImageContinuous(unittest.TestCase):
             img1.show()
         # img1.save("cont_state_no_target.pdf")
 
+        pos = np.array([10.0, 10.0])
         target = np.array([10, 10])
         imc = ImageContinuous(
             cs2,
-            circle_radius=10,
+            circle_radius=5,
             target_point=target,
-            width=400,
-            height=400,
+            width=100,
+            height=100,
         )
         img1 = Image.fromarray(np.squeeze(imc.generate_image(pos)), "RGB")
         if render:
             img1.show()
-        # img1.save("cont_state_target.pdf")
+        img1.save("cont_state_target.pdf")
 
         # Terminal sub-spaces
         lows = np.array([2.0, 4.0])
