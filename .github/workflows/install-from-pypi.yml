@@ -25,7 +25,7 @@ jobs:
         pip install numpy
     - name: Install from PyPI
       run: |
-        pip install mdp-playground[extras]
+        pip install mdp-playground
     - name: Basic functionality test
       run: |
         run-mdpp-experiments --help

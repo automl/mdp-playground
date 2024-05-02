@@ -24,7 +24,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install flake8 pytest pytest-cov setuptools numpy
-        pip install -e .[extras]
+        pip install -e .
         pip install ray[rllib,debug]
         pip install tensorflow
     - name: Lint with flake8
