@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 from mdp_playground.spaces.image_continuous import ImageContinuous
-from gym.spaces import Box
+from gymnasium.spaces import Box
 
 # import PIL.ImageDraw as ImageDraw
 import PIL.Image as Image

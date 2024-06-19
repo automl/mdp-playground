@@ -1,9 +1,9 @@
-import gym
+import gymnasium as gym
 import copy
 import numpy as np
 import sys
-from gym.spaces import Box, Tuple
-from gym.wrappers import AtariPreprocessing
+from gymnasium.spaces import Box, Tuple
+from gymnasium.wrappers import AtariPreprocessing
 from mdp_playground.envs.rl_toy_env import RLToyEnv
 import warnings
 import PIL.ImageDraw as ImageDraw
@@ -31,8 +31,12 @@ class GymEnvWrapper(gym.Env):
 
     """
 
-    # Should not be a gym.Wrapper because 1) gym.Wrapper has member variables observation_space and action_space while here with irrelevant_features we would have multiple observation_spaces and this could cause conflict with code that assumes any subclass of gym.Wrapper should have these member variables.
-    # However, it _should_ be at least a gym.Env
+    # Should not be a gym.Wrapper because 1) gym.Wrapper has member variables 
+    # observation_space and action_space while here with irrelevant_features 
+    # we would have multiple observation_spaces and this could cause conflict 
+    # with code that assumes any subclass of gym.Wrapper should have these member
+    # variables. However, it _should_ be at least a gym.Env.
+    # Following comment based on the old get_gym_wrapper(base_class) code:
     # Does it need to be a subclass of base_class because some external code
     # may check if it's an AtariEnv, for instance, and do further stuff based
     # on that?
@@ -46,16 +50,16 @@ class GymEnvWrapper(gym.Env):
         if "seed" in config:
             seed_int = config["seed"]
 
-        self.seed(seed_int)  # seed
+        self.seed(seed_int)  # #seed
         # IMP Move below code from here to seed()? Because if seed is called
         # during the run of an env, the expectation is that all obs., act. space,
-        # etc. seeds are set? Only Atari in Gym seems to do something similar, the
-        # others I saw there don't seem to set seed for obs., act. spaces.
+        # etc. seeds are set during that call? Only Atari in Gym seems to do something 
+        # similar, the others I saw there don't seem to set seed for obs., act. spaces.
         self.env.seed(
             seed_int
-        )  # seed ###IMP Apparently Atari also has a seed. :/ Without this, for beam_rider(?), about 1 in 5 times I got reward of 88.0 and 44.0 the remaining times with the same action sequence!! With setting this seed, I got the same reward of 44.0 when I ran about 20 times.; ##TODO If this is really a wrapper, should it be modifying the seed of the env?
-        obs_space_seed = self.np_random.randint(sys.maxsize)  # random
-        act_space_seed = self.np_random.randint(sys.maxsize)  # random
+        )  # #seed ###IMP Apparently Atari also has a seed. :/ Without this, for beam_rider(?), about 1 in 5 times I got reward of 88.0 and 44.0 the remaining times with the same action sequence!! With setting this seed, I got the same reward of 44.0 when I ran about 20 times.; ##TODO If this is really a wrapper, should it be modifying the seed of the env?
+        obs_space_seed = self.np_random.integers(sys.maxsize).item()  # random
+        act_space_seed = self.np_random.integers(sys.maxsize).item()  # random
         self.env.observation_space.seed(obs_space_seed)  # seed
         self.env.action_space.seed(act_space_seed)  # seed
 
@@ -203,7 +207,7 @@ class GymEnvWrapper(gym.Env):
             # self.irrelevant_features =  config["irrelevant_features"]
             irr_toy_env_conf = config["irrelevant_features"]
             if "seed" not in irr_toy_env_conf:
-                irr_toy_env_conf["seed"] = self.np_random.randint(sys.maxsize)  # random
+                irr_toy_env_conf["seed"] = self.np_random.integers(sys.maxsize).item()  # random
 
             if config["state_space_type"] == "discrete":
                 pass
@@ -323,7 +327,7 @@ class GymEnvWrapper(gym.Env):
         # print("Setting Mujoco self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight to", self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight, "corresponding to time_unit in config.")
 
     def step(self, action):
-        # next_state, reward, done, info = super(GymEnvWrapper, self).step(action)
+        # next_state, reward, done, trunc, info = super(GymEnvWrapper, self).step(action)
         self.total_transitions_episode += 1
 
         if self.config["state_space_type"] == "discrete":
@@ -356,22 +360,22 @@ class GymEnvWrapper(gym.Env):
 
         if "irrelevant_features" in self.config:
             if self.config["state_space_type"] == "discrete":
-                next_state, reward, done, info = self.env.step(action[0])
-                next_state_irr, _, done_irr, _ = self.irr_toy_env.step(action[1])
+                next_state, reward, done, trunc, info = self.env.step(action[0])
+                next_state_irr, _, done_irr, trunc_irr, _ = self.irr_toy_env.step(action[1])
                 next_state = tuple([next_state, next_state_irr])
             else:
                 # env_act_shape is the shape of the underlying env's action space and we
                 # sub-select those dimensions from the total action space next and apply
                 # to the underlying env:
-                next_state, reward, done, info = self.env.step(
+                next_state, reward, done, trunc, info = self.env.step(
                     action[: self.env_act_shape[0]]
                 )
-                next_state_irr, _, done_irr, _ = self.irr_toy_env.step(
+                next_state_irr, _, done_irr, trunc_irr, _ = self.irr_toy_env.step(
                     action[self.env_act_shape[0] :]
                 )
                 next_state = np.concatenate((next_state, next_state_irr))
         else:
-            next_state, reward, done, info = self.env.step(action)
+            next_state, reward, done, trunc, info = self.env.step(action)
             if self.config["state_space_type"] == "continuous":
                 next_state += noise_in_transition
 
@@ -403,7 +407,7 @@ class GymEnvWrapper(gym.Env):
         reward *= self.reward_scale
         reward += self.reward_shift
 
-        return next_state, reward, done, info
+        return next_state, reward, done, trunc, info
 
     def reset(self):
         # on episode "end" stuff (to not be invoked when reset() called when
@@ -441,15 +445,15 @@ class GymEnvWrapper(gym.Env):
 
         if "irrelevant_features" in self.config:
             if self.config["state_space_type"] == "discrete":
-                reset_state = self.env.reset()
-                reset_state_irr = self.irr_toy_env.reset()
+                reset_state = self.env.reset()[0]
+                reset_state_irr = self.irr_toy_env.reset()[0]
                 reset_state = tuple([reset_state, reset_state_irr])
             else:
-                reset_state = self.env.reset()
-                reset_state_irr = self.irr_toy_env.reset()
+                reset_state = self.env.reset()[0]
+                reset_state_irr = self.irr_toy_env.reset()[0]
                 reset_state = np.concatenate((reset_state, reset_state_irr))
         else:
-            reset_state = self.env.reset()
+            reset_state = self.env.reset()[0]
 
         if self.image_transforms:
             reset_state = self.get_transformed_image(reset_state)
@@ -470,7 +474,7 @@ class GymEnvWrapper(gym.Env):
         int
             The seed returned by Gym
         """
-        # If seed is None, you get a randomly generated seed from gym.utils...
+        # If seed is None, you get a randomly generated seed from gymnasium.utils...
         self.np_random, self.seed_ = gym.utils.seeding.np_random(seed)  # random
         print(
             "Env SEED set to: "
@@ -544,8 +548,8 @@ class GymEnvWrapper(gym.Env):
         if "shift" in self.image_transforms:
             max_shift_w = (tot_width - R) // 2
             max_shift_h = (tot_height - R) // 2
-            add_shift_w = self.np_random.randint(-max_shift_w + 1, max_shift_w)
-            add_shift_h = self.np_random.randint(-max_shift_h + 1, max_shift_h)
+            add_shift_w = self.np_random.integers(-max_shift_w + 1, max_shift_w).item()
+            add_shift_h = self.np_random.integers(-max_shift_h + 1, max_shift_h).item()
             # print("add_shift_w, add_shift_h", add_shift_w, add_shift_h)
             add_shift_w = int(add_shift_w / sh_quant) * sh_quant
             add_shift_h = int(add_shift_h / sh_quant) * sh_quant
@@ -582,8 +586,8 @@ class GymEnvWrapper(gym.Env):
 
 
 # from mdp_playground.envs.gym_env_wrapper import get_gym_wrapper
-# from gym.envs.atari import AtariEnv
-# from gym.wrappers import AtariPreprocessing
+# from gymnasium.envs.atari import AtariEnv
+# from gymnasium.wrappers import AtariPreprocessing
 # AtariPreprocessing()
 # AtariEnvWrapper = get_gym_wrapper(AtariEnv)
 # from ray.tune.registry import register_env
@@ -592,7 +596,7 @@ class GymEnvWrapper(gym.Env):
 # ob = aew.reset()
 
 # from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-# from gym.envs.atari import AtariEnv
+# from gymnasium.envs.atari import AtariEnv
 # ae = AtariEnv(**{'game': 'beam_rider', 'obs_type': 'image', 'frameskip': 1})
 # aew = GymEnvWrapper(ae, **{'reward_noise': lambda a: a.normal(0, 0.1), 'transition_noise': 0.1, 'delay': 1, 'frame_skip': 4, "atari_preprocessing": True, "state_space_type": "discrete", 'seed': 0})
 # ob = aew.reset()
@@ -601,7 +605,7 @@ class GymEnvWrapper(gym.Env):
 # total_reward = 0.0
 # for i in range(200):
 #     act = aew.action_space.sample()
-#     next_state, reward, done, info = aew.step(act)
+#     next_state, reward, done, trunc, info = aew.step(act)
 #     print(reward, done, act)
 #     if reward > 10:
 #         print("reward in step:", i, reward)

@@ -71,7 +71,7 @@ class TestRunExperiments(unittest.TestCase):
     #     from glob import glob
     #     expt_list = glob("experiments/*.py")
 
-    #     # sel_expt_list = np.random.randint(0, len(expt_list), 10)
+    #     # sel_expt_list = np.random.integers(0, len(expt_list), 10)
     #     expt_list = np.random.permutation(expt_list)
     #     for i in range(2):
     #         conf_file = expt_list[i]

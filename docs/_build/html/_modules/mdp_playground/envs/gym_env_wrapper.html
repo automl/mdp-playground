@@ -602,7 +602,7 @@
             <span class="c1"># print(&quot;Setting Mujoco self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight to&quot;, self.frame_skip, self._ctrl_cost_weight, self._forward_reward_weight, &quot;corresponding to time_unit in config.&quot;)</span>
 
 <div class="viewcode-block" id="GymEnvWrapper.step"><a class="viewcode-back" href="../../../_autosummary/mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.html#mdp_playground.envs.gym_env_wrapper.GymEnvWrapper.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
-        <span class="c1"># next_state, reward, done, info = super(GymEnvWrapper, self).step(action)</span>
+        <span class="c1"># next_state, reward, done, trunc, info = super(GymEnvWrapper, self).step(action)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_transitions_episode</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;state_space_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;discrete&quot;</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition_noise</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
@@ -689,7 +689,7 @@
 <span class="sd">        int</span>
 <span class="sd">            The seed returned by Gym</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># If seed is None, you get a randomly generated seed from gym.utils...</span>
+        <span class="c1"># If seed is None, you get a randomly generated seed from gymnasium.utils...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed_</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">seeding</span><span class="o">.</span><span class="n">np_random</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="c1">#random</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Env SEED set to: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;. Returned seed from Gym: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_</span><span class="p">))</span>
 
@@ -701,8 +701,8 @@
 
 
 <span class="c1"># from mdp_playground.envs.gym_env_wrapper import get_gym_wrapper</span>
-<span class="c1"># from gym.envs.atari import AtariEnv</span>
-<span class="c1"># from gym.wrappers import AtariPreprocessing</span>
+<span class="c1"># from gymnasium.envs.atari import AtariEnv</span>
+<span class="c1"># from gymnasium.wrappers import AtariPreprocessing</span>
 <span class="c1"># AtariPreprocessing()</span>
 <span class="c1"># AtariEnvWrapper = get_gym_wrapper(AtariEnv)</span>
 <span class="c1"># from ray.tune.registry import register_env</span>
@@ -711,7 +711,7 @@
 <span class="c1"># ob = aew.reset()</span>
 
 <span class="c1"># from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper</span>
-<span class="c1"># from gym.envs.atari import AtariEnv</span>
+<span class="c1"># from gymnasium.envs.atari import AtariEnv</span>
 <span class="c1"># ae = AtariEnv(**{&#39;game&#39;: &#39;beam_rider&#39;, &#39;obs_type&#39;: &#39;image&#39;, &#39;frameskip&#39;: 1})</span>
 <span class="c1"># aew = GymEnvWrapper(ae, **{&#39;reward_noise&#39;: lambda a: a.normal(0, 0.1), &#39;transition_noise&#39;: 0.1, &#39;delay&#39;: 1, &#39;frame_skip&#39;: 4, &quot;atari_preprocessing&quot;: True, &quot;state_space_type&quot;: &quot;discrete&quot;, &#39;seed&#39;: 0})</span>
 <span class="c1"># ob = aew.reset()</span>
@@ -720,7 +720,7 @@
 <span class="c1"># total_reward = 0.0</span>
 <span class="c1"># for i in range(200):</span>
 <span class="c1">#     act = aew.action_space.sample()</span>
-<span class="c1">#     next_state, reward, done, info = aew.step(act)</span>
+<span class="c1">#     next_state, reward, done, trunc, info = aew.step(act)</span>
 <span class="c1">#     print(reward, done, act)</span>
 <span class="c1">#     if reward &gt; 10:</span>
 <span class="c1">#         print(&quot;reward in step:&quot;, i, reward)</span>

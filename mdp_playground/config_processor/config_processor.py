@@ -786,7 +786,7 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
             from mdp_playground.envs.mujoco_env_wrapper import (
                 get_mujoco_wrapper,
             )  # hack
-            from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+            from gymnasium.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
 
             wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
             register_env(
@@ -802,7 +802,7 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
             from mdp_playground.envs.mujoco_env_wrapper import (
                 get_mujoco_wrapper,
             )  # hack
-            from gym.envs.mujoco.hopper_v3 import HopperEnv
+            from gymnasium.envs.mujoco.hopper_v3 import HopperEnv
 
             wrapped_mujoco_env = get_mujoco_wrapper(HopperEnv)
             register_env(
@@ -818,7 +818,7 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
             from mdp_playground.envs.mujoco_env_wrapper import (
                 get_mujoco_wrapper,
             )  # hack
-            from gym.envs.mujoco.pusher import PusherEnv
+            from gymnasium.envs.mujoco.pusher import PusherEnv
 
             wrapped_mujoco_env = get_mujoco_wrapper(PusherEnv)
             register_env(
@@ -834,7 +834,7 @@ def combined_processing(*static_configs, varying_configs, framework="ray", algor
             from mdp_playground.envs.mujoco_env_wrapper import (
                 get_mujoco_wrapper,
             )  # hack
-            from gym.envs.mujoco.reacher import ReacherEnv
+            from gymnasium.envs.mujoco.reacher import ReacherEnv
 
             wrapped_mujoco_env = get_mujoco_wrapper(ReacherEnv)
             register_env(
@@ -993,7 +993,7 @@ def post_processing(framework="ray"):
 
 
 def create_gym_env_wrapper_atari(config):
-    from gym.envs.atari import AtariEnv
+    from gymnasium.envs.atari import AtariEnv
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
 
     ae = AtariEnv(**config["AtariEnv"])
@@ -1008,9 +1008,9 @@ def create_gym_env_wrapper_frame_stack_atari(config):  # hack ###TODO remove?
     """When using frameStack GymEnvWrapper should wrap AtariEnv using wrap_deepmind_ray and therefore this function sets "wrap_deepmind_ray": True and 'frame_skip': 1 inside config so as to keep config same as for create_gym_env_wrapper_atari above and reduce manual errors when switching between the 2."""
     config["wrap_deepmind_ray"] = True  # hack
     config["frame_skip"] = 1  # hack
-    from gym.envs.atari import AtariEnv
+    from gymnasium.envs.atari import AtariEnv
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-    import gym
+    import gymnasium as gym
 
     game = config["AtariEnv"]["game"]
     game = "".join([g.capitalize() for g in game.split("_")])

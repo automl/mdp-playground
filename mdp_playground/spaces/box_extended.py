@@ -1,6 +1,6 @@
 import numpy as np
-import gym
-from gym.spaces import Box
+import gymnasium as gym
+from gymnasium.spaces import Box
 
 
 class BoxExtended(Box):

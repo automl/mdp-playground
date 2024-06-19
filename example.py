@@ -59,7 +59,7 @@ def discrete_environment_example():
     config["repeats_in_sequences"] = False
 
     config["generate_random_mdp"] = True
-    env = RLToyEnv(**config)  # Calls env.reset() automatically. So, in general,
+    env = RLToyEnv(**config)  # Calls env.reset()[0] automatically. So, in general,
     # there is no need to call it after this.
 
     # The environment maintains an augmented state which contains the underlying
@@ -73,7 +73,7 @@ def discrete_environment_example():
         "the transition:"
     )
     action = env.action_space.sample()
-    next_state, reward, done, info = env.step(action)
+    next_state, reward, done, trunc, info = env.step(action)
     print("sars', done =", state, action, reward, next_state, done)
 
     env.close()
@@ -113,7 +113,7 @@ def discrete_environment_image_representations_example():
         "the transition:"
     )
     action = env.action_space.sample()
-    next_state_image, reward, done, info = env.step(action)
+    next_state_image, reward, done, trunc, info = env.step(action)
     augmented_state_dict = env.get_augmented_state()
     next_state = augmented_state_dict["curr_state"]  # Underlying MDP state holds
     # the current discrete state.
@@ -159,7 +159,7 @@ def discrete_environment_diameter_image_representations_example():
         "the transition:"
     )
     action = env.action_space.sample()
-    next_state_image, reward, done, info = env.step(action)
+    next_state_image, reward, done, trunc, info = env.step(action)
     augmented_state_dict = env.get_augmented_state()
     next_state = augmented_state_dict["curr_state"]  # Underlying MDP state holds
     # the current discrete state.
@@ -192,14 +192,14 @@ def continuous_environment_example_move_to_a_point():
     config["reward_function"] = "move_to_a_point"
 
     env = RLToyEnv(**config)
-    state = env.reset().copy()
+    state = env.reset()[0].copy()
 
     print(
         "Taking a step in the environment with a random action and printing "
         "the transition:"
     )
     action = env.action_space.sample()
-    next_state, reward, done, info = env.step(action)
+    next_state, reward, done, trunc, info = env.step(action)
     print("sars', done =", state, action, reward, next_state, done)
 
     env.close()
@@ -231,7 +231,7 @@ def continuous_environment_example_move_to_a_point_irrelevant_image():
     config["relevant_indices"] = [0, 1]
 
     env = RLToyEnv(**config)
-    state = env.reset()
+    state = env.reset()[0]
     augmented_state_dict = env.get_augmented_state()
     state = augmented_state_dict["curr_state"].copy()  # Underlying MDP state holds
     # the current continuous state.
@@ -241,7 +241,7 @@ def continuous_environment_example_move_to_a_point_irrelevant_image():
         "the transition:"
     )
     action = env.action_space.sample()
-    next_state_image, reward, done, info = env.step(action)
+    next_state_image, reward, done, trunc, info = env.step(action)
     augmented_state_dict = env.get_augmented_state()
     next_state = augmented_state_dict["curr_state"].copy()  # Underlying MDP state holds
     # the current continuous state.
@@ -274,14 +274,14 @@ def continuous_environment_example_move_along_a_line():
     config["reward_function"] = "move_along_a_line"
 
     env = RLToyEnv(**config)
-    state = env.reset().copy()
+    state = env.reset()[0].copy()
 
     print(
         "Taking a step in the environment with a random action and printing "
         "the transition:"
     )
     action = env.action_space.sample()
-    next_state, reward, done, info = env.step(action)
+    next_state, reward, done, trunc, info = env.step(action)
     print("sars', done =", state, action, reward, next_state, done)
 
     env.close()
@@ -305,12 +305,12 @@ def grid_environment_example():
 
     for i in range(len(actions)):
         action = actions[i]
-        next_obs, reward, done, info = env.step(action)
+        next_obs, reward, done, trunc, info = env.step(action)
         next_state = env.get_augmented_state()["augmented_state"][-1]
         print("sars', done =", state, action, reward, next_state, done)
         state = next_state
 
-    env.reset()
+    env.reset()[0]
     env.close()
 
 
@@ -334,12 +334,12 @@ def grid_environment_image_representations_example():
 
     for i in range(len(actions)):
         action = actions[i]
-        next_obs, reward, done, info = env.step(action)
+        next_obs, reward, done, trunc, info = env.step(action)
         next_state = env.get_augmented_state()["augmented_state"][-1]
         print("sars', done =", state, action, reward, next_state, done)
         state = next_state
 
-    env.reset()
+    env.reset()[0]
     env.close()
 
     display_image(next_obs)
@@ -356,18 +356,18 @@ def atari_wrapper_example():
     }
 
     from mdp_playground.envs import GymEnvWrapper
-    import gym
+    import gymnasium as gym
 
     ae = gym.make("QbertNoFrameskip-v4")
     env = GymEnvWrapper(ae, **config)
-    state = env.reset()
+    state = env.reset()[0]
 
     print(
         "Taking 10 steps in the environment with a random action and printing the transition:"
     )
     for i in range(10):
         action = env.action_space.sample()
-        next_state, reward, done, info = env.step(action)
+        next_state, reward, done, trunc, info = env.step(action)
         print(
             "s.shape a r s'.shape, done =",
             state.shape,
@@ -403,18 +403,18 @@ def mujoco_wrapper_example():
     # of the Mujoco base_class.
     try:
         from mdp_playground.envs import get_mujoco_wrapper
-        from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+        from gymnasium.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
 
         wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
 
         env = wrapped_mujoco_env(**config)
-        state = env.reset()
+        state = env.reset()[0]
 
         print(
             "Taking a step in the environment with a random action and printing the transition:"
         )
         action = env.action_space.sample()
-        next_state, reward, done, info = env.step(action)
+        next_state, reward, done, trunc, info = env.step(action)
         print("sars', done =", state, action, reward, next_state, done)
 
         env.close()
@@ -440,22 +440,22 @@ def minigrid_wrapper_example():
     }
 
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-    import gym
+    import gymnasium as gym
 
-    from gym_minigrid.wrappers import RGBImgPartialObsWrapper, ImgObsWrapper
+    from minigrid.wrappers import RGBImgPartialObsWrapper, ImgObsWrapper
 
     env = gym.make("MiniGrid-Empty-8x8-v0")
     env = RGBImgPartialObsWrapper(env)  # Get pixel observations
     env = ImgObsWrapper(env)  # Get rid of the 'mission' field
 
     env = GymEnvWrapper(env, **config)
-    obs = env.reset()  # This now produces an RGB tensor only
+    obs = env.reset()[0]  # This now produces an RGB tensor only
 
     print(
         "Taking a step in the environment with a random action and printing the transition:"
     )
     action = env.action_space.sample()
-    next_obs, reward, done, info = env.step(action)
+    next_obs, reward, done, trunc, info = env.step(action)
     print(
         "s.shape ar s'.shape, done =",
         obs.shape,
@@ -481,17 +481,17 @@ def procgen_wrapper_example():
     }
 
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
-    import gym
+    import gymnasium as gym
 
     env = gym.make("procgen:procgen-coinrun-v0")
     env = GymEnvWrapper(env, **config)
-    obs = env.reset()
+    obs = env.reset()[0]
 
     print(
         "Taking a step in the environment with a random action and printing the transition:"
     )
     action = env.action_space.sample()
-    next_obs, reward, done, info = env.step(action)
+    next_obs, reward, done, trunc, info = env.step(action)
     print(
         "s.shape ar s'.shape, done =",
         obs.shape,
@@ -577,7 +577,7 @@ if __name__ == "__main__":
 
     # Using gym.make() example 1
     import mdp_playground
-    import gym
+    import gymnasium as gym
 
     gym.make("RLToy-v0")
 
@@ -591,6 +591,6 @@ if __name__ == "__main__":
             "maximally_connected": True,
         }
     )
-    env.reset()
+    env.reset()[0]
     for i in range(10):
         print(env.step(env.action_space.sample()))

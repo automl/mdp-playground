@@ -82,7 +82,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="mdp-playground",
-    version="0.0.2",
+    version="1.0.0",
     author=AUTHORS,
     author_email=AUTHOR_EMAIL,
     description="A python package to design and debug RL agents",
@@ -109,7 +109,7 @@ setup(
     py_modules=[],
     python_requires=">=3.6",
     setup_requires=["numpy"],
-    install_requires=["dill", "numpy"],
+    install_requires=["dill", "numpy", "scipy", "pillow", "gymnasium"],
     extras_require={
         "extras": extras_require,
         "extras_disc": extras_require_disc,

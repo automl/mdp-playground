@@ -1,10 +1,10 @@
 import unittest
 import numpy as np
 from mdp_playground.spaces.image_multi_discrete import ImageMultiDiscrete
-from gym.spaces import Discrete, MultiDiscrete
+from gymnasium.spaces import Discrete, MultiDiscrete
 
-# import gym
-# from gym.spaces import MultiDiscrete
+# import gymnasium as gym
+# from gymnasium.spaces import MultiDiscrete
 # # from .space import Space
 # import PIL.ImageDraw as ImageDraw
 # import PIL.Image as Image

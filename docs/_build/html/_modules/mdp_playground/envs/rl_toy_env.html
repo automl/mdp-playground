@@ -1967,7 +1967,7 @@
 <span class="sd">        int</span>
 <span class="sd">            The seed returned by Gym</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># If seed is None, you get a randomly generated seed from gym.utils...</span>
+        <span class="c1"># If seed is None, you get a randomly generated seed from gymnasium.utils...</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">np_random</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed_</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">seeding</span><span class="o">.</span><span class="n">np_random</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="c1">#random</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Env SEED set to: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;. Returned seed from Gym: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed_</span></div></div>

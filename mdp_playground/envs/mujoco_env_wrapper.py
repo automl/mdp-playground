@@ -1,7 +1,7 @@
-# from gym.envs.mujoco.mujoco_env import MujocoEnv
-from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
-from gym.envs.mujoco.pusher import PusherEnv
-from gym.envs.mujoco.reacher import ReacherEnv
+# from gymnasium.envs.mujoco.mujoco_env import MujocoEnv
+from gymnasium.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+from gymnasium.envs.mujoco.pusher import PusherEnv
+from gymnasium.envs.mujoco.reacher import ReacherEnv
 import copy
 
 
@@ -104,20 +104,20 @@ def get_mujoco_wrapper(base_class):
                     )
 
         def step(self, action):  # hack
-            obs, reward, done, info = super(MujocoEnvWrapper, self).step(action)
+            obs, reward, done, trunc, info = super(MujocoEnvWrapper, self).step(action)
             if (
                 self.base_class in [PusherEnv, ReacherEnv]
                 and "time_unit" in self.config
             ):
                 reward *= self.time_unit
-            return obs, reward, done, info
+            return obs, reward, done, trunc, info
 
     return MujocoEnvWrapper
 
 
 # from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper #hack
 #
-# from gym.envs.mujoco.reacher import ReacherEnv
+# from gymnasium.envs.mujoco.reacher import ReacherEnv
 # ReacherWrapperV2 = get_mujoco_wrapper(ReacherEnv)
 # config = {"time_unit": 0.2}
 # rw2 = ReacherWrapperV2(**config)

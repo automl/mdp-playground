@@ -1,5 +1,5 @@
 from mdp_playground.envs.rl_toy_env import RLToyEnv
-from gym import error
+from gymnasium import error
 
 try:
     from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper

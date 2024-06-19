@@ -1,4 +1,4 @@
-from gym.envs.registration import register
+from gymnasium.envs.registration import register
 
 register(
     id="RLToy-v0",
@@ -11,4 +11,4 @@ register(
     max_episode_steps=100,
 )
 
-__version__ = "0.0.2"
+__version__ = "1.0.0"

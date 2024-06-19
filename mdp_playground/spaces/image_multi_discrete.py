@@ -1,7 +1,7 @@
 import warnings
 import numpy as np
-import gym
-from gym.spaces import Box, Discrete, MultiDiscrete, Space
+import gymnasium as gym
+from gymnasium.spaces import Box, Discrete, MultiDiscrete, Space
 import PIL.ImageDraw as ImageDraw
 import PIL.Image as Image
 from PIL.Image import FLIP_LEFT_RIGHT, FLIP_TOP_BOTTOM
@@ -160,8 +160,8 @@ class ImageMultiDiscrete(Box):
         if "shift" in self.transforms:
             max_shift_w = self.width / 2 - R
             max_shift_h = self.height / 2 - R
-            add_shift_w = self.np_random.randint(-max_shift_w + 1, max_shift_w)
-            add_shift_h = self.np_random.randint(-max_shift_h + 1, max_shift_h)
+            add_shift_w = self.np_random.integers(-max_shift_w + 1, max_shift_w).item()
+            add_shift_h = self.np_random.integers(-max_shift_h + 1, max_shift_h).item()
             add_shift_w = (add_shift_w // sh_quant) * sh_quant
             add_shift_h = (add_shift_h // sh_quant) * sh_quant
             # print("shift_w, shift_h", add_shift_w, add_shift_h)
@@ -236,15 +236,15 @@ class ImageMultiDiscrete(Box):
             "rotate" in self.transforms
         ):  # TODO rotation can lead to image going out of bounds.
             # rotation_ = (360 / polygon_sides) * (discrete_state / state_space_size) # Need to divide by polygon_sides because
-            rotation = self.np_random.randint(360)
+            rotation = self.np_random.integers(360).item()
             rotation = (rotation // ro_quant) * ro_quant
             # print("rotation", rotation)
             image_ = image_.rotate(rotation)
             # image_.rotate(
 
         if "flip" in self.transforms:
-            if self.np_random.randint(2) == 0:  # Only flip half the times
-                if self.np_random.randint(2) == 0:
+            if self.np_random.integers(2).item() == 0:  # Only flip half the times
+                if self.np_random.integers(2).item() == 0:
                     image_ = image_.transpose(FLIP_LEFT_RIGHT)
                 else:
                     image_ = image_.transpose(FLIP_TOP_BOTTOM)

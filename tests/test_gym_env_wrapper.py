@@ -4,6 +4,7 @@ import numpy as np
 from mdp_playground.envs.gym_env_wrapper import GymEnvWrapper
 import unittest
 import pytest
+import gymnasium as gym
 
 import sys
 
@@ -27,11 +28,6 @@ class TestGymEnvWrapper(unittest.TestCase):
         """ """
         print("\033[32;1;4mTEST_REWARD_DELAY\033[0m")
         config = {
-            "AtariEnv": {
-                "game": "beam_rider",  # "breakout",
-                "obs_type": "image",
-                "frameskip": 1,
-            },
             "delay": 1,
             # "GymEnvWrapper": {
             "atari_preprocessing": True,
@@ -46,9 +42,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         # config["log_filename"] = log_filename
 
-        from gym.envs.atari import AtariEnv
-
-        ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+        ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
         ob = aew.reset()
         print("observation_space.shape:", ob.shape)
@@ -56,7 +50,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         total_reward = 0.0
         for i in range(200):
             act = aew.action_space.sample()
-            next_state, reward, done, info = aew.step(act)
+            next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
             if i == 154 or i == 159:
                 assert reward == 44.0, (
@@ -72,11 +66,6 @@ class TestGymEnvWrapper(unittest.TestCase):
         """ """
         print("\033[32;1;4mTEST_REWARD_SHIFT\033[0m")
         config = {
-            "AtariEnv": {
-                "game": "beam_rider",  # "breakout",
-                "obs_type": "image",
-                "frameskip": 1,
-            },
             "reward_shift": 1,
             # "GymEnvWrapper": {
             "atari_preprocessing": True,
@@ -91,9 +80,8 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         # config["log_filename"] = log_filename
 
-        from gym.envs.atari import AtariEnv
 
-        ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+        ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
         ob = aew.reset()
         print("observation_space.shape:", ob.shape)
@@ -101,7 +89,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         total_reward = 0.0
         for i in range(200):
             act = aew.action_space.sample()
-            next_state, reward, done, info = aew.step(act)
+            next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
             if i == 153 or i == 158:
                 assert reward == 45.0, (
@@ -119,11 +107,6 @@ class TestGymEnvWrapper(unittest.TestCase):
         """ """
         print("\033[32;1;4mTEST_REWARD_SCALE\033[0m")
         config = {
-            "AtariEnv": {
-                "game": "beam_rider",  # "breakout",
-                "obs_type": "image",
-                "frameskip": 1,
-            },
             "reward_scale": 2,
             # "GymEnvWrapper": {
             "atari_preprocessing": True,
@@ -138,9 +121,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         # config["log_filename"] = log_filename
 
-        from gym.envs.atari import AtariEnv
-
-        ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+        ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
         ob = aew.reset()
         print("observation_space.shape:", ob.shape)
@@ -148,7 +129,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         total_reward = 0.0
         for i in range(200):
             act = aew.action_space.sample()
-            next_state, reward, done, info = aew.step(act)
+            next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
             if i == 153 or i == 158:
                 assert reward == 88.0, (
@@ -167,11 +148,6 @@ class TestGymEnvWrapper(unittest.TestCase):
     #     """ """
     #     print("\033[32;1;4mTEST_TERM_STATE_REWARD\033[0m")
     #     config = {
-    #         "AtariEnv": {
-    #             "game": "beam_rider",  # "breakout",
-    #             "obs_type": "image",
-    #             "frameskip": 1,
-    #         },
     #         "term_state_reward": 200,
     #         # "GymEnvWrapper": {
     #         "atari_preprocessing": True,
@@ -186,9 +162,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
     #     # config["log_filename"] = log_filename
 
-    #     from gym.envs.atari import AtariEnv
-
-    #     ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+    #     ae = gym.make("BeamRiderNoFrameskip-v4")
     #     aew = GymEnvWrapper(ae, **config)
     #     ob = aew.reset()
     #     print("observation_space.shape:", ob.shape)
@@ -196,7 +170,7 @@ class TestGymEnvWrapper(unittest.TestCase):
     #     total_reward = 0.0
     #     for i in range(200):
     #         act = aew.action_space.sample()
-    #         next_state, reward, done, info = aew.step(act)
+    #         next_state, reward, done, trunc, info = aew.step(act)
     #         print("step, reward, done, act:", i, reward, done, act)
     #         if i == 153 or i == 158:
     #             assert reward == 88.0, (
@@ -210,57 +184,50 @@ class TestGymEnvWrapper(unittest.TestCase):
     #     print("total_reward:", total_reward)
     #     aew.reset()
 
-    def test_r_delay_ray_frame_stack(self):
-        """
-        Uses wrap_deepmind_ray to frame stack Atari
-        """
-        print("\033[32;1;4mTEST_REWARD_DELAY_RAY_FRAME_STACK\033[0m")
-        config = {
-            "AtariEnv": {
-                "game": "beam_rider",  # "breakout",
-                "obs_type": "image",
-                "frameskip": 1,
-            },
-            "delay": 1,
-            # "GymEnvWrapper": {
-            "wrap_deepmind_ray": True,
-            "frame_skip": 1,
-            "atari_preprocessing": True,
-            "frame_skip": 4,
-            "grayscale_obs": False,
-            "state_space_type": "discrete",
-            "action_space_type": "discrete",
-            "seed": 0,
-            # },
-            # 'seed': 0, #seed
-        }
+    # Disabled tests for Ray Rllib for now, too much maintenance overhead.
+    # def test_r_delay_ray_frame_stack(self):
+    #     """
+    #     Uses wrap_deepmind_ray to frame stack Atari
+    #     """
+    #     print("\033[32;1;4mTEST_REWARD_DELAY_RAY_FRAME_STACK\033[0m")
+    #     config = {
+    #         "delay": 1,
+    #         # "GymEnvWrapper": {
+    #         "wrap_deepmind_ray": True,
+    #         "frame_skip": 1,
+    #         "atari_preprocessing": True,
+    #         "frame_skip": 4,
+    #         "grayscale_obs": False,
+    #         "state_space_type": "discrete",
+    #         "action_space_type": "discrete",
+    #         "seed": 0,
+    #         # },
+    #         # 'seed': 0, #seed
+    #     }
 
-        # config["log_filename"] = log_filename
+    #     # config["log_filename"] = log_filename
 
-        from gym.envs.atari import AtariEnv
-        import gym
-
-        game = "beam_rider"
-        game = "".join([g.capitalize() for g in game.split("_")])
-        ae = gym.make("{}NoFrameskip-v4".format(game))
-        aew = GymEnvWrapper(ae, **config)
-        ob = aew.reset()
-        print("observation_space.shape:", ob.shape)
-        # print(ob)
-        total_reward = 0.0
-        for i in range(200):
-            act = aew.action_space.sample()
-            next_state, reward, done, info = aew.step(act)
-            print("step, reward, done, act:", i, reward, done, act)
-            if i == 142 or i == 159:
-                assert reward == 44.0, (
-                    "1-step delayed reward in step: "
-                    + str(i)
-                    + " should have been 44.0."
-                )
-            total_reward += reward
-        print("total_reward:", total_reward)
-        aew.reset()
+    #     game = "beam_rider"
+    #     game = "".join([g.capitalize() for g in game.split("_")])
+    #     ae = gym.make("{}NoFrameskip-v4".format(game))
+    #     aew = GymEnvWrapper(ae, **config)
+    #     ob = aew.reset()
+    #     print("observation_space.shape:", ob.shape)
+    #     # print(ob)
+    #     total_reward = 0.0
+    #     for i in range(200):
+    #         act = aew.action_space.sample()
+    #         next_state, reward, done, trunc, info = aew.step(act)
+    #         print("step, reward, done, act:", i, reward, done, act)
+    #         if i == 142 or i == 159:
+    #             assert reward == 44.0, (
+    #                 "1-step delayed reward in step: "
+    #                 + str(i)
+    #                 + " should have been 44.0."
+    #             )
+    #         total_reward += reward
+    #     print("total_reward:", total_reward)
+    #     aew.reset()
 
     def test_r_delay_p_noise_r_noise(self):
         """
@@ -268,11 +235,6 @@ class TestGymEnvWrapper(unittest.TestCase):
         """
         print("\033[32;1;4mTEST_MULTIPLE\033[0m")
         config = {
-            "AtariEnv": {
-                "game": "beam_rider",  # "breakout",
-                "obs_type": "image",
-                "frameskip": 1,
-            },
             "delay": 1,
             "reward_noise": lambda a: a.normal(0, 0.1),
             "transition_noise": 0.1,
@@ -289,9 +251,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         # config["log_filename"] = log_filename
 
-        from gym.envs.atari import AtariEnv
-
-        ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+        ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
         ob = aew.reset()
         print("observation_space.shape:", ob.shape)
@@ -299,7 +259,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         total_reward = 0.0
         for i in range(200):
             act = aew.action_space.sample()
-            next_state, reward, done, info = aew.step(act)
+            next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
             # Testing hardcoded values at these timesteps implicitly tests that there
             # were 21 noisy transitions in total and noise inserted in rewards.
@@ -329,11 +289,6 @@ class TestGymEnvWrapper(unittest.TestCase):
         """ """
         print("\033[32;1;4mTEST_DISC_IRR_FEATURES\033[0m")
         config = {
-            "AtariEnv": {
-                "game": "beam_rider",  # "breakout",
-                "obs_type": "image",
-                "frameskip": 1,
-            },
             "delay": 1,
             # "GymEnvWrapper": {
             "atari_preprocessing": True,
@@ -359,9 +314,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         # config["log_filename"] = log_filename
 
-        from gym.envs.atari import AtariEnv
-
-        ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+        ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
         ob = aew.reset()
         print("type(observation_space):", type(ob))
@@ -369,7 +322,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         total_reward = 0.0
         for i in range(200):
             act = aew.action_space.sample()
-            next_state, reward, done, info = aew.step(act)
+            next_state, reward, done, trunc, info = aew.step(act)
             print(
                 "step, reward, done, act, next_state[1]:",
                 i,
@@ -392,11 +345,6 @@ class TestGymEnvWrapper(unittest.TestCase):
         """ """
         print("\033[32;1;4mTEST_IMAGE_TRANSFORMS\033[0m")
         config = {
-            "AtariEnv": {
-                "game": "beam_rider",  # "breakout",
-                "obs_type": "image",
-                "frameskip": 1,
-            },
             "image_transforms": "shift,scale,rotate",
             # "image_sh_quant": 2,
             "image_width": 40,
@@ -414,9 +362,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         # config["log_filename"] = log_filename
 
-        from gym.envs.atari import AtariEnv
-
-        ae = AtariEnv(**{"game": "beam_rider", "obs_type": "image", "frameskip": 1})
+        ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
         ob = aew.reset()
         print("observation_space.shape:", ob.shape)
@@ -425,7 +371,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         total_reward = 0.0
         for i in range(200):
             act = aew.action_space.sample()
-            next_state, reward, done, info = aew.step(act)
+            next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
             if i == 153 or i == 158:
                 assert reward == 44.0, (
@@ -440,11 +386,6 @@ class TestGymEnvWrapper(unittest.TestCase):
         """ """
         print("\033[32;1;4mTEST_CONT_IRR_FEATURES\033[0m")
         config = {
-            # "AtariEnv": {
-            #     "game": 'beam_rider', #"breakout",
-            #     'obs_type': 'image',
-            #     'frameskip': 1,
-            # },
             # 'delay': 1,
             # "GymEnvWrapper": {
             "state_space_type": "continuous",
@@ -471,7 +412,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         # config["log_filename"] = log_filename
 
         from mdp_playground.envs.mujoco_env_wrapper import get_mujoco_wrapper  # hack
-        from gym.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
+        from gymnasium.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
 
         HalfCheetahWrapperV3 = get_mujoco_wrapper(HalfCheetahEnv)
         base_env_config = {}
@@ -512,7 +453,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         for i in range(200):
             act = hc3w.action_space.sample()
-            next_state, reward, done, info = hc3w.step(act)
+            next_state, reward, done, trunc, info = hc3w.step(act)
             print(
                 "step, reward, done, act, next_state:", i, reward, done, act, next_state
             )

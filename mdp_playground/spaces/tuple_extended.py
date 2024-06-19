@@ -1,6 +1,6 @@
 import numpy as np
-import gym
-from gym.spaces import Tuple
+import gymnasium as gym
+from gymnasium.spaces import Tuple
 
 
 class TupleExtended(Tuple):

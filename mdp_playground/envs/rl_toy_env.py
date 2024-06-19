@@ -12,7 +12,7 @@ import numpy as np
 import scipy
 from scipy import stats
 from scipy.spatial import distance
-import gym
+import gymnasium as gym
 from mdp_playground.spaces import (
     BoxExtended,
     DiscreteExtended,
@@ -287,7 +287,7 @@ class RLToyEnv(gym.Env):
             self.seed_int = config["seed"]
             need_to_gen_seeds = True
         else:
-            raise TypeError("Unsupported data type for seed: ", type(config["seed"]))
+            raise TypeError("Unsupported data type for seed, actual config: ", type(config["seed"]), config)
 
         # #seed #TODO move to seed() so that obs., act. space, etc. have their
         # seeds reset too when env seed is reset?
@@ -300,25 +300,25 @@ class RLToyEnv(gym.Env):
             # separation of the relevant and irrelevant dimensions!! _And_ the seed
             # remaining the same for the underlying discrete environment makes it
             # easier to write tests!
-            self.seed_dict["relevant_state_space"] = self.np_random.randint(
+            self.seed_dict["relevant_state_space"] = self.np_random.integers(
                 sys.maxsize
-            )  # #random
-            self.seed_dict["relevant_action_space"] = self.np_random.randint(
+            ).item()  # #random
+            self.seed_dict["relevant_action_space"] = self.np_random.integers(
                 sys.maxsize
-            )  # #random
-            self.seed_dict["irrelevant_state_space"] = self.np_random.randint(
+            ).item()  # #random
+            self.seed_dict["irrelevant_state_space"] = self.np_random.integers(
                 sys.maxsize
-            )  # #random
-            self.seed_dict["irrelevant_action_space"] = self.np_random.randint(
+            ).item()  # #random
+            self.seed_dict["irrelevant_action_space"] = self.np_random.integers(
                 sys.maxsize
-            )  # #random
+            ).item()  # #random
             # #IMP This is currently used to sample only for continuous spaces and not used for discrete spaces by the Environment. User might want to sample from it for multi-discrete environments. #random
-            self.seed_dict["state_space"] = self.np_random.randint(sys.maxsize)
+            self.seed_dict["state_space"] = self.np_random.integers(sys.maxsize).item()
             # #IMP This IS currently used to sample random actions by the RL agent for both discrete and continuous environments (but not used anywhere by the Environment). #random
-            self.seed_dict["action_space"] = self.np_random.randint(sys.maxsize)
-            self.seed_dict["image_representations"] = self.np_random.randint(
+            self.seed_dict["action_space"] = self.np_random.integers(sys.maxsize).item()
+            self.seed_dict["image_representations"] = self.np_random.integers(
                 sys.maxsize
-            )  # #random
+            ).item()  # #random
             # print("Mersenne0, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
         else:  # if seed dict was passed
             self.seed(self.seed_dict["env"])
@@ -1928,8 +1928,8 @@ class RLToyEnv(gym.Env):
 
         Returns
         -------
-        int or np.array, double, boolean, dict
-            The next state, reward, whether the episode terminated and additional info dict at the end of the current transition
+        int or np.array, double, boolean, boolean, dict
+            The next state, reward, whether the episode terminated, whether it was truncated and additional info dict at the end of the current transition
         """
 
         # For imaginary transitions, discussion:
@@ -2043,7 +2043,11 @@ class RLToyEnv(gym.Env):
             + str(self.reward)
         )
 
-        return self.curr_obs, self.reward, self.done, self.get_augmented_state()
+        # The following returns False for the truncated variable as early termination of episodes is handled
+        # using max_episode_steps in the environment wrapper gymnasium.wrappers.TimeLimit when using 
+        # the env RLToyFinitieHorizon. In the experiments from the paper, early termination was handled by
+        # Ray Rllib's horizon parameter.
+        return self.curr_obs, self.reward, self.done, False, self.get_augmented_state()
 
     def get_augmented_state(self):
         """Intended to return the full augmented state which would be Markovian. (However, it's not Markovian wrt the noise in P and R because we're not returning the underlying RNG.) Currently, returns the augmented state which is the sequence of length "delay + sequence_length + 1" of past states for both discrete and continuous environments. Additonally, the current state derivatives are also returned for continuous environments.
@@ -2229,7 +2233,7 @@ class RLToyEnv(gym.Env):
             + str(self.sequence_length)
         )
 
-        return self.curr_obs
+        return self.curr_obs, {}
 
     def seed(self, seed=None):
         """Initialises the Numpy RNG for the environment by calling a utility for this in Gym.
@@ -2246,7 +2250,11 @@ class RLToyEnv(gym.Env):
         int
             The seed returned by Gym
         """
-        # If seed is None, you get a randomly generated seed from gym.utils...
+        # If seed is None, you get a randomly generated seed from gymnasium.utils...
+        # As of 2024.06.18:
+        # seed_seq = np.random.SeedSequence(seed)
+        # np_seed = seed_seq.entropy
+        # rng = RandomNumberGenerator(np.random.PCG64(seed_seq))
         self.np_random, self.seed_ = gym.utils.seeding.np_random(seed)  # #random
         print(
             "Env SEED set to: "

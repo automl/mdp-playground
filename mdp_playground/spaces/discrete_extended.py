@@ -1,6 +1,6 @@
 import numpy as np
-import gym
-from gym.spaces import Discrete
+import gymnasium as gym
+from gymnasium.spaces import Discrete
 
 
 class DiscreteExtended(Discrete):

@@ -1,7 +1,7 @@
 import warnings
 import numpy as np
-import gym
-from gym.spaces import Box, Space
+import gymnasium as gym
+from gymnasium.spaces import Box, Space
 import PIL.ImageDraw as ImageDraw
 import PIL.Image as Image
 from PIL.Image import FLIP_LEFT_RIGHT, FLIP_TOP_BOTTOM

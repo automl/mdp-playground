@@ -1,5 +1,5 @@
 import numpy as np
-import gym
+import gymnasium as gym
 from mdp_playground.spaces import BoxExtended
 
 
@@ -15,8 +15,8 @@ class GridActionSpace(BoxExtended):
         # Select which dimension will have action (only 1 dimension can have
         # motion in traditional grid worlds). This also is more consistent with
         # Manhattan dist reward defined for grid worlds in rl_toy_env.py
-        ind = self.np_random.randint(self.high.size)
-        val = self.np_random.randint(3)
+        ind = self.np_random.integers(self.high.size).item()
+        val = self.np_random.integers(3).item()
         samp[ind] = val - 1  # Shift into grid action range of [-1, 0, 1]
 
         return samp.astype(int)

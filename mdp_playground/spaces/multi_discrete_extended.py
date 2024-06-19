@@ -1,6 +1,6 @@
 import numpy as np
-import gym
-from gym.spaces import MultiDiscrete
+import gymnasium as gym
+from gymnasium.spaces import MultiDiscrete
 
 
 class MultiDiscreteExtended(MultiDiscrete):
