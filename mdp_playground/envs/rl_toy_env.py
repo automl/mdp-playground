@@ -53,7 +53,7 @@ class RLToyEnv(gym.Env):
         diameter : int > 0
             For discrete environments, if diameter = d, the set of states is set to be a d-partite graph (and NOT a complete d-partite graph), where, if we order the d sets as 1, 2, .., d, states from set 1 will have actions leading to states in set 2 and so on, with the final set d having actions leading to states in set 1. Number of actions for each state will, thus, be = (number of states) / (d). Default value: 1 for discrete environments. For continuous environments, this dimension is set automatically based on the state_space_max value.
         terminal_state_density : float in range [0, 1]
-            For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states when we consider them to be ordered by their numerical value. This is w.l.o.g. because discrete states are categorical. For continuous environments, please see terminal_states and term_state_edge for how to control terminal states. Default value: 0.25.
+            For discrete environments, the fraction of states that are terminal; the terminal states are fixed to the "last" states when we consider them to be ordered by their numerical value. This is w.l.o.g. because discrete states are categorical. For continuous environments, please see terminal_states and term_state_edge for how to control terminal states. For grid environments, please see terminal_states only. Default value: 0.25.
         term_state_reward : float
             Adds this to the reward if a terminal state was reached at the current time step. Default value: 0.
         image_representations : boolean
@@ -134,7 +134,7 @@ class RLToyEnv(gym.Env):
             target_point : numpy.ndarray
                 The target point in case move_to_a_point is the reward_function. If make_denser is false, reward is only handed out when the target point is reached.
             terminal_states : Python function(state) or 1-D numpy.ndarray
-                Same description as for terminal_states under discrete envs
+                Same description as for terminal_states under discrete envs, except that the state is a grid state, e.g., a list of [x, y] coordinates for a 2-D grid.
 
     Other important config:
         Specific to discrete environments:
@@ -253,6 +253,8 @@ class RLToyEnv(gym.Env):
         # sh = logging.StreamHandler()
         # sh.setFormatter(fmt=fmtr)
         self.logger = logging.getLogger(__name__)
+        # print("Logging stuff:", self.logger, self.logger.handlers, __name__)
+        # Example output of above: <Logger mdp_playground.envs.rl_toy_env (INFO)> [] mdp_playground.envs.rl_toy_env
         # self.logger.addHandler(sh)
 
         if "log_filename" in config:
@@ -516,6 +518,7 @@ class RLToyEnv(gym.Env):
         elif config["state_space_type"] == "grid":
             assert "grid_shape" in config
             self.grid_shape = config["grid_shape"]
+            self.grid_np_data_type = np.int64
         else:
             raise ValueError("Unknown state_space_type")
 
@@ -678,7 +681,7 @@ class RLToyEnv(gym.Env):
                     )  # #seed
                 else:
                     self.action_space = self.action_spaces[0]
-            else:
+            else:  # not image_representations for discrete env
                 if self.irrelevant_features:
                     self.observation_space = TupleExtended(
                         self.observation_spaces, seed=self.seed_dict["state_space"]
@@ -919,7 +922,7 @@ class RLToyEnv(gym.Env):
                         highs = term_state  # #hardcoded
                         self.term_spaces.append(
                             BoxExtended(
-                                low=lows, high=highs, seed=self.seed_, dtype=np.int64
+                                low=lows, high=highs, seed=self.seed_, dtype=self.grid_np_data_type
                             )
                         )  # #seed #hack #TODO
 
@@ -1098,7 +1101,7 @@ class RLToyEnv(gym.Env):
                             # meaningful even if someone doesn't check for
                             # 'done' being = True
 
-                # #irrelevant dimensions part
+                # #irrelevant dimensions part for discrete env
                 if self.irrelevant_features:  # #test
                     self.config["transition_function_irrelevant"] = np.zeros(
                         shape=(self.state_space_size[1], self.action_space_size[1]),
@@ -1617,10 +1620,13 @@ class RLToyEnv(gym.Env):
                     )
             # if "transition_noise" in self.config:
             noise_in_transition = (
-                self.transition_noise(self.np_random) if self.transition_noise else 0
+                self.transition_noise(self.np_random) if self.transition_noise else 
+                np.zeros(self.state_space_dim)
             )  # #random
             self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
             next_state += noise_in_transition  # ##IMP Noise is only applied to
+            # Store the noise in transition for easier testing
+            self.noise_in_transition = noise_in_transition
             # state and not to higher order derivatives
             # TODO Check if next_state is within state space bounds
             if not self.observation_space.contains(next_state):
@@ -1660,7 +1666,7 @@ class RLToyEnv(gym.Env):
             # Need to check that dtype is int because Gym doesn't
             if (
                 self.action_space.contains(action)
-                and np.array(action).dtype == np.int64
+                and np.array(action).dtype == self.grid_np_data_type
             ):
                 if self.transition_noise:
                     # self.np_random.choice only works for 1-D arrays
@@ -1675,6 +1681,7 @@ class RLToyEnv(gym.Env):
                                 )
                                 # print(str(action) + str(new_action))
                                 self.total_noisy_transitions_episode += 1
+                                # print("action, new_action", action, new_action)
                                 action = new_action
                                 break
 
@@ -1698,7 +1705,11 @@ class RLToyEnv(gym.Env):
                 )
 
             if self.config["reward_function"] == "move_to_a_point":
-                if self.target_point == next_state:
+                if "irrelevant_features" in self.config and self.config["irrelevant_features"]:
+                    next_state_rel = next_state[:len(self.grid_shape) // 2]
+                else:
+                    next_state_rel = next_state
+                if self.target_point == next_state_rel:
                     self.reached_terminal = True
 
             next_state = np.array(next_state)
@@ -1769,7 +1780,6 @@ class RLToyEnv(gym.Env):
                     sub_seq = tuple(
                         state_considered[1 + delay : self.augmented_state_length]
                     )
-                    # print(state_considered, "with delay", self.delay, "rewarded with:", 1)
                     if sub_seq in self.rewardable_sequences:
                         reward = self.rewardable_sequences[sub_seq]
                         # print(state_considered, "with delay", self.delay, "rewarded with:", reward)
@@ -1803,7 +1813,13 @@ class RLToyEnv(gym.Env):
             else:
                 if self.config["reward_function"] == "move_along_a_line":
                     # print("######reward test", self.total_transitions_episode, np.array(self.augmented_state), np.array(self.augmented_state).shape)
-                    # #test: 1. for checking 0 distance for same action being always applied; 2. similar to 1. but for different dynamics orders; 3. similar to 1 but for different action_space_dims; 4. for a known applied action case, check manually the results of the formulae and see that programmatic results match: should also have a unit version of 4. for dist_of_pt_from_line() and an integration version here for total_deviation calc.?.
+                    # #test: 1. for checking 0 distance for same action being always applied; 
+                    # 2. similar to 1. but for different dynamics orders; 
+                    # 3. similar to 1 but for different action_space_dims; 
+                    # 4. for a known applied action case, check manually the results 
+                    # of the formulae and see that programmatic results match: should 
+                    # also have a unit version of 4. for dist_of_pt_from_line() and 
+                    # an integration version here for total_deviation calc.?.
                     data_ = np.array(state_considered, dtype=self.dtype)[
                         1 + delay : self.augmented_state_length,
                         self.config["relevant_indices"],
@@ -1818,9 +1834,9 @@ class RLToyEnv(gym.Env):
                     )
                     line_end_pts = (
                         vv[0] * np.linspace(-1, 1, 2)[:, np.newaxis]
-                    )  # vv[0] = 1st
-                    # eigenvector, corres. to Principal Component #hardcoded -100
-                    # to 100 to get a "long" line which should make calculations more
+                    )  
+                    # vv[0] = 1st eigenvector, corres. to Principal Component #hardcoded -100
+                    # to 100 initially to get a "long" line which should make calculations more
                     # robust(?: didn't seem to be the case for 1st few trials, so changed it
                     # to -1, 1; even tried up to 10000 - seems to get less precise for larger
                     # numbers) to numerical issues in dist_of_pt_from_line() below; newaxis
@@ -1911,6 +1927,7 @@ class RLToyEnv(gym.Env):
         # #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
+        self.logger.info("Reward: " + str(reward) + " Noise in reward: " + str(noise_in_reward))
         reward += noise_in_reward
         reward *= self.reward_scale
         reward += self.reward_shift
@@ -2266,7 +2283,8 @@ class RLToyEnv(gym.Env):
 
 
 def dist_of_pt_from_line(pt, ptA, ptB):
-    """Returns shortest distance of a point from a line defined by 2 points - ptA and ptB. Based on: https://softwareengineering.stackexchange.com/questions/168572/distance-from-point-to-n-dimensional-line"""
+    """Returns shortest distance of a point from a line defined by 2 points - ptA and ptB. 
+    Based on: https://softwareengineering.stackexchange.com/questions/168572/distance-from-point-to-n-dimensional-line"""
 
     tolerance = 1e-13
     lineAB = ptA - ptB
@@ -2278,10 +2296,13 @@ def dist_of_pt_from_line(pt, ptA, ptB):
         proj = dot_product / np.linalg.norm(
             lineAB
         )  # #### TODO could lead to division by zero if line is a null vector!
+        # Assuming the above happens when action was nearly 0, we return 0 in the 
+        # if block above, which is the max reward when one stays in a line in the
+        # move_along_a_line case.
         sq_dist = np.linalg.norm(lineApt) ** 2 - proj ** 2
 
         if sq_dist < 0:
-            if sq_dist < tolerance:
+            if sq_dist < -tolerance:
                 logging.warning(
                     "The squared distance calculated in dist_of_pt_from_line()"
                     " using Pythagoras' theorem was less than the tolerance allowed."

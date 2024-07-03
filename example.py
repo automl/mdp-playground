@@ -570,7 +570,7 @@ if __name__ == "__main__":
     mujoco_wrapper_example()
 
     print(set_ansi_escape + "\nRunning MiniGrid wrapper example:\n" + reset_ansi_escape)
-    minigrid_wrapper_example()
+    # minigrid_wrapper_example()
 
     # print(set_ansi_escape + "\nRunning ProcGen wrapper example:\n" + reset_ansi_escape)
     # procgen_wrapper_example()
