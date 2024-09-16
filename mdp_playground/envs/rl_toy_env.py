@@ -302,29 +302,29 @@ class RLToyEnv(gym.Env):
             # separation of the relevant and irrelevant dimensions!! _And_ the seed
             # remaining the same for the underlying discrete environment makes it
             # easier to write tests!
-            self.seed_dict["relevant_state_space"] = self.np_random.integers(
+            self.seed_dict["relevant_state_space"] = self._np_random.integers(
                 sys.maxsize
             ).item()  # #random
-            self.seed_dict["relevant_action_space"] = self.np_random.integers(
+            self.seed_dict["relevant_action_space"] = self._np_random.integers(
                 sys.maxsize
             ).item()  # #random
-            self.seed_dict["irrelevant_state_space"] = self.np_random.integers(
+            self.seed_dict["irrelevant_state_space"] = self._np_random.integers(
                 sys.maxsize
             ).item()  # #random
-            self.seed_dict["irrelevant_action_space"] = self.np_random.integers(
+            self.seed_dict["irrelevant_action_space"] = self._np_random.integers(
                 sys.maxsize
             ).item()  # #random
             # #IMP This is currently used to sample only for continuous spaces and not used for discrete spaces by the Environment. User might want to sample from it for multi-discrete environments. #random
-            self.seed_dict["state_space"] = self.np_random.integers(sys.maxsize).item()
+            self.seed_dict["state_space"] = self._np_random.integers(sys.maxsize).item()
             # #IMP This IS currently used to sample random actions by the RL agent for both discrete and continuous environments (but not used anywhere by the Environment). #random
-            self.seed_dict["action_space"] = self.np_random.integers(sys.maxsize).item()
-            self.seed_dict["image_representations"] = self.np_random.integers(
+            self.seed_dict["action_space"] = self._np_random.integers(sys.maxsize).item()
+            self.seed_dict["image_representations"] = self._np_random.integers(
                 sys.maxsize
             ).item()  # #random
-            # print("Mersenne0, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
+            # print("Mersenne0, dummy_eval:", self._np_random.get_state()[2], "dummy_eval" in config)
         else:  # if seed dict was passed
             self.seed(self.seed_dict["env"])
-            # print("Mersenne0 (dict), dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in config)
+            # print("Mersenne0 (dict), dummy_eval:", self._np_random.get_state()[2], "dummy_eval" in config)
 
         self.logger.warning("Seeds set to:" + str(self.seed_dict))
         # print(f'Seeds set to {self.seed_dict=}') # Available from Python 3.8
@@ -785,11 +785,11 @@ class RLToyEnv(gym.Env):
         # #init_state_dist: Initialises uniform distribution over non-terminal states for discrete distribution; After looking into Gym code, I can say that for continuous, it's uniform over non-terminal if limits are [a, b], shifted exponential if exactly one of the limits is np.inf, normal if both limits are np.inf - this sampling is independent for each dimension (and is done for the defined limits for the respective dimension).
         self.init_init_state_dist()
         self.init_transition_function()
-        # print("Mersenne1, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
+        # print("Mersenne1, dummy_eval:", self._np_random.get_state()[2], "dummy_eval" in self.config)
         self.init_reward_function()
 
         self.curr_obs = (
-            self.reset()
+            self.reset(seed=self.seed_dict["env"])
         )  # #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
 
         self.logger.info(
@@ -1202,7 +1202,7 @@ class RLToyEnv(gym.Env):
 
     def init_reward_function(self):
         """Initialises reward function, R by selecting random sequences to be rewardable for discrete environments. For continuous environments, we have fixed available options for the reward function."""
-        # print("Mersenne2, dummy_eval:", self.np_random.get_state()[2], "dummy_eval" in self.config)
+        # print("Mersenne2, dummy_eval:", self._np_random.get_state()[2], "dummy_eval" in self.config)
 
         # #TODO Maybe refactor this code and put useful reusable permutation generators, etc. in one library
         if self.config["state_space_type"] == "discrete":
@@ -1248,7 +1248,7 @@ class RLToyEnv(gym.Env):
                                 " set for given reward_density, sequence_length,"
                                 " diameter and terminal_state_density. Setting it to 1."
                             )
-                        sel_sequence_nums = self.np_random.choice(
+                        sel_sequence_nums = self._np_random.choice(
                             num_possible_sequences,
                             size=num_sel_sequences,
                             replace=False,
@@ -1256,7 +1256,7 @@ class RLToyEnv(gym.Env):
                         # sequences have an equal likelihood of being selected
                         # for being a reward sequence; This line also makes it
                         # not possible to have this function be portable as
-                        # part of a library because it use the np_random
+                        # part of a library because it use the _np_random
                         # member variable of this class
                         for i_s in range(diameter):  # Allow sequences to begin in
                             # any of the independent sets and therefore this loop is
@@ -1344,19 +1344,19 @@ class RLToyEnv(gym.Env):
                                     " sequence_length, diameter and"
                                     " terminal_state_density. Setting it to 1."
                                 )
-                            # print("Mersenne3:", self.np_random.get_state()[2])
-                            sel_sequence_nums = self.np_random.choice(
+                            # print("Mersenne3:", self._np_random.get_state()[2])
+                            sel_sequence_nums = self._np_random.choice(
                                 num_possible_permutations,
                                 size=num_sel_sequences,
                                 replace=False,
                             )  # #random # This assumes that all
                             # sequences have an equal likelihood of being
                             # selected for being a reward sequence; # TODO
-                            # this code could be replaced with self.np_random.permutation(
+                            # this code could be replaced with self._np_random.permutation(
                             # non_term_state_space_size)[self.sequence_length]?
                             # Replacement becomes a problem then! We have to
                             # keep sampling until we have all unique rewardable sequences.
-                            # print("Mersenne4:", self.np_random.get_state()[2])
+                            # print("Mersenne4:", self._np_random.get_state()[2])
 
                             total_clashes = 0
                             for i in range(num_sel_sequences):
@@ -1430,7 +1430,7 @@ class RLToyEnv(gym.Env):
                     # used as keys for a dict
                     if callable(self.reward_dist):
                         self.rewardable_sequences[sequence] = self.reward_dist(
-                            self.np_random, self.rewardable_sequences
+                            self._np_random, self.rewardable_sequences
                         )
                     else:
                         self.rewardable_sequences[sequence] = 1.0  # this is the
@@ -1486,7 +1486,7 @@ class RLToyEnv(gym.Env):
                             reward_dist_[0], reward_dist_[1], num=num_rews
                         )
                     assert rews[-1] == 1.0
-                    self.np_random.shuffle(rews)
+                    self._np_random.shuffle(rews)
 
                     def get_rews(rng, r_dict):
                         return rews[len(r_dict)]
@@ -1620,7 +1620,7 @@ class RLToyEnv(gym.Env):
                     )
             # if "transition_noise" in self.config:
             noise_in_transition = (
-                self.transition_noise(self.np_random) if self.transition_noise else 
+                self.transition_noise(self._np_random) if self.transition_noise else 
                 np.zeros(self.state_space_dim)
             )  # #random
             self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
@@ -1669,8 +1669,8 @@ class RLToyEnv(gym.Env):
                 and np.array(action).dtype == self.grid_np_data_type
             ):
                 if self.transition_noise:
-                    # self.np_random.choice only works for 1-D arrays
-                    if self.np_random.uniform() < self.transition_noise:  # #random
+                    # self._np_random.choice only works for 1-D arrays
+                    if self._np_random.uniform() < self.transition_noise:  # #random
                         while True:  # Be careful of infinite loops
                             new_action = list(self.action_space.sample())  # #random
                             if new_action != action:
@@ -1923,7 +1923,7 @@ class RLToyEnv(gym.Env):
             # print("self.reward_buffer", self.reward_buffer)
             del self.reward_buffer[0]
 
-        noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0
+        noise_in_reward = self.reward_noise(self._np_random) if self.reward_noise else 0
         # #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
@@ -2098,7 +2098,7 @@ class RLToyEnv(gym.Env):
 
         return augmented_state_dict
 
-    def reset(self):
+    def reset(self, seed=None):
         """Resets the environment for the beginning of an episode and samples a start state from rho_0. For discrete environments uses the defined rho_0 directly. For continuous environments, samples a state and resamples until a non-terminal state is sampled.
 
         Returns
@@ -2106,6 +2106,7 @@ class RLToyEnv(gym.Env):
         int or np.array
             The start state for a new episode.
         """
+        res_ = super(RLToyEnv, self).reset(seed=seed)  # Returns None (13.9.24, Gymnasium v0.29)
 
         # on episode "end" stuff (to not be invoked when reset() called when
         # self.total_episodes = 0; end is in quotes because it may not be a true
@@ -2135,13 +2136,13 @@ class RLToyEnv(gym.Env):
         self.total_episodes += 1
 
         if self.config["state_space_type"] == "discrete":
-            self.curr_state_relevant = self.np_random.choice(
+            self.curr_state_relevant = self._np_random.choice(
                 self.state_space_size[0], p=self.config["relevant_init_state_dist"]
             )  # #random
             self.curr_state = self.curr_state_relevant  # # curr_state set here
             # already in case if statement below is not entered
             if self.irrelevant_features:
-                self.curr_state_irrelevant = self.np_random.choice(
+                self.curr_state_irrelevant = self._np_random.choice(
                     self.state_space_size[1],
                     p=self.config["irrelevant_init_state_dist"],
                 )  # #random
@@ -2260,7 +2261,7 @@ class RLToyEnv(gym.Env):
         Parameters
         ----------
         seed : int
-            seed to initialise the np_random instance held by the environment. Cannot use numpy.int64 or similar because Gym doesn't accept it.
+            seed to initialise the _np_random instance held by the environment. Cannot use numpy.int64 or similar because Gym doesn't accept it.
 
         Returns
         -------
@@ -2272,7 +2273,7 @@ class RLToyEnv(gym.Env):
         # seed_seq = np.random.SeedSequence(seed)
         # np_seed = seed_seq.entropy
         # rng = RandomNumberGenerator(np.random.PCG64(seed_seq))
-        self.np_random, self.seed_ = gym.utils.seeding.np_random(seed)  # #random
+        self._np_random, self.seed_ = gym.utils.seeding.np_random(seed)  # #random
         print(
             "Env SEED set to: "
             + str(seed)

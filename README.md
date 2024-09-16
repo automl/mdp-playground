@@ -49,7 +49,7 @@ pip install -r requirements.txt
 pip install -e .[extras_disc]
 ```
 
-Please follow the following commands to install for the continuous and complex experiments. **IMPORTANT**: In case, you do not have MuJoCo, please ignore any mujoco-py related installation errors below:
+Please follow the following commands to install for the continuous and complex experiments. **IMPORTANT**: In case, you do not have MuJoCo, please ignore any mujoco related installation errors below:
 ```bash
 conda create -n py36_toy_rl_cont_comp python=3.6
 conda activate py36_toy_rl_cont_comp

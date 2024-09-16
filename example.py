@@ -11,8 +11,8 @@ Calling this file as a script, invokes the following examples:
     one for grid environments with image representations
     one for wrapping Atari env qbert
     one for wrapping Mujoco env HalfCheetah
-    one for wrapping MiniGrid env
-    one for wrapping ProcGen env
+    one for wrapping MiniGrid env  # Currently commented out due to some errors
+    one for wrapping ProcGen env  # Currently commented out due to some errors
     two examples at the end showing how to create toy envs using gym.make()
 
 Many further examples can be found in test_mdp_playground.py.
@@ -383,32 +383,98 @@ def atari_wrapper_example():
     display_image(next_state)
 
 
-def mujoco_wrapper_example():
+def mujoco_wrapper_examples():
 
+    # For Mujoco envs, a few specific dimensions need to be changed by fiddling with 
+    # attributes of the MujocoEnv class. This is achieved through a Mujoco
+    # wrapper that subclasses the Mujoco env and modifies relevant properties.
+    # Please see the documentation of mujoco_env_wrapper.py for more details. 
+    # Below, we specify 2 dicts: one for the specific dimensions that are changed
+    # using the Mujoco wrapper and the other for the general dimensions that are
+    # changed using a GymEnvWrapper.
+
+    # 1: Mujoco wrapper config:
     # The scalar values for the dimensions passed in this dict are used to
     # multiply the base environments' values. For these Mujoco envs, the
     # time_unit is achieved by multiplying the Gym Mujoco env's frame_skip and
-    # thus will be the integer part of time_unit * frame_skip. The time_unit
+    # thus will be the integer part of time_unit * frame_skip. (For HalfCheetah-v4
+    # and Pusher-v4, frame_skip is 5; for Reacher-v4, it is 2.) The time_unit
     # is NOT achieved by changing Mujoco's timestep because that would change
     # the numerical integration done my Mujoco and thus the environment
     # dynamics.
-    config = {
-        "seed": 0,
+    mujoco_wrap_config = {
         "action_space_max": 0.5,
         "time_unit": 0.5,
     }
 
-    # This actually makes a subclass and not a wrapper. Because, some
+    # 2: Gym wrapper config:
+    gym_wrap_config = {
+        "seed": 0,
+        "state_space_type": "continuous",
+        "transition_noise": 0.25,
+    }
+
+
+    # This makes a subclass and not a wrapper because some
     # frameworks might need an instance of this class to also be an instance
     # of the Mujoco base_class.
     try:
         from mdp_playground.envs import get_mujoco_wrapper
-        from gymnasium.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
 
+        # HalfCheetah example
+        from gymnasium.envs.mujoco.half_cheetah_v4 import HalfCheetahEnv
         wrapped_mujoco_env = get_mujoco_wrapper(HalfCheetahEnv)
 
-        env = wrapped_mujoco_env(**config)
-        state = env.reset()[0]
+        env = wrapped_mujoco_env(**mujoco_wrap_config)
+
+        from mdp_playground.envs import GymEnvWrapper
+        import gymnasium as gym
+        env = GymEnvWrapper(env, **gym_wrap_config)
+
+        # From Gymnasium v26, the seed is set in the reset method.
+        state = env.reset(seed=gym_wrap_config["seed"])[0]
+
+        print(
+            "Taking a step in the environment with a random action and printing the transition:"
+        )
+        action = env.action_space.sample()
+        next_state, reward, done, trunc, info = env.step(action)
+        print("sars', done =", state, action, reward, next_state, done)
+
+        env.close()
+
+        # Pusher example
+        from gymnasium.envs.mujoco.pusher_v4 import PusherEnv
+        wrapped_mujoco_env = get_mujoco_wrapper(PusherEnv)
+
+        env = wrapped_mujoco_env(**mujoco_wrap_config)
+
+        from mdp_playground.envs import GymEnvWrapper
+        import gymnasium as gym
+        env = GymEnvWrapper(env, **gym_wrap_config)
+
+        state = env.reset(seed=gym_wrap_config["seed"])[0]
+
+        print(
+            "Taking a step in the environment with a random action and printing the transition:"
+        )
+        action = env.action_space.sample()
+        next_state, reward, done, trunc, info = env.step(action)
+        print("sars', done =", state, action, reward, next_state, done)
+
+        env.close()
+
+        # Reacher example
+        from gymnasium.envs.mujoco.reacher_v4 import ReacherEnv
+        wrapped_mujoco_env = get_mujoco_wrapper(ReacherEnv)
+
+        env = wrapped_mujoco_env(**mujoco_wrap_config)
+        
+        from mdp_playground.envs import GymEnvWrapper
+        import gymnasium as gym
+        env = GymEnvWrapper(env, **gym_wrap_config)
+
+        state = env.reset(seed=gym_wrap_config["seed"])[0]
 
         print(
             "Taking a step in the environment with a random action and printing the transition:"
@@ -424,7 +490,7 @@ def mujoco_wrapper_example():
             "Exception:",
             type(e),
             e,
-            "caught. You may need to install mujoco-py. NOT running mujoco_wrapper_example.",
+            "caught. You may need to install mujoco with pip. NOT running mujoco_wrapper_examples.",
         )
         return
 
@@ -567,7 +633,7 @@ if __name__ == "__main__":
     atari_wrapper_example()
 
     print(set_ansi_escape + "\nRunning Mujoco wrapper example:\n" + reset_ansi_escape)
-    mujoco_wrapper_example()
+    mujoco_wrapper_examples()
 
     print(set_ansi_escape + "\nRunning MiniGrid wrapper example:\n" + reset_ansi_escape)
     # minigrid_wrapper_example()
@@ -579,6 +645,7 @@ if __name__ == "__main__":
     import mdp_playground
     import gymnasium as gym
 
+    # The following are with seed=None:
     gym.make("RLToy-v0")
 
     env = gym.make(

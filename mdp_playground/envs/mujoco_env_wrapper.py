@@ -1,12 +1,12 @@
 # from gymnasium.envs.mujoco.mujoco_env import MujocoEnv
-from gymnasium.envs.mujoco.half_cheetah_v3 import HalfCheetahEnv
-from gymnasium.envs.mujoco.pusher import PusherEnv
-from gymnasium.envs.mujoco.reacher import ReacherEnv
+from gymnasium.envs.mujoco.half_cheetah_v4 import HalfCheetahEnv
+from gymnasium.envs.mujoco.pusher_v4 import PusherEnv
+from gymnasium.envs.mujoco.reacher_v4 import ReacherEnv
 import copy
 
 
 def get_mujoco_wrapper(base_class):
-    """Wraps a mujoco-py environment to be able to modify its low-level Mujoco XML attributes and inject the dimensions of MDP Playground. Please see [`example.py`](example.py) for some simple examples of how to use this class. The values for these dimensions are passed in a config dict as for mdp_playground.envs.RLToyEnv. The description for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.
+    """Wraps a mujoco environment, by subclassing it, to be able to modify its low-level Mujoco XML attributes and inject the dimensions of MDP Playground. Please see [`example.py`](example.py) for some simple examples of how to use this class. The values for these dimensions are passed in a config dict as for mdp_playground.envs.RLToyEnv. The description for the supported dimensions below can be found in mdp_playground/envs/rl_toy_env.py.
 
     Currently supported dimensions:
         time_unit
@@ -14,7 +14,7 @@ def get_mujoco_wrapper(base_class):
 
     For both of these dimensions, the scalar value passed in the dict is used to multiply the base environments' values.
 
-    For the Mujoco environments, the time_unit is achieved by multiplying the Gym Mujoco environments's frame_skip and thus needs to be such that time_unit * frame_skip is an integer. The time_unit is NOT achieved by changing Mujoco's timestep because that would change the numerical integration done by Mujoco and thus the objective of the environment. The _ctrl_cost_weight and _forward_reward_weight used by the underlying mujoco-py class to calculate rewards in th e environment are proportionally multiplied by the time_unit, so that the rewards are on the same scale across different time_units on average.
+    For the Mujoco environments, the time_unit is achieved by multiplying the Gym Mujoco environments's frame_skip and thus needs to be such that time_unit * frame_skip is an integer. The time_unit is NOT achieved by changing Mujoco's timestep because that would change the numerical integration done by Mujoco and thus the objective of the environment. The _ctrl_cost_weight and _forward_reward_weight used by the underlying MujocoEnv class to calculate rewards in the environment are proportionally multiplied by the time_unit, so that the rewards are on the same scale across different time_units on average.
 
     Similarly for the action_space_max (which controls the action range), the new action range is achieved by multiplying the Gym Mujoco environments's action_max and action_min by the action_space_max passed in the dict.
 
@@ -102,6 +102,12 @@ def get_mujoco_wrapper(base_class):
                         self._forward_reward_weight,
                         "corresponding to time_unit in config.",
                     )
+                else:
+                    print("Current mujoco env is not HalfCheetah v4, so only modified frameskip when changing time_unit. "\
+                        "Not changing the _ctrl_cost_weight or _forward_reward_weight. It may make sense to also modify "\
+                        "these variables depending on their relation with the time_unit. You will need to look deeper into "\
+                        "how the reward function is defined to know if this is needed.")
+
 
         def step(self, action):  # hack
             obs, reward, done, trunc, info = super(MujocoEnvWrapper, self).step(action)

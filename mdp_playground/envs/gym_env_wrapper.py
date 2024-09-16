@@ -55,11 +55,12 @@ class GymEnvWrapper(gym.Env):
         # during the run of an env, the expectation is that all obs., act. space,
         # etc. seeds are set during that call? Only Atari in Gym seems to do something 
         # similar, the others I saw there don't seem to set seed for obs., act. spaces.
-        self.env.seed(
-            seed_int
-        )  # #seed ###IMP Apparently Atari also has a seed. :/ Without this, for beam_rider(?), about 1 in 5 times I got reward of 88.0 and 44.0 the remaining times with the same action sequence!! With setting this seed, I got the same reward of 44.0 when I ran about 20 times.; ##TODO If this is really a wrapper, should it be modifying the seed of the env?
-        obs_space_seed = self.np_random.integers(sys.maxsize).item()  # random
-        act_space_seed = self.np_random.integers(sys.maxsize).item()  # random
+        if "seed" in dir(self.env):  # hack
+            self.env.seed(
+                seed_int
+            )  # #seed ###IMP Apparently Atari also has a seed. :/ Without this, for beam_rider(?), about 1 in 5 times I got reward of 88.0 and 44.0 the remaining times with the same action sequence!! With setting this seed, I got the same reward of 44.0 when I ran about 20 times.; ##TODO If this is really a wrapper, should it be modifying the seed of the env?
+        obs_space_seed = self._np_random.integers(sys.maxsize).item()  # random
+        act_space_seed = self._np_random.integers(sys.maxsize).item()  # random
         self.env.observation_space.seed(obs_space_seed)  # seed
         self.env.action_space.seed(act_space_seed)  # seed
 
@@ -207,7 +208,7 @@ class GymEnvWrapper(gym.Env):
             # self.irrelevant_features =  config["irrelevant_features"]
             irr_toy_env_conf = config["irrelevant_features"]
             if "seed" not in irr_toy_env_conf:
-                irr_toy_env_conf["seed"] = self.np_random.integers(sys.maxsize).item()  # random
+                irr_toy_env_conf["seed"] = self._np_random.integers(sys.maxsize).item()  # random
 
             if config["state_space_type"] == "discrete":
                 pass
@@ -340,7 +341,7 @@ class GymEnvWrapper(gym.Env):
                 probs[action] = 1 - self.transition_noise
                 old_action = action
                 action = int(
-                    self.np_random.choice(self.env.action_space.n, size=1, p=probs)
+                    self._np_random.choice(self.env.action_space.n, size=1, p=probs)
                 )  # random
                 if old_action != action:
                     # print("NOISE inserted", old_action, action)
@@ -348,7 +349,7 @@ class GymEnvWrapper(gym.Env):
         else:  # cont. envs
             if self.transition_noise is not None:
                 noise_in_transition = (
-                    self.transition_noise(self.np_random)
+                    self.transition_noise(self._np_random)
                     if self.transition_noise
                     else 0
                 )  # #random
@@ -400,7 +401,7 @@ class GymEnvWrapper(gym.Env):
         # action and time_step as well. Would need to change implementation to
         # have a queue for the rewards achieved and then pick the reward that was
         # generated delay timesteps ago.
-        noise_in_reward = self.reward_noise(self.np_random) if self.reward_noise else 0
+        noise_in_reward = self.reward_noise(self._np_random) if self.reward_noise else 0
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
@@ -409,7 +410,11 @@ class GymEnvWrapper(gym.Env):
 
         return next_state, reward, done, trunc, info
 
-    def reset(self):
+    def reset(self, seed=None):
+        '''
+        From Gymnasium v26, the reset method has a seed parameter. 
+        '''
+
         # on episode "end" stuff (to not be invoked when reset() called when
         # self.total_episodes = 0; end is in quotes because it may not be a true
         # episode end reached by reaching a terminal state, but reset() may have
@@ -445,18 +450,18 @@ class GymEnvWrapper(gym.Env):
 
         if "irrelevant_features" in self.config:
             if self.config["state_space_type"] == "discrete":
-                reset_state = self.env.reset()[0]
-                reset_state_irr = self.irr_toy_env.reset()[0]
-                reset_state = tuple([reset_state, reset_state_irr])
+                reset_state, reset_state_info = self.env.reset(seed=seed)
+                reset_state_irr, reset_state_irr_info = self.irr_toy_env.reset(seed=seed)
+                reset_state = tuple([reset_state, reset_state_irr]), tuple([reset_state_info, reset_state_irr_info])
             else:
-                reset_state = self.env.reset()[0]
-                reset_state_irr = self.irr_toy_env.reset()[0]
-                reset_state = np.concatenate((reset_state, reset_state_irr))
+                reset_state, reset_state_info = self.env.reset(seed=seed)
+                reset_state_irr, reset_state_irr_info = self.irr_toy_env.reset(seed=seed)
+                reset_state = np.concatenate((reset_state, reset_state_irr)), tuple([reset_state_info, reset_state_irr_info])
         else:
-            reset_state = self.env.reset()[0]
+            reset_state = self.env.reset(seed=seed)
 
         if self.image_transforms:
-            reset_state = self.get_transformed_image(reset_state)
+            reset_state = (self.get_transformed_image(reset_state[0]), reset_state[1])
 
         return reset_state
         # return super(GymEnvWrapper, self).reset()
@@ -467,7 +472,7 @@ class GymEnvWrapper(gym.Env):
         Parameters
         ----------
         seed : int
-            seed to initialise the np_random instance held by the environment. Cannot use numpy.int64 or similar because Gym doesn't accept it.
+            seed to initialise the _np_random instance held by the environment. Cannot use numpy.int64 or similar because Gym doesn't accept it.
 
         Returns
         -------
@@ -475,7 +480,7 @@ class GymEnvWrapper(gym.Env):
             The seed returned by Gym
         """
         # If seed is None, you get a randomly generated seed from gymnasium.utils...
-        self.np_random, self.seed_ = gym.utils.seeding.np_random(seed)  # random
+        self._np_random, self.seed_ = gym.utils.seeding.np_random(seed)  # random
         print(
             "Env SEED set to: "
             + str(seed)
@@ -540,7 +545,7 @@ class GymEnvWrapper(gym.Env):
         #             + str(min_R)
         #         )
         #     min_R = np.log(min_R)
-        #     log_sample = min_R + self.np_random.random() * (max_R - min_R)
+        #     log_sample = min_R + self._np_random.random() * (max_R - min_R)
         #     sample_ = np.exp(log_sample)
         #     R = int(sample_)
         #     # print("R", min_R, max_R)
@@ -548,8 +553,8 @@ class GymEnvWrapper(gym.Env):
         if "shift" in self.image_transforms:
             max_shift_w = (tot_width - R) // 2
             max_shift_h = (tot_height - R) // 2
-            add_shift_w = self.np_random.integers(-max_shift_w + 1, max_shift_w).item()
-            add_shift_h = self.np_random.integers(-max_shift_h + 1, max_shift_h).item()
+            add_shift_w = self._np_random.integers(-max_shift_w + 1, max_shift_w).item()
+            add_shift_h = self._np_random.integers(-max_shift_h + 1, max_shift_h).item()
             # print("add_shift_w, add_shift_h", add_shift_w, add_shift_h)
             add_shift_w = int(add_shift_w / sh_quant) * sh_quant
             add_shift_h = int(add_shift_h / sh_quant) * sh_quant
