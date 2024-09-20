@@ -38,12 +38,12 @@ class RLToyEnv(gym.Env):
             Delays each reward by this number of timesteps. Default value: 0.
         sequence_length : int >= 1
             Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length are set to be rewardable at initialisation if use_custom_mdp = false and generate_random_mdp = true. Default value: 1.
-        transition_noise : float in range [0, 1] or Python function(rng)
+        transition_noise : float in range [0, 1] or Python function(state, action, rng)
             For discrete environments, it is a float that specifies the fraction of times the environment transitions to a noisy next state at each timestep, independently and uniformly at random.
-            For continuous environments, if it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise. If it is a Python function with one argument, it is added to next state. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility. Default value: 0.
-        reward_noise : float or Python function(rng)
+            For continuous environments, if it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise. If it is a Python function, it should have 3 arguments and return a noise value that is added to next state. The arguments are provided to it by the existing code in this class and are the current state, the current action and the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG is used to ensure reproducibility. Default value: 0.
+        reward_noise : float or Python function(state, action, rng)
             If it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise.
-            If it's a Python function with one argument, it is added to the reward given at every time step. The argument is the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG should be used to perform calls to the desired random function to be used as noise to ensure reproducibility. Default value: 0.
+            If it is a Python function, it should have 3 arguments and return a noise value that is to the reward. The arguments are provided to it by the existing code in this class and are the current state, the current action and the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG is used to ensure reproducibility. Default value: 0.
         reward_density : float in range [0, 1]
             The fraction of possible sequences of a given length that will be selected to be rewardable at initialisation time. Default value: 0.25.
         reward_scale : float
@@ -61,7 +61,7 @@ class RLToyEnv(gym.Env):
             For discrete envs, this is handled by an mdp_playground.spaces.ImageMultiDiscrete object. It associates the image of an n + 3 sided polygon for a categorical state n. More details can be found in the documentation for the ImageMultiDiscrete class.
             For continuous and grid envs, this is handled by an mdp_playground.spaces.ImageContinuous object. More details can be found in the documentation for the ImageContinuous class.
         irrelevant_features : boolean
-            If True, an additional irrelevant sub-space (irrelevant to achieving rewards) is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space.
+            If True, an additional irrelevant sub-space (irrelevant to achieving rewards) is present as part of the observation space. This sub-space has its own transition dynamics independent of the dynamics of the relevant sub-space. No noise is currently added to irrelevant_features parts in continuous or grid spaces. Default value: False.
             For discrete environments, additionally, state_space_size must be specified as a list.
             For continuous environments, the option relevant_indices must be specified. This option specifies the dimensions relevant to achieving rewards.
             For grid environments, nothing additional needs to be done as relevant grid shape is also used as the irrelevant grid shape.
@@ -243,16 +243,16 @@ class RLToyEnv(gym.Env):
 
         # Set other default settings for config to use if config is passed without any values for them
         if "log_level" not in config:
-            self.log_level = logging.CRITICAL  # #logging.NOTSET
+            self.log_level = logging.NOTSET  # #logging.CRITICAL
         else:
             self.log_level = config["log_level"]
 
         # print('self.log_level', self.log_level)
-        logging.getLogger(__name__).setLevel(self.log_level)
         # fmtr = logging.Formatter(fmt='%(message)s - %(levelname)s - %(name)s - %(asctime)s', datefmt='%m.%d.%Y %I:%M:%S %p', style='%')
         # sh = logging.StreamHandler()
         # sh.setFormatter(fmt=fmtr)
         self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(self.log_level)
         # print("Logging stuff:", self.logger, self.logger.handlers, __name__)
         # Example output of above: <Logger mdp_playground.envs.rl_toy_env (INFO)> [] mdp_playground.envs.rl_toy_env
         # self.logger.addHandler(sh)
@@ -389,7 +389,7 @@ class RLToyEnv(gym.Env):
                 self.reward_noise = config["reward_noise"]
             else:
                 reward_noise_std = config["reward_noise"]
-                self.reward_noise = lambda a: a.normal(0, reward_noise_std)
+                self.reward_noise = lambda s, a, rng: rng.normal(0, reward_noise_std)
         else:
             self.reward_noise = None
 
@@ -399,7 +399,7 @@ class RLToyEnv(gym.Env):
                     self.transition_noise = config["transition_noise"]
                 else:
                     p_noise_std = config["transition_noise"]
-                    self.transition_noise = lambda a: a.normal(0, p_noise_std)
+                    self.transition_noise = lambda s, a, rng: rng.normal(0, p_noise_std, s.shape)
             else:  # discrete case
                 self.transition_noise = config["transition_noise"]
         else:  # no transition noise
@@ -792,13 +792,13 @@ class RLToyEnv(gym.Env):
             self.reset(seed=self.seed_dict["env"])
         )  # #TODO Maybe not call it here, since Gym seems to expect to _always_ call this method when using an environment; make this seedable? DO NOT do seed dependent initialization in reset() otherwise the initial state distrbution will always be at the same state at every call to reset()!! (Gym env has its own seed? Yes, it does, as does also space);
 
-        self.logger.info(
+        self.logger.debug(
             "self.augmented_state, len: "
             + str(self.augmented_state)
             + ", "
             + str(len(self.augmented_state))
         )
-        self.logger.info(
+        self.logger.debug(
             "MDP Playground toy env instantiated with config: " + str(self.config)
         )
         print("MDP Playground toy env instantiated with config: " + str(self.config))
@@ -1286,7 +1286,7 @@ class RLToyEnv(gym.Env):
                                     # replace=True) # Be careful that sequence_length is less than state space
                                     # size
                                 sequences.append(specific_sequence)
-                            self.logger.info(
+                            self.logger.debug(
                                 "Total no. of rewarded sequences:"
                                 + str(len(sequences))
                                 + "Out of"
@@ -1303,7 +1303,7 @@ class RLToyEnv(gym.Env):
                         for i in range(length):
                             permutations.append(maximum - (i // diameter))
                         # permutations = list(range(maximum + 1 - length, maximum + 1))
-                        self.logger.info(
+                        self.logger.debug(
                             "No. of choices for each element in a"
                             " possible sequence (Total no. of permutations will be a"
                             " product of this), no. of possible perms per independent"
@@ -1412,7 +1412,7 @@ class RLToyEnv(gym.Env):
                                 " rewardable sequence when it was generated. No. of"
                                 " times a clash was detected:" + str(total_clashes)
                             )
-                            self.logger.info(
+                            self.logger.debug(
                                 "Total no. of rewarded sequences:"
                                 + str(len(sequences))
                                 + "Out of"
@@ -1556,7 +1556,7 @@ class RLToyEnv(gym.Env):
                 new_next_state = self.observation_spaces[0].sample(prob=probs)  # random
                 # print("noisy old next_state, new_next_state", next_state, new_next_state)
                 if next_state != new_next_state:
-                    self.logger.info(
+                    self.logger.debug(
                         "NOISE inserted! old next_state, new_next_state"
                         + str(next_state)
                         + str(new_next_state)
@@ -1618,19 +1618,22 @@ class RLToyEnv(gym.Env):
                         + str(action)
                         + " out of range of action space. Applying 0 action!!"
                     )
+
             # if "transition_noise" in self.config:
             noise_in_transition = (
-                self.transition_noise(self._np_random) if self.transition_noise else 
+                self.transition_noise(state, action, self._np_random) if self.transition_noise else 
                 np.zeros(self.state_space_dim)
             )  # #random
             self.total_abs_noise_in_transition_episode += np.abs(noise_in_transition)
+            self.logger.debug("total_transitions_episode: " + str(self.total_transitions_episode)
+                               + " Noise in transition: " + str(noise_in_transition))
             next_state += noise_in_transition  # ##IMP Noise is only applied to
             # Store the noise in transition for easier testing
             self.noise_in_transition = noise_in_transition
             # state and not to higher order derivatives
             # TODO Check if next_state is within state space bounds
             if not self.observation_space.contains(next_state):
-                self.logger.info(
+                self.logger.debug(
                     "next_state out of bounds. next_state, clipping to"
                     + str(next_state)
                     + str(
@@ -1674,7 +1677,7 @@ class RLToyEnv(gym.Env):
                         while True:  # Be careful of infinite loops
                             new_action = list(self.action_space.sample())  # #random
                             if new_action != action:
-                                self.logger.info(
+                                self.logger.debug(
                                     "NOISE inserted! old action, new_action"
                                     + str(action)
                                     + str(new_action)
@@ -1690,11 +1693,11 @@ class RLToyEnv(gym.Env):
                     # actions -1, 0, 1 represent back, noop, forward respt.
                     next_state.append(state[i] + action[i])
                     if next_state[i] < 0:
-                        self.logger.info("Underflow in grid next state. Bouncing back.")
+                        self.logger.debug("Underflow in grid next state. Bouncing back.")
                         next_state[i] = 0
 
                     if next_state[i] >= self.grid_shape[i]:
-                        self.logger.info("Overflow in grid next state. Bouncing back.")
+                        self.logger.debug("Overflow in grid next state. Bouncing back.")
                         next_state[i] = self.grid_shape[i] - 1
 
             else:  # if action is from outside allowed action_space
@@ -1792,7 +1795,7 @@ class RLToyEnv(gym.Env):
             # print("self.reward_buffer", self.reward_buffer)
             del self.reward_buffer[0]
 
-            self.logger.info("rew" + str(reward))
+            self.logger.debug("rew" + str(reward))
 
         elif self.config["state_space_type"] == "continuous":
             # ##TODO Make reward for along a line case to be length of line
@@ -1826,7 +1829,7 @@ class RLToyEnv(gym.Env):
                     ]
                     data_mean = data_.mean(axis=0)
                     uu, dd, vv = np.linalg.svd(data_ - data_mean)
-                    self.logger.info(
+                    self.logger.debug(
                         "uu.shape, dd.shape, vv.shape ="
                         + str(uu.shape)
                         + str(dd.shape)
@@ -1852,7 +1855,7 @@ class RLToyEnv(gym.Env):
                         total_deviation += dist_of_pt_from_line(
                             data_pt, line_end_pts[0], line_end_pts[-1]
                         )
-                    self.logger.info(
+                    self.logger.debug(
                         "total_deviation of pts from fit line:" + str(total_deviation)
                     )
 
@@ -1923,8 +1926,8 @@ class RLToyEnv(gym.Env):
             # print("self.reward_buffer", self.reward_buffer)
             del self.reward_buffer[0]
 
-        noise_in_reward = self.reward_noise(self._np_random) if self.reward_noise else 0
-        # #random ###TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
+        noise_in_reward = self.reward_noise(state, action, self._np_random) if self.reward_noise else 0
+        # #random ### TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         self.logger.info("Reward: " + str(reward) + " Noise in reward: " + str(noise_in_reward))
@@ -2024,6 +2027,8 @@ class RLToyEnv(gym.Env):
                     #     print("NOISE inserted! old next_state_irrelevant, new_next_state_irrelevant", next_state_irrelevant, new_next_state_irrelevant)
                     #     self.total_noisy_transitions_irrelevant_episode += 1
                     next_state_irrelevant = new_next_state_irrelevant
+        # No noise is currently added to irrelevant_features parts in continuous or grid spaces
+
 
         # Transform discrete back to multi-discrete if needed
         if self.config["state_space_type"] == "discrete":
@@ -2049,14 +2054,14 @@ class RLToyEnv(gym.Env):
             self.reward += (
                 self.term_state_reward * self.reward_scale
             )  # Scale before or after?
-        self.logger.info(
+        self.logger.debug(
             "sas'r:   "
             + str(self.augmented_state[-2])
-            + "   "
+            + "\n"
             + str(action)
-            + "   "
+            + "\n"
             + str(self.augmented_state[-1])
-            + "   "
+            + "\n"
             + str(self.reward)
         )
 
@@ -2147,11 +2152,11 @@ class RLToyEnv(gym.Env):
                     p=self.config["irrelevant_init_state_dist"],
                 )  # #random
                 self.curr_state = (self.curr_state_relevant, self.curr_state_irrelevant)
-                self.logger.info(
+                self.logger.debug(
                     "RESET called. Relevant part of state reset to:"
                     + str(self.curr_state_relevant)
                 )
-                self.logger.info(
+                self.logger.debug(
                     "Irrelevant part of state reset to:"
                     + str(self.curr_state_irrelevant)
                 )
@@ -2176,7 +2181,7 @@ class RLToyEnv(gym.Env):
                     for i in range(len(self.term_spaces)):
                         if self.term_spaces[i].contains(self.curr_state):
                             j = i
-                    self.logger.info(
+                    self.logger.debug(
                         "A state was sampled in term state subspace."
                         " Therefore, resampling. State was, subspace was:"
                         + str(self.curr_state)
@@ -2213,7 +2218,7 @@ class RLToyEnv(gym.Env):
                 self.curr_state = self.feature_space.sample().astype(int)  # #random
                 self.curr_state_relevant = list(self.curr_state[[0, 1]])  # #hardcoded
                 if self.is_terminal_state(self.curr_state_relevant):
-                    self.logger.info(
+                    self.logger.debug(
                         "A terminal state was sampled. Therefore,"
                         " resampling. State was:" + str(self.curr_state)
                     )
@@ -2238,9 +2243,12 @@ class RLToyEnv(gym.Env):
         self.reached_terminal = False
 
         self.total_abs_noise_in_reward_episode = 0
-        self.total_abs_noise_in_transition_episode = (
-            0  # only present in continuous spaces
-        )
+        if self.config["state_space_type"] == "continuous":
+            self.total_abs_noise_in_transition_episode = (
+                np.zeros(shape=(self.state_space_dim))  # only present in continuous spaces
+            )
+        else:
+            self.total_abs_noise_in_transition_episode = None
         self.total_noisy_transitions_episode = 0  # only present in discrete spaces
         self.total_reward_episode = 0
         self.total_transitions_episode = 0
@@ -2271,7 +2279,7 @@ class RLToyEnv(gym.Env):
         # If seed is None, you get a randomly generated seed from gymnasium.utils...
         # As of 2024.06.18:
         # seed_seq = np.random.SeedSequence(seed)
-        # np_seed = seed_seq.entropy
+        # np_seed = seed_seq.entropy  # Is just the same as the seed above
         # rng = RandomNumberGenerator(np.random.PCG64(seed_seq))
         self._np_random, self.seed_ = gym.utils.seeding.np_random(seed)  # #random
         print(

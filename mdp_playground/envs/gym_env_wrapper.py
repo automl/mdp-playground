@@ -9,6 +9,7 @@ import warnings
 import PIL.ImageDraw as ImageDraw
 import PIL.Image as Image
 from PIL.Image import FLIP_LEFT_RIGHT, FLIP_TOP_BOTTOM
+import logging
 
 # def get_gym_wrapper(base_class):
 
@@ -23,7 +24,7 @@ class GymEnvWrapper(gym.Env):
         reward scale
         reward shift
         terminal state reward
-        image_transforms (for discrete environments)
+        image_transforms (for discrete environments with image observations)
 
     The wrapper is pretty general and can be applied to any Gym Environment. The environment should be instantiated and passed as the 1st argument to the __init__ method of this class. If using this wrapper with Atari, additional keys may be added specifying either atari_preprocessing = True or wrap_deepmind_ray = True. These would use the AtariPreprocessing wrapper from OpenAI Gym or wrap_deepmind() wrapper from Ray Rllib.
 
@@ -36,6 +37,7 @@ class GymEnvWrapper(gym.Env):
     # we would have multiple observation_spaces and this could cause conflict 
     # with code that assumes any subclass of gym.Wrapper should have these member
     # variables. However, it _should_ be at least a gym.Env.
+
     # Following comment based on the old get_gym_wrapper(base_class) code:
     # Does it need to be a subclass of base_class because some external code
     # may check if it's an AtariEnv, for instance, and do further stuff based
@@ -45,6 +47,21 @@ class GymEnvWrapper(gym.Env):
         self.config = copy.deepcopy(config)
         # self.env = config["env"]
         self.env = env
+
+        if "log_level" not in config:
+            self.log_level = logging.NOTSET
+        else:
+            self.log_level = config["log_level"]
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(self.log_level)
+        
+        if "log_filename" in config:
+            if not self.logger.handlers:
+                self.log_filename = config["log_filename"]
+                log_file_handler = logging.FileHandler(self.log_filename)
+                self.logger.addHandler(log_file_handler)
+                print("Logger logging to:", self.log_filename)
 
         seed_int = None
         if "seed" in config:
@@ -74,30 +91,27 @@ class GymEnvWrapper(gym.Env):
             self.delay = 0
 
         if "transition_noise" in config:
-            self.transition_noise = config["transition_noise"]
             if config["state_space_type"] == "continuous":
                 if callable(config["transition_noise"]):
                     self.transition_noise = config["transition_noise"]
                 else:
                     p_noise_std = config["transition_noise"]
-                    self.transition_noise = lambda a: a.normal(0, p_noise_std)
-            else:
+                    self.transition_noise = lambda s, a, rng: rng.normal(0, p_noise_std, size=s.shape)
+            else:  # discrete env
+                self.transition_noise = config["transition_noise"]
                 assert self.transition_noise <= 1.0 and self.transition_noise >= 0.0, (
                     "transition_noise must be a value in [0.0, 1.0] when env is discrete, it was:"
                     + str(self.transition_noise)
                 )
         else:
-            if config["state_space_type"] == "discrete":
-                self.transition_noise = 0.0
-            else:
-                self.transition_noise = lambda a: 0.0
+            self.transition_noise = None
 
         if "reward_noise" in config:
             if callable(config["reward_noise"]):
                 self.reward_noise = config["reward_noise"]
             else:
                 reward_noise_std = config["reward_noise"]
-                self.reward_noise = lambda a: a.normal(0, reward_noise_std)
+                self.reward_noise = lambda s, a, rng: rng.normal(0, reward_noise_std)
         else:
             self.reward_noise = None
 
@@ -121,14 +135,15 @@ class GymEnvWrapper(gym.Env):
         else:
             assert (
                 config["state_space_type"] == "discrete"
-            ), "Image transforms are only applicable to discrete envs."
+            ), "Image transforms are only supported for discrete envs with \
+                image observations."
             self.image_transforms = config["image_transforms"]
             if len(self.env.observation_space.shape) != 3:
                 warnings.warn(
                     "The length of observation_space.shape ="
                     + self.env.observation_space.shape
-                    + "It was expected"
-                    + "to be 3 for environments with image representations."
+                    + "It was expected to be 3 (width, height, channels) "
+                    + "for environments with image representations."
                 )
 
             if "image_padding" in config:
@@ -332,7 +347,7 @@ class GymEnvWrapper(gym.Env):
         self.total_transitions_episode += 1
 
         if self.config["state_space_type"] == "discrete":
-            if self.transition_noise > 0.0:
+            if self.transition_noise:
                 probs = (
                     np.ones(shape=(self.env.action_space.n,))
                     * self.transition_noise
@@ -347,24 +362,24 @@ class GymEnvWrapper(gym.Env):
                     # print("NOISE inserted", old_action, action)
                     self.total_noisy_transitions_episode += 1
         else:  # cont. envs
-            if self.transition_noise is not None:
-                noise_in_transition = (
-                    self.transition_noise(self._np_random)
-                    if self.transition_noise
-                    else 0
-                )  # #random
-                self.total_abs_noise_in_transition_episode += np.abs(
-                    noise_in_transition
-                )
-            else:
-                noise_in_transition = 0.0
+            noise_in_transition = (
+                self.transition_noise(self.curr_state, action, self._np_random)
+                if self.transition_noise
+                else 0.0
+            )  # #random
+            self.total_abs_noise_in_transition_episode += np.abs(
+                noise_in_transition
+            )
+            self.logger.debug("total_transitions_episode: " + str(self.total_transitions_episode)
+                               + " Noise in transition: " + str(noise_in_transition))
 
         if "irrelevant_features" in self.config:
             if self.config["state_space_type"] == "discrete":
                 next_state, reward, done, trunc, info = self.env.step(action[0])
                 next_state_irr, _, done_irr, trunc_irr, _ = self.irr_toy_env.step(action[1])
                 next_state = tuple([next_state, next_state_irr])
-            else:
+                next_obs = next_state
+            else:  # cont. env
                 # env_act_shape is the shape of the underlying env's action space and we
                 # sub-select those dimensions from the total action space next and apply
                 # to the underlying env:
@@ -375,13 +390,20 @@ class GymEnvWrapper(gym.Env):
                     action[self.env_act_shape[0] :]
                 )
                 next_state = np.concatenate((next_state, next_state_irr))
-        else:
+                next_obs = next_state.copy()
+        else:  # no irrelevant features
             next_state, reward, done, trunc, info = self.env.step(action)
-            if self.config["state_space_type"] == "continuous":
-                next_state += noise_in_transition
+            if self.config["state_space_type"] == "discrete":
+                next_obs = next_state
+            else:  # cont. env
+                next_obs = next_state.copy()
+
+        # I think this adds noise whether or not irrelevant features are present. #TODO Add test
+        if self.config["state_space_type"] == "continuous":
+            next_obs += noise_in_transition
 
         if self.image_transforms:
-            next_state = self.get_transformed_image(next_state)
+            next_obs = self.get_transformed_image(next_state)
 
         if done:
             # if episode is finished return the rewards that were delayed and not
@@ -401,14 +423,17 @@ class GymEnvWrapper(gym.Env):
         # action and time_step as well. Would need to change implementation to
         # have a queue for the rewards achieved and then pick the reward that was
         # generated delay timesteps ago.
-        noise_in_reward = self.reward_noise(self._np_random) if self.reward_noise else 0
+        noise_in_reward = self.reward_noise(self.curr_state, action, self._np_random) if self.reward_noise else 0
+        self.logger.info("Noise in reward: " + str(noise_in_reward))
         self.total_abs_noise_in_reward_episode += np.abs(noise_in_reward)
         self.total_reward_episode += reward
         reward += noise_in_reward
         reward *= self.reward_scale
         reward += self.reward_shift
 
-        return next_state, reward, done, trunc, info
+        self.logger.debug("sas'o'r: " + str(self.curr_state) + "\n" + str(action) + "\n" + str(next_state) + "\n" + str(next_obs) + " \n" + str(reward))
+        self.curr_state = next_state
+        return next_obs, reward, done, trunc, info
 
     def reset(self, seed=None):
         '''
@@ -420,7 +445,7 @@ class GymEnvWrapper(gym.Env):
         # episode end reached by reaching a terminal state, but reset() may have
         # been called in the middle of an episode):
         if not self.total_episodes == 0:
-            print(
+            self.logger.info(
                 "Noise stats for previous episode num.: "
                 + str(self.total_episodes)
                 + " (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): "
@@ -463,6 +488,8 @@ class GymEnvWrapper(gym.Env):
         if self.image_transforms:
             reset_state = (self.get_transformed_image(reset_state[0]), reset_state[1])
 
+        # Need to store the state to be able to calculate the state- and action-dependent noise in step()
+        self.curr_state = reset_state[0]
         return reset_state
         # return super(GymEnvWrapper, self).reset()
 

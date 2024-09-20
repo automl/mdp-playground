@@ -1,0 +1,1985 @@
+Begin logging to: log_file.txt
+[33;1mRunning discrete environment
+[0m
+Seeds set to:{'env': 0, 'relevant_state_space': 5874934615388537134, 'relevant_action_space': 2488343231644625808, 'irrelevant_state_space': 377914054924498011, 'irrelevant_action_space': 152440531369162766, 'state_space': 7501093982645987484, 'action_space': 8418684267946577446, 'image_representations': 5595227450766711102}
+Inited terminal states to self.config['terminal_states']: [7 6]. Total 2
+self.relevant_init_state_dist:[0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
+ 0.         0.        ]
+specific_sequence that will be rewarded(3, 4, 1)
+specific_sequence that will be rewarded(1, 4, 3)
+specific_sequence that will be rewarded(2, 3, 0)
+specific_sequence that will be rewarded(3, 5, 4)
+specific_sequence that will be rewarded(4, 5, 1)
+specific_sequence that will be rewarded(5, 2, 1)
+specific_sequence that will be rewarded(5, 4, 2)
+specific_sequence that will be rewarded(0, 1, 4)
+specific_sequence that will be rewarded(1, 2, 4)
+specific_sequence that will be rewarded(3, 0, 1)
+specific_sequence that will be rewarded(5, 3, 1)
+specific_sequence that will be rewarded(3, 5, 1)
+specific_sequence that will be rewarded(4, 3, 5)
+specific_sequence that will be rewarded(4, 5, 3)
+specific_sequence that will be rewarded(0, 1, 2)
+specific_sequence that will be rewarded(1, 5, 2)
+specific_sequence that will be rewarded(3, 5, 2)
+specific_sequence that will be rewarded(1, 4, 2)
+specific_sequence that will be rewarded(4, 0, 2)
+specific_sequence that will be rewarded(0, 1, 5)
+specific_sequence that will be rewarded(2, 0, 1)
+specific_sequence that will be rewarded(3, 1, 2)
+specific_sequence that will be rewarded(0, 2, 4)
+specific_sequence that will be rewarded(3, 1, 0)
+specific_sequence that will be rewarded(5, 2, 3)
+specific_sequence that will be rewarded(2, 5, 0)
+specific_sequence that will be rewarded(0, 4, 1)
+specific_sequence that will be rewarded(2, 4, 3)
+specific_sequence that will be rewarded(4, 0, 5)
+specific_sequence that will be rewarded(4, 5, 2)
+RESET called. curr_state reset to: 3
+ self.delay, self.sequence_length:13
+Reward: 0.0 Noise in reward: -0.06605243164565094
+[33;1m
+Running discrete environment with image representations
+[0m
+Seeds set to:{'env': 0, 'relevant_state_space': 5874934615388537134, 'relevant_action_space': 2488343231644625808, 'irrelevant_state_space': 377914054924498011, 'irrelevant_action_space': 152440531369162766, 'state_space': 7501093982645987484, 'action_space': 8418684267946577446, 'image_representations': 5595227450766711102}
+Inited terminal states to self.config['terminal_states']: [7 6]. Total 2
+self.relevant_init_state_dist:[0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
+ 0.         0.        ]
+specific_sequence that will be rewarded(3, 4, 1)
+specific_sequence that will be rewarded(1, 4, 3)
+specific_sequence that will be rewarded(2, 3, 0)
+specific_sequence that will be rewarded(3, 5, 4)
+specific_sequence that will be rewarded(4, 5, 1)
+specific_sequence that will be rewarded(5, 2, 1)
+specific_sequence that will be rewarded(5, 4, 2)
+specific_sequence that will be rewarded(0, 1, 4)
+specific_sequence that will be rewarded(1, 2, 4)
+specific_sequence that will be rewarded(3, 0, 1)
+specific_sequence that will be rewarded(5, 3, 1)
+specific_sequence that will be rewarded(3, 5, 1)
+specific_sequence that will be rewarded(4, 3, 5)
+specific_sequence that will be rewarded(4, 5, 3)
+specific_sequence that will be rewarded(0, 1, 2)
+specific_sequence that will be rewarded(1, 5, 2)
+specific_sequence that will be rewarded(3, 5, 2)
+specific_sequence that will be rewarded(1, 4, 2)
+specific_sequence that will be rewarded(4, 0, 2)
+specific_sequence that will be rewarded(0, 1, 5)
+specific_sequence that will be rewarded(2, 0, 1)
+specific_sequence that will be rewarded(3, 1, 2)
+specific_sequence that will be rewarded(0, 2, 4)
+specific_sequence that will be rewarded(3, 1, 0)
+specific_sequence that will be rewarded(5, 2, 3)
+specific_sequence that will be rewarded(2, 5, 0)
+specific_sequence that will be rewarded(0, 4, 1)
+specific_sequence that will be rewarded(2, 4, 3)
+specific_sequence that will be rewarded(4, 0, 5)
+specific_sequence that will be rewarded(4, 5, 2)
+RESET called. curr_state reset to: 3
+ self.delay, self.sequence_length:13
+Reward: 0.0 Noise in reward: -0.06605243164565094
+[33;1m
+Running discrete environment with diameter and image representations
+[0m
+Seeds set to:{'env': 3, 'relevant_state_space': 789974133212406139, 'relevant_action_space': 2184191404571879930, 'irrelevant_state_space': 7390452496230446618, 'irrelevant_action_space': 5369497044354532241, 'state_space': 868183486707206022, 'action_space': 3994890908985562243, 'image_representations': 4418468347491149040}
+Inited terminal states to self.config['terminal_states']: [3 7]. Total 1
+self.relevant_init_state_dist:[0.16666667 0.16666667 0.16666667 0.         0.16666667 0.16666667
+ 0.16666667 0.        ]
+specific_sequence that will be rewarded(2, 4, 0)
+specific_sequence that will be rewarded(2, 4, 1)
+specific_sequence that will be rewarded(1, 5, 2)
+specific_sequence that will be rewarded(0, 5, 1)
+specific_sequence that will be rewarded(6, 1, 4)
+specific_sequence that will be rewarded(6, 2, 4)
+specific_sequence that will be rewarded(5, 2, 4)
+specific_sequence that will be rewarded(6, 1, 5)
+RESET called. curr_state reset to: 0
+ self.delay, self.sequence_length:13
+Reward: 0.0 Noise in reward: -1.2778325156570909
+[33;1m
+Running continuous environment: move_to_a_point
+[0m
+Seeds set to:{'env': 0, 'relevant_state_space': 5874934615388537134, 'relevant_action_space': 2488343231644625808, 'irrelevant_state_space': 377914054924498011, 'irrelevant_action_space': 152440531369162766, 'state_space': 7501093982645987484, 'action_space': 8418684267946577446, 'image_representations': 5595227450766711102}
+RESET called. curr_state reset to: [4.7930346 7.204931 ]
+ self.delay, self.sequence_length:01
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 [0. 0.] 0 0 0
+RESET called. curr_state reset to: [-4.655305 -2.974354]
+ self.delay, self.sequence_length:01
+Reward: -0.7221389 Noise in reward: 0
+[33;1m
+Running continuous environment: move_to_a_point with irrelevant features and image representations
+[0m
+Seeds set to:{'env': 0, 'relevant_state_space': 5874934615388537134, 'relevant_action_space': 2488343231644625808, 'irrelevant_state_space': 377914054924498011, 'irrelevant_action_space': 152440531369162766, 'state_space': 7501093982645987484, 'action_space': 8418684267946577446, 'image_representations': 5595227450766711102}
+RESET called. curr_state reset to: [ 4.7930346  7.204931  -4.655305  -2.974354 ]
+ self.delay, self.sequence_length:01
+Passed config: {'seed': 0, 'state_space_type': 'discrete', 'action_space_size': 8, 'delay': 1, 'sequence_length': 3, 'reward_scale': 2.5, 'reward_shift': -1.75, 'reward_noise': 0.5, 'transition_noise': 0.1, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'maximally_connected': True, 'repeats_in_sequences': False, 'generate_random_mdp': True} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: 0. Returned seed from Gym: 0
+transition_matrix inited to:
+[[0 2 4 7 1 6 5 3]
+ [6 1 5 2 7 3 4 0]
+ [6 5 3 2 4 1 0 7]
+ [0 5 1 4 2 6 3 7]
+ [3 0 2 4 5 7 6 1]
+ [6 0 3 7 2 5 1 4]
+ [6 6 6 6 6 6 6 6]
+ [7 7 7 7 7 7 7 7]]
+Python type of state: <class 'int'>
+rewardable_sequences: {(3, 4, 1): 1.0, (1, 4, 3): 1.0, (2, 3, 0): 1.0, (3, 5, 4): 1.0, (4, 5, 1): 1.0, (5, 2, 1): 1.0, (5, 4, 2): 1.0, (0, 1, 4): 1.0, (1, 2, 4): 1.0, (3, 0, 1): 1.0, (5, 3, 1): 1.0, (3, 5, 1): 1.0, (4, 3, 5): 1.0, (4, 5, 3): 1.0, (0, 1, 2): 1.0, (1, 5, 2): 1.0, (3, 5, 2): 1.0, (1, 4, 2): 1.0, (4, 0, 2): 1.0, (0, 1, 5): 1.0, (2, 0, 1): 1.0, (3, 1, 2): 1.0, (0, 2, 4): 1.0, (3, 1, 0): 1.0, (5, 2, 3): 1.0, (2, 5, 0): 1.0, (0, 4, 1): 1.0, (2, 4, 3): 1.0, (4, 0, 5): 1.0, (4, 5, 2): 1.0}
+MDP Playground toy env instantiated with config: {'seed': 0, 'state_space_type': 'discrete', 'action_space_size': 8, 'delay': 1, 'sequence_length': 3, 'reward_scale': 2.5, 'reward_shift': -1.75, 'reward_noise': 0.5, 'transition_noise': 0.1, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'maximally_connected': True, 'repeats_in_sequences': False, 'generate_random_mdp': True, 'terminal_states': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
+       0.16666667, 0.        , 0.        ]), 'transition_function': <function RLToyEnv.init_transition_function.<locals>.<lambda> at 0x7b47a29bd090>}
+Taking a step in the environment with a random action and printing the transition:
+sars', done = 3 1 -1.9151310791141274 5 False
+Passed config: {'seed': 0, 'state_space_type': 'discrete', 'action_space_size': 8, 'image_representations': True, 'delay': 1, 'sequence_length': 3, 'reward_scale': 2.5, 'reward_shift': -1.75, 'reward_noise': 0.5, 'transition_noise': 0.1, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'maximally_connected': True, 'repeats_in_sequences': False, 'generate_random_mdp': True} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: 0. Returned seed from Gym: 0
+transition_matrix inited to:
+[[0 2 4 7 1 6 5 3]
+ [6 1 5 2 7 3 4 0]
+ [6 5 3 2 4 1 0 7]
+ [0 5 1 4 2 6 3 7]
+ [3 0 2 4 5 7 6 1]
+ [6 0 3 7 2 5 1 4]
+ [6 6 6 6 6 6 6 6]
+ [7 7 7 7 7 7 7 7]]
+Python type of state: <class 'int'>
+rewardable_sequences: {(3, 4, 1): 1.0, (1, 4, 3): 1.0, (2, 3, 0): 1.0, (3, 5, 4): 1.0, (4, 5, 1): 1.0, (5, 2, 1): 1.0, (5, 4, 2): 1.0, (0, 1, 4): 1.0, (1, 2, 4): 1.0, (3, 0, 1): 1.0, (5, 3, 1): 1.0, (3, 5, 1): 1.0, (4, 3, 5): 1.0, (4, 5, 3): 1.0, (0, 1, 2): 1.0, (1, 5, 2): 1.0, (3, 5, 2): 1.0, (1, 4, 2): 1.0, (4, 0, 2): 1.0, (0, 1, 5): 1.0, (2, 0, 1): 1.0, (3, 1, 2): 1.0, (0, 2, 4): 1.0, (3, 1, 0): 1.0, (5, 2, 3): 1.0, (2, 5, 0): 1.0, (0, 4, 1): 1.0, (2, 4, 3): 1.0, (4, 0, 5): 1.0, (4, 5, 2): 1.0}
+MDP Playground toy env instantiated with config: {'seed': 0, 'state_space_type': 'discrete', 'action_space_size': 8, 'image_representations': True, 'delay': 1, 'sequence_length': 3, 'reward_scale': 2.5, 'reward_shift': -1.75, 'reward_noise': 0.5, 'transition_noise': 0.1, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'maximally_connected': True, 'repeats_in_sequences': False, 'generate_random_mdp': True, 'terminal_states': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
+       0.16666667, 0.        , 0.        ]), 'transition_function': <function RLToyEnv.init_transition_function.<locals>.<lambda> at 0x7b47a29bd240>}
+Taking a step in the environment with a random action and printing the transition:
+sars', done = 3 1 -1.9151310791141274 5 False
+Passed config: {'seed': 3, 'state_space_type': 'discrete', 'action_space_size': 4, 'image_representations': True, 'delay': 1, 'diameter': 2, 'sequence_length': 3, 'reward_scale': 2.5, 'reward_shift': -1.75, 'reward_noise': 0.5, 'transition_noise': 0.1, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'maximally_connected': True, 'repeats_in_sequences': False, 'generate_random_mdp': True} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: 3. Returned seed from Gym: 3
+transition_matrix inited to:
+[[6 7 5 4]
+ [6 5 4 7]
+ [5 4 6 7]
+ [3 3 3 3]
+ [1 2 0 3]
+ [1 0 2 3]
+ [0 2 3 1]
+ [7 7 7 7]]
+Python type of state: <class 'int'>
+rewardable_sequences: {(2, 4, 0): 1.0, (2, 4, 1): 1.0, (1, 5, 2): 1.0, (0, 5, 1): 1.0, (6, 1, 4): 1.0, (6, 2, 4): 1.0, (5, 2, 4): 1.0, (6, 1, 5): 1.0}
+MDP Playground toy env instantiated with config: {'seed': 3, 'state_space_type': 'discrete', 'action_space_size': 4, 'image_representations': True, 'delay': 1, 'diameter': 2, 'sequence_length': 3, 'reward_scale': 2.5, 'reward_shift': -1.75, 'reward_noise': 0.5, 'transition_noise': 0.1, 'reward_density': 0.25, 'make_denser': False, 'terminal_state_density': 0.25, 'maximally_connected': True, 'repeats_in_sequences': False, 'generate_random_mdp': True, 'terminal_states': array([3, 7]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.        , 0.16666667,
+       0.16666667, 0.16666667, 0.        ]), 'transition_function': <function RLToyEnv.init_transition_function.<locals>.<lambda> at 0x7b47a29bcf70>}
+Taking a step in the environment with a random action and printing the transition:
+sars', done = 0 3 -4.944581289142727 4 False
+Passed config: {'seed': 0, 'state_space_type': 'continuous', 'state_space_dim': 2, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'make_denser': True, 'target_point': [0, 0], 'target_radius': 0.05, 'state_space_max': 10, 'action_space_max': 1, 'action_loss_weight': 0.0, 'reward_function': 'move_to_a_point'} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: 0. Returned seed from Gym: 0
+MDP Playground toy env instantiated with config: {'seed': 0, 'state_space_type': 'continuous', 'state_space_dim': 2, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'make_denser': True, 'target_point': [0, 0], 'target_radius': 0.05, 'state_space_max': 10, 'action_space_max': 1, 'action_loss_weight': 0.0, 'reward_function': 'move_to_a_point', 'relevant_indices': range(0, 2)}
+Taking a step in the environment with a random action and printing the transition:
+sars', done = [-4.655305 -2.974354] [-0.517571   -0.52710384] -0.7221389 [-5.172876 -3.501458] False
+Passed config: {'seed': 0, 'state_space_type': 'continuous', 'state_space_dim': 4, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'make_denser': True, 'target_point': [0, 0], 'target_radius': 0.05, 'state_space_max': 10, 'action_space_max': 1, 'action_loss_weight': 0.0, 'reward_function': 'move_to_a_point', 'image_representations': True, 'irrelevant_features': True, 'relevant_indices': [0, 1]} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: 0. Returned seed from Gym: 0
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 [0. 0. 0. 0.] 0 0 0
+RESET called. curr_state reset to: [-1.0326167   0.95215625 -9.128669    5.937066  ]
+ self.delay, self.sequence_length:01
+Reward: -0.202806 Noise in reward: 0
+[33;1m
+Running continuous environment: move_along_a_line
+[0m
+Seeds set to:{'env': 0, 'relevant_state_space': 5874934615388537134, 'relevant_action_space': 2488343231644625808, 'irrelevant_state_space': 377914054924498011, 'irrelevant_action_space': 152440531369162766, 'state_space': 7501093982645987484, 'action_space': 8418684267946577446, 'image_representations': 5595227450766711102}
+RESET called. curr_state reset to: [-2.957625    1.4144933   0.14378542 -0.54651916]
+ self.delay, self.sequence_length:010
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 [0. 0. 0. 0.] 0 0 0
+RESET called. curr_state reset to: [-0.9091467  -0.7278909  -0.53039795  0.8469715 ]
+ self.delay, self.sequence_length:010
+Reward: 0.0 Noise in reward: -0.0535669373161111
+[33;1m
+Running grid environment: move_to_a_point
+[0m
+Seeds set to:{'env': 0, 'relevant_state_space': 5874934615388537134, 'relevant_action_space': 2488343231644625808, 'irrelevant_state_space': 377914054924498011, 'irrelevant_action_space': 152440531369162766, 'state_space': 7501093982645987484, 'action_space': 8418684267946577446, 'image_representations': 5595227450766711102}
+RESET called. curr_state reset to: [5 6]
+ self.delay, self.sequence_length:01
+Reward: -1.0 Noise in reward: 0
+Reward: -1.0 Noise in reward: 0
+Reward: -1.0 Noise in reward: 0
+Reward: 1.0 Noise in reward: 0
+/home/rajanr/mdp-playground/mdp_playground/envs/rl_toy_env.py:1705: UserWarning: WARNING: Action [0.5, -0.5] out of range of action space. Applying noop action!!
+  warnings.warn(
+Reward: 0.0 Noise in reward: 0
+/home/rajanr/mdp-playground/mdp_playground/envs/rl_toy_env.py:1705: UserWarning: WARNING: Action [1, 2] out of range of action space. Applying noop action!!
+  warnings.warn(
+Reward: 0.0 Noise in reward: 0
+/home/rajanr/mdp-playground/mdp_playground/envs/rl_toy_env.py:1705: UserWarning: WARNING: Action [1, 1] out of range of action space. Applying noop action!!
+  warnings.warn(
+Reward: 0.0 Noise in reward: 0
+Reward: 0.0 Noise in reward: 0
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 None -2.0 0 8
+RESET called. curr_state reset to: [2 2]
+ self.delay, self.sequence_length:01
+[33;1m
+Running grid environment: move_to_a_point with image representations
+[0m
+Seeds set to:{'env': 0, 'relevant_state_space': 5874934615388537134, 'relevant_action_space': 2488343231644625808, 'irrelevant_state_space': 377914054924498011, 'irrelevant_action_space': 152440531369162766, 'state_space': 7501093982645987484, 'action_space': 8418684267946577446, 'image_representations': 5595227450766711102}
+RESET called. curr_state reset to: [5 6]
+ self.delay, self.sequence_length:01
+Reward: -1.0 Noise in reward: 0
+Reward: -1.0 Noise in reward: 0
+Reward: -1.0 Noise in reward: 0
+Reward: 1.0 Noise in reward: 0
+Reward: 0.0 Noise in reward: 0
+Reward: 0.0 Noise in reward: 0
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 None -2.0 0 6
+RESET called. curr_state reset to: [2 2]
+ self.delay, self.sequence_length:01
+[33;1m
+Running Atari wrapper example:
+[0m
+A.L.E: Arcade Learning Environment (version 0.8.1+53f58b7)
+[Powered by Stella]
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 0 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 0.010490011715303971
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 2 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 0.03615950549094848
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 3 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 0.09470809631292422
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 5 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] -0.12654214710460526
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 5 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 0.00413259793472436
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 3 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] -0.021879166393254573
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 2 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] -0.07322673547034517
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 4 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] -0.031630015636915455
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 5 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 0.10425133694426776
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 0 [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] [[[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ ...
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]
+
+ [[0 0 0]
+  [0 0 0]
+  [0 0 0]
+  ...
+  [0 0 0]
+  [0 0 0]
+  [0 0 0]]] 0.1366463470549686
+[33;1m
+Running Mujoco wrapper example:
+[0m
+INFO:mdp_playground:[33;1m
+Running Mujoco wrapper example:
+[0m
+DEBUG:mdp_playground.envs.gym_env_wrapper:total_transitions_episode: 1 Noise in transition: [ 0.16010566  0.02622503 -0.13391734  0.09039876  0.32600001  0.23677024
+ -0.17593381 -0.31635537 -0.15581862  0.01033149 -0.58125769 -0.05469792
+ -0.31147774 -0.18306684 -0.13606475 -0.07907504  0.10290763]
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [-0.04604266 -0.0918053  -0.09669447  0.06265405  0.08255112  0.02132716
+  0.04589931  0.008725   -0.12654215 -0.06232745  0.0041326  -0.23250308
+ -0.02187917 -0.12459109 -0.07322674 -0.0544259  -0.03163002] [-0.04805083  0.3459275  -0.2552678   0.2436387  -0.4248672  -0.01168279] [ 0.10950414 -0.06336018 -0.2275261   0.18317325  0.3461872   0.28841474
+ -0.18688053 -0.30771495 -0.13111082 -0.28758849 -0.47827629  0.28402364
+  1.37572029 -3.87323739  1.81738214 -3.64180002  0.10067344] [ 0.10950414 -0.06336018 -0.2275261   0.18317325  0.3461872   0.28841474
+ -0.18688053 -0.30771495 -0.13111082 -0.28758849 -0.47827629  0.28402364
+  1.37572029 -3.87323739  1.81738214 -3.64180002  0.10067344] -0.024188971266994975
+DEBUG:mdp_playground.envs.gym_env_wrapper:total_transitions_episode: 1 Noise in transition: [ 0.16010566  0.02622503 -0.13391734  0.09039876  0.32600001  0.23677024
+ -0.17593381 -0.31635537 -0.15581862  0.01033149 -0.58125769 -0.05469792
+ -0.31147774 -0.18306684 -0.13606475 -0.07907504  0.10290763  0.26062834
+ -0.03213367  0.34161587 -0.16629867  0.08787752  0.22586755]
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00
+  0.00000000e+00  0.00000000e+00  0.00000000e+00  3.13270239e-03
+  4.12755577e-03  1.06635776e-03  2.29496561e-03  4.36249915e-04
+  4.35072424e-03  3.15853554e-03  8.21000000e-01 -6.00000000e-01
+  0.00000000e+00  2.56611054e-01 -3.37707943e-01 -2.75000000e-01
+  4.50000000e-01 -5.00000000e-02 -3.23000000e-01] [-0.09610166  0.691855   -0.5105356   0.4872774  -0.8497344  -0.02336558
+ -0.56485224] [ 0.16013751  0.02655736 -0.13673393  0.090879    0.32045312  0.23664117
+ -0.17957025 -0.31526854 -0.12720501 -0.17721969 -0.58767688 -0.42326442
+ -0.32038087 -0.4256351   0.6849352  -0.67905798  0.10269957  0.5172394
+ -0.36984161  0.06661587  0.28370133  0.03787752 -0.09713245] [ 0.16013751  0.02655736 -0.13673393  0.090879    0.32045312  0.23664117
+ -0.17957025 -0.31526854 -0.12720501 -0.17721969 -0.58767688 -0.42326442
+ -0.32038087 -0.4256351   0.6849352  -0.67905798  0.10269957  0.5172394
+ -0.36984161  0.06661587  0.28370133  0.03787752 -0.09713245] -0.44646933818807744
+MDP Playground toy env instantiated with config: {'seed': 0, 'state_space_type': 'continuous', 'state_space_dim': 4, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'make_denser': True, 'target_point': [0, 0], 'target_radius': 0.05, 'state_space_max': 10, 'action_space_max': 1, 'action_loss_weight': 0.0, 'reward_function': 'move_to_a_point', 'image_representations': True, 'irrelevant_features': True, 'relevant_indices': [0, 1]}
+Taking a step in the environment with a random action and printing the transition:
+sars', done = [-1.0326167   0.95215625 -9.128669    5.937066  ] [-0.517571   -0.52710384 -0.11979694 -0.59993315] -0.202806 [-1.5501877  0.4250524 -9.248466   5.337133 ] False
+Passed config: {'seed': 0, 'state_space_type': 'continuous', 'state_space_dim': 4, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'delay': 0, 'sequence_length': 10, 'reward_scale': 1.0, 'reward_noise': 0.1, 'transition_noise': 0.1, 'reward_function': 'move_along_a_line'} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: 0. Returned seed from Gym: 0
+MDP Playground toy env instantiated with config: {'seed': 0, 'state_space_type': 'continuous', 'state_space_dim': 4, 'transition_dynamics_order': 1, 'inertia': 1, 'time_unit': 1, 'delay': 0, 'sequence_length': 10, 'reward_scale': 1.0, 'reward_noise': 0.1, 'transition_noise': 0.1, 'reward_function': 'move_along_a_line', 'relevant_indices': range(0, 4)}
+Taking a step in the environment with a random action and printing the transition:
+sars', done = [-0.9091467  -0.7278909  -0.53039795  0.8469715 ] [-2.6563277  0.6132033 -0.574738   1.8175125] -0.0535669373161111 [-3.5529015  -0.12789811 -1.0410937   2.674974  ] False
+Passed config: {'seed': 0, 'state_space_type': 'grid', 'grid_shape': (8, 8), 'reward_function': 'move_to_a_point', 'make_denser': True, 'target_point': [5, 5]} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: 0. Returned seed from Gym: 0
+MDP Playground toy env instantiated with config: {'seed': 0, 'state_space_type': 'grid', 'grid_shape': (8, 8), 'reward_function': 'move_to_a_point', 'make_denser': True, 'target_point': [5, 5]}
+sars', done = [np.int64(5), np.int64(6)] [0, 1] -1.0 [np.int64(5), np.int64(7)] False
+sars', done = [np.int64(5), np.int64(7)] [-1, 0] -1.0 [np.int64(4), np.int64(7)] False
+sars', done = [np.int64(4), np.int64(7)] [-1, 0] -1.0 [np.int64(3), np.int64(7)] False
+sars', done = [np.int64(3), np.int64(7)] [1, 0] 1.0 [np.int64(4), np.int64(7)] False
+sars', done = [np.int64(4), np.int64(7)] [0.5, -0.5] 0.0 [np.int64(4), np.int64(7)] False
+sars', done = [np.int64(4), np.int64(7)] [1, 2] 0.0 [np.int64(4), np.int64(7)] False
+sars', done = [np.int64(4), np.int64(7)] [1, 1] 0.0 [np.int64(4), np.int64(7)] False
+sars', done = [np.int64(4), np.int64(7)] [0, 1] 0.0 [np.int64(4), np.int64(7)] False
+Passed config: {'seed': 0, 'state_space_type': 'grid', 'grid_shape': (8, 8), 'reward_function': 'move_to_a_point', 'make_denser': True, 'target_point': [5, 5], 'image_representations': True, 'terminal_states': [[5, 5], [2, 3], [2, 4], [3, 3], [3, 4]]} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: 0. Returned seed from Gym: 0
+MDP Playground toy env instantiated with config: {'seed': 0, 'state_space_type': 'grid', 'grid_shape': (8, 8), 'reward_function': 'move_to_a_point', 'make_denser': True, 'target_point': [5, 5], 'image_representations': True, 'terminal_states': [[5, 5], [2, 3], [2, 4], [3, 3], [3, 4]]}
+sars', done = [np.int64(5), np.int64(6)] [0, 1] -1.0 [np.int64(5), np.int64(7)] False
+sars', done = [np.int64(5), np.int64(7)] [-1, 0] -1.0 [np.int64(4), np.int64(7)] False
+sars', done = [np.int64(4), np.int64(7)] [-1, 0] -1.0 [np.int64(3), np.int64(7)] False
+sars', done = [np.int64(3), np.int64(7)] [1, 0] 1.0 [np.int64(4), np.int64(7)] False
+sars', done = [np.int64(4), np.int64(7)] [0.5, -0.5] 0.0 [np.int64(4), np.int64(7)] False
+sars', done = [np.int64(4), np.int64(7)] [1, 2] 0.0 [np.int64(4), np.int64(7)] False
+Logger name: mdp_playground.envs.gym_env_wrapper <Logger mdp_playground.envs.gym_env_wrapper (DEBUG)>
+Logger level set to: 0
+Env SEED set to: 0. Returned seed from Gym: 0
+Taking 10 steps in the environment with a random action and printing the transition:
+s.shape a r s'.shape, done = (210, 160, 3) 0 0.010490011715303971 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 2 0.03615950549094848 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 3 0.09470809631292422 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 5 -0.12654214710460526 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 5 0.00413259793472436 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 1 -0.021879166393254573 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 2 -0.07322673547034517 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 4 -0.031630015636915455 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 5 0.10425133694426776 (210, 160, 3) False
+s.shape a r s'.shape, done = (210, 160, 3) 0 0.1366463470549686 (210, 160, 3) False
+Setting Mujoco self.action_space.low, self.action_space.high from: [-1. -1. -1. -1. -1. -1.] [1. 1. 1. 1. 1. 1.]
+to: [-0.5 -0.5 -0.5 -0.5 -0.5 -0.5] [0.5 0.5 0.5 0.5 0.5 0.5]
+Original frame_skip for Mujoco Env: 5
+Setting Mujoco self.frame_skip to 2 corresponding to time_unit in config.
+Setting Mujoco self._ctrl_cost_weight, self._forward_reward_weight to 0.05 0.5 corresponding to time_unit in config.
+Logger name: mdp_playground.envs.gym_env_wrapper <Logger mdp_playground.envs.gym_env_wrapper (DEBUG)>
+Logger level set to: 0
+Env SEED set to: 0. Returned seed from Gym: 0
+Taking a step in the environment with a random action and printing the transition:
+sars', done = [-0.04604266 -0.0918053  -0.09669447  0.06265405  0.08255112  0.02132716
+  0.04589931  0.008725   -0.12654215 -0.06232745  0.0041326  -0.23250308
+ -0.02187917 -0.12459109 -0.07322674 -0.0544259  -0.03163002] [-0.04805083  0.3459275  -0.2552678   0.2436387  -0.4248672  -0.01168279] -0.024188971266994975 [ 0.10950414 -0.06336018 -0.2275261   0.18317325  0.3461872   0.28841474
+ -0.18688053 -0.30771495 -0.13111082 -0.28758849 -0.47827629  0.28402364
+  1.37572029 -3.87323739  1.81738214 -3.64180002  0.10067344] False
+Setting Mujoco self.action_space.low, self.action_space.high from: [-2. -2. -2. -2. -2. -2. -2.] [2. 2. 2. 2. 2. 2. 2.]
+to: [-1. -1. -1. -1. -1. -1. -1.] [1. 1. 1. 1. 1. 1. 1.]
+Original frame_skip for Mujoco Env: 5
+Setting Mujoco self.frame_skip to 2 corresponding to time_unit in config.
+Current mujoco env is not HalfCheetah v4, so only modified frameskip when changing time_unit. Not changing the _ctrl_cost_weight or _forward_reward_weight. It may make sense to also modify these variables depending on their relation with the time_unit. You will need to look deeper into how the reward function is defined to know if this is needed.
+Logger name: mdp_playground.envs.gym_env_wrapper <Logger mdp_playground.envs.gym_env_wrapper (DEBUG)>
+Logger level set to: 0
+Env SEED set to: 0. Returned seed from Gym: 0
+Taking a step in the environment with a random action and printing the transition:
+sars', done = [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00
+  0.00000000e+00  0.00000000e+00  0.00000000e+00  3.13270239e-03
+  4.12755577e-03  1.06635776e-03  2.29496561e-03  4.36249915e-04
+  4.35072424e-03  3.15853554e-03  8.21000000e-01 -6.00000000e-01
+  0.00000000e+00  2.56611054e-01 -3.37707943e-01 -2.75000000e-01
+  4.50000000e-01 -5.00000000e-02 -3.23000000e-01] [-0.09610166  0.691855   -0.5105356   0.4872774  -0.8497344  -0.02336558
+ -0.56485224] -0.44646933818807744 DEBUG:mdp_playground.envs.gym_env_wrapper:total_transitions_episode: 1 Noise in transition: [ 0.16010566  0.02622503 -0.13391734  0.09039876  0.32600001  0.23677024
+ -0.17593381 -0.31635537 -0.15581862  0.01033149 -0.58125769]
+DEBUG:mdp_playground.envs.gym_env_wrapper:sas'or: [ 9.99624853e-01  9.98940224e-01  2.73889120e-02 -4.60263911e-02
+  4.26543103e-02  9.17986244e-02  4.36249915e-04  4.35072424e-03
+  1.67289045e-01 -9.11111494e-02  0.00000000e+00] [-0.04805083  0.3459275 ] [ 1.15974342  1.02531983 -0.10700366  0.04785959  0.36865432  0.32856887
+ -0.27129071  0.3762751   0.01147739 -0.08049602 -0.58125769] [ 1.15974342  1.02531983 -0.10700366  0.04785959  0.36865432  0.32856887
+ -0.27129071  0.3762751   0.01147739 -0.08049602 -0.58125769] -0.15623291976154724
+Seeds set to:{'env': None, 'relevant_state_space': 9004017047643832299, 'relevant_action_space': 4834550647764529712, 'irrelevant_state_space': 3717188456764710370, 'irrelevant_action_space': 8356878982445552517, 'state_space': 3589039499206773928, 'action_space': 6966239785405507687, 'image_representations': 6875145353107871371}
+WARNING:mdp_playground.envs.rl_toy_env:Seeds set to:{'env': None, 'relevant_state_space': 9004017047643832299, 'relevant_action_space': 4834550647764529712, 'irrelevant_state_space': 3717188456764710370, 'irrelevant_action_space': 8356878982445552517, 'state_space': 3589039499206773928, 'action_space': 6966239785405507687, 'image_representations': 6875145353107871371}
+Inited terminal states to self.config['terminal_states']: [7 6]. Total 2
+WARNING:mdp_playground.envs.rl_toy_env:Inited terminal states to self.config['terminal_states']: [7 6]. Total 2
+self.relevant_init_state_dist:[0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
+ 0.         0.        ]
+WARNING:mdp_playground.envs.rl_toy_env:self.relevant_init_state_dist:[0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
+ 0.         0.        ]
+DEBUG:mdp_playground.envs.rl_toy_env:No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), no. of possible perms per independent set: [6], 6
+DEBUG:mdp_playground.envs.rl_toy_env:Number of generated sequences that did not clash with an existing one when it was generated:0
+DEBUG:mdp_playground.envs.rl_toy_env:Total no. of rewarded sequences:1Out of6per independent set
+specific_sequence that will be rewarded(4,)
+WARNING:mdp_playground.envs.rl_toy_env:specific_sequence that will be rewarded(4,)
+RESET called. curr_state reset to: 3
+INFO:mdp_playground.envs.rl_toy_env:RESET called. curr_state reset to: 3
+ self.delay, self.sequence_length:01
+INFO:mdp_playground.envs.rl_toy_env: self.delay, self.sequence_length:01
+DEBUG:mdp_playground.envs.rl_toy_env:self.augmented_state, len: [nan, 3], 2
+DEBUG:mdp_playground.envs.rl_toy_env:MDP Playground toy env instantiated with config: {'state_space_size': 8, 'action_space_size': 8, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'terminal_state_density': 0.25, 'maximally_connected': True, 'terminal_states': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
+       0.16666667, 0.        , 0.        ]), 'transition_function': <function RLToyEnv.init_transition_function.<locals>.<lambda> at 0x7b479f72e440>}
+Seeds set to:{'env': None, 'relevant_state_space': 7063060476891979449, 'relevant_action_space': 1709824039924999301, 'irrelevant_state_space': 6643936351744273560, 'irrelevant_action_space': 4629118677738699341, 'state_space': 6986896399128717799, 'action_space': 1441446296418599557, 'image_representations': 228710266027316918}
+WARNING:mdp_playground.envs.rl_toy_env:Seeds set to:{'env': None, 'relevant_state_space': 7063060476891979449, 'relevant_action_space': 1709824039924999301, 'irrelevant_state_space': 6643936351744273560, 'irrelevant_action_space': 4629118677738699341, 'state_space': 6986896399128717799, 'action_space': 1441446296418599557, 'image_representations': 228710266027316918}
+Inited terminal states to self.config['terminal_states']: [7 6]. Total 2
+WARNING:mdp_playground.envs.rl_toy_env:Inited terminal states to self.config['terminal_states']: [7 6]. Total 2
+self.relevant_init_state_dist:[0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
+ 0.         0.        ]
+WARNING:mdp_playground.envs.rl_toy_env:self.relevant_init_state_dist:[0.16666667 0.16666667 0.16666667 0.16666667 0.16666667 0.16666667
+ 0.         0.        ]
+DEBUG:mdp_playground.envs.rl_toy_env:No. of choices for each element in a possible sequence (Total no. of permutations will be a product of this), no. of possible perms per independent set: [6], 6
+DEBUG:mdp_playground.envs.rl_toy_env:Number of generated sequences that did not clash with an existing one when it was generated:0
+DEBUG:mdp_playground.envs.rl_toy_env:Total no. of rewarded sequences:1Out of6per independent set
+specific_sequence that will be rewarded(1,)
+WARNING:mdp_playground.envs.rl_toy_env:specific_sequence that will be rewarded(1,)
+RESET called. curr_state reset to: 4
+INFO:mdp_playground.envs.rl_toy_env:RESET called. curr_state reset to: 4
+ self.delay, self.sequence_length:01
+INFO:mdp_playground.envs.rl_toy_env: self.delay, self.sequence_length:01
+DEBUG:mdp_playground.envs.rl_toy_env:self.augmented_state, len: [nan, 4], 2
+DEBUG:mdp_playground.envs.rl_toy_env:MDP Playground toy env instantiated with config: {'state_space_size': 8, 'action_space_size': 8, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'maximally_connected': True, 'terminal_states': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
+       0.16666667, 0.        , 0.        ]), 'transition_function': <function RLToyEnv.init_transition_function.<locals>.<lambda> at 0x7b482737b640>}
+/home/rajanr/anaconda3/envs/unc/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:181: DeprecationWarning: [33mWARN: Current gymnasium version requires that `Env.reset` can be passed `options` to allow the environment initialisation to be passed additional information.[0m
+  logger.deprecation(
+Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 None 0 0 0
+INFO:mdp_playground.envs.rl_toy_env:Noise stats for previous episode num.: 1 (total abs. noise in rewards, total abs. noise in transitions, total reward, total noisy transitions, total transitions): 0 None 0 0 0
+RESET called. curr_state reset to: 5
+INFO:mdp_playground.envs.rl_toy_env:RESET called. curr_state reset to: 5
+ self.delay, self.sequence_length:01
+INFO:mdp_playground.envs.rl_toy_env: self.delay, self.sequence_length:01
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[5, 4] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   5   3   4   0.0
+(4, 0.0, False, False, {'curr_state': 4, 'curr_obs': 4, 'augmented_state': [5, 4]})
+INFO:mdp_playground:(4, 0.0, False, False, {'curr_state': 4, 'curr_obs': 4, 'augmented_state': [5, 4]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[4, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   4   0   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [4, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [4, 6]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[6, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   6   0   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[6, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   6   5   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[6, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   6   2   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[6, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   6   0   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[6, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   6   4   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[6, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   6   4   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[6, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   6   5   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+DEBUG:mdp_playground.envs.rl_toy_env:state_considered for reward:[6, 6] with delay 0
+DEBUG:mdp_playground.envs.rl_toy_env:rew0.0
+Reward: 0.0 Noise in reward: 0
+INFO:mdp_playground.envs.rl_toy_env:Reward: 0.0 Noise in reward: 0
+DEBUG:mdp_playground.envs.rl_toy_env:sas'r:   6   4   6   0.0
+(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+INFO:mdp_playground:(6, 0.0, True, False, {'curr_state': 6, 'curr_obs': 6, 'augmented_state': [6, 6]})
+[ 0.16013751  0.02655736 -0.13673393  0.090879    0.32045312  0.23664117
+ -0.17957025 -0.31526854 -0.12720501 -0.17721969 -0.58767688 -0.42326442
+ -0.32038087 -0.4256351   0.6849352  -0.67905798  0.10269957  0.5172394
+ -0.36984161  0.06661587  0.28370133  0.03787752 -0.09713245] False
+Setting Mujoco self.action_space.low, self.action_space.high from: [-1. -1.] [1. 1.]
+to: [-0.5 -0.5] [0.5 0.5]
+Original frame_skip for Mujoco Env: 2
+Setting Mujoco self.frame_skip to 1 corresponding to time_unit in config.
+Current mujoco env is not HalfCheetah v4, so only modified frameskip when changing time_unit. Not changing the _ctrl_cost_weight or _forward_reward_weight. It may make sense to also modify these variables depending on their relation with the time_unit. You will need to look deeper into how the reward function is defined to know if this is needed.
+Logger name: mdp_playground.envs.gym_env_wrapper <Logger mdp_playground.envs.gym_env_wrapper (DEBUG)>
+Logger level set to: 0
+Env SEED set to: 0. Returned seed from Gym: 0
+Taking a step in the environment with a random action and printing the transition:
+sars', done = [ 9.99624853e-01  9.98940224e-01  2.73889120e-02 -4.60263911e-02
+  4.26543103e-02  9.17986244e-02  4.36249915e-04  4.35072424e-03
+  1.67289045e-01 -9.11111494e-02  0.00000000e+00] [-0.04805083  0.3459275 ] -0.15623291976154724 [ 1.15974342  1.02531983 -0.10700366  0.04785959  0.36865432  0.32856887
+ -0.27129071  0.3762751   0.01147739 -0.08049602 -0.58125769] False
+Passed config: {} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: None. Returned seed from Gym: 69231007977469579473528112087359450090
+transition_matrix inited to:
+[[1 3 7 4 6 0 5 2]
+ [1 0 7 4 5 2 6 3]
+ [6 5 4 1 7 3 2 0]
+ [7 0 6 4 3 5 2 1]
+ [6 3 5 0 1 2 4 7]
+ [6 4 5 0 7 1 3 2]
+ [6 6 6 6 6 6 6 6]
+ [7 7 7 7 7 7 7 7]]
+Python type of state: <class 'int'>
+rewardable_sequences: {(4,): 1.0}
+MDP Playground toy env instantiated with config: {'state_space_size': 8, 'action_space_size': 8, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'terminal_state_density': 0.25, 'maximally_connected': True, 'terminal_states': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
+       0.16666667, 0.        , 0.        ]), 'transition_function': <function RLToyEnv.init_transition_function.<locals>.<lambda> at 0x7b479f72e440>}
+Passed config: {'state_space_size': 8, 'action_space_size': 8, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'maximally_connected': True} 
+
+[32;1m========================================================Initialising Toy MDP========================================================[0m
+Current working directory: /home/rajanr/mdp-playground
+Env SEED set to: None. Returned seed from Gym: 210298697754387723685784222489111545910
+transition_matrix inited to:
+[[3 1 2 5 0 4 7 6]
+ [1 0 5 7 3 2 4 6]
+ [7 4 5 1 0 3 6 2]
+ [2 7 3 4 1 6 5 0]
+ [6 3 5 7 4 1 2 0]
+ [5 3 6 4 7 2 1 0]
+ [6 6 6 6 6 6 6 6]
+ [7 7 7 7 7 7 7 7]]
+Python type of state: <class 'int'>
+rewardable_sequences: {(1,): 1.0}
+MDP Playground toy env instantiated with config: {'state_space_size': 8, 'action_space_size': 8, 'state_space_type': 'discrete', 'action_space_type': 'discrete', 'maximally_connected': True, 'terminal_states': array([7, 6]), 'relevant_init_state_dist': array([0.16666667, 0.16666667, 0.16666667, 0.16666667, 0.16666667,
+       0.16666667, 0.        , 0.        ]), 'transition_function': <function RLToyEnv.init_transition_function.<locals>.<lambda> at 0x7b482737b640>}
