@@ -6,7 +6,10 @@ __pycache__/
 MUJOCO_LOG.TXT
 *.pdf
 
+# Debugging stuff
+test_run*.txt
 log*
+temp.txt
 
 *.swp
 *.csv

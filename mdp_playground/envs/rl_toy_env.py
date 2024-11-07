@@ -38,6 +38,7 @@ class RLToyEnv(gym.Env):
             Delays each reward by this number of timesteps. Default value: 0.
         sequence_length : int >= 1
             Intrinsic sequence length of the reward function of an environment. For discrete environments, randomly selected sequences of this length are set to be rewardable at initialisation if use_custom_mdp = false and generate_random_mdp = true. Default value: 1.
+            See also reward_every_n_steps documentation. The default value for reward_every_n_steps = sequence_length means that rewards are handed out only if the rewardable sequence ends at a timestep that is a multiple of the sequence length. Set reward_every_n_steps = 1 to make the environment rewardable at any possible timestep that a rewardable sequence may end.
         transition_noise : float in range [0, 1] or Python function(state, action, rng)
             For discrete environments, it is a float that specifies the fraction of times the environment transitions to a noisy next state at each timestep, independently and uniformly at random.
             For continuous environments, if it's a float, it's used as the standard deviation of an i.i.d. normal distribution of noise. If it is a Python function, it should have 3 arguments and return a noise value that is added to next state. The arguments are provided to it by the existing code in this class and are the current state, the current action and the Random Number Generator (RNG) of the environment which is an np.random.RandomState object. This RNG is used to ensure reproducibility. Default value: 0.
@@ -142,8 +143,6 @@ class RLToyEnv(gym.Env):
                 If true, allows rewardable sequences to have repeating states in them.
             maximally_connected : boolean
                 If true, sets the transition function such that every state in independent set i can transition to every state in independent set i + 1. If false, then sets the transition function such that a state in independent set i may have any state in independent set i + 1 as the next state for a transition.
-            reward_every_n_steps : boolean
-                Hand out rewards only at multiples of sequence_length steps. This makes the probability that an agent is executing overlapping rewarding sequences 0. This makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise is added at every step, regardless of this setting. Currently, not implemented for either the make_denser = true case or for continuous and grid environments.
             generate_random_mdp : boolean
                 If true, automatically generate MDPs when use_custom_mdp = false. Currently, this option doesn't need to be specified because random MDPs are always generated when use_custom_mdp = false.
 
@@ -152,10 +151,12 @@ class RLToyEnv(gym.Env):
 
         For all, continuous, discrete and grid environments:
         make_denser : boolean
-            If true, makes the reward denser in environments.
-            For discrete environments, hands out a partial reward for completing partial sequences.
+            If true, makes the reward denser in environments:
+            For discrete environments, hands out a partial reward for completing partial rewarding sequences.
             For continuous environments, for reward function move_to_a_point, the base reward handed out is equal to the distance moved towards the target point in the current timestep.
             For grid envs, the base reward handed out is equal to the Manhattan distance moved towards the target point in the current timestep.
+        reward_every_n_steps : int
+            Hand out rewards only at multiples of reward_every_n_steps steps. For discrete envs, this allows one to set it to sequence_length, thereby making the probability that an agent is collecting rewards for overlapping rewarding sequences 0. For discrete, continuous and grid envs, it provides another possibility to have sparser reward envs. This also makes it simpler to evaluate HRL algorithms and whether they can "discretise" time correctly. Noise (in the transition or reward function) is added at every step, regardless of this setting. Default value: sequence_length for discrete envs and 1 for continuous and grid envs.
         seed : int or dict
             Recommended to be passed as an int which generates seeds to be used for the various components of the environment. It is, however, possible to control individual seeds by passing it as a dict. Please see the default initialisation for seeds below to see how to do that.
         log_filename : str
@@ -528,7 +529,15 @@ class RLToyEnv(gym.Env):
             self.action_loss_weight = config["action_loss_weight"]
 
         if "reward_every_n_steps" not in config:
-            self.reward_every_n_steps = True
+            # The default is different for the different state_space_types, because
+            # making it sequence_length for discrete envs makes it easier to find what the optimal returns
+            # are and it avoids the agent being on overlapping rewarding sequences. For the other
+            # types, it's set to 1 by default because that is the more natural and common
+            # setting.
+            if config["state_space_type"] == "discrete":
+                self.reward_every_n_steps = self.sequence_length
+            else:  # continuous and grid envs
+                self.reward_every_n_steps = 1
         else:
             self.reward_every_n_steps = config["reward_every_n_steps"]
 
@@ -1756,10 +1765,7 @@ class RLToyEnv(gym.Env):
 
         if self.use_custom_mdp:
             reward = self.config["reward_function"](state_considered, action)
-            self.reward_buffer.append(reward)  # ##TODO Modify seq_len and delay
-            # code for discrete and continuous case to use buffer too?
-            reward = self.reward_buffer[0]
-            del self.reward_buffer[0]
+            # ##TODO Modify seq_len and delay also for custom MDP envs.?
 
         elif self.config["state_space_type"] == "discrete":
             if np.isnan(state_considered[0 + delay]):
@@ -1775,27 +1781,18 @@ class RLToyEnv(gym.Env):
                     + " with delay "
                     + str(self.delay)
                 )
-                if not self.reward_every_n_steps or (
-                    self.reward_every_n_steps
-                    and self.total_transitions_episode % self.sequence_length == 0
-                ):
-                    # ###TODO also implement reward_every_n_steps for continuous envs.?
-                    sub_seq = tuple(
-                        state_considered[1 + delay : self.augmented_state_length]
-                    )
-                    if sub_seq in self.rewardable_sequences:
-                        reward = self.rewardable_sequences[sub_seq]
-                        # print(state_considered, "with delay", self.delay, "rewarded with:", reward)
-                    else:
-                        # print(state_considered, "with delay", self.delay, "NOT rewarded.")
-                        pass
+                # ### TODO also implement reward_every_n_steps for continuous envs.? Done
+                # at one place common for all types of envs below.
+                sub_seq = tuple(
+                    state_considered[1 + delay : self.augmented_state_length]
+                )
+                if sub_seq in self.rewardable_sequences:
+                    reward = self.rewardable_sequences[sub_seq]
+                    # print(state_considered, "with delay", self.delay, "rewarded with:", reward)
+                else:
+                    # print(state_considered, "with delay", self.delay, "NOT rewarded.")
+                    pass
 
-            self.reward_buffer.append(reward)
-            reward = self.reward_buffer[0]
-            # print("self.reward_buffer", self.reward_buffer)
-            del self.reward_buffer[0]
-
-            self.logger.debug("rew" + str(reward))
 
         elif self.config["state_space_type"] == "continuous":
             # ##TODO Make reward for along a line case to be length of line
@@ -1896,11 +1893,6 @@ class RLToyEnv(gym.Env):
                         np.array(action, dtype=self.dtype)
                     )
 
-            self.reward_buffer.append(reward)
-            reward = self.reward_buffer[0]
-            # print("self.reward_buffer", self.reward_buffer)
-            del self.reward_buffer[0]
-
         elif self.config["state_space_type"] == "grid":
             if self.config["reward_function"] == "move_to_a_point":
                 if self.make_denser:
@@ -1921,10 +1913,20 @@ class RLToyEnv(gym.Env):
                     if list(new_relevant_state) == self.target_point:
                         reward += 1.0
 
-            self.reward_buffer.append(reward)
-            reward = self.reward_buffer[0]
-            # print("self.reward_buffer", self.reward_buffer)
-            del self.reward_buffer[0]
+
+        # Process reward buffer for all types of envs here and take the next one
+        # in queue. This is done to have a delay in the reward given to the agent.
+        self.reward_buffer.append(reward)
+        reward = self.reward_buffer[0]
+        # print("self.reward_buffer", self.reward_buffer)
+        del self.reward_buffer[0]
+
+        if (
+            self.total_transitions_episode % self.reward_every_n_steps != 0
+        ):
+            reward = 0.0
+
+        self.logger.debug("rew" + str(reward))
 
         noise_in_reward = self.reward_noise(state, action, self._np_random) if self.reward_noise else 0
         # #random ### TODO Would be better to parameterise this in terms of state, action and time_step as well. Would need to change implementation to have a queue for the rewards achieved and then pick the reward that was generated delay timesteps ago.

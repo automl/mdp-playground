@@ -1,5 +1,10 @@
-"""We collect here some examples of basic usage for MDP Playground.
-Example call: python example.py --do_not_display_images --log_level INFO
+"""We collect some examples of basic usage for MDP Playground in this script.
+Example calls: 
+python example.py --do_not_display_images --log_level INFO
+python example.py --do_not_display_images --func_list discrete_environment_example    
+Equivalent call with short flags:
+python example.py -n -ll INFO
+python example.py -n -f discrete_environment_example
 
 Calling this file as a script, invokes the following examples:
     one for basic discrete environments
@@ -9,6 +14,7 @@ Calling this file as a script, invokes the following examples:
     one for continuous environments with reward function move to a target point with irrelevant features and image representations
     one for continuous environments with reward function move along a line
     one for basic grid environments
+    one for grid environments with reward_every_n_steps
     one for grid environments with image representations
     one for wrapping Atari env qbert
     one for wrapping Mujoco envs HalfCheetah, Pusher, Reacher
@@ -42,6 +48,7 @@ def display_image(obs, mode="RGB"):
 
 
 def discrete_environment_example():
+    """discrete environment example"""
 
     config = {}
     config["seed"] = 0
@@ -82,6 +89,7 @@ def discrete_environment_example():
 
 
 def discrete_environment_image_representations_example():
+    '''discrete environment with image representations example'''
 
     config = {}
     config["seed"] = 0
@@ -128,6 +136,7 @@ def discrete_environment_image_representations_example():
 
 
 def discrete_environment_diameter_image_representations_example():
+    '''discrete environment with diameter > 1 and image representations example'''
 
     config = {}
     config["seed"] = 3
@@ -175,6 +184,8 @@ def discrete_environment_diameter_image_representations_example():
 
 
 def continuous_environment_example_move_to_a_point():
+    '''continuous environment example: move to a point'''
+
     config = {}
     config["seed"] = 0
 
@@ -210,6 +221,8 @@ def continuous_environment_example_move_to_a_point():
 
 
 def continuous_environment_example_move_to_a_point_irrelevant_image():
+    '''continuous environment example: move to a point with irrelevant features and image representations'''
+
     config = {}
     config["seed"] = 0
 
@@ -259,6 +272,7 @@ def continuous_environment_example_move_to_a_point_irrelevant_image():
 
 
 def continuous_environment_example_move_along_a_line():
+    '''continuous environment example: move along a line'''
 
     config = {}
     config["seed"] = 0
@@ -293,6 +307,8 @@ def continuous_environment_example_move_along_a_line():
 
 
 def grid_environment_example():
+    '''grid environment example: move towards a goal point'''
+
     config = {}
     config["seed"] = 0
 
@@ -318,8 +334,39 @@ def grid_environment_example():
     env.reset()[0]
     env.close()
 
+def grid_environment_example_reward_every_n_steps():
+    '''grid environment example: move towards a goal point but with sparser rewards using the reward_every_n_steps config'''
+
+    config = {}
+    config["seed"] = 0
+
+    config["state_space_type"] = "grid"
+    config["grid_shape"] = (8, 8)
+
+    config["reward_function"] = "move_to_a_point"
+    config["make_denser"] = True
+    config["reward_every_n_steps"] = 3
+    config["target_point"] = [5, 5]
+
+    env = RLToyEnv(**config)
+
+    state = env.get_augmented_state()["augmented_state"][-1]
+    actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
+
+    for i in range(len(actions)):
+        action = actions[i]
+        next_obs, reward, done, trunc, info = env.step(action)
+        next_state = env.get_augmented_state()["augmented_state"][-1]
+        print("sars', done =", state, action, reward, next_state, done)
+        state = next_state
+
+    env.reset()[0]
+    env.close()
+
 
 def grid_environment_image_representations_example():
+    '''grid environment example: move towards a goal point with image representations'''
+
     config = {}
     config["seed"] = 0
 
@@ -352,6 +399,7 @@ def grid_environment_image_representations_example():
 
 
 def atari_wrapper_example():
+    '''wrapping Atari env qbert example'''
 
     config = {
         "seed": 0,
@@ -391,6 +439,7 @@ def atari_wrapper_example():
 
 
 def mujoco_wrapper_examples():
+    '''wrapping Mujoco envs HalfCheetah, Pusher, Reacher examples'''
 
     # For Mujoco envs, a few specific dimensions need to be changed by fiddling with 
     # attributes of the MujocoEnv class. This is achieved through a Mujoco
@@ -509,6 +558,7 @@ def mujoco_wrapper_examples():
 
 
 def minigrid_wrapper_example():
+    '''wrapping MiniGrid env example'''
 
     config = {
         "seed": 0,
@@ -551,6 +601,7 @@ def minigrid_wrapper_example():
 
 
 def procgen_wrapper_example():
+    '''wrapping ProcGen env example'''
 
     config = {
         "seed": 0,
@@ -592,12 +643,14 @@ if __name__ == "__main__":
     # Use argparse to set display_images to False if you don't want to display images
     # and to set log level.
     import argparse
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(epilog=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--display_images", "-di", help="Display image observations (available for some examples)", action="store_true")
     parser.add_argument("--do_not_display_images", "-n", help="Do not display image observations (available for some examples)", action="store_false", dest="display_images")
-    parser.add_argument("--log_level", type=str, default="DEBUG", help="Set the log level")
+    parser.add_argument("--log_level", "-ll", type=str, default="DEBUG", help="Set the log level")
+    parser.add_argument("--func_list", "-f", type=str, nargs="+", help="Set the list of examples to run. Set it to the names of the functions corresponding to the examples inside this script.")
     parser.set_defaults(display_images=True)
     args = parser.parse_args()
+    # print("Args:", args)
     display_images = args.display_images
 
     # Set up logging globally for the MDP Playground library:
@@ -622,72 +675,40 @@ if __name__ == "__main__":
     set_ansi_escape = "\033[33;1m"  # Yellow, bold
     reset_ansi_escape = "\033[0m"
 
-    logger.info(set_ansi_escape + "Running discrete environment\n" + reset_ansi_escape)
-    discrete_environment_example()
+    # Run the examples called in the function list:
+    if args.func_list:
+        for func_name in args.func_list:
+            logger.info(set_ansi_escape + "Running " + globals()[func_name].__doc__ + reset_ansi_escape)
+            globals()[func_name]()
+        exit()
 
-    logger.info(
-        set_ansi_escape
-        + "\nRunning discrete environment with image representations\n"
-        + reset_ansi_escape
-    )
-    discrete_environment_image_representations_example()
+    # Else run all other examples except the ones disabled right now:
 
-    logger.info(
-        set_ansi_escape
-        + "\nRunning discrete environment with diameter and image representations\n"
-        + reset_ansi_escape
-    )
-    discrete_environment_diameter_image_representations_example()
+    # List all function names defined in the current script
+    functions = [name for name, obj in globals().items() if callable(obj) and obj.__module__ == "__main__"]
+    print("Available functions:", functions)
 
-    logger.info(
-        set_ansi_escape
-        + "\nRunning continuous environment: move_to_a_point\n"
-        + reset_ansi_escape
-    )
-    continuous_environment_example_move_to_a_point()
+    # Disabled examples:
+    functions_to_ignore = ["display_image", "minigrid_wrapper_example", "procgen_wrapper_example"]
 
-    logger.info(
-        set_ansi_escape
-        + "\nRunning continuous environment: move_to_a_point with irrelevant features and image representations\n"
-        + reset_ansi_escape
-    )
-    continuous_environment_example_move_to_a_point_irrelevant_image()
+    # Run all functions except the ones in functions_to_ignore:
+    for func_name in functions:
+        if func_name in functions_to_ignore:
+            continue
+        logger.info(set_ansi_escape + "Running " + globals()[func_name].__doc__ + reset_ansi_escape)
+        globals()[func_name]()
 
-    logger.info(
-        set_ansi_escape
-        + "\nRunning continuous environment: move_along_a_line\n"
-        + reset_ansi_escape
-    )
-    continuous_environment_example_move_along_a_line()
+    # Causes RuntimeError: dictionary changed size during iteration
+    # global_vars = globals()
+    # for func_name in global_vars:
+    #     if callable(global_vars[func_name]):
+    #         logger.info(func_name)
 
-    logger.info(
-        set_ansi_escape
-        + "\nRunning grid environment: move_to_a_point\n"
-        + reset_ansi_escape
-    )
-    grid_environment_example()
-
-    logger.info(
-        set_ansi_escape + "\nRunning grid environment: move_to_a_point "
-        "with image representations\n" + reset_ansi_escape
-    )
-    grid_environment_image_representations_example()
-
-    logger.info(set_ansi_escape + "\nRunning Atari wrapper example:\n" + reset_ansi_escape)
-    atari_wrapper_example()
-
-    logger.info(set_ansi_escape + "\nRunning Mujoco wrapper example:\n" + reset_ansi_escape)
-    mujoco_wrapper_examples()
-
-    # logger.info(set_ansi_escape + "\nRunning MiniGrid wrapper example:\n" + reset_ansi_escape)
-    # minigrid_wrapper_example()
-
-    # logger.info(set_ansi_escape + "\nRunning ProcGen wrapper example:\n" + reset_ansi_escape)
-    # procgen_wrapper_example()
-
-    # Using gym.make() example 1
+    # Running extra examples to show using gym.make():
     import mdp_playground
     import gymnasium as gym
+
+    logger.info(set_ansi_escape + "Running 2 extra examples to show using gym.make()" + reset_ansi_escape)
 
     # The following are with seed=None:
     gym.make("RLToy-v0")
