@@ -173,7 +173,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test 5: R noise - same as Test 1 above except with reward noise and with only 5 steps
         # instead of 20.
         print("\nTest 5: \033[32;1;4mTEST_CONTINUOUS_DYNAMICS_R_NOISE\033[0m")
-        config["reward_noise"] = lambda a: a.normal(0, 0.5)
+        config["reward_noise"] = lambda s, a, rng: rng.normal(0, 0.5)
         config["delay"] = 0
         env = RLToyEnv(**config)
         state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
@@ -303,7 +303,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         # Test P noise
         print("\nTest 9: \033[32;1;4mTEST_CONTINUOUS_DYNAMICS_P_NOISE\033[0m")
-        config["transition_noise"] = lambda a: a.normal([0] * 7, [0.5] * 7)
+        config["transition_noise"] = lambda s, a, rng: rng.normal([0] * 7, [0.5] * 7)
         # Reset seed to have states far away from state maxes so that it is easier to 
         # test stuff below, but in the end, the state is clipped to [-5, 5] anyway
         # while testing, so this wasn't really needed.
@@ -1243,9 +1243,10 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)
         state = env.get_augmented_state()["curr_state"]
-        self.assertEqual(
-            type(state), int, "Type of discrete state should be int."
-        )  # TODO Move this and the test_continuous_dynamics type checks to separate unit tests
+        if type(state) != int:
+            self.assertEqual(
+                state.dtype, env.observation_space.dtype, "Type of discrete state should be: " + str(env.observation_space.dtype)
+            )  # TODO Move this and the test_continuous_dynamics type checks to separate unit tests
 
         action = 2
         next_state, reward, done, trunc, info = env.step(action)
@@ -1482,7 +1483,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["delay"] = 0
         config["sequence_length"] = 1
         config["reward_scale"] = 1.0
-        config["reward_noise"] = lambda a: a.normal(0, 0.5)
+        config["reward_noise"] = lambda s, a, rng: rng.normal(0, 0.5)
 
         config["generate_random_mdp"] = True
         config["log_level"] = logging.INFO
@@ -1545,7 +1546,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_scale"] = 2.5
         config["reward_shift"] = -1.75
         # config["transition_noise"] = 0.1
-        config["reward_noise"] = lambda a: a.normal(0, 0.5)
+        config["reward_noise"] = lambda s, a, rng: rng.normal(0, 0.5)
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)
@@ -1804,7 +1805,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_scale"] = 2.5
         config["reward_shift"] = -1.75
         # config["transition_noise"] = 0.1
-        config["reward_noise"] = lambda a: a.normal(0, 0.5)
+        config["reward_noise"] = lambda s, a, rng: rng.normal(0, 0.5)
 
         config["generate_random_mdp"] = True
 

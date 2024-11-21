@@ -176,6 +176,8 @@ class RLToyEnv(gym.Env):
         The externally visible observation space for the enviroment.
     action_space : Gym.Space
         The externally visible action space for the enviroment.
+    feature_space : Gym.Space
+        In case of continuous and grid environments, this is the underlying state space. ##TODO Unify this across all types of environments.
     rewardable_sequences : dict
         holds the rewardable sequences. The keys are tuples of rewardable sequences and values are the rewards handed out. When make_denser is True for discrete environments, this dict also holds the rewardable partial sequences.
 
@@ -519,7 +521,6 @@ class RLToyEnv(gym.Env):
         elif config["state_space_type"] == "grid":
             assert "grid_shape" in config
             self.grid_shape = config["grid_shape"]
-            self.grid_np_data_type = np.int64
         else:
             raise ValueError("Unknown state_space_type")
 
@@ -546,9 +547,9 @@ class RLToyEnv(gym.Env):
         else:
             self.repeats_in_sequences = config["repeats_in_sequences"]
 
-        self.dtype = np.float32 if "dtype" not in config else config["dtype"]
 
         if config["state_space_type"] == "discrete":
+            self.dtype_s = np.int64 if "dtype_s" not in config else config["dtype_s"]
             if self.irrelevant_features:
                 assert (
                     len(config["action_space_size"]) == 2
@@ -570,6 +571,7 @@ class RLToyEnv(gym.Env):
                 )
                 # assert (np.array(self.state_space_size) % np.array(self.diameter) == 0).all(), "state_space_size should be a multiple of the diameter to allow for the generation of regularly connected MDPs."
         elif config["state_space_type"] == "continuous":
+            self.dtype_s = np.float32 if "dtype_s" not in config else config["dtype_s"]
             self.action_space_dim = self.state_space_dim
             if self.irrelevant_features:
                 assert (
@@ -580,9 +582,17 @@ class RLToyEnv(gym.Env):
                 config["relevant_indices"] = range(self.state_space_dim)
             # config["irrelevant_indices"] = list(set(range(len(config["state_space_dim"]))) - set(config["relevant_indices"]))
         elif config["state_space_type"] == "grid":
+            self.dtype_s = np.int64 if "dtype_s" not in config else config["dtype_s"]
             # Repeat the grid for the irrelevant part as well
             if self.irrelevant_features:
                 self.grid_shape = self.grid_shape * 2
+
+        # Set the dtype for the observation space:
+        if self.image_representations:
+            self.dtype_o = np.float32 if "dtype_o" not in config else config["dtype_o"]
+        else:
+            self.dtype_o = self.dtype_s if "dtype_o" not in config else config["dtype_o"]
+
 
         if ("init_state_dist" in config) and ("relevant_init_state_dist" not in config):
             config["relevant_init_state_dist"] = config["init_state_dist"]
@@ -614,7 +624,7 @@ class RLToyEnv(gym.Env):
                 assert self.sequence_length == 1
                 if "target_point" in config:
                     self.target_point = np.array(
-                        config["target_point"], dtype=self.dtype
+                        config["target_point"], dtype=self.dtype_s
                     )
                     assert self.target_point.shape == (
                         len(config["relevant_indices"]),
@@ -640,6 +650,7 @@ class RLToyEnv(gym.Env):
                 DiscreteExtended(
                     self.state_space_size[0],
                     seed=self.seed_dict["relevant_state_space"],
+                    # dtype=self.dtype_o,  # Gymnasium seems to hardcode as np.int64
                 )
             ]  # #seed #hardcoded, many time below as well
             self.action_spaces = [
@@ -671,7 +682,7 @@ class RLToyEnv(gym.Env):
             # self.action_spaces[i] = DiscreteExtended(self.action_space_size[i],
             # seed=self.seed_dict["irrelevant_action_space"]) #seed
 
-            if self.image_representations:
+            if self.image_representations:  # for discrete envs
                 # underlying_obs_space = MultiDiscreteExtended(self.state_space_size, seed=self.seed_dict["state_space"]) #seed
                 self.observation_space = ImageMultiDiscrete(
                     self.state_space_size,
@@ -714,7 +725,7 @@ class RLToyEnv(gym.Env):
                 self.state_space_max,
                 shape=(self.state_space_dim,),
                 seed=self.seed_dict["state_space"],
-                dtype=self.dtype,
+                dtype=self.dtype_s,
             )  # #seed
             # hack #TODO # low and high are 1st 2 and required arguments
             # for instantiating BoxExtended
@@ -729,7 +740,7 @@ class RLToyEnv(gym.Env):
                 self.action_space_max,
                 shape=(self.action_space_dim,),
                 seed=self.seed_dict["action_space"],
-                dtype=self.dtype,
+                dtype=self.dtype_s,
             )  # #seed
             # hack #TODO
 
@@ -754,7 +765,7 @@ class RLToyEnv(gym.Env):
                 0 * underlying_space_maxes,
                 underlying_space_maxes,
                 seed=self.seed_dict["state_space"],
-                dtype=self.dtype,
+                dtype=self.dtype_s,
             )  # #seed
 
             lows = np.array([-1] * len(self.grid_shape))
@@ -893,7 +904,7 @@ class RLToyEnv(gym.Env):
                         # print("Term state lows, highs:", lows, highs)
                         self.term_spaces.append(
                             BoxExtended(
-                                low=lows, high=highs, seed=self.seed_, dtype=self.dtype
+                                low=lows, high=highs, seed=self.seed_, dtype=self.dtype_s
                             )
                         )  # #seed #hack #TODO
                     self.logger.debug(
@@ -931,7 +942,7 @@ class RLToyEnv(gym.Env):
                         highs = term_state  # #hardcoded
                         self.term_spaces.append(
                             BoxExtended(
-                                low=lows, high=highs, seed=self.seed_, dtype=self.grid_np_data_type
+                                low=lows, high=highs, seed=self.seed_, dtype=self.dtype_s
                             )
                         )  # #seed #hack #TODO
 
@@ -1657,7 +1668,7 @@ class RLToyEnv(gym.Env):
                 # for a "wall", but would need to take care of multiple
                 # reflections near a corner/edge.
                 # Resets all higher order derivatives to 0
-                zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype)
+                zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype_s)
                 # #####IMP to have copy() otherwise it's the same array
                 # (in memory) at every position in the list:
                 self.state_derivatives = [
@@ -1666,7 +1677,7 @@ class RLToyEnv(gym.Env):
                 self.state_derivatives[0] = next_state
 
             if self.config["reward_function"] == "move_to_a_point":
-                next_state_rel = np.array(next_state, dtype=self.dtype)[
+                next_state_rel = np.array(next_state, dtype=self.dtype_s)[
                     self.config["relevant_indices"]
                 ]
                 dist_ = np.linalg.norm(next_state_rel - self.target_point)
@@ -1678,7 +1689,7 @@ class RLToyEnv(gym.Env):
             # Need to check that dtype is int because Gym doesn't
             if (
                 self.action_space.contains(action)
-                and np.array(action).dtype == self.grid_np_data_type
+                and np.array(action).dtype == self.dtype_s
             ):
                 if self.transition_noise:
                     # self._np_random.choice only works for 1-D arrays
@@ -1820,7 +1831,7 @@ class RLToyEnv(gym.Env):
                     # of the formulae and see that programmatic results match: should 
                     # also have a unit version of 4. for dist_of_pt_from_line() and 
                     # an integration version here for total_deviation calc.?.
-                    data_ = np.array(state_considered, dtype=self.dtype)[
+                    data_ = np.array(state_considered, dtype=self.dtype_s)[
                         1 + delay : self.augmented_state_length,
                         self.config["relevant_indices"],
                     ]
@@ -1863,10 +1874,10 @@ class RLToyEnv(gym.Env):
                     # that. #TODO Generate it randomly to have random Rs?
                     if self.make_denser:
                         old_relevant_state = np.array(
-                            state_considered, dtype=self.dtype
+                            state_considered, dtype=self.dtype_s
                         )[-2, self.config["relevant_indices"]]
                         new_relevant_state = np.array(
-                            state_considered, dtype=self.dtype
+                            state_considered, dtype=self.dtype_s
                         )[-1, self.config["relevant_indices"]]
                         reward = -np.linalg.norm(new_relevant_state - self.target_point)
                         # Should allow other powers of the distance from target_point,
@@ -1879,7 +1890,7 @@ class RLToyEnv(gym.Env):
                         # TODO also make_denser, sparse rewards only at target
                     else:  # sparse reward
                         new_relevant_state = np.array(
-                            state_considered, dtype=self.dtype
+                            state_considered, dtype=self.dtype_s
                         )[-1, self.config["relevant_indices"]]
                         if (
                             np.linalg.norm(new_relevant_state - self.target_point)
@@ -1890,7 +1901,7 @@ class RLToyEnv(gym.Env):
                             # stay in the radius and earn more reward.
 
                     reward -= self.action_loss_weight * np.linalg.norm(
-                        np.array(action, dtype=self.dtype)
+                        np.array(action, dtype=self.dtype_s)
                     )
 
         elif self.config["state_space_type"] == "grid":
@@ -2044,8 +2055,8 @@ class RLToyEnv(gym.Env):
         if self.image_representations:
             next_obs = self.observation_space.get_concatenated_image(next_state)
 
-        self.curr_state = next_state
-        self.curr_obs = next_obs
+        self.curr_state = self.dtype_s(next_state)
+        self.curr_obs = self.dtype_o(next_obs)
 
         # #### TODO curr_state is external state, while we need to check relevant state for terminality! Done - by using augmented_state now instead of curr_state!
         self.done = (
@@ -2199,7 +2210,7 @@ class RLToyEnv(gym.Env):
 
             # if not self.use_custom_mdp:
             # init the state derivatives needed for continuous spaces
-            zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype)
+            zero_state = np.array([0.0] * (self.state_space_dim), dtype=self.dtype_s)
             self.state_derivatives = [
                 zero_state.copy() for i in range(self.dynamics_order + 1)
             ]  # #####IMP to have copy()
@@ -2217,7 +2228,7 @@ class RLToyEnv(gym.Env):
             while True:  # Be careful about infinite loops
                 term_space_was_sampled = False
                 # curr_state is an np.array while curr_state_relevant is a list
-                self.curr_state = self.feature_space.sample().astype(int)  # #random
+                self.curr_state = self.feature_space.sample().astype(self.dtype_s)  # #random
                 self.curr_state_relevant = list(self.curr_state[[0, 1]])  # #hardcoded
                 if self.is_terminal_state(self.curr_state_relevant):
                     self.logger.debug(
@@ -2240,6 +2251,9 @@ class RLToyEnv(gym.Env):
             )
         else:
             self.curr_obs = self.curr_state
+
+        self.curr_state = self.dtype_s(self.curr_state)
+        self.curr_obs = self.dtype_o(self.curr_obs)
 
         self.logger.info("RESET called. curr_state reset to: " + str(self.curr_state))
         self.reached_terminal = False
