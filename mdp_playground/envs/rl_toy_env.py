@@ -345,6 +345,7 @@ class RLToyEnv(gym.Env):
                 # if config["state_space_type"] == "discrete":
                 #     assert "init_state_dist" in config
 
+        # Common defaults for all types of environments:
         if "terminal_state_density" not in config:
             self.terminal_state_density = 0.25
         else:
@@ -483,6 +484,7 @@ class RLToyEnv(gym.Env):
                 else:
                     self.image_scale_range = config["image_scale_range"]
 
+        # Defaults for the individual environment types:
         if config["state_space_type"] == "discrete":
             if "reward_dist" not in config:
                 self.reward_dist = None
@@ -497,6 +499,11 @@ class RLToyEnv(gym.Env):
         elif config["state_space_type"] == "continuous":
             # if not self.use_custom_mdp:
             self.state_space_dim = config["state_space_dim"]
+
+            # ##TODO Do something to dismbiguate the Python function reward_function from the 
+            # choice of reward_function below.
+            if "reward_function" not in config:
+                config["reward_function"] = "move_to_a_point"
 
             if "transition_dynamics_order" not in config:
                 self.dynamics_order = 1
@@ -548,8 +555,9 @@ class RLToyEnv(gym.Env):
             self.repeats_in_sequences = config["repeats_in_sequences"]
 
 
+        # ##TODO Move these to the individual env types' defaults section above?
         if config["state_space_type"] == "discrete":
-            self.dtype_s = np.int64 if "dtype_s" not in config else config["dtype_s"]
+            self.dtype_s = np.int32 if "dtype_s" not in config else config["dtype_s"]
             if self.irrelevant_features:
                 assert (
                     len(config["action_space_size"]) == 2
@@ -589,7 +597,7 @@ class RLToyEnv(gym.Env):
 
         # Set the dtype for the observation space:
         if self.image_representations:
-            self.dtype_o = np.float32 if "dtype_o" not in config else config["dtype_o"]
+            self.dtype_o = np.uint8 if "dtype_o" not in config else config["dtype_o"]
         else:
             self.dtype_o = self.dtype_s if "dtype_o" not in config else config["dtype_o"]
 

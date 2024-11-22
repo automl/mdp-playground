@@ -127,7 +127,7 @@ def discrete_environment_image_representations_example():
     augmented_state_dict = env.get_augmented_state()
     next_state = augmented_state_dict["curr_state"]  # Underlying MDP state holds
     # the current discrete state.
-    print("sars', done =", state, action, reward, next_state, done)
+    print("sars', done, image shape =", state, action, reward, next_state, done, next_state_image.shape)
 
     env.close()
 
@@ -175,7 +175,7 @@ def discrete_environment_diameter_image_representations_example():
     augmented_state_dict = env.get_augmented_state()
     next_state = augmented_state_dict["curr_state"]  # Underlying MDP state holds
     # the current discrete state.
-    print("sars', done =", state, action, reward, next_state, done)
+    print("sars', done, shape =", state, action, reward, next_state, done, next_state_image.shape)
 
     env.close()
 
@@ -262,7 +262,7 @@ def continuous_environment_example_move_to_a_point_irrelevant_image():
     augmented_state_dict = env.get_augmented_state()
     next_state = augmented_state_dict["curr_state"].copy()  # Underlying MDP state holds
     # the current continuous state.
-    print("sars', done =", state, action, reward, next_state, done)
+    print("sars', done, image shape =", state, action, reward, next_state, done, next_state_image.shape)
 
     env.close()
 
@@ -388,7 +388,7 @@ def grid_environment_image_representations_example():
         action = actions[i]
         next_obs, reward, done, trunc, info = env.step(action)
         next_state = env.get_augmented_state()["augmented_state"][-1]
-        print("sars', done =", state, action, reward, next_state, done)
+        print("sars', done, image shape =", state, action, reward, next_state, done, next_obs.shape)
         state = next_state
 
     env.reset()[0]

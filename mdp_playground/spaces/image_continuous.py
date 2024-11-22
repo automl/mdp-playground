@@ -24,6 +24,7 @@ class ImageContinuous(Box):
         term_spaces=None,
         width=100,
         height=100,
+        num_channels=3,
         circle_radius=5,
         target_point=None,
         relevant_indices=[0, 1],
@@ -43,6 +44,8 @@ class ImageContinuous(Box):
             The width of the image
         height : int
             The height of the image
+        num_channels : int
+            The number of channels in the image  ###TODO: Support for 1 channel; unify with ImageMultiDiscrete
         circle_radius : int
             The radius of the circle which represents the agent and target point
         target_point : np.array
@@ -60,6 +63,7 @@ class ImageContinuous(Box):
         assert (self.feature_space.low != -np.inf).any()
         self.width = width
         self.height = height
+        self.num_channels = num_channels
         # Warn if resolution is too low?
         self.circle_radius = circle_radius
         self.target_point = target_point
@@ -99,7 +103,7 @@ class ImageContinuous(Box):
 
         # Shape has 1 appended for Ray Rllib to be compatible IIRC
         super(ImageContinuous, self).__init__(
-            shape=(width, height, 1), dtype=dtype, low=0, high=255
+            shape=(width, height, num_channels), dtype=dtype, low=0, high=255
         )
         super(ImageContinuous, self).seed(seed=seed)
 
@@ -117,10 +121,10 @@ class ImageContinuous(Box):
 
         """
         # Use RGB
-        image_ = Image.new("RGB", (self.width, self.height), color=self.bg_colour)
-        # Use L for black and white 8-bit pixels instead of RGB in case not
-        # using custom images
-        # image_ = Image.new("L", (self.width, self.height))
+        if self.num_channels == 3:
+            image_ = Image.new("RGB", (self.width, self.height), color=self.bg_colour)
+        elif self.num_channels == 1:
+            image_ = Image.new("L", (self.width, self.height), color=self.bg_colour)
         draw = ImageDraw.Draw(image_)
 
         # Draw in decreasing order of importance:
@@ -239,7 +243,7 @@ class ImageContinuous(Box):
         if x.shape == (
             self.width,
             self.height,
-            1,
+            self.num_channels,
         ):  # TODO compare each pixel for all possible images?
             return True
 
