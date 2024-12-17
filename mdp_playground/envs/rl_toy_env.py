@@ -557,7 +557,8 @@ class RLToyEnv(gym.Env):
 
         # ##TODO Move these to the individual env types' defaults section above?
         if config["state_space_type"] == "discrete":
-            self.dtype_s = np.int32 if "dtype_s" not in config else config["dtype_s"]
+            # I think Gymnasium wants int64, but Dreamer-V3 (~June 2024) code may prefer int32
+            self.dtype_s = np.int64 if "dtype_s" not in config else config["dtype_s"]
             if self.irrelevant_features:
                 assert (
                     len(config["action_space_size"]) == 2
@@ -1226,7 +1227,8 @@ class RLToyEnv(gym.Env):
             # fixed parameterisation for cont. envs. right now.
             pass
 
-        self.P = lambda s, a: self.transition_function(s, a)
+        # ####IMP Keep this commented out as it causes problems with deepcopy().
+        # self.P = lambda s, a: self.transition_function(s, a)
 
     def init_reward_function(self):
         """Initialises reward function, R by selecting random sequences to be rewardable for discrete environments. For continuous environments, we have fixed available options for the reward function."""
@@ -1550,7 +1552,7 @@ class RLToyEnv(gym.Env):
         elif self.config["state_space_type"] == "grid":
             ...  # ###TODO Make sequences compatible with grid
 
-        self.R = lambda s, a: self.reward_function(s, a)
+        # self.R = lambda s, a: self.reward_function(s, a)
 
     def transition_function(self, state, action):
         """The transition function, P.
@@ -2009,7 +2011,7 @@ class RLToyEnv(gym.Env):
         # ### TODO Decide whether to give reward before or after transition ("after" would mean taking next state into account and seems more logical to me) - make it a dimension? - R(s) or R(s, a) or R(s, a, s')? I'd say give it after and store the old state in the augmented_state to be able to let the R have any of the above possible forms. That would also solve the problem of implicit 1-step delay with giving it before. _And_ would not give any reward for already being in a rewarding state in the 1st step but _would_ give a reward if 1 moved to a rewardable state - even if called with R(s, a) because s' is stored in the augmented_state! #####IMP
 
         # ###TODO P uses last state while R uses augmented state; for cont. env, P does know underlying state_derivatives - we don't want this to be the case for the imaginary rollout scenario;
-        next_state = self.P(state, action)
+        next_state = self.transition_function(state, action)
 
         # if imaginary_rollout:
         #     pass
@@ -2025,7 +2027,7 @@ class RLToyEnv(gym.Env):
 
         self.total_transitions_episode += 1
 
-        self.reward = self.R(self.augmented_state, action)
+        self.reward = self.reward_function(self.augmented_state, action)
 
         # #irrelevant dimensions part
         if self.config["state_space_type"] == "discrete":

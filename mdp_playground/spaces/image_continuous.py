@@ -101,7 +101,7 @@ class ImageContinuous(Box):
             "Image observations are " "supported only " "for 1- or 2-D feature spaces."
         )
 
-        # Shape has 1 appended for Ray Rllib to be compatible IIRC
+        # Shape needs 3rd dimension for Ray Rllib to be compatible IIRC
         super(ImageContinuous, self).__init__(
             shape=(width, height, num_channels), dtype=dtype, low=0, high=255
         )
@@ -244,7 +244,7 @@ class ImageContinuous(Box):
             self.width,
             self.height,
             self.num_channels,
-        ):  # TODO compare each pixel for all possible images?
+        ):  # TODO compare each pixel for all possible image observations? Hard to implement.
             return True
 
     def to_jsonable(self, sample_n):
