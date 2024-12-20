@@ -24,6 +24,8 @@ from mdp_playground.spaces import (
 
 
 class RLToyEnv(gym.Env):
+    metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
+
     """
     The base toy environment in MDP Playground. It is parameterised by a config dict and can be instantiated to be an MDP with any of the possible dimensions from the accompanying research paper. The class extends OpenAI Gym's environment gym.Env.
 
@@ -428,61 +430,65 @@ class RLToyEnv(gym.Env):
             self.image_representations = False
         else:
             self.image_representations = config["image_representations"]
-            if "image_transforms" in config:
-                assert config["state_space_type"] == "discrete", (
-                    "Image " "transforms are only applicable to discrete envs."
-                )
-                self.image_transforms = config["image_transforms"]
-            else:
-                self.image_transforms = "none"
 
-            if "image_width" in config:
-                self.image_width = config["image_width"]
-            else:
-                self.image_width = 100
+        # Moved these out of the image_representations block when adding render()
+        # because they are needed for the render() method even if image_representations
+        # is False.
+        if "image_transforms" in config:
+            assert config["state_space_type"] == "discrete", (
+                "Image " "transforms are only applicable to discrete envs."
+            )
+            self.image_transforms = config["image_transforms"]
+        else:
+            self.image_transforms = "none"
 
-            if "image_height" in config:
-                self.image_height = config["image_height"]
-            else:
-                self.image_height = 100
+        if "image_width" in config:
+            self.image_width = config["image_width"]
+        else:
+            self.image_width = 100
 
-            # The following transforms are only applicable in discrete envs:
-            if config["state_space_type"] == "discrete":
-                if "image_sh_quant" not in config:
-                    if "shift" in self.image_transforms:
-                        warnings.warn(
-                            "Setting image shift quantisation to the \
-                        default of 1, since no config value was provided for it."
-                        )
-                        self.image_sh_quant = 1
-                    else:
-                        self.image_sh_quant = None
+        if "image_height" in config:
+            self.image_height = config["image_height"]
+        else:
+            self.image_height = 100
+
+        # The following transforms are only applicable in discrete envs:
+        if config["state_space_type"] == "discrete":
+            if "image_sh_quant" not in config:
+                if "shift" in self.image_transforms:
+                    warnings.warn(
+                        "Setting image shift quantisation to the \
+                    default of 1, since no config value was provided for it."
+                    )
+                    self.image_sh_quant = 1
                 else:
-                    self.image_sh_quant = config["image_sh_quant"]
+                    self.image_sh_quant = None
+            else:
+                self.image_sh_quant = config["image_sh_quant"]
 
-                if "image_ro_quant" not in config:
-                    if "rotate" in self.image_transforms:
-                        warnings.warn(
-                            "Setting image rotate quantisation to the \
-                        default of 1, since no config value was provided for it."
-                        )
-                        self.image_ro_quant = 1
-                    else:
-                        self.image_ro_quant = None
+            if "image_ro_quant" not in config:
+                if "rotate" in self.image_transforms:
+                    warnings.warn(
+                        "Setting image rotate quantisation to the \
+                    default of 1, since no config value was provided for it."
+                    )
+                    self.image_ro_quant = 1
                 else:
-                    self.image_ro_quant = config["image_ro_quant"]
+                    self.image_ro_quant = None
+            else:
+                self.image_ro_quant = config["image_ro_quant"]
 
-                if "image_scale_range" not in config:
-                    if "scale" in self.image_transforms:
-                        warnings.warn(
-                            "Setting image scale range to the default \
-                        of (0.5, 1.5), since no config value was provided for it."
-                        )
-                        self.image_scale_range = (0.5, 1.5)
-                    else:
-                        self.image_scale_range = None
+            if "image_scale_range" not in config:
+                if "scale" in self.image_transforms:
+                    warnings.warn(
+                        "Setting image scale range to the default \
+                    of (0.5, 1.5), since no config value was provided for it."
+                    )
+                    self.image_scale_range = (0.5, 1.5)
                 else:
-                    self.image_scale_range = config["image_scale_range"]
+                    self.image_scale_range = None
+            else:
+                self.image_scale_range = config["image_scale_range"]
 
         # Defaults for the individual environment types:
         if config["state_space_type"] == "discrete":
@@ -827,6 +833,15 @@ class RLToyEnv(gym.Env):
             + ", "
             + str(len(self.augmented_state))
         )
+
+        # Needed for rendering with pygame for use with Gymnasium.Env's render() method:
+        render_mode = config.get("render_mode", None)
+        assert render_mode is None or render_mode in self.metadata["render_modes"]
+        self.render_mode = render_mode
+
+        self.window = None
+        self.clock = None
+
         self.logger.debug(
             "MDP Playground toy env instantiated with config: " + str(self.config)
         )
@@ -1639,7 +1654,8 @@ class RLToyEnv(gym.Env):
                                 / factorial_array[j]
                             )
                     # print('self.state_derivatives:', self.state_derivatives)
-                    next_state = self.state_derivatives[0]
+                    # copy to avoid modifying the original state which may be used by external code, e.g. to print the state
+                    next_state = self.state_derivatives[0].copy()
 
                 else:  # if action is from outside allowed action_space
                     next_state = state
@@ -1684,7 +1700,8 @@ class RLToyEnv(gym.Env):
                 self.state_derivatives = [
                     zero_state.copy() for i in range(self.dynamics_order + 1)
                 ]
-                self.state_derivatives[0] = next_state
+                # copy to avoid modifying the original state which may be used by external code, e.g. to print the state
+                self.state_derivatives[0] = next_state.copy()
 
             if self.config["reward_function"] == "move_to_a_point":
                 next_state_rel = np.array(next_state, dtype=self.dtype_s)[
@@ -2126,7 +2143,7 @@ class RLToyEnv(gym.Env):
 
         return augmented_state_dict
 
-    def reset(self, seed=None):
+    def reset(self, seed=None, options=None):
         """Resets the environment for the beginning of an episode and samples a start state from rho_0. For discrete environments uses the defined rho_0 directly. For continuous environments, samples a state and resamples until a non-terminal state is sampled.
 
         Returns
@@ -2225,7 +2242,8 @@ class RLToyEnv(gym.Env):
                 zero_state.copy() for i in range(self.dynamics_order + 1)
             ]  # #####IMP to have copy()
             # otherwise it's the same array (in memory) at every position in the list
-            self.state_derivatives[0] = self.curr_state
+            # copy to avoid modifying the original state which may be used by external code, e.g. to print the state
+            self.state_derivatives[0] = self.curr_state.copy()
 
             self.augmented_state = [
                 [np.nan] * self.state_space_dim
@@ -2316,6 +2334,82 @@ class RLToyEnv(gym.Env):
         )
         return self.seed_
 
+    def render(self,):
+        '''
+        Renders the environment using pygame if render_mode is "human" and returns the rendered 
+        image if render_mode is "rgb_array".
+
+        Based on https://gymnasium.farama.org/tutorials/gymnasium_basics/environment_creation/
+        '''
+
+        import pygame
+
+        # Init stuff on first call. For non-image_representations based envs, it makes sense
+        # to only instantiate the render_space here and not in __init__ because it's only needed
+        # if render() is called.
+        if self.window is None:
+            if self.image_representations:
+                self.render_space = self.observation_space
+            else:
+                if self.config["state_space_type"] == "discrete":
+                    self.render_space = ImageMultiDiscrete(
+                        self.state_space_size,
+                        width=self.image_width,
+                        height=self.image_height,
+                        transforms=self.image_transforms,
+                        sh_quant=self.image_sh_quant,
+                        scale_range=self.image_scale_range,
+                        ro_quant=self.image_ro_quant,
+                        circle_radius=20,
+                        seed=self.seed_dict["image_representations"],
+                    )  # #seed
+                elif self.config["state_space_type"] == "continuous":
+                    self.render_space = ImageContinuous(
+                        self.feature_space,
+                        width=self.image_width,
+                        height=self.image_height,
+                        term_spaces=self.term_spaces,
+                        target_point=self.target_point,
+                        circle_radius=5,
+                        seed=self.seed_dict["image_representations"],
+                    )  # #seed
+                elif self.config["state_space_type"] == "grid":
+                    target_pt = list_to_float_np_array(self.target_point)
+                    self.render_space = ImageContinuous(
+                        self.feature_space,
+                        width=self.image_width,
+                        height=self.image_height,
+                        term_spaces=self.term_spaces,
+                        target_point=target_pt,
+                        circle_radius=5,
+                        grid_shape=self.grid_shape,
+                        seed=self.seed_dict["image_representations"],
+                    )  # #seed
+
+
+        if self.window is None and self.render_mode == "human":
+            pygame.init()
+            pygame.display.init()
+            self.window = pygame.display.set_mode(
+                (self.image_width, self.image_height)
+            )
+        if self.clock is None and self.render_mode == "human":
+            self.clock = pygame.time.Clock()
+
+        # ##TODO There are repeated calculations here in calling get_concatenated_image 
+        # that can be taken from storing variables in step() or reset().
+        if self.render_mode == "human":
+            rgb_array = self.render_space.get_concatenated_image(self.curr_state)
+            pygame_surface = pygame.surfarray.make_surface(rgb_array)
+            self.window.blit(pygame_surface, pygame_surface.get_rect())
+            pygame.event.pump()
+            pygame.display.update()
+
+            # We need to ensure that human-rendering occurs at the predefined framerate.
+            # The following line will automatically add a delay to keep the framerate stable.
+            self.clock.tick(self.metadata["render_fps"])
+        elif self.render_mode == "rgb_array":
+            return self.render_space.get_concatenated_image(self.curr_state)
 
 def dist_of_pt_from_line(pt, ptA, ptB):
     """Returns shortest distance of a point from a line defined by 2 points - ptA and ptB. 

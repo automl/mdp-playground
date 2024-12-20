@@ -11,6 +11,11 @@ import PIL.Image as Image
 from PIL.Image import FLIP_LEFT_RIGHT, FLIP_TOP_BOTTOM
 import logging
 
+# Needed from Gymnasium v1.0.0 onwards
+import ale_py
+gym.register_envs(ale_py)  # optional, helpful for IDEs or pre-commit
+
+
 # def get_gym_wrapper(base_class):
 
 

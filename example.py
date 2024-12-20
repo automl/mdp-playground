@@ -32,8 +32,6 @@ For an example with multiple use cases of how to use the continuous environments
 from mdp_playground.envs import RLToyEnv
 import numpy as np
 
-display_images = True
-
 def display_image(obs, mode="RGB"):
     # Display the image observation associated with the next state
     from PIL import Image
@@ -411,6 +409,8 @@ def atari_wrapper_example():
 
     from mdp_playground.envs import GymEnvWrapper
     import gymnasium as gym
+    import ale_py
+    gym.register_envs(ale_py)  # optional, helpful for IDEs or pre-commit
 
     ae = gym.make("QbertNoFrameskip-v4")
     env = GymEnvWrapper(ae, **config)

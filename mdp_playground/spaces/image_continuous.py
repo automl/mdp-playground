@@ -212,7 +212,9 @@ class ImageContinuous(Box):
         # image to have >=3 dims
 
     def convert_to_pixel(self, position):
-        """ """
+        """
+        Convert a continuous position to a pixel position in the image
+        """
         # It's implicit that both relevant and irrelevant sub-spaces have the
         # same max and min here:
         max = self.feature_space.high[self.relevant_indices]

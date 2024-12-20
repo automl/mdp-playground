@@ -44,7 +44,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
-        ob = aew.reset()
+        ob, _ = aew.reset()
         print("observation_space.shape:", ob.shape)
         # print(ob)
         total_reward = 0.0
@@ -83,7 +83,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
-        ob = aew.reset()
+        ob, _ = aew.reset()
         print("observation_space.shape:", ob.shape)
         # print(ob)
         total_reward = 0.0
@@ -123,7 +123,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
-        ob = aew.reset()
+        ob, _ = aew.reset()
         print("observation_space.shape:", ob.shape)
         # print(ob)
         total_reward = 0.0
@@ -164,7 +164,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
     #     ae = gym.make("BeamRiderNoFrameskip-v4")
     #     aew = GymEnvWrapper(ae, **config)
-    #     ob = aew.reset()
+    #     ob, _ = aew.reset()
     #     print("observation_space.shape:", ob.shape)
     #     # print(ob)
     #     total_reward = 0.0
@@ -211,7 +211,7 @@ class TestGymEnvWrapper(unittest.TestCase):
     #     game = "".join([g.capitalize() for g in game.split("_")])
     #     ae = gym.make("{}NoFrameskip-v4".format(game))
     #     aew = GymEnvWrapper(ae, **config)
-    #     ob = aew.reset()
+    #     ob, _ = aew.reset()
     #     print("observation_space.shape:", ob.shape)
     #     # print(ob)
     #     total_reward = 0.0
@@ -253,7 +253,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
-        ob = aew.reset()
+        ob, _ = aew.reset()
         print("observation_space.shape:", ob.shape)
         # print(ob)
         total_reward = 0.0
@@ -316,7 +316,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
-        ob = aew.reset()
+        ob, _ = aew.reset()
         print("type(observation_space):", type(ob))
         # print(ob)
         total_reward = 0.0
@@ -364,7 +364,7 @@ class TestGymEnvWrapper(unittest.TestCase):
 
         ae = gym.make("BeamRiderNoFrameskip-v4")
         aew = GymEnvWrapper(ae, **config)
-        ob = aew.reset()
+        ob, _ = aew.reset()
         print("observation_space.shape:", ob.shape)
         assert ob.shape == (100, 100, 3), "Observation shape of the env was unexpected."
         # print(ob)
@@ -420,7 +420,7 @@ class TestGymEnvWrapper(unittest.TestCase):
         # register_env("HalfCheetahWrapper-v3", lambda config: HalfCheetahWrapperV3(**config))
 
         hc3w = GymEnvWrapper(hc3, **config)
-        ob = hc3w.reset()
+        ob, _ = hc3w.reset()
         print("obs shape, type(observation_space):", ob.shape, type(ob))
         print("initial obs: ", ob)
         assert (
