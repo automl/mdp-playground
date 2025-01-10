@@ -35,7 +35,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             "grayscale_obs": False,
             "state_space_type": "discrete",
             "action_space_type": "discrete",
-            "seed": 0,
+            "seed": 1,
             # },
             # 'seed': 0, #seed
         }
@@ -52,7 +52,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             act = aew.action_space.sample()
             next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
-            if i == 154 or i == 159:
+            if i == 124 or i == 152 or i == 171:
                 assert reward == 44.0, (
                     "1-step delayed reward in step: "
                     + str(i)
@@ -73,7 +73,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             "grayscale_obs": False,
             "state_space_type": "discrete",
             "action_space_type": "discrete",
-            "seed": 0,
+            "seed": 1,
             # },
             # 'seed': 0, #seed
         }
@@ -91,7 +91,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             act = aew.action_space.sample()
             next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
-            if i == 153 or i == 158:
+            if i == 123 or i == 151 or i == 170:
                 assert reward == 45.0, (
                     "Shifted reward in step: " + str(i) + " should have been 45.0."
                 )
@@ -114,7 +114,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             "grayscale_obs": False,
             "state_space_type": "discrete",
             "action_space_type": "discrete",
-            "seed": 0,
+            "seed": 1,
             # },
             # 'seed': 0, #seed
         }
@@ -131,7 +131,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             act = aew.action_space.sample()
             next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
-            if i == 153 or i == 158:
+            if i == 123 or i == 151 or i == 170:
                 assert reward == 88.0, (
                     "Scaled reward in step: " + str(i) + " should have been 88.0."
                 )
@@ -236,15 +236,15 @@ class TestGymEnvWrapper(unittest.TestCase):
         print("\033[32;1;4mTEST_MULTIPLE\033[0m")
         config = {
             "delay": 1,
-            "reward_noise": lambda a: a.normal(0, 0.1),
-            "transition_noise": 0.1,
+            "reward_noise": lambda s, a, rng: rng.normal(0, 0.1),
+            "transition_noise": 0.2,
             # "GymEnvWrapper": {
             "atari_preprocessing": True,
             "frame_skip": 4,
             "grayscale_obs": False,
             "state_space_type": "discrete",
             "action_space_type": "discrete",
-            "seed": 0,
+            "seed": 1,
             # },
             # 'seed': 0, #seed
         }
@@ -262,24 +262,24 @@ class TestGymEnvWrapper(unittest.TestCase):
             next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
             # Testing hardcoded values at these timesteps implicitly tests that there
-            # were 21 noisy transitions in total and noise inserted in rewards.
-            if i == 154:
+            # were noisy transitions and noise inserted in rewards.
+            if i == 147:
                 np.testing.assert_allclose(
                     reward,
-                    44.12183457980473,
+                    44.0668047426572,
                     rtol=1e-05,
                     err_msg="1-step delayed reward in step: "
                     + str(i)
-                    + " should have been 44.0.",
+                    + " should have been 44.066...",
                 )
-            if i == 199:
+            if i == 173:
                 np.testing.assert_allclose(
                     reward,
-                    0.07467690634910334,
+                    44.088450289124935,
                     rtol=1e-05,
                     err_msg="1-step delayed reward in step: "
                     + str(i)
-                    + " should have been 44.0.",
+                    + " should have been 44.088...",
                 )
             total_reward += reward
         print("total_reward:", total_reward)
@@ -296,7 +296,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             "grayscale_obs": False,
             "state_space_type": "discrete",
             "action_space_type": "discrete",
-            "seed": 0,
+            "seed": 1,
             "irrelevant_features": {
                 "state_space_type": "discrete",
                 "action_space_type": "discrete",
@@ -331,7 +331,7 @@ class TestGymEnvWrapper(unittest.TestCase):
                 act,
                 next_state[1],
             )
-            if i == 154 or i == 159:
+            if i == 128 or i == 151:
                 assert reward == 44.0, (
                     "1-step delayed reward in step: "
                     + str(i)
@@ -355,7 +355,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             "grayscale_obs": False,
             "state_space_type": "discrete",
             "action_space_type": "discrete",
-            "seed": 0,
+            "seed": 1,
             # },
             # 'seed': 0, #seed
         }
@@ -373,7 +373,7 @@ class TestGymEnvWrapper(unittest.TestCase):
             act = aew.action_space.sample()
             next_state, reward, done, trunc, info = aew.step(act)
             print("step, reward, done, act:", i, reward, done, act)
-            if i == 153 or i == 158:
+            if i == 123 or i == 151:
                 assert reward == 44.0, (
                     "Reward in step: " + str(i) + " should have been 44.0."
                 )

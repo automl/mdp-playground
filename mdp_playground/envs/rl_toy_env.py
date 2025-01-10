@@ -2348,9 +2348,7 @@ class RLToyEnv(gym.Env):
         # to only instantiate the render_space here and not in __init__ because it's only needed
         # if render() is called.
         if self.window is None:
-            if self.image_representations:
-                self.render_space = self.observation_space
-            else:
+            if not self.image_representations:
                 if self.config["state_space_type"] == "discrete":
                     self.render_space = ImageMultiDiscrete(
                         self.state_space_size,
@@ -2396,10 +2394,11 @@ class RLToyEnv(gym.Env):
         if self.clock is None and self.render_mode == "human":
             self.clock = pygame.time.Clock()
 
-        # ##TODO There are repeated calculations here in calling get_concatenated_image 
-        # that can be taken from storing variables in step() or reset().
         if self.render_mode == "human":
-            rgb_array = self.render_space.get_concatenated_image(self.curr_state)
+            if not self.image_representations:
+                rgb_array = self.render_space.get_concatenated_image(self.curr_state)
+            elif self.image_representations:
+                rgb_array = self.curr_obs
             pygame_surface = pygame.surfarray.make_surface(rgb_array)
             self.window.blit(pygame_surface, pygame_surface.get_rect())
             pygame.event.pump()
@@ -2409,7 +2408,22 @@ class RLToyEnv(gym.Env):
             # The following line will automatically add a delay to keep the framerate stable.
             self.clock.tick(self.metadata["render_fps"])
         elif self.render_mode == "rgb_array":
-            return self.render_space.get_concatenated_image(self.curr_state)
+            if not self.image_representations:
+                return self.render_space.get_concatenated_image(self.curr_state)
+            elif self.image_representations:
+                return self.curr_obs
+            
+    def close(self):
+        '''
+        Closes the environment and the pygame window if it was opened.
+        '''
+        if self.window is not None and self.render_mode == "human":
+            import pygame
+            pygame.display.quit()
+            pygame.quit()
+            self.window = None
+            self.clock = None
+
 
 def dist_of_pt_from_line(pt, ptA, ptB):
     """Returns shortest distance of a point from a line defined by 2 points - ptA and ptB. 

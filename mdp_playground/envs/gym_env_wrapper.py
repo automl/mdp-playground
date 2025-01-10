@@ -360,9 +360,7 @@ class GymEnvWrapper(gym.Env):
                 )
                 probs[action] = 1 - self.transition_noise
                 old_action = action
-                action = int(
-                    self._np_random.choice(self.env.action_space.n, size=1, p=probs)
-                )  # random
+                action = self._np_random.choice(self.env.action_space.n, size=1, p=probs).item()  # random
                 if old_action != action:
                     # print("NOISE inserted", old_action, action)
                     self.total_noisy_transitions_episode += 1

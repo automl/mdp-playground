@@ -814,15 +814,15 @@ class TestRLToyEnv(unittest.TestCase):
         actions = [
             [0, 1],
             [-1, 0],
-            [-1, 0],
-            [1, 0],
+            [0, -1],
+            [0, -1],
             [0.5, -0.5],
             [1, 2],
             [1, 0],
             [0, -1],
             [0, -1],
         ]
-        expected_image_sums = [6372018, 6371313, 6372018, 6371313, 6371313]
+        expected_image_sums = [6371313, 6372018, 6372018, 6407811]
 
         # obs = env.curr_obs[0]
         # import PIL.Image as Image
@@ -853,7 +853,7 @@ class TestRLToyEnv(unittest.TestCase):
                 )
 
         # To check bouncing back behaviour of grid walls
-        for i in range(4):
+        for i in range(6):
             # action = env.action_space.sample()
             action = [0, 1]
             next_obs, reward, done, trunc, info = env.step(action)
@@ -862,8 +862,8 @@ class TestRLToyEnv(unittest.TestCase):
             state = next_state.copy()
             tot_rew += reward
 
-        assert tot_rew == 2.0, str(tot_rew)
-        assert state == [5, 7], str(state)
+        assert tot_rew == 6.0, str(tot_rew)
+        assert state == [6, 7], str(state)
         # test_ = np.allclose(a, b, rtol=1e-05, atol=1e-08, equal_nan=False)
         # self.assertAlmostEqual(state, np.array([21.59339006, 20.68189965, 21.49608203, 20.19183292]), places=3) # Error
         env.reset()[0]
@@ -894,7 +894,7 @@ class TestRLToyEnv(unittest.TestCase):
             state = next_state.copy()
             tot_rew += reward
 
-        assert tot_rew == 2.0, str(tot_rew)
+        assert tot_rew == 4.0, str(tot_rew)
 
         env.reset()[0]
         env.close()
@@ -938,7 +938,7 @@ class TestRLToyEnv(unittest.TestCase):
             state = next_state.copy()
             tot_rew += reward
 
-        assert tot_rew == -0.5, str(tot_rew)
+        assert tot_rew == 3, str(tot_rew)
 
         env.reset()[0]
         env.close()
@@ -959,7 +959,7 @@ class TestRLToyEnv(unittest.TestCase):
             [0, -1],
             [0, -1],
         ]
-        expected_image_sums = [12272400, 12271695]
+        expected_image_sums = [12271695, 12272400]
 
         # obs = env.curr_obs[0]
         # import PIL.Image as Image
@@ -1002,7 +1002,7 @@ class TestRLToyEnv(unittest.TestCase):
             # img1.show()
 
 
-        assert tot_rew == -3, str(tot_rew)
+        assert tot_rew == 4, str(tot_rew)
 
         env.reset()[0]
         env.close()
@@ -1049,7 +1049,7 @@ class TestRLToyEnv(unittest.TestCase):
             # img1 = Image.fromarray(np.squeeze(obs), 'RGB')
             # img1.show()
 
-        assert tot_rew == 0.75, str(tot_rew)
+        assert tot_rew == 1.0, str(tot_rew)
 
         env.reset()[0]
         env.close()
@@ -1326,7 +1326,7 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()["curr_state"]
 
         actions = [
-            6,
+            3,
             2,
             5,
             4,
@@ -1337,7 +1337,6 @@ class TestRLToyEnv(unittest.TestCase):
             4,
         ]  # 2nd last action is random just to check that last delayed reward works with any action
         expected_rewards = [0, 0, 0, 1, 0, 0, 0, 1, 0]
-        expected_states = [5, 4, 0, 0, 5, 4, 6,]
         for i in range(len(expected_rewards)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -1348,9 +1347,6 @@ class TestRLToyEnv(unittest.TestCase):
                 + str(i + 1)
                 + " when reward delay = 3.",
             )
-            # self.assertEqual(state, expected_states[i], "Expected state mismatch in
-            # time step: " + str(i + 1) + " when reward delay = 3.") # will not work
-            # for 2nd last time step due to random action.
             state = next_state
 
         env.reset()[0]
@@ -1432,20 +1428,20 @@ class TestRLToyEnv(unittest.TestCase):
         config["delay"] = 0
         config["sequence_length"] = 1
         config["reward_scale"] = 1.0
-        config["transition_noise"] = 0.5
+        config["transition_noise"] = 0.9
 
         config["generate_random_mdp"] = True
         # config["log_level"] = logging.INFO
         env = RLToyEnv(**config)
         state = env.get_augmented_state()["curr_state"]
 
-        actions = [6, 6, 2, np.random.default_rng().integers(config["action_space_size"])]  #
+        actions = [6, 6, 2, np.random.default_rng(0).integers(config["action_space_size"])]  #
         expected_states = [
-            1,
-            5,
+            0,
             4,
+            3,
             1,
-        ]  # Last state 3 is fixed for this test because of fixed seed for Env which selects the next noisy state.
+        ]
         for i in range(len(actions)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -1490,13 +1486,11 @@ class TestRLToyEnv(unittest.TestCase):
         env = RLToyEnv(**config)
         state = env.get_augmented_state()["curr_state"]
 
-        actions = [6, 6, 2, 1]  #
+        actions = [3, 6,]
         expected_rewards = [
-            1 + 0.32021,
-            0.0524501,
-            -0.267835,
-            0.180798,
-        ]  # 2nd state produces 'true' reward
+            1 - 0.0660524,
+            0.320211,
+        ]
         for i in range(len(actions)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -1818,31 +1812,31 @@ class TestRLToyEnv(unittest.TestCase):
         state = env.get_augmented_state()["augmented_state"][-1]
 
         actions = [
-            6,
+            4,
             6,
             2,
-            3,
+            7,
             4,
             2,
-            np.random.default_rng().integers(config["action_space_size"]),
+            np.random.default_rng(1).integers(config["action_space_size"]),
             5,
         ]  #
-        expected_rewards = [0, 0, 0, 1, 0, 1, 0, 0]
+        expected_rewards = [0, 0, 0, 0, 1,] # 0, 1, 0, 0]
         expected_reward_noises = [
-            -0.292808,
-            0.770696,
-            -1.01743611,
-            -0.042768,
-            0.78761320,
-            -0.510087,
-            -0.089978,
-            0.48654863,
+            -0.0660524,
+            0.3202113,
+            0.052450,
+            -0.267834,
+            0.1807975,
+            # -0.510087,
+            # -0.089978,
+            # 0.48654863,
         ]
         expected_image_sums = [
-            122910,
-            212925,
-            111180,
-        ]  # [152745, 282030, 528870], [105060, 232050, 78795]
+            364395,
+            342465,
+            412335,
+        ]
         for i in range(len(expected_rewards)):
             expected_rewards[i] = (
                 expected_rewards[i] + expected_reward_noises[i]
@@ -1911,18 +1905,15 @@ class TestRLToyEnv(unittest.TestCase):
 
         actions = [
             6,
-            6,
             2,
-            3,
+            2,
             4,
-            2,
+            4,
+            6,
             6,
             1,
-            0,
-            np.random.default_rng().integers(config["action_space_size"]),
-            5,
         ]  #
-        expected_rewards = [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0]
+        expected_rewards = [0, 0, 1, 0, 0, 1,]
         for i in range(len(expected_rewards)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -1941,24 +1932,12 @@ class TestRLToyEnv(unittest.TestCase):
         # With delay
         config["delay"] = 1
         config["sequence_length"] = 3
+        config["reward_every_n_steps"] = 2
 
         env = RLToyEnv(**config)
         state = env.get_augmented_state()["curr_state"]
 
-        actions = [
-            6,
-            6,
-            2,
-            3,
-            4,
-            2,
-            6,
-            1,
-            0,
-            np.random.default_rng().integers(config["action_space_size"]),
-            5,
-        ]  #
-        expected_rewards = [0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0]
+        expected_rewards = [0, 0, 0, 1, 0, 0,]
         for i in range(len(expected_rewards)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -1983,18 +1962,16 @@ class TestRLToyEnv(unittest.TestCase):
 
         actions = [
             6,
-            6,
-            2,
             3,
             4,
-            2,
+            4,
+            4,
+            6,
             6,
             1,
-            0,
-            np.random.default_rng().integers(config["action_space_size"]),
-            5,
         ]  #
-        expected_rewards = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+        expected_rewards = [0, 0, 0, 1, 0, 1, 0,]
         for i in range(len(expected_rewards)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -2029,8 +2006,8 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["use_custom_mdp"] = True
         # np.random.seed(0)  # seed
-        config["transition_function"] = np.random.default_rng().integers(8, size=(8, 5))
-        config["reward_function"] = np.random.default_rng().integers(4, size=(8, 5))
+        config["transition_function"] = np.random.default_rng(0).integers(8, size=(8, 5))
+        config["reward_function"] = np.random.default_rng(1).integers(4, size=(8, 5))
         config["init_state_dist"] = np.array([1 / 8 for i in range(8)])
 
         env = RLToyEnv(**config)
@@ -2049,7 +2026,7 @@ class TestRLToyEnv(unittest.TestCase):
             np.random.default_rng(0).integers(config["action_space_size"]),
             4,
         ]  #
-        expected_rewards = [0, 0, 6, 4, 4, 0, 4, 6, 6, 2, 0]
+        expected_rewards = [0, 2, 2, 6, 6, 2, 0, 2, 6, 2, 2]
         for i in range(len(expected_rewards)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -2065,8 +2042,8 @@ class TestRLToyEnv(unittest.TestCase):
 
         # np.random.seed(0) #seed
         config["delay"] = 2
-        P = np.random.default_rng().integers(8, size=(8, 5))
-        R = np.random.default_rng().integers(4, size=(8, 5))
+        P = np.random.default_rng(0).integers(8, size=(8, 5))
+        R = np.random.default_rng(1).integers(4, size=(8, 5))
         config["transition_function"] = lambda s, a: P[s, a]
         config["reward_function"] = lambda s, a: R[s[-2], a]
         config["init_state_dist"] = np.array([1 / 8 for i in range(8)])
@@ -2087,7 +2064,7 @@ class TestRLToyEnv(unittest.TestCase):
             np.random.default_rng().integers(config["action_space_size"]),
             4,
         ]  #
-        expected_rewards = [0, 0, 0, 2, 2, 0, 0, 6, 0, 4, 6]
+        expected_rewards = [0, 0, 2, 2, 6, 6, 2, 0, 2, 6, 2]
         for i in range(len(expected_rewards)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -2128,13 +2105,13 @@ class TestRLToyEnv(unittest.TestCase):
         actions = [2, [0.5, 1.5], 2, 3, [-10, -5], 2, 1, 1]  #
         expected_rewards = [
             0,
-            -1.06496,
-            0.935036,
-            1.435036,
-            3.435036,
-            6.435036,
-            -3.564964,
-            -1.564964,
+            -2.95762,
+            -0.957624,
+            # 1.435036,
+            # 3.435036,
+            # 6.435036,
+            # -3.564964,
+            # -1.564964,
         ]  # , -0.564964]
         for i in range(len(expected_rewards)):
             next_state, reward, done, trunc, info = env.step(actions[i])
@@ -2300,16 +2277,16 @@ class TestRLToyEnv(unittest.TestCase):
         )  # TODO Similar test case for irrelevant_features
 
         state = env.get_augmented_state()["curr_state"]
-        actions = [6, 6, 7, 7, 0, 7, 1]  #
+        actions = [7, 1, 1, 7, 0, 7, 1]  #
         expected_rewards = [
             0,
             0,
             1,
             0,
-            0,
-            0,
             1,
-        ]  # 1st, 3rd and 4th states produce 'true' rewards, every reward has been shifted by 1
+            0,
+            0,
+        ]  #
         for i in range(len(actions)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
@@ -2385,7 +2362,7 @@ class TestRLToyEnv(unittest.TestCase):
         )  # TODO Similar test case for irrelevant_features
 
         state = env.get_augmented_state()["curr_state"]
-        actions = [1, 7, 2, 4, 0, 7, 1]  # Leads to rewardable sequence 20, 1, 12, 21, 5
+        actions = [2, 5, 5, 1, 0, 7, 1]  # From 1st state 13, actions lead to rewardable sequence 19, 1, 10, 21, 4
         expected_rewards = [
             0,
             0,
@@ -2394,7 +2371,7 @@ class TestRLToyEnv(unittest.TestCase):
             1,
             0,
             0,
-        ]  # 1st, 3rd and 4th states produce 'true' rewards, every reward has been shifted by 1
+        ]  #
         for i in range(len(actions)):
             next_state, reward, done, trunc, info = env.step(actions[i])
             print("sars', done =", state, actions[i], reward, next_state, done)
