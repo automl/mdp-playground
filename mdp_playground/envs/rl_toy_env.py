@@ -381,7 +381,10 @@ class RLToyEnv(gym.Env):
             self.reward_density = config["reward_density"]
 
         if "make_denser" not in config:
-            self.make_denser = False
+            if config["state_space_type"] == "discrete":
+                self.make_denser = False
+            elif config["state_space_type"] == "continuous":
+                self.make_denser = True
         else:
             self.make_denser = config["make_denser"]
 
@@ -1661,8 +1664,10 @@ class RLToyEnv(gym.Env):
                     next_state = state
                     warnings.warn(
                         "WARNING: Action "
-                        + str(action)
-                        + " out of range of action space. Applying 0 action!!"
+                        + str(action) + " " + str(action.dtype) + " " + str(type(action))
+                        + " out of range of action space. Applying 0 action!!\n"
+                        + "If the action seems to be within range, please check the dtype. "
+                        + "We need to have the action dtype be " + str(self.dtype_s) + "."
                     )
 
             # if "transition_noise" in self.config:
@@ -2334,17 +2339,25 @@ class RLToyEnv(gym.Env):
         )
         return self.seed_
 
-    def render(self,):
+    def render(self, actions=None, render_mode=None):
         '''
         Renders the environment using pygame if render_mode is "human" and returns the rendered 
         image if render_mode is "rgb_array".
 
         Based on https://gymnasium.farama.org/tutorials/gymnasium_basics/environment_creation/
+        
+        If actions and render_mode are None, it does the default Gymnasium render for the current state.
+        If an array or list of actions is provided, it performs steps in the environment with that action
+        sequence and then renders the resulting trajectory and returns the rendered RGB images.
+        If render_mode is provided, it overrides the default render_mode set in the environment's config. Currently, only 
+        rgb_array is supported for this. Would need to look deeper into pygame, e.g. for how to instantiate mutliple windows
+        to support "human" mode overriding as well.
         '''
 
         import pygame
 
-        # Init stuff on first call. For non-image_representations based envs, it makes sense
+        # Init stuff on first call to this function now. 
+        # For non-image_representations based envs, it makes sense
         # to only instantiate the render_space here and not in __init__ because it's only needed
         # if render() is called.
         if self.window is None:
@@ -2384,16 +2397,45 @@ class RLToyEnv(gym.Env):
                         seed=self.seed_dict["image_representations"],
                     )  # #seed
 
+            # Also init pygame stuff on first call to render() if render_mode is "human":
+            if self.render_mode == "human":
+                pygame.init()
+                pygame.display.init()
+                self.window = pygame.display.set_mode(
+                    (self.image_width, self.image_height)
+                )
+                self.clock = pygame.time.Clock()
 
-        if self.window is None and self.render_mode == "human":
-            pygame.init()
-            pygame.display.init()
-            self.window = pygame.display.set_mode(
-                (self.image_width, self.image_height)
-            )
-        if self.clock is None and self.render_mode == "human":
-            self.clock = pygame.time.Clock()
+        # If actions is not None, we need to perform 1 or more steps in the environment.
+        # Create a deepcopy of the environment and roll it out with the actions provided.
+        if actions is not None:
+            if not isinstance(actions, (list, tuple, np.ndarray)):
+                raise TypeError(
+                    "actions should be a list or numpy array of actions, not "
+                    + str(type(actions))
+                )
+            if len(actions) == 0:
+                raise ValueError("actions cannot be an empty list or array.")
+            # Make a copy of the environment to perform the rollout:
+            env_copy = copy.deepcopy(self)
+            env_copy.render_mode = "rgb_array"  # Set render_mode to rgb_array for the copy #hardcoded
+            if render_mode is not None and render_mode != "rgb_array":
+                raise NotImplementedError(
+                    "Currently, only render_mode 'rgb_array' is supported for action sequences."
+                    "render_mode should be None or 'rgb_array' when such sequences are provided, not "
+                    + str(render_mode)
+                )
 
+            # Perform the rollout with the actions provided:
+            rgb_arrays = []
+            for action in actions:
+                obs, reward, done, truncated, _ = env_copy.step(action)
+                rgb_array = env_copy.render()
+                rgb_arrays.append(rgb_array)
+
+            return rgb_arrays
+
+        # General render logic for every call to render():
         if self.render_mode == "human":
             if not self.image_representations:
                 rgb_array = self.render_space.get_concatenated_image(self.curr_state)
