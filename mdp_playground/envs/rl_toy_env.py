@@ -202,7 +202,9 @@ class RLToyEnv(gym.Env):
     R(state, action)
         defined as a lambda function in the call to init_reward_function() and is equivalent to calling reward_function()
     get_augmented_state()
-        gets underlying Markovian state of the MDP
+        gets underlying Markovian state of the MDP as a dictionary
+    set_augmented_state(augmented_state_dict)
+        sets underlying Markovian state of the MDP, by default, using a dictionary in the same format as returned by get_augmented_state()
     reset()
         Resets environment state
     seed()
@@ -1575,8 +1577,14 @@ class RLToyEnv(gym.Env):
     def transition_function(self, state, action):
         """The transition function, P.
 
-        Performs a transition according to the initialised P for discrete environments (with dynamics independent for relevant vs irrelevant dimension sub-spaces). For continuous environments, we have a fixed available option for the dynamics (which is the same for relevant or irrelevant dimensions):
-        The order of the system decides the dynamics. For an nth order system, the nth order derivative of the state is set to the action value / inertia for time_unit seconds. And then the dynamics are integrated over the time_unit to obtain the next state.
+        Performs a transition according to the initialised P for discrete environments (the independent dynamics for the irrelevant 
+        dimension sub-spaces are handled in step() for discrete envs while they are handled here for grid envs). 
+        For continuous environments, we have a fixed available option for the dynamics (which is the same for relevant 
+        or irrelevant dimensions):
+        The order of the system decides the dynamics. For an nth order system, the nth order derivative of the state is set to the 
+        action value / inertia for time_unit seconds. And then the dynamics are integrated over the time_unit to obtain the next state.
+
+        ###TODO Make this function use Markov state also for continuous envs. 
 
         Parameters
         ----------
@@ -1989,7 +1997,7 @@ class RLToyEnv(gym.Env):
         action : int or np.array
             The action that the environment will use to perform a transition.
         imaginary_rollout: boolean
-            Option for the user to perform "imaginary" transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide a list of states to this function to be able to perform a rollout.
+            Unsupported at the moment. Option for the user to perform "imaginary" transitions, e.g., for model-based RL. If set to true, underlying augmented state of the MDP is not changed and user is responsible to maintain and provide a list of states to this function to be able to perform a rollout.
 
         Returns
         -------
@@ -2117,12 +2125,21 @@ class RLToyEnv(gym.Env):
         return self.curr_obs, self.reward, self.done, False, self.get_augmented_state()
 
     def get_augmented_state(self):
-        """Intended to return the full augmented state which would be Markovian. (However, it's not Markovian wrt the noise in P and R because we're not returning the underlying RNG.) Currently, returns the augmented state which is the sequence of length "delay + sequence_length + 1" of past states for both discrete and continuous environments. Additonally, the current state derivatives are also returned for continuous environments.
+        """Intended to return the full augmented state which would be Markovian. (However, it's not Markovian wrt the noise in P and R
+        because we're not returning the underlying RNG.)
 
-        Returns
+        Returns a dictionary with the following keys:
         -------
-        dict
-            Contains at the end of the current transition
+
+        augmented_state contains the sequence / list of past states of length "delay + sequence_length + 1". Each element in this list contains 
+            only the relevant parts for discrete envs, continuous (only 0th order info, i.e., position) and grid envs iirc.
+        state_derivatives contains the list of state derivatives - only present for continuous envs. 
+        curr_state contains the relevant and irrelevant parts (if any) for discrete, continuous and grid envs.
+        curr_obs contains the same unless image_representations is True, in which case it contains the image representation of curr_state.
+
+        Remark: relevant_indices for cont. envs can be figured out using curr_state and augmented_state. So, all the info needed to make the 
+        state Markov is present in the returned dict (except for the RNG state if P and R are noisy). This could be improved but this is the
+        current implementation.
 
         """
         # #TODO For noisy processes, this would need the noise distribution and random seed too. Also add the irrelevant state parts, etc.? We don't need the irrelevant parts for the state to be Markovian.
@@ -2147,6 +2164,55 @@ class RLToyEnv(gym.Env):
             }
 
         return augmented_state_dict
+
+    def set_augmented_state(self, augmented_state_dict):
+        """Sets the underlying Markov state of the environment to the one specified in the argument. This is useful for 
+        setting a custom state from which to rollout, e.g., for model-based RL imaginary rollouts.
+
+        Parameters
+        ----------
+        augmented_state_dict : dict or state
+            If it's a dictionary, it should be in the format returned by get_augmented_state().
+            If it's a state, all of the elements of the member variables curr_state, curr_obs, 
+            augmented_state and state_derivatives (for continuous envs) are set to this state.
+
+        """
+
+        if type(augmented_state_dict) is not dict:
+            warnings.warn(
+                "Warning: When setting the Markov state of the env, the passed state dictionary " \
+                "was not a dict in the expected format (i.e. the one returned by get_augmented_state()). " \
+                "Setting all relevant member variables of the env to be the value that was passed in. " \
+                "If you see any errors, you will need to dig deeper into the code to see how to set the state properly."
+            )
+
+            if self.config["state_space_type"] == "continuous":
+                # Create copies of np.arrays to avoid modifying the original state which may be used by external code:
+                augmented_state_dict = {
+                    "curr_state": augmented_state_dict.copy(),
+                    "curr_obs": augmented_state_dict.copy(),
+                    "augmented_state": [[np.nan] * self.state_space_dim] * (self.augmented_state_length - 1) + [augmented_state_dict.copy()],
+                }
+
+                # If continuous env, also set state_derivatives to 0, except the 0th order one which is the state itself:
+                augmented_state_dict["state_derivatives"] = [
+                    np.zeros(self.state_space_dim, dtype=self.dtype_s)
+                ] * (self.dynamics_order + 1)
+                augmented_state_dict["state_derivatives"][0] = augmented_state_dict["curr_state"].copy()
+
+            else:  # discrete or grid env
+                augmented_state_dict = {
+                    "curr_state": augmented_state_dict,
+                    "curr_obs": augmented_state_dict,
+                    "augmented_state": [np.nan] * (self.augmented_state_length - 1) + [augmented_state_dict],
+                }
+
+        self.curr_state = augmented_state_dict["curr_state"]
+        self.curr_obs = augmented_state_dict["curr_obs"]
+        self.augmented_state = augmented_state_dict["augmented_state"]
+
+        if self.config["state_space_type"] == "continuous":
+            self.state_derivatives = augmented_state_dict["state_derivatives"]
 
     def reset(self, seed=None, options=None):
         """Resets the environment for the beginning of an episode and samples a start state from rho_0. For discrete environments uses the defined rho_0 directly. For continuous environments, samples a state and resamples until a non-terminal state is sampled.
@@ -2339,7 +2405,7 @@ class RLToyEnv(gym.Env):
         )
         return self.seed_
 
-    def render(self, actions=None, render_mode=None):
+    def render(self, actions=None, state=None, render_mode=None):
         '''
         Renders the environment using pygame if render_mode is "human" and returns the rendered 
         image if render_mode is "rgb_array".
@@ -2419,6 +2485,9 @@ class RLToyEnv(gym.Env):
             # Make a copy of the environment to perform the rollout:
             env_copy = copy.deepcopy(self)
             env_copy.render_mode = "rgb_array"  # Set render_mode to rgb_array for the copy #hardcoded
+            # Allow rolling out from a custom state:
+            if state is not None:
+                env_copy.set_augmented_state(state)
             if render_mode is not None and render_mode != "rgb_array":
                 raise NotImplementedError(
                     "Currently, only render_mode 'rgb_array' is supported for action sequences."
