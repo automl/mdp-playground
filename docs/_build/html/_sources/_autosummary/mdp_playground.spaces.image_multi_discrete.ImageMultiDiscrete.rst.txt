@@ -20,7 +20,7 @@ mdp\_playground.spaces.image\_multi\_discrete.ImageMultiDiscrete
       ~ImageMultiDiscrete.contains
       ~ImageMultiDiscrete.from_jsonable
       ~ImageMultiDiscrete.generate_image
-      ~ImageMultiDiscrete.get_concatenated_image
+      ~ImageMultiDiscrete.get_image_representation
       ~ImageMultiDiscrete.is_bounded
       ~ImageMultiDiscrete.sample
       ~ImageMultiDiscrete.seed

@@ -2093,7 +2093,7 @@ class RLToyEnv(gym.Env):
             next_obs = next_state
 
         if self.image_representations:
-            next_obs = self.observation_space.get_concatenated_image(next_state)
+            next_obs = self.observation_space.get_image_representation(next_state)
 
         self.curr_state = self.dtype_s(next_state)
         self.curr_obs = self.dtype_o(next_obs)
@@ -2345,7 +2345,7 @@ class RLToyEnv(gym.Env):
             self.augmented_state.append(self.curr_state_relevant)
 
         if self.image_representations:
-            self.curr_obs = self.observation_space.get_concatenated_image(
+            self.curr_obs = self.observation_space.get_image_representation(
                 self.curr_state
             )
         else:
@@ -2405,19 +2405,13 @@ class RLToyEnv(gym.Env):
         )
         return self.seed_
 
-    def render(self, actions=None, state=None, render_mode=None):
+    def render(self,):
         '''
         Renders the environment using pygame if render_mode is "human" and returns the rendered 
         image if render_mode is "rgb_array".
 
         Based on https://gymnasium.farama.org/tutorials/gymnasium_basics/environment_creation/
         
-        If actions and render_mode are None, it does the default Gymnasium render for the current state.
-        If an array or list of actions is provided, it performs steps in the environment with that action
-        sequence and then renders the resulting trajectory and returns the rendered RGB images.
-        If render_mode is provided, it overrides the default render_mode set in the environment's config. Currently, only 
-        rgb_array is supported for this. Would need to look deeper into pygame, e.g. for how to instantiate mutliple windows
-        to support "human" mode overriding as well.
         '''
 
         import pygame
@@ -2472,42 +2466,10 @@ class RLToyEnv(gym.Env):
                 )
                 self.clock = pygame.time.Clock()
 
-        # If actions is not None, we need to perform 1 or more steps in the environment.
-        # Create a deepcopy of the environment and roll it out with the actions provided.
-        if actions is not None:
-            if not isinstance(actions, (list, tuple, np.ndarray)):
-                raise TypeError(
-                    "actions should be a list or numpy array of actions, not "
-                    + str(type(actions))
-                )
-            if len(actions) == 0:
-                raise ValueError("actions cannot be an empty list or array.")
-            # Make a copy of the environment to perform the rollout:
-            env_copy = copy.deepcopy(self)
-            env_copy.render_mode = "rgb_array"  # Set render_mode to rgb_array for the copy #hardcoded
-            # Allow rolling out from a custom state:
-            if state is not None:
-                env_copy.set_augmented_state(state)
-            if render_mode is not None and render_mode != "rgb_array":
-                raise NotImplementedError(
-                    "Currently, only render_mode 'rgb_array' is supported for action sequences."
-                    "render_mode should be None or 'rgb_array' when such sequences are provided, not "
-                    + str(render_mode)
-                )
-
-            # Perform the rollout with the actions provided:
-            rgb_arrays = []
-            for action in actions:
-                obs, reward, done, truncated, _ = env_copy.step(action)
-                rgb_array = env_copy.render()
-                rgb_arrays.append(rgb_array)
-
-            return rgb_arrays
-
         # General render logic for every call to render():
         if self.render_mode == "human":
             if not self.image_representations:
-                rgb_array = self.render_space.get_concatenated_image(self.curr_state)
+                rgb_array = self.render_space.get_image_representation(self.curr_state)
             elif self.image_representations:
                 rgb_array = self.curr_obs
             pygame_surface = pygame.surfarray.make_surface(rgb_array)
@@ -2520,10 +2482,55 @@ class RLToyEnv(gym.Env):
             self.clock.tick(self.metadata["render_fps"])
         elif self.render_mode == "rgb_array":
             if not self.image_representations:
-                return self.render_space.get_concatenated_image(self.curr_state)
+                return self.render_space.get_image_representation(self.curr_state)
             elif self.image_representations:
                 return self.curr_obs
             
+
+    def imagine_and_render(self, actions, state=None,):
+        """
+        Performs steps in a deep copy of the environment with an action
+        sequence and then renders the resulting trajectory and returns the rendered RGB images.
+
+        Currently, render_mode is hardcoded to "rgb_array" for the copied environment. 
+        Would need to look deeper into pygame, e.g. for how to instantiate mutliple windows
+        to support "human" render_mode as well.
+
+        Parameters
+        ----------
+        actions : list or np.array
+            A list or numpy array of actions to perform in the environment.
+        state : dict or state, optional
+            The state from which to start the rollout. If None, the current state of the environment is used. 
+            The state should be in the format returned by get_augmented_state().
+        """
+    
+        # Create a deepcopy of the environment and roll it out with the actions provided.
+        if not isinstance(actions, (list, tuple, np.ndarray)):
+            raise TypeError(
+                "actions should be a list or numpy array of actions, not "
+                + str(type(actions))
+            )
+        if len(actions) == 0:
+            raise ValueError("actions cannot be an empty list or array.")
+        # Make a copy of the environment to perform the rollout:
+        env_copy = copy.deepcopy(self)
+        env_copy.render_mode = "rgb_array"  # Set render_mode to rgb_array for the copy #hardcoded
+        # Allow rolling out from a custom state:
+        if state is not None:
+            env_copy.set_augmented_state(state)
+
+        # Perform the rollout with the actions provided:
+        rgb_arrays = []
+        for action in actions:
+            obs, reward, done, truncated, _ = env_copy.step(action)
+            rgb_array = env_copy.render()
+            rgb_arrays.append(rgb_array)
+
+        return rgb_arrays
+
+
+
     def close(self):
         '''
         Closes the environment and the pygame window if it was opened.

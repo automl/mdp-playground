@@ -9,11 +9,23 @@ import os
 
 
 class ImageMultiDiscrete(Box):
-    """A space that maps a (multi-)discrete space 1-to-1 to images so that the images may be used as representations for corresponding (multi-)discrete states. A MultiDiscrete space will have multiple dimensions. For each of these dimensions, there is a size that represents the number of categorical states that correspond to that dimension. For size = n, each of these categorical states is numbered from 0 to n-1. For each categorical state numbered n, we associate a polygon with n + 3 sides. This polygon is present in the image associated with this dimension. The images generated for all the dimensions are concatenated together by placing them side by side in the order of the dimensions in Space. Any of the transforms - rotate, flip, scale, shift - can be associated with an object of this class, to apply at random to polygons in the images whenever they are generated.
+    """A space that maps a (multi-)discrete space 1-to-1 to images so that the images may be used as representations 
+    for corresponding (multi-)discrete states. A MultiDiscrete space will have multiple dimensions. For each of these 
+    dimensions, there is a size that represents the number of categorical states that correspond to that dimension. 
+    For size = n, each of these categorical states is numbered from 0 to n-1. For each categorical state numbered n, 
+    we associate a polygon with n + 3 sides. This polygon is present in the image associated with this dimension. The 
+    images generated for all the dimensions are concatenated together by placing them side by side in the order of 
+    the dimensions in Space. Any of the transforms - rotate, flip, scale, shift - can be associated with an object of
+    this class, to apply at random to polygons in the images whenever they are generated.
+
+    A point of difference between this class and ImageContinuous is that this class does not support uncertainty-based
+    images as representations for discrete states. It's not clear at the moment how epistemic uncertainty, e.g., obtained
+    from an ensemble of models, can be represented in an image in the setting of having these polygons associated with
+    the underlying discrete states mapped to integers. Would need to put more thought into this.
 
     Methods
     -------
-    get_concatenated_image(multi_discrete_state)
+    get_image_representation(multi_discrete_state)
         Gets an image representation for a given multi_discrete_state
     """
 
@@ -257,7 +269,7 @@ class ImageMultiDiscrete(Box):
 
         return ret_arr
 
-    def get_concatenated_image(
+    def get_image_representation(
         self,
         multi_discrete_state,
     ):
@@ -286,7 +298,7 @@ class ImageMultiDiscrete(Box):
         #     sampled = [sampled]
         sampled = list(sampled)
 
-        return self.get_concatenated_image(sampled)
+        return self.get_image_representation(sampled)
 
     def __repr__(self):
         return (

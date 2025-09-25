@@ -23,7 +23,7 @@ class TestImageMultiDiscrete(unittest.TestCase):
         from PIL import Image
 
         # img1 = Image.fromarray(imd.disjoint_states[0][1], 'L')
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(3)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(3)), "L")
         if render:
             img1.show()
 
@@ -34,7 +34,7 @@ class TestImageMultiDiscrete(unittest.TestCase):
                 use_custom_images="textures",
                 cust_path="/home/rajanr/textures",
             )
-            img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(2)), "RGB")
+            img1 = Image.fromarray(np.squeeze(imd.get_image_representation(2)), "RGB")
         if render:
             img1.show()
 
@@ -45,73 +45,73 @@ class TestImageMultiDiscrete(unittest.TestCase):
                 use_custom_images="images",
                 cust_path="/home/rajanr/textures",
             )
-            img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(1)), "RGB")
+            img1 = Image.fromarray(np.squeeze(imd.get_image_representation(1)), "RGB")
         if render:
             img1.show()
 
         imd = ImageMultiDiscrete(ds4, transforms="scale")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(3)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(3)), "L")
         if render:
             img1.show()
 
         imd = ImageMultiDiscrete(ds4, transforms="rotate")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(3)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(3)), "L")
         if render:
             img1.show()
 
         imd = ImageMultiDiscrete(ds4, transforms="flip")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(3)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(3)), "L")
         if render:
             img1.show()
 
         imd = ImageMultiDiscrete(ds4, transforms="shift")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(2)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(2)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="scale")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(2)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(2)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="rotate")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(2)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(2)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="flip")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(2)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(2)), "L")
         if render:
             img1.show()
 
         imd = ImageMultiDiscrete(ds4, transforms="shift")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(1)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(1)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="scale")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(1)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(1)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="rotate")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(1)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(1)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="flip")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(1)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(1)), "L")
         if render:
             img1.show()
 
         imd = ImageMultiDiscrete(ds4, transforms="shift")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(0)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(0)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="scale")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(0)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(0)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="rotate")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(0)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(0)), "L")
         if render:
             img1.show()
         imd = ImageMultiDiscrete(ds4, transforms="flip")
-        img1 = Image.fromarray(np.squeeze(imd.get_concatenated_image(0)), "L")
+        img1 = Image.fromarray(np.squeeze(imd.get_image_representation(0)), "L")
         if render:
             img1.show()
 

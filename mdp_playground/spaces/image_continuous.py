@@ -14,7 +14,7 @@ class ImageContinuous(Box):
 
     Methods
     -------
-    get_concatenated_image(continuous_obs)
+    get_image_representation(continuous_obs)
         Gets an image representation for a given feature space observation
     """
 
@@ -53,7 +53,7 @@ class ImageContinuous(Box):
         relevant_indices : list
 
         grid_shape : tuple of length 2
-
+            For grid-world environments, the shape of the grid to be drawn
         seed : int
             Seed for this space
         """
@@ -113,11 +113,18 @@ class ImageContinuous(Box):
                 target_point += 0.5
             self.target_point_pixel = self.convert_to_pixel(target_point)
 
-    def generate_image(self, position, relevant=True):
+    def generate_image(self, position, relevant=True, epistemic_uncertainty=None):
         """
         Parameters
         ----------
         position : np.array
+            A 2-D position in the continuous space
+        relevant : bool
+            Whether the position is in the relevant sub-space of RLToyEnv or not
+        epistemic_uncertainty : np.array
+            Assumed to be the std dev. of a Gaussian over the position. If given,
+            we draw an uncertainty ellipse over the position.
+            
 
         """
         # Use RGB
@@ -128,7 +135,7 @@ class ImageContinuous(Box):
         draw = ImageDraw.Draw(image_)
 
         # Draw in decreasing order of importance:
-        # grid lines, term_spaces, etc. first, so that others are drawn over them
+        # grid lines (in case of grid-based envs), term_spaces, etc. first, so that others are drawn over them
         if self.draw_grid:
             position = position.astype(float)
             position += 0.5
@@ -137,7 +144,7 @@ class ImageContinuous(Box):
                 1, self.grid_shape[0 + offset] + 1
             ):  # +1 because this is along
                 # concatentation dimension when stitching together images below in
-                # get_concatenated_image
+                # get_image_representation
                 x_ = (
                     i * self.width // self.grid_shape[0 + offset] - 1
                 )  # -1 to not go outside
@@ -171,6 +178,7 @@ class ImageContinuous(Box):
 
         R = self.circle_radius
 
+        # The target point matters only in the relevant sub-space:
         if self.target_point is not None and relevant:
             # print("draw2", self.target_point_pixel)
             leftUpPoint = tuple((self.target_point_pixel - R))
@@ -186,23 +194,49 @@ class ImageContinuous(Box):
         twoPointList = [leftUpPoint, rightDownPoint]
         draw.ellipse(twoPointList, fill=self.agent_colour)
 
+        if epistemic_uncertainty is not None:
+            epi_unc_pixel = self.convert_to_pixel(epistemic_uncertainty, scale_only=True)
+            leftUpPoint = tuple(pos_pixel - R - epi_unc_pixel)
+            rightDownPoint = tuple(pos_pixel + R + epi_unc_pixel)
+            twoPointList = [leftUpPoint, rightDownPoint]
+            draw.ellipse(twoPointList, outline=self.agent_colour)
+
         # Because numpy is row-major and Image is column major, need to transpose
         # ret_arr = np.array(image_).T # For 2-D
         ret_arr = np.transpose(np.array(image_), axes=(1, 0, 2))
 
         return ret_arr
 
-    def get_concatenated_image(self, obs):
+    def get_image_representation(self, obs):
         """Gets the "stitched together" image made from images corresponding to
         each continuous sub-space within the continuous space, concatenated
         along the X-axis.
+
+        obs can be a single 2-D observation vector or a 2-D tensor / matrix with 
+        observations along the 2nd axis. If it is such a tensor, we take the mean 
+        and std dev. of the tensor and generate an image with an uncertainty
+        over the state.
         """
+
+        # Check if obs is a 2-D tensor of observations, obtained possibly from an ensemble,
+        # so as to estimate some level of epistemic uncertainty from them:
+        if len(obs.shape) == 2:
+            epi_unc = True
+            mean = np.mean(obs, axis=0)
+            std_dev = np.std(obs, axis=0)
+            obs = mean
+        else:
+            epi_unc = False
+
         concatenated_image = []
         # For relevant/irrelevant sub-spaces:
-        concatenated_image.append(self.generate_image(obs[self.relevant_indices]))
+        concatenated_image.append(self.generate_image(obs[self.relevant_indices], 
+                                                      epistemic_uncertainty=std_dev[self.relevant_indices] 
+                                                      if epi_unc else None))
         if self.irrelevant_features:
             irr_image = self.generate_image(
-                obs[self.irrelevant_indices], relevant=False
+                obs[self.irrelevant_indices], relevant=False, epistemic_uncertainty=std_dev[self.irrelevant_indices]
+                if epi_unc else None
             )
             concatenated_image.append(irr_image)
 
@@ -211,23 +245,41 @@ class ImageContinuous(Box):
         return np.atleast_3d(concatenated_image)  # because Ray expects an
         # image to have >=3 dims
 
-    def convert_to_pixel(self, position):
+    def convert_to_pixel(self, vector, scale_only=False):
         """
-        Convert a continuous position to a pixel position in the image
+        Converts a continuous vector from the feature space of the object 
+        to an integer pixel position in the image representation space by default.
+        If scale_only is True, we return the vector scaled by the ratio of
+        image size to feature space size.
+
+        Parameters
+        ----------
+        vector : np.array
+            A 2-D vector in the feature space that can represent a position
+            or anything else in the feature space, e.g., std. dev. of a
+            Gaussian over the position.
+        scale_only : bool
+            If True, we only scale
+
         """
         # It's implicit that both relevant and irrelevant sub-spaces have the
         # same max and min here:
         max = self.feature_space.high[self.relevant_indices]
         min = self.feature_space.low[self.relevant_indices]
-        pos_pixel = (position - min) / (max - min)
-        pos_pixel = (pos_pixel * self.shape[:2]).astype(int)
+        if scale_only:
+            # By default this is used for scaling uncertainty (std dev), so we heuristically multiply by 3
+            # to make it look good. 1 std dev, in some cases, led to a 0 pixel std dev after converting to int.
+            pixel_vec = 3 * (vector) / (max - min)
+        else:
+            pixel_vec = (vector - min) / (max - min)
+        pixel_vec = (pixel_vec * self.shape[:2]).astype(int)  # self.shape is (100, 100, 3) by default
 
-        return pos_pixel
+        return pixel_vec
 
     def sample(self):
 
         sampled = self.feature_space.sample()
-        return self.get_concatenated_image(sampled)
+        return self.get_image_representation(sampled)
 
     def __repr__(self):
         return (

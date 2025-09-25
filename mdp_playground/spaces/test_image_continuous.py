@@ -79,7 +79,7 @@ class TestImageContinuous(unittest.TestCase):
             height=400,
         )
         pos = np.array([5.0, 7.0])
-        img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), "RGB")
+        img1 = Image.fromarray(np.squeeze(imc.get_image_representation(pos)), "RGB")
         if render:
             img1.show()
         # img1.save("cont_state_target_terminal_states.pdf")
@@ -93,10 +93,10 @@ class TestImageContinuous(unittest.TestCase):
             height=400,
         )
         pos = np.array([5.0, 7.0, 10.0, 15.0])
-        img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), "RGB")
+        img1 = Image.fromarray(np.squeeze(imc.get_image_representation(pos)), "RGB")
         if render:
             img1.show()
-        # print(imc.get_concatenated_image(pos).shape)
+        # print(imc.get_image_representation(pos).shape)
 
         # Random sample and __repr__
         imc = ImageContinuous(
@@ -126,7 +126,7 @@ class TestImageContinuous(unittest.TestCase):
             height=400,
             grid_shape=grid_shape,
         )
-        img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), "RGB")
+        img1 = Image.fromarray(np.squeeze(imc.get_image_representation(pos)), "RGB")
         if render:
             img1.show()
         # img1.save("grid_target.pdf")
@@ -157,7 +157,7 @@ class TestImageContinuous(unittest.TestCase):
             height=400,
             grid_shape=grid_shape,
         )
-        img1 = Image.fromarray(np.squeeze(imc.get_concatenated_image(pos)), "RGB")
+        img1 = Image.fromarray(np.squeeze(imc.get_image_representation(pos)), "RGB")
         if render:
             img1.show()
         # img1.save("grid_target_terminal_states.pdf")

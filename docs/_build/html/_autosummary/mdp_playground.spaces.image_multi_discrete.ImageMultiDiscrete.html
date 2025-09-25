@@ -464,8 +464,8 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">gym.spaces.box.Box</span></code></p>
 <p>A space that maps a (multi-)discrete space 1-to-1 to images so that the images may be used as representations for corresponding (multi-)discrete states. A MultiDiscrete space will have multiple dimensions. For each of these dimensions, there is a size that represents the number of categorical states that correspond to that dimension. For size = n, each of these categorical states is numbered from 0 to n-1. For each categorical state numbered n, we associate a polygon with n + 3 sides. This polygon is present in the image associated with this dimension. The images generated for all the dimensions are concatenated together by placing them side by side in the order of the dimensions in Space. Any of the transforms - rotate, flip, scale, shift - can be associated with an object of this class, to apply at random to polygons in the images whenever they are generated.</p>
 <dl class="py method">
-<dt id="mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.get_concatenated_image">
-<code class="sig-name descname"><span class="pre">get_concatenated_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multi_discrete_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/spaces/image_multi_discrete.html#ImageMultiDiscrete.get_concatenated_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.get_concatenated_image" title="Permalink to this definition">¶</a></dt>
+<dt id="mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.get_image_representation">
+<code class="sig-name descname"><span class="pre">get_image_representation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multi_discrete_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/spaces/image_multi_discrete.html#ImageMultiDiscrete.get_image_representation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.get_image_representation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets an image representation for a given multi_discrete_state</p>
 </dd></dl>
 
@@ -532,7 +532,7 @@
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_image</span></code>(discrete_state)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.get_concatenated_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_concatenated_image</span></code></a>(multi_discrete_state)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id0" title="mdp_playground.spaces.image_multi_discrete.ImageMultiDiscrete.get_image_representation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_image_representation</span></code></a>(multi_discrete_state)</p></td>
 <td><p>Gets the “stitched together” image made from images corresponding to each discrete sub-space within the multidiscrete space, concatenated along the X-axis</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_bounded</span></code>([manner])</p></td>
@@ -564,7 +564,7 @@ member of this space</p>
 
 <dl class="py method">
 <dt id="id0">
-<code class="sig-name descname"><span class="pre">get_concatenated_image</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multi_discrete_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/spaces/image_multi_discrete.html#ImageMultiDiscrete.get_concatenated_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_image_representation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multi_discrete_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/spaces/image_multi_discrete.html#ImageMultiDiscrete.get_image_representation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets the “stitched together” image made from images corresponding to each discrete sub-space within the multidiscrete space, concatenated along the X-axis</p>
 </dd></dl>
 

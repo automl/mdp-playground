@@ -21,7 +21,7 @@ mdp\_playground.spaces.image\_continuous.ImageContinuous
       ~ImageContinuous.convert_to_pixel
       ~ImageContinuous.from_jsonable
       ~ImageContinuous.generate_image
-      ~ImageContinuous.get_concatenated_image
+      ~ImageContinuous.get_image_representation
       ~ImageContinuous.is_bounded
       ~ImageContinuous.sample
       ~ImageContinuous.seed
