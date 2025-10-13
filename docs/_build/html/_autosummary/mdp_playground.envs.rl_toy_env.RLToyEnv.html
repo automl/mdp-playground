@@ -712,8 +712,8 @@ For grid envs, the base reward handed out is equal to the Manhattan distance mov
 </dd></dl>
 
 <dl class="py method">
-<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.get_augmented_state">
-<code class="sig-name descname"><span class="pre">get_augmented_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.get_augmented_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.get_augmented_state" title="Permalink to this definition">¶</a></dt>
+<dt id="mdp_playground.envs.rl_toy_env.RLToyEnv.get_markov_state">
+<code class="sig-name descname"><span class="pre">get_markov_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.get_markov_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.get_markov_state" title="Permalink to this definition">¶</a></dt>
 <dd><p>gets underlying Markovian state of the MDP</p>
 </dd></dl>
 
@@ -765,7 +765,7 @@ For grid envs, the base reward handed out is equal to the Manhattan distance mov
 <tr class="row-even"><td><p><a class="reference internal" href="#mdp_playground.envs.rl_toy_env.RLToyEnv.close" title="mdp_playground.envs.rl_toy_env.RLToyEnv.close"><code class="xref py py-obj docutils literal notranslate"><span class="pre">close</span></code></a>()</p></td>
 <td><p>Override close in your subclass to perform any necessary cleanup.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#id1" title="mdp_playground.envs.rl_toy_env.RLToyEnv.get_augmented_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_augmented_state</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#id1" title="mdp_playground.envs.rl_toy_env.RLToyEnv.get_markov_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_markov_state</span></code></a>()</p></td>
 <td><p>Intended to return the full augmented state which would be Markovian.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#id2" title="mdp_playground.envs.rl_toy_env.RLToyEnv.init_init_state_dist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">init_init_state_dist</span></code></a>()</p></td>
@@ -837,7 +837,7 @@ garbage collected or when the program exits.</p>
 
 <dl class="py method">
 <dt id="id1">
-<code class="sig-name descname"><span class="pre">get_augmented_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.get_augmented_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname"><span class="pre">get_markov_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/mdp_playground/envs/rl_toy_env.html#RLToyEnv.get_markov_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition">¶</a></dt>
 <dd><p>Intended to return the full augmented state which would be Markovian. (However, it’s not Markovian wrt the noise in P and R because we’re not returning the underlying RNG.) Currently, returns the augmented state which is the sequence of length “delay + sequence_length + 1” of past states for both discrete and continuous environments. Additonally, the current state derivatives are also returned for continuous environments.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>

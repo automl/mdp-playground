@@ -201,10 +201,10 @@ class RLToyEnv(gym.Env):
         the reward function of the MDP, R
     R(state, action)
         defined as a lambda function in the call to init_reward_function() and is equivalent to calling reward_function()
-    get_augmented_state()
+    get_markov_state()
         gets underlying Markovian state of the MDP as a dictionary
-    set_augmented_state(augmented_state_dict)
-        sets underlying Markovian state of the MDP, by default, using a dictionary in the same format as returned by get_augmented_state()
+    set_markov_state(markov_state_dict)
+        sets underlying Markovian state of the MDP, by default, using a dictionary in the same format as returned by get_markov_state()
     reset()
         Resets environment state
     seed()
@@ -2122,9 +2122,9 @@ class RLToyEnv(gym.Env):
         # using max_episode_steps in the environment wrapper gymnasium.wrappers.TimeLimit when using 
         # the env RLToyFinitieHorizon. In the experiments from the paper, early termination was handled by
         # Ray Rllib's horizon parameter.
-        return self.curr_obs, self.reward, self.done, False, self.get_augmented_state()
+        return self.curr_obs, self.reward, self.done, False, self.get_markov_state()
 
-    def get_augmented_state(self):
+    def get_markov_state(self):
         """Intended to return the full augmented state which would be Markovian. (However, it's not Markovian wrt the noise in P and R
         because we're not returning the underlying RNG.)
 
@@ -2144,75 +2144,75 @@ class RLToyEnv(gym.Env):
         """
         # #TODO For noisy processes, this would need the noise distribution and random seed too. Also add the irrelevant state parts, etc.? We don't need the irrelevant parts for the state to be Markovian.
         if self.config["state_space_type"] == "discrete":
-            augmented_state_dict = {
+            markov_state_dict = {
                 "curr_state": self.curr_state,
                 "curr_obs": self.curr_obs,
                 "augmented_state": self.augmented_state,
             }
         elif self.config["state_space_type"] == "continuous":
-            augmented_state_dict = {
+            markov_state_dict = {
                 "curr_state": self.curr_state,
                 "curr_obs": self.curr_obs,
                 "augmented_state": self.augmented_state,
                 "state_derivatives": self.state_derivatives,
             }
         elif self.config["state_space_type"] == "grid":
-            augmented_state_dict = {
+            markov_state_dict = {
                 "curr_state": self.curr_state,
                 "curr_obs": self.curr_obs,
                 "augmented_state": self.augmented_state,
             }
 
-        return augmented_state_dict
+        return markov_state_dict
 
-    def set_augmented_state(self, augmented_state_dict):
+    def set_markov_state(self, markov_state_dict):
         """Sets the underlying Markov state of the environment to the one specified in the argument. This is useful for 
         setting a custom state from which to rollout, e.g., for model-based RL imaginary rollouts.
 
         Parameters
         ----------
-        augmented_state_dict : dict or state
-            If it's a dictionary, it should be in the format returned by get_augmented_state().
+        markov_state_dict : dict or state
+            If it's a dictionary, it should be in the format returned by get_markov_state().
             If it's a state, all of the elements of the member variables curr_state, curr_obs, 
             augmented_state and state_derivatives (for continuous envs) are set to this state.
 
         """
 
-        if type(augmented_state_dict) is not dict:
+        if type(markov_state_dict) is not dict:
             warnings.warn(
                 "Warning: When setting the Markov state of the env, the passed state dictionary " \
-                "was not a dict in the expected format (i.e. the one returned by get_augmented_state()). " \
+                "was not a dict in the expected format (i.e. the one returned by get_markov_state()). " \
                 "Setting all relevant member variables of the env to be the value that was passed in. " \
                 "If you see any errors, you will need to dig deeper into the code to see how to set the state properly."
             )
 
             if self.config["state_space_type"] == "continuous":
                 # Create copies of np.arrays to avoid modifying the original state which may be used by external code:
-                augmented_state_dict = {
-                    "curr_state": augmented_state_dict.copy(),
-                    "curr_obs": augmented_state_dict.copy(),
-                    "augmented_state": [[np.nan] * self.state_space_dim] * (self.augmented_state_length - 1) + [augmented_state_dict.copy()],
+                markov_state_dict = {
+                    "curr_state": markov_state_dict.copy(),
+                    "curr_obs": markov_state_dict.copy(),
+                    "augmented_state": [[np.nan] * self.state_space_dim] * (self.augmented_state_length - 1) + [markov_state_dict.copy()],
                 }
 
                 # If continuous env, also set state_derivatives to 0, except the 0th order one which is the state itself:
-                augmented_state_dict["state_derivatives"] = [
+                markov_state_dict["state_derivatives"] = [
                     np.zeros(self.state_space_dim, dtype=self.dtype_s)
                 ] * (self.dynamics_order + 1)
-                augmented_state_dict["state_derivatives"][0] = augmented_state_dict["curr_state"].copy()
+                markov_state_dict["state_derivatives"][0] = markov_state_dict["curr_state"].copy()
 
             else:  # discrete or grid env
-                augmented_state_dict = {
-                    "curr_state": augmented_state_dict,
-                    "curr_obs": augmented_state_dict,
-                    "augmented_state": [np.nan] * (self.augmented_state_length - 1) + [augmented_state_dict],
+                markov_state_dict = {
+                    "curr_state": markov_state_dict,
+                    "curr_obs": markov_state_dict,
+                    "augmented_state": [np.nan] * (self.augmented_state_length - 1) + [markov_state_dict],
                 }
 
-        self.curr_state = augmented_state_dict["curr_state"]
-        self.curr_obs = augmented_state_dict["curr_obs"]
-        self.augmented_state = augmented_state_dict["augmented_state"]
+        self.curr_state = markov_state_dict["curr_state"]
+        self.curr_obs = markov_state_dict["curr_obs"]
+        self.augmented_state = markov_state_dict["augmented_state"]
 
         if self.config["state_space_type"] == "continuous":
-            self.state_derivatives = augmented_state_dict["state_derivatives"]
+            self.state_derivatives = markov_state_dict["state_derivatives"]
 
     def reset(self, seed=None, options=None):
         """Resets the environment for the beginning of an episode and samples a start state from rho_0. For discrete environments uses the defined rho_0 directly. For continuous environments, samples a state and resamples until a non-terminal state is sampled.
@@ -2502,7 +2502,7 @@ class RLToyEnv(gym.Env):
             A list or numpy array of actions to perform in the environment.
         state : dict or state, optional
             The state from which to start the rollout. If None, the current state of the environment is used. 
-            The state should be in the format returned by get_augmented_state().
+            The state should be in the format returned by get_markov_state().
         """
     
         # Create a deepcopy of the environment and roll it out with the actions provided.
@@ -2518,7 +2518,7 @@ class RLToyEnv(gym.Env):
         env_copy.render_mode = "rgb_array"  # Set render_mode to rgb_array for the copy #hardcoded
         # Allow rolling out from a custom state:
         if state is not None:
-            env_copy.set_augmented_state(state)
+            env_copy.set_markov_state(state)
 
         # Perform the rollout with the actions provided:
         rgb_arrays = []

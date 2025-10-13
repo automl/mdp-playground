@@ -62,7 +62,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test 1: general dynamics and reward
         print("\nTest 1: \033[32;1;4mTEST_CONTINUOUS_DYNAMICS_GENERAL\033[0m")
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         self.assertEqual(
             type(state), np.ndarray, "Type of continuous state should be numpy.ndarray."
         )
@@ -91,7 +91,7 @@ class TestRLToyEnv(unittest.TestCase):
         # lengths.
         print("\nTest 3: \033[32;1;4mTEST_CONTINUOUS_DYNAMICS_RANDOM_ACTIONS\033[0m")
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         prev_reward = None
         for i in range(40):
             if i < 20:
@@ -136,7 +136,7 @@ class TestRLToyEnv(unittest.TestCase):
         print("\nTest 4: \033[32;1;4mTEST_CONTINUOUS_DYNAMICS_DELAY\033[0m")
         config["delay"] = 1
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         prev_reward = None
         for i in range(40):
             if i < 20:
@@ -176,7 +176,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_noise"] = lambda s, a, rng: rng.normal(0, 0.5)
         config["delay"] = 0
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         expected_rewards = [0.062865110, -0.0660524, 0.32021132, 0.05245005, -0.267834]
         for i in range(5):
             # action = env.action_space.sample()
@@ -201,7 +201,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["relevant_indices"] = [0, 1, 2, 6]
         config["action_space_relevant_indices"] = [0, 1, 2, 6]
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(20):
             action = env.action_space.sample()
             action[
@@ -225,7 +225,7 @@ class TestRLToyEnv(unittest.TestCase):
         # move_along_a_line reward function
         print("\nTest 7: \033[32;1;4mTEST_CONTINUOUS_DYNAMICS_IRR_DIMS_2\033[0m")
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(20):
             action = env.action_space.sample()
             # test to see if acting "in a line" for irrelevant dimensions and not for relevant dimensions produces bad reward
@@ -248,7 +248,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["state_space_max"] = 5  # Will be a Box in the range [-max, max]
         config["action_space_max"] = 1  # Will be a Box in the range [-max, max]
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(20):
             # action = env.action_space.sample()
             action = np.array([-1] * 7, dtype=env.action_space.dtype)  # just to test if acting "in a line" works
@@ -276,7 +276,7 @@ class TestRLToyEnv(unittest.TestCase):
         ]
         config["term_state_edge"] = 1.0
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         state_derivatives = copy.deepcopy(env.state_derivatives)
         # augmented_state = copy.deepcopy(env.augmented_state)
 
@@ -310,7 +310,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["seed"] = 12
         env = RLToyEnv(**config)
         # env.reset()
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         state_derivatives = copy.deepcopy(env.state_derivatives)
         # augmented_state = copy.deepcopy(env.augmented_state)
 
@@ -439,7 +439,7 @@ class TestRLToyEnv(unittest.TestCase):
         # copy is needed to have a copy of the old state, otherwise we get the
         # np.array that has the same location in memory and is constantly updated
         # by step()
-        state = env.get_augmented_state()["curr_state"].copy()
+        state = env.get_markov_state()["curr_state"].copy()
         state_derivatives = copy.deepcopy(env.state_derivatives)
 
         action = np.array([2.0, 1.0], dtype=env.action_space.dtype)
@@ -519,7 +519,7 @@ class TestRLToyEnv(unittest.TestCase):
         # with the same action at every step, so the reward is pretty much constant (except for numerical issues
         # or at the last step I think)
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(20):
             # action = env.action_space.sample()
             action = np.array([0.5] * 2, dtype=env.action_space.dtype)  # just to test if acting "in a line" works
@@ -544,7 +544,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["action_space_relevant_indices"] = [1, 2]
         config["target_point"] = [1.27494, -0.780999]
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(20):
             # action = env.action_space.sample()
             action = np.array([0.5] * 5, dtype=env.action_space.dtype)  # just to test if acting "in a line" works
@@ -576,7 +576,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test delay
         config["delay"] = 10
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(20):
             # action = env.action_space.sample()
             action = np.array([0.5] * 5, dtype=env.action_space.dtype)  # just to test if acting "in a line" works
@@ -637,7 +637,7 @@ class TestRLToyEnv(unittest.TestCase):
         # The last 3 steps are taken within the target radius, so the reward is 1*2.0
         # The rest of the test is the same as the dense case above.
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(20):
             # action = env.action_space.sample()
             action = np.array([0.5] * 2, dtype=env.action_space.dtype)  # just to test if acting "in a line" works
@@ -662,7 +662,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Adds delay to the previous test case
         config["delay"] = 10
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(35):
             # action = env.action_space.sample()
             action = np.array([0.5] * 2, dtype=env.action_space.dtype)  # just to test if acting "in a line" works
@@ -690,7 +690,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["action_space_relevant_indices"] = [1, 2]
         config["target_point"] = [1.27494, -0.780999]
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"].copy()  # env.reset()[0]
+        state = env.get_markov_state()["curr_state"].copy()  # env.reset()[0]
         for i in range(35):
             # action = env.action_space.sample()
             action = np.array([0.5] * 5, dtype=env.action_space.dtype)  # just to test if acting "in a line" works
@@ -749,7 +749,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["image_width"] = 100
         config["image_height"] = 100
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["augmented_state"][-1]
+        state = env.get_markov_state()["augmented_state"][-1]
         # init state: [ 1.9652315 -2.4397445]
         expected_image_sums = [6168414, 6168414, 6168414, 6171735, 6204207]
 
@@ -762,7 +762,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = np.array([-0.45, -0.8], dtype=env.action_space.dtype)  # just to test if acting "in a line" works
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
 
@@ -810,7 +810,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         # Test 1: Sparse reward case
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["augmented_state"][-1]
+        state = env.get_markov_state()["augmented_state"][-1]
         actions = [
             [0, 1],
             [-1, 0],
@@ -834,7 +834,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = actions[i]
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
             tot_rew += reward
@@ -857,7 +857,7 @@ class TestRLToyEnv(unittest.TestCase):
             # action = env.action_space.sample()
             action = [0, 1]
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
             tot_rew += reward
@@ -872,7 +872,7 @@ class TestRLToyEnv(unittest.TestCase):
         # Test 2: Almost the same as above, but with make_denser
         config["make_denser"] = True
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["augmented_state"][-1]
+        state = env.get_markov_state()["augmented_state"][-1]
         actions = [
             [0, 1],
             [-1, 0],
@@ -889,7 +889,7 @@ class TestRLToyEnv(unittest.TestCase):
         for i in range(len(actions)):
             action = actions[i]
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
             tot_rew += reward
@@ -907,7 +907,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["term_state_reward"] = -0.25
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["augmented_state"][-1]
+        state = env.get_markov_state()["augmented_state"][-1]
         actions = [
             [0, 1],
             [-1, 0],
@@ -933,7 +933,7 @@ class TestRLToyEnv(unittest.TestCase):
         for i in range(len(actions)):
             action = actions[i]
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
             tot_rew += reward
@@ -1078,7 +1078,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["term_state_reward"] = -0.25
         env = RLToyEnv(**config)
 
-        state = env.get_augmented_state()["augmented_state"][-1]
+        state = env.get_markov_state()["augmented_state"][-1]
         actions = [
             [0, 1],
             [-1, 0],
@@ -1102,7 +1102,7 @@ class TestRLToyEnv(unittest.TestCase):
         for i in range(len(actions)):
             action = actions[i]
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             self.assertEqual(
                 reward,
@@ -1125,7 +1125,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["term_state_reward"] = 0.0
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["augmented_state"][-1]
+        state = env.get_markov_state()["augmented_state"][-1]
         actions = [
             [0, -1],
             [-1, 0],
@@ -1145,7 +1145,7 @@ class TestRLToyEnv(unittest.TestCase):
         for i in range(len(actions)):
             action = actions[i] + [0, 0]
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             self.assertEqual(
                 reward,
@@ -1162,7 +1162,7 @@ class TestRLToyEnv(unittest.TestCase):
         for i in range(len(actions)):
             action = [0, 0] + actions[i]
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             state = next_state.copy()
             tot_rew += reward
@@ -1178,7 +1178,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["term_state_reward"] = -0.25
         env = RLToyEnv(**config)
 
-        state = env.get_augmented_state()["augmented_state"][-1]
+        state = env.get_markov_state()["augmented_state"][-1]
         actions = [
             [0, -1],
             [-1, 0],
@@ -1200,7 +1200,7 @@ class TestRLToyEnv(unittest.TestCase):
         for i in range(len(actions)):
             action = actions[i]
             next_obs, reward, done, trunc, info = env.step(action)
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, action, reward, next_state, done)
             self.assertEqual(
                 reward,
@@ -1242,7 +1242,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
         if type(state) != int:
             self.assertEqual(
                 state.dtype, env.observation_space.dtype, "Type of discrete state should be: " + str(env.observation_space.dtype)
@@ -1323,7 +1323,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [
             3,
@@ -1378,7 +1378,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [
             5,
@@ -1433,7 +1433,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
         # config["log_level"] = logging.INFO
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [6, 6, 2, np.random.default_rng(0).integers(config["action_space_size"])]  #
         expected_states = [
@@ -1484,7 +1484,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
         config["log_level"] = logging.INFO
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [3, 6,]
         expected_rewards = [
@@ -1544,7 +1544,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [
             6,
@@ -1621,7 +1621,7 @@ class TestRLToyEnv(unittest.TestCase):
     #     config["generate_random_mdp"] = True
     #
     #     env = RLToyEnv(**config)
-    #     state = env.get_augmented_state()['curr_state']
+    #     state = env.get_markov_state()['curr_state']
     #
     #     actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
     #     expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
@@ -1670,7 +1670,7 @@ class TestRLToyEnv(unittest.TestCase):
     #
     #     try: # Testing for maximally_connected options working properly when invalid config specified. #TODO Is this part needed?
     #         env = RLToyEnv(**config)
-    #         state = env.get_augmented_state()['curr_state']
+    #         state = env.get_markov_state()['curr_state']
     #
     #         actions = [[1, 1, 0], [0, 1, 0], [1, 0 ,1], [1, 0 ,0], [1, 0, 1], [0, 1, 0], [0, 1, 1], [0, 0, 1], [1, 0, 0]]
     #         expected_rewards = [0, 0, 0, 0, 1, 1, 0, 1, 0]
@@ -1690,7 +1690,7 @@ class TestRLToyEnv(unittest.TestCase):
     #     # Test: Adds one irrelevant dimension
     #     config["state_space_size"] = [2, 2, 2, 5]
     #     env = RLToyEnv(**config)
-    #     state = env.get_augmented_state()['curr_state']
+    #     state = env.get_markov_state()['curr_state']
     #
     #     actions = [[1, 4, 1, 0], [0, 3, 1, 0], [1, 4, 0, 1], [1, 0 ,0, 0], [1, 2, 0, 1], [0, 3, 1, 0], [0, 1, 1, 1], [0, 4, 0, 1], [1, 4, 0, 0]]
     #     expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
@@ -1711,7 +1711,7 @@ class TestRLToyEnv(unittest.TestCase):
     # config["action_space_size"] = [2, 5, 1, 1, 2, 2]
     # config["action_space_relevant_indices"] = [0, 4, 5]
     # env = RLToyEnv(**config)
-    # state = env.get_augmented_state()['curr_state']
+    # state = env.get_markov_state()['curr_state']
     #
     # actions = [[1, 4, 0, 0, 1, 0], [0, 3, 0, 0, 1, 0], [1, 4, 0, 0, 0, 1], [1, 0, 0, 0, 0, 0], [1, 2, 0, 0, 0, 1], [0, 3, 0, 0, 1, 0], [0, 1, 0, 0, 1, 1], [0, 4, 0, 0, 0, 1], [1, 4, 0, 0, 0, 0]]
     # expected_rewards = [0, 0, 0, 1, 1, 0, 1, 0, 0]
@@ -1751,7 +1751,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["generate_random_mdp"] = True
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [[7, 0], [5, 0], [5, 0], [1, 2]] + [
             [5, np.random.default_rng().integers(config["action_space_size"][1])]
@@ -1809,7 +1809,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["image_transforms"] = "shift,scale,rotate,flip"
         config["image_scale_range"] = (0.5, 1.5)
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["augmented_state"][-1]
+        state = env.get_markov_state()["augmented_state"][-1]
 
         actions = [
             4,
@@ -1861,7 +1861,7 @@ class TestRLToyEnv(unittest.TestCase):
                     + ". Was: "
                     + str(next_state.sum())
                 )  # Rotation changes the expected sum of 255 * 10201 = 2601255
-            next_state = env.get_augmented_state()["augmented_state"][-1]
+            next_state = env.get_markov_state()["augmented_state"][-1]
             print("sars', done =", state, actions[i], reward, next_state, done)
             np.testing.assert_allclose(
                 reward,
@@ -1901,7 +1901,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [
             6,
@@ -1935,7 +1935,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["reward_every_n_steps"] = 2
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         expected_rewards = [0, 0, 0, 1, 0, 0,]
         for i in range(len(expected_rewards)):
@@ -1958,7 +1958,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["sequence_length"] = 1
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [
             6,
@@ -2011,7 +2011,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["init_state_dist"] = np.array([1 / 8 for i in range(8)])
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [
             4,
@@ -2049,7 +2049,7 @@ class TestRLToyEnv(unittest.TestCase):
         config["init_state_dist"] = np.array([1 / 8 for i in range(8)])
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [
             4,
@@ -2100,7 +2100,7 @@ class TestRLToyEnv(unittest.TestCase):
         # config["init_state_dist"] = np.array([1 / 8 for i in range(8)])
 
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [2, [0.5, 1.5], 2, 3, [-10, -5], 2, 1, 1]  #
         expected_rewards = [
@@ -2153,7 +2153,7 @@ class TestRLToyEnv(unittest.TestCase):
     #     config["generate_random_mdp"] = True
     #
     #     env = RLToyEnv(**config)
-    #     state = env.get_augmented_state()['curr_state']
+    #     state = env.get_markov_state()['curr_state']
     #
     #     actions = [0, 1, 17, 5, 3, 4, 3, 2]
     #     expected_rewards = [0, 0, 0, 0, 0, 0]#, 1, 0, 0]
@@ -2193,7 +2193,7 @@ class TestRLToyEnv(unittest.TestCase):
 
         config["generate_random_mdp"] = True
         env = RLToyEnv(**config)
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
 
         actions = [6, 6, 2, 6]  #
         expected_rewards = [
@@ -2276,7 +2276,7 @@ class TestRLToyEnv(unittest.TestCase):
             + str(np.sum(env.config["relevant_init_state_dist"])),
         )  # TODO Similar test case for irrelevant_features
 
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
         actions = [7, 1, 1, 7, 0, 7, 1]  #
         expected_rewards = [
             0,
@@ -2361,7 +2361,7 @@ class TestRLToyEnv(unittest.TestCase):
             + str(np.sum(env.config["relevant_init_state_dist"])),
         )  # TODO Similar test case for irrelevant_features
 
-        state = env.get_augmented_state()["curr_state"]
+        state = env.get_markov_state()["curr_state"]
         actions = [2, 5, 5, 1, 0, 7, 1]  # From 1st state 13, actions lead to rewardable sequence 19, 1, 10, 21, 4
         expected_rewards = [
             0,

@@ -72,7 +72,7 @@ def discrete_environment_example():
     # The environment maintains an augmented state which contains the underlying
     # state used by the MDP to perform transitions and hand out rewards. We can
     # fetch a dict containing the augmented state and current state like this:
-    augmented_state_dict = env.get_augmented_state()
+    augmented_state_dict = env.get_markov_state()
     state = augmented_state_dict["curr_state"]
 
     print(
@@ -113,7 +113,7 @@ def discrete_environment_image_representations_example():
     # The environment maintains an augmented state which contains the underlying
     # state used by the MDP to perform transitions and hand out rewards. We can
     # fetch a dict containing the augmented state and current state like this:
-    augmented_state_dict = env.get_augmented_state()
+    augmented_state_dict = env.get_markov_state()
     state = augmented_state_dict["curr_state"]
 
     print(
@@ -122,7 +122,7 @@ def discrete_environment_image_representations_example():
     )
     action = env.action_space.sample()
     next_state_image, reward, done, trunc, info = env.step(action)
-    augmented_state_dict = env.get_augmented_state()
+    augmented_state_dict = env.get_markov_state()
     next_state = augmented_state_dict["curr_state"]  # Underlying MDP state holds
     # the current discrete state.
     print("sars', done, image shape =", state, action, reward, next_state, done, next_state_image.shape)
@@ -161,7 +161,7 @@ def discrete_environment_diameter_image_representations_example():
     # The environment maintains an augmented state which contains the underlying
     # state used by the MDP to perform transitions and hand out rewards. We can
     # fetch a dict containing the augmented state and current state like this:
-    augmented_state_dict = env.get_augmented_state()
+    augmented_state_dict = env.get_markov_state()
     state = augmented_state_dict["curr_state"]
 
     print(
@@ -170,7 +170,7 @@ def discrete_environment_diameter_image_representations_example():
     )
     action = env.action_space.sample()
     next_state_image, reward, done, trunc, info = env.step(action)
-    augmented_state_dict = env.get_augmented_state()
+    augmented_state_dict = env.get_markov_state()
     next_state = augmented_state_dict["curr_state"]  # Underlying MDP state holds
     # the current discrete state.
     print("sars', done, shape =", state, action, reward, next_state, done, next_state_image.shape)
@@ -247,7 +247,7 @@ def continuous_environment_example_move_to_a_point_irrelevant_image():
 
     env = RLToyEnv(**config)
     state = env.reset()[0]
-    augmented_state_dict = env.get_augmented_state()
+    augmented_state_dict = env.get_markov_state()
     state = augmented_state_dict["curr_state"].copy()  # Underlying MDP state holds
     # the current continuous state.
 
@@ -257,7 +257,7 @@ def continuous_environment_example_move_to_a_point_irrelevant_image():
     )
     action = env.action_space.sample()
     next_state_image, reward, done, trunc, info = env.step(action)
-    augmented_state_dict = env.get_augmented_state()
+    augmented_state_dict = env.get_markov_state()
     next_state = augmented_state_dict["curr_state"].copy()  # Underlying MDP state holds
     # the current continuous state.
     print("sars', done, image shape =", state, action, reward, next_state, done, next_state_image.shape)
@@ -319,13 +319,13 @@ def grid_environment_example():
 
     env = RLToyEnv(**config)
 
-    state = env.get_augmented_state()["augmented_state"][-1]
+    state = env.get_markov_state()["augmented_state"][-1]
     actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
 
     for i in range(len(actions)):
         action = actions[i]
         next_obs, reward, done, trunc, info = env.step(action)
-        next_state = env.get_augmented_state()["augmented_state"][-1]
+        next_state = env.get_markov_state()["augmented_state"][-1]
         print("sars', done =", state, action, reward, next_state, done)
         state = next_state
 
@@ -348,13 +348,13 @@ def grid_environment_example_reward_every_n_steps():
 
     env = RLToyEnv(**config)
 
-    state = env.get_augmented_state()["augmented_state"][-1]
+    state = env.get_markov_state()["augmented_state"][-1]
     actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2], [1, 1], [0, 1]]
 
     for i in range(len(actions)):
         action = actions[i]
         next_obs, reward, done, trunc, info = env.step(action)
-        next_state = env.get_augmented_state()["augmented_state"][-1]
+        next_state = env.get_markov_state()["augmented_state"][-1]
         print("sars', done =", state, action, reward, next_state, done)
         state = next_state
 
@@ -379,13 +379,13 @@ def grid_environment_image_representations_example():
     config["terminal_states"] = [[5, 5], [2, 3], [2, 4], [3, 3], [3, 4]]
     env = RLToyEnv(**config)
 
-    state = env.get_augmented_state()["augmented_state"][-1]
+    state = env.get_markov_state()["augmented_state"][-1]
     actions = [[0, 1], [-1, 0], [-1, 0], [1, 0], [0.5, -0.5], [1, 2]]
 
     for i in range(len(actions)):
         action = actions[i]
         next_obs, reward, done, trunc, info = env.step(action)
-        next_state = env.get_augmented_state()["augmented_state"][-1]
+        next_state = env.get_markov_state()["augmented_state"][-1]
         print("sars', done, image shape =", state, action, reward, next_state, done, next_obs.shape)
         state = next_state
 

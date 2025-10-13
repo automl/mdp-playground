@@ -18,7 +18,7 @@ mdp\_playground.envs.rl\_toy\_env.RLToyEnv
    
       ~RLToyEnv.__init__
       ~RLToyEnv.close
-      ~RLToyEnv.get_augmented_state
+      ~RLToyEnv.get_markov_state
       ~RLToyEnv.init_init_state_dist
       ~RLToyEnv.init_reward_function
       ~RLToyEnv.init_terminal_states

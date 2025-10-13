@@ -207,35 +207,32 @@ class ImageContinuous(Box):
 
         return ret_arr
 
-    def get_image_representation(self, obs):
+    def get_image_representation(self, obs, epistemic_uncertainty=None, aleatoric_uncertainty=None):
         """Gets the "stitched together" image made from images corresponding to
         each continuous sub-space within the continuous space, concatenated
         along the X-axis.
 
-        obs can be a single 2-D observation vector or a 2-D tensor / matrix with 
-        observations along the 2nd axis. If it is such a tensor, we take the mean 
-        and std dev. of the tensor and generate an image with an uncertainty
-        over the state.
+        Parameters
+        ----------
+        obs : np.array
+            obs is a single 2-D observation vector
+        epistemic_uncertainty : np.array
+            If given, we assume it to be the std dev. of a Gaussian
+            over the position and draw an uncertainty ellipse over the position.          
+        aleatoric_uncertainty : np.array
+            Not used currently.
         """
 
-        # Check if obs is a 2-D tensor of observations, obtained possibly from an ensemble,
-        # so as to estimate some level of epistemic uncertainty from them:
-        if len(obs.shape) == 2:
-            epi_unc = True
-            mean = np.mean(obs, axis=0)
-            std_dev = np.std(obs, axis=0)
-            obs = mean
-        else:
-            epi_unc = False
+        epi_unc = True if epistemic_uncertainty is not None else False
 
         concatenated_image = []
         # For relevant/irrelevant sub-spaces:
         concatenated_image.append(self.generate_image(obs[self.relevant_indices], 
-                                                      epistemic_uncertainty=std_dev[self.relevant_indices] 
+                                                      epistemic_uncertainty=epistemic_uncertainty[self.relevant_indices] 
                                                       if epi_unc else None))
         if self.irrelevant_features:
             irr_image = self.generate_image(
-                obs[self.irrelevant_indices], relevant=False, epistemic_uncertainty=std_dev[self.irrelevant_indices]
+                obs[self.irrelevant_indices], relevant=False, epistemic_uncertainty=epistemic_uncertainty[self.irrelevant_indices]
                 if epi_unc else None
             )
             concatenated_image.append(irr_image)
@@ -250,7 +247,11 @@ class ImageContinuous(Box):
         Converts a continuous vector from the feature space of the object 
         to an integer pixel position in the image representation space by default.
         If scale_only is True, we return the vector scaled by the ratio of
-        image size to feature space size.
+        image size to feature space size. This is useful for scaling, e.g.,
+        the std. dev. of a Gaussian over the position to draw an uncertainty
+        ellipse over the position, where the std dev does not have to be shifted
+        around a new origin.
+
 
         Parameters
         ----------
