@@ -2487,10 +2487,12 @@ class RLToyEnv(gym.Env):
                 return self.curr_obs
             
 
-    def imagine_and_render(self, actions, state=None,):
+    def imagine_and_render(self, actions, state=None, render=True):
         """
         Performs steps in a deep copy of the environment with an action
-        sequence and then renders the resulting trajectory and returns the rendered RGB images.
+        sequence and then optionally renders the resulting trajectory and returns the rendered RGB images.
+        If render is False, returns the observations created by stepping in the env 
+        using actions instead of rendered images.
 
         Currently, render_mode is hardcoded to "rgb_array" for the copied environment. 
         Would need to look deeper into pygame, e.g. for how to instantiate mutliple windows
@@ -2522,11 +2524,16 @@ class RLToyEnv(gym.Env):
 
         # Perform the rollout with the actions provided:
         rgb_arrays = []
+        obs_array = []
         for action in actions:
             obs, reward, done, truncated, _ = env_copy.step(action)
-            rgb_array = env_copy.render()
-            rgb_arrays.append(rgb_array)
+            if render:
+                rgb_array = env_copy.render()
+                rgb_arrays.append(rgb_array)
+            obs_array.append(obs)
 
+        if not render:
+            return obs_array
         return rgb_arrays
 
 

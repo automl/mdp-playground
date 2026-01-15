@@ -21,6 +21,23 @@
 # MDP Playground
 A python package to inject low-level dimensions of hardness in RL environments. There are toy environments to design and debug RL agents. And complex environment wrappers for Gym environments (inclduing Atari and Mujoco) to test robustness to these dimensions in complex environments.
 
+## Quick Start
+Example to inject hardness (reward delay and reward noise) into 2 Gymnasium environments: a toy environment and using the Gymnasium wrapper for an Atari environment:
+
+```python
+from mdp_playground.envs import
+RLToyEnv, GymEnvWrapper
+config = {
+’state_space_type’: ’discrete’,
+’action_space_size’: 8,
+’delay’: 1,
+’reward_noise’: 0.25,
+}
+env = RLToyEnv(**config)
+ae = gym.make("QbertNoFrameskip-v4")
+env = GymEnvWrapper(ae, **config)
+```
+
 ## Getting started
 There are 4 parts to the package:
 1) **Toy Environments**: The base toy Environment in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py) implements the toy environment functionality, including discrete and continuous environments, and is parameterised by a `config` dict which contains all the information needed to instantiate the required toy MDP. Please see [`example.py`](example.py) for some simple examples of how to use these. For further details, please refer to the documentation in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py).
