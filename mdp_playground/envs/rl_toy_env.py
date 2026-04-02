@@ -2490,13 +2490,21 @@ class RLToyEnv(gym.Env):
     def imagine_and_render(self, actions, state=None, render=True):
         """
         Performs steps in a deep copy of the environment with an action
-        sequence and then optionally renders the resulting trajectory and returns the rendered RGB images.
+        sequence and then optionally renders the resulting trajectory and 
+        returns the rendered RGB images. It's called "imagine" and not "rollout"
+        because performing steps in a copy of the environment means that the
+        original environment and its state is not affected by the actions rolled
+        out here.
         If render is False, returns the observations created by stepping in the env 
         using actions instead of rendered images.
 
-        Currently, render_mode is hardcoded to "rgb_array" for the copied environment. 
+        Notes:
+        1) Currently, render_mode is hardcoded to "rgb_array" for the copied environment. 
         Would need to look deeper into pygame, e.g. for how to instantiate mutliple windows
-        to support "human" render_mode as well.
+        to support "human" render_mode as well. 
+        2) Ideally, the rollout and render would be separated but currently the render() is
+        based on the current state of the environment, so separating is going to be harder.
+
 
         Parameters
         ----------

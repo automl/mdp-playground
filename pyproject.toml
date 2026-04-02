@@ -1,0 +1,87 @@
+[project]
+name = "mdp-playground"
+version = "1.0.0"
+description = "A python package to design and debug RL agents"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "ale-py>=0.11.2",
+    "dill>=0.4.1",
+    "gymnasium>=1.2.2",
+    "numpy>=2.4.2",
+    "scipy>=1.17.0",
+    "pillow>=12.2.0",                  # Image processing
+]
+license = { text = "Apache License, Version 2.0" }
+
+authors = [
+  { name = "Raghu Rajan" },
+  { name = "Jessica Borja" },
+  { name = "Suresh Guttikonda" },
+  { name = "Fabio Ferreira" },
+  { name = "Jan Ole von Hartz" },
+  { name = "André Biedenkapp" },
+  { name = "Frank Hutter" }
+]
+
+maintainers = [
+  { name = "Raghu Rajan", email = "rajanr@cs.uni-freiburg.de" }
+]
+
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+  "Natural Language :: English",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+[project.urls]
+Homepage = "https://github.com/automl/mdp-playground"
+"Bug Tracker" = "https://github.com/automl/mdp-playground/issues"
+
+
+[project.optional-dependencies]
+# A single consolidated extra containing all environment and analysis tools. Many of these haven't been tested yet.
+extras = [
+    # "ray[default,rllib]>=2.54.1",
+    # "tensorflow>=2.21.0",
+    # "tensorflow-probability>=0.23.0",
+    "gymnasium[atari,other]>=1.2.2",
+    "mujoco>=3.1.0",
+    "configspace>=1.2.2",
+    "pandas>=3.0.0",
+    "scipy>=1.17.1",
+    "matplotlib>=3.10.8",              # Plotting
+    "opencv-python>=4.13.0.92",        # CV2
+    # "opencv-python-headless>=4.13.0.92",
+    "requests>=2.31.0",
+]
+
+# hpo_analysis = [
+#   "cave>=1.4.0"
+# ]
+
+[project.scripts]
+run-mdpp-experiments = "mdp_playground.scripts.run_experiments:cli"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.setuptools.package-data]
+"*" = ["*"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
+
+[tool.uv]
+package = true

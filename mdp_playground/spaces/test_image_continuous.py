@@ -52,7 +52,7 @@ class TestImageContinuous(unittest.TestCase):
         img1 = Image.fromarray(np.squeeze(imc.generate_image(pos)), "RGB")
         if render:
             img1.show()
-        img1.save("cont_state_target.pdf")
+        img1.save("cont_state_target.pdf", format="PDF")
 
         # Terminal sub-spaces
         lows = np.array([2.0, 4.0])

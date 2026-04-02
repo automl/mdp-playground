@@ -38,6 +38,9 @@ ae = gym.make("QbertNoFrameskip-v4")
 env = GymEnvWrapper(ae, **config)
 ```
 
+## Important Note
+We are moving to package management with `uv` and away from using Ray Rllib, so some experiment / agent running functionality might break. The wrappers and toy environment should still work fine though.
+
 ## Getting started
 There are 4 parts to the package:
 1) **Toy Environments**: The base toy Environment in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py) implements the toy environment functionality, including discrete and continuous environments, and is parameterised by a `config` dict which contains all the information needed to instantiate the required toy MDP. Please see [`example.py`](example.py) for some simple examples of how to use these. For further details, please refer to the documentation in [`mdp_playground/envs/rl_toy_env.py`](mdp_playground/envs/rl_toy_env.py).
